@@ -1,10 +1,16 @@
 import Link from 'next/link';
 
 import { brands } from '@/lib/malamal-content';
+import { SeoScripts } from '@/components/SeoScripts';
+import { shopByBrandsMetadata, shopByBrandsSchemas } from '@/lib/seo';
+
+export const metadata = shopByBrandsMetadata;
 
 export default function ShopByBrandsPage() {
   return (
-    <main className="flex-1 bg-[#f5f6f8] pb-16">
+    <>
+      <SeoScripts data={shopByBrandsSchemas} />
+      <main className="flex-1 bg-[#f5f6f8] pb-16">
       <div className="mx-auto w-full max-w-350 px-4 py-6 lg:px-6">
         <section className="rounded-3xl bg-[#0e2f56] p-6 text-white shadow-sm sm:p-8">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-white/65">
@@ -29,6 +35,7 @@ export default function ShopByBrandsPage() {
           ))}
         </section>
       </div>
-    </main>
+      </main>
+    </>
   );
 }

@@ -9,13 +9,16 @@ export type Product = {
   sku: string;
   stock: string;
   rating: string;
+  category: string;
 };
 
 export type Category = {
   name: string;
+  slug: string;
   href: string;
   image: string;
   description: string;
+  accent: string;
 };
 
 export type Brand = {
@@ -26,51 +29,67 @@ export type Brand = {
 export const topCategories: Category[] = [
   {
     name: 'Air Cooler & Fans',
-    href: '/shop',
+    slug: 'air-cooler-fans',
+    href: '/category/air-cooler-fans',
     image: '/category-air-cooler.svg',
     description: 'Air cooler, ceiling fan, exhaust fan and accessories.',
+    accent: 'from-[#0e2f56] to-[#163f77]',
   },
   {
     name: 'Cleaning & Maintenance',
-    href: '/shop',
+    slug: 'cleaning-maintenance',
+    href: '/category/cleaning-maintenance',
     image: '/category-cleaning.svg',
     description: 'Vacuum, washing, disinfection and plumbing tools.',
+    accent: 'from-[#4d6b92] to-[#90a4c8]',
   },
   {
     name: 'Construction Machinery',
-    href: '/shop',
+    slug: 'construction-machinery',
+    href: '/category/construction-machinery',
     image: '/category-construction.svg',
     description: 'Heavy-duty tools for site and workshop work.',
+    accent: 'from-[#5f2d1f] to-[#c56c47]',
   },
   {
     name: 'Electrical Tools',
-    href: '/shop',
+    slug: 'electrical-tools',
+    href: '/category/electrical-tools',
     image: '/category-electrical.svg',
     description: 'Generators, lights, cables and electrical accessories.',
+    accent: 'from-[#233647] to-[#5a7288]',
   },
   {
     name: 'Power Tools',
-    href: '/shop',
+    slug: 'power-tools',
+    href: '/category/power-tools',
     image: '/category-power-tools.svg',
     description: 'Drills, saws, grinders and workshop tools.',
+    accent: 'from-[#f15a24] to-[#f89c57]',
   },
   {
     name: 'Welding & Cutting',
-    href: '/shop',
+    slug: 'welding-cutting',
+    href: '/category/welding-cutting',
     image: '/category-welding.svg',
     description: 'Welding machines, cutters and consumables.',
+    accent: 'from-[#5f2d1f] to-[#c56c47]',
   },
   {
     name: 'Commercial Packaging',
-    href: '/shop',
+    slug: 'commercial-packaging',
+    href: '/category/commercial-packaging',
     image: '/category-packaging.svg',
     description: 'Taping, sealing and packaging machines.',
+    accent: 'from-[#233647] to-[#5a7288]',
   },
   {
     name: 'Material Handling',
-    href: '/shop',
+    slug: 'material-handling',
+    href: '/category/material-handling',
     image: '/category-handling.svg',
     description: 'Crane, hoist, mixer and handling equipment.',
+    accent: 'from-[#3d5a48] to-[#80a27c]',
   },
 ];
 
@@ -87,6 +106,7 @@ export const featuredProducts: Product[] = [
     sku: '10916',
     stock: 'In stock',
     rating: '4.8',
+    category: 'Welding & Cutting',
   },
   {
     title: '23L Vacuum Cleaner 2100W SANFORD-SF23L-2100W (Malaysia)',
@@ -100,6 +120,7 @@ export const featuredProducts: Product[] = [
     sku: '14090',
     stock: 'In stock',
     rating: '5.0',
+    category: 'Cleaning & Maintenance',
   },
   {
     title: '12V/24V Battery Charger Brand INGCO – ING-CB1601',
@@ -113,6 +134,7 @@ export const featuredProducts: Product[] = [
     sku: '13168',
     stock: 'In stock',
     rating: '4.9',
+    category: 'Electrical Tools',
   },
   {
     title: 'High Pressure Car Washer 1500W 100bar Brand TOTAL – TGT11236',
@@ -126,6 +148,7 @@ export const featuredProducts: Product[] = [
     sku: '12086',
     stock: 'In stock',
     rating: '4.7',
+    category: 'Cleaning & Maintenance',
   },
   {
     title: 'Electric Mini Crane with Rope Hoist 500 Kg 50 Mtr Winch',
@@ -139,6 +162,7 @@ export const featuredProducts: Product[] = [
     sku: '13981',
     stock: 'In stock',
     rating: '4.8',
+    category: 'Material Handling',
   },
 ];
 
@@ -155,6 +179,7 @@ export const latestProducts: Product[] = [
     sku: '12166',
     stock: 'In stock',
     rating: '4.6',
+    category: 'Construction Machinery',
   },
   {
     title: '80L Industrial Vacuum Cleaner 4500W CHINA WET & DRY BAOLYWUD Brand',
@@ -168,6 +193,7 @@ export const latestProducts: Product[] = [
     sku: '11062',
     stock: 'In stock',
     rating: '4.5',
+    category: 'Cleaning & Maintenance',
   },
   {
     title: 'Electric Router 2200W Brand Total – TR11122',
@@ -181,6 +207,7 @@ export const latestProducts: Product[] = [
     sku: '12138',
     stock: 'In stock',
     rating: '4.8',
+    category: 'Power Tools',
   },
   {
     title: 'Bench Grinder Machine 8" 200mm 350W Brand INGCO – BG83502',
@@ -194,6 +221,7 @@ export const latestProducts: Product[] = [
     sku: '12788',
     stock: 'In stock',
     rating: '4.6',
+    category: 'Power Tools',
   },
   {
     title: '13mm Impact Drill 750w Brand Total – TG108136',
@@ -207,6 +235,7 @@ export const latestProducts: Product[] = [
     sku: '13748',
     stock: 'In stock',
     rating: '4.4',
+    category: 'Power Tools',
   },
 ];
 
@@ -223,6 +252,7 @@ export const offerProducts: Product[] = [
     sku: '12166',
     stock: 'In stock',
     rating: '4.6',
+    category: 'Construction Machinery',
   },
   {
     title: 'Lithium-Lon Vacuum Cleaner With Battery & Charger Brand Ingco – CVL12001',
@@ -236,6 +266,7 @@ export const offerProducts: Product[] = [
     sku: '12890',
     stock: 'In stock',
     rating: '4.7',
+    category: 'Cleaning & Maintenance',
   },
   {
     title: '235mm (9-1/4”) Circular Saw 2200W INGCO – CS23522',
@@ -249,6 +280,7 @@ export const offerProducts: Product[] = [
     sku: '14018',
     stock: 'In stock',
     rating: '4.8',
+    category: 'Power Tools',
   },
   {
     title: 'Automatic Box Carton Taping Machine – PACKWELL FXC-4030',
@@ -262,6 +294,7 @@ export const offerProducts: Product[] = [
     sku: '047836',
     stock: 'In stock',
     rating: '4.9',
+    category: 'Commercial Packaging',
   },
   {
     title: 'Fogger Machine MS/SY-5000 for HouseHold Use Bundle Offer',
@@ -275,6 +308,7 @@ export const offerProducts: Product[] = [
     sku: '11922',
     stock: 'In stock',
     rating: '4.5',
+    category: 'Cleaning & Maintenance',
   },
 ];
 
@@ -349,42 +383,66 @@ export const policySections = [
 export const categoryShowcase = [
   {
     title: 'Cleaning & maintenance',
-    href: '/shop',
+    slug: 'cleaning-maintenance',
+    href: '/category/cleaning-maintenance',
     description:
       'Vacuum cleaners, washers, foggers, disinfection and maintenance gear.',
     accent: 'from-[#0e2f56] to-[#163f77]',
   },
   {
     title: 'Ladder',
-    href: '/shop',
+    slug: 'ladder',
+    href: '/category/ladder',
     description: 'Aluminium ladders, step ladders and working platforms.',
     accent: 'from-[#4d6b92] to-[#90a4c8]',
   },
   {
     title: 'Power tools',
-    href: '/shop',
+    slug: 'power-tools',
+    href: '/category/power-tools',
     description: 'Drills, saws, routers and workshop essentials.',
     accent: 'from-[#f15a24] to-[#f89c57]',
   },
   {
     title: 'Welding & cutting',
-    href: '/shop',
+    slug: 'welding-cutting',
+    href: '/category/welding-cutting',
     description: 'Welding machines, cutters and industrial workshop machines.',
     accent: 'from-[#5f2d1f] to-[#c56c47]',
   },
   {
     title: 'Commercial packaging',
-    href: '/shop',
+    slug: 'commercial-packaging',
+    href: '/category/commercial-packaging',
     description: 'Taping, sealing, batching and packaging machines.',
     accent: 'from-[#233647] to-[#5a7288]',
   },
   {
     title: 'Material handling',
-    href: '/shop',
+    slug: 'material-handling',
+    href: '/category/material-handling',
     description: 'Mini crane, hoist, mixer and load handling systems.',
     accent: 'from-[#3d5a48] to-[#80a27c]',
   },
 ];
+
+export const categoryPages = Array.from(
+  new Map([...topCategories, ...categoryShowcase].map(category => [category.slug, category])).values(),
+);
+
+export type CategoryPageEntry = (typeof categoryPages)[number];
+
+export function findCategoryBySlug(slug: string) {
+  return categoryPages.find(category => category.slug === slug);
+}
+
+export function findCategoryByName(name: string) {
+  return categoryPages.find(category => ('name' in category ? category.name : category.title) === name);
+}
+
+export function getProductsByCategory(categoryName: string) {
+  return allProducts.filter(product => product.category === categoryName);
+}
 
 export const supportStats = [
   { value: '24/7', label: 'Ordering support' },

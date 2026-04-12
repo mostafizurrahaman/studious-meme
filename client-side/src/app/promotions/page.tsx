@@ -1,9 +1,15 @@
 import { ProductCard } from '@/components/ProductCard';
 import { offerProducts } from '@/lib/malamal-content';
+import { SeoScripts } from '@/components/SeoScripts';
+import { promotionsMetadata, promotionsSchemas } from '@/lib/seo';
+
+export const metadata = promotionsMetadata;
 
 export default function PromotionsPage() {
   return (
-    <main className="flex-1 bg-[#f5f6f8] pb-16">
+    <>
+      <SeoScripts data={promotionsSchemas} />
+      <main className="flex-1 bg-[#f5f6f8] pb-16">
       <div className="mx-auto w-full max-w-350 px-4 py-6 lg:px-6">
         <section className="rounded-3xl bg-linear-to-r from-[#f15a24] to-[#0e2f56] p-6 text-white shadow-sm sm:p-8">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-white/70">
@@ -39,6 +45,7 @@ export default function PromotionsPage() {
           </div>
         </section>
       </div>
-    </main>
+      </main>
+    </>
   );
 }

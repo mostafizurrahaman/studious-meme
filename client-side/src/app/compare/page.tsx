@@ -1,6 +1,9 @@
 import Image from 'next/image';
 
 import { featuredProducts } from '@/lib/malamal-content';
+import { compareMetadata } from '@/lib/seo';
+
+export const metadata = compareMetadata;
 
 export default function ComparePage() {
   const products = featuredProducts.slice(0, 3);

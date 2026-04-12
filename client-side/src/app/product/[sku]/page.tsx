@@ -5,10 +5,26 @@ import { notFound } from 'next/navigation';
 import { ProductCard } from '@/components/ProductCard';
 import { AddToCartButton } from '@/components/cart/AddToCartButton';
 import { allProducts, findProductBySku } from '@/lib/malamal-content';
+import { SeoScripts } from '@/components/SeoScripts';
+import { buildProductMetadata, buildProductSchemas } from '@/lib/seo';
 
 type Props = {
   params: Promise<{ sku: string }>;
 };
+
+export async function generateMetadata({ params }: Props) {
+  const { sku } = await params;
+  const product = findProductBySku(sku);
+
+  if (!product) {
+    return {
+      title: 'Product not found',
+      robots: { index: false, follow: false },
+    };
+  }
+
+  return buildProductMetadata(product);
+}
 
 export function generateStaticParams() {
   return Array.from(new Map(allProducts.map(product => [product.sku, product])).values()).map(product => ({
@@ -28,7 +44,9 @@ export default async function ProductPage({ params }: Props) {
   const gallery = [product.image, ...related.map(item => item.image)].slice(0, 4);
 
   return (
-    <main className="flex-1 bg-[#f5f6f8] pb-16">
+    <>
+      <SeoScripts data={buildProductSchemas(product)} />
+      <main className="flex-1 bg-[#f5f6f8] pb-16">
       <div className="mx-auto w-full max-w-310 px-4 py-6 lg:px-0">
         <nav className="text-xs font-semibold uppercase tracking-[0.24em] text-black/45">
           <Link href="/" className="hover:text-[#f15a24]">Home</Link> / <Link href="/shop" className="hover:text-[#f15a24]">Shop</Link> / {product.title}
@@ -184,6 +202,7 @@ export default async function ProductPage({ params }: Props) {
           </div>
         </section>
       </div>
-    </main>
+      </main>
+    </>
   );
 }

@@ -1,5 +1,8 @@
 import { ProductCard } from '@/components/ProductCard';
 import { latestProducts } from '@/lib/malamal-content';
+import { wishlistMetadata } from '@/lib/seo';
+
+export const metadata = wishlistMetadata;
 
 export default function WishlistPage() {
   return (

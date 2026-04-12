@@ -1,10 +1,16 @@
 import Link from 'next/link';
 
 import { categoryShowcase, topCategories } from '@/lib/malamal-content';
+import { SeoScripts } from '@/components/SeoScripts';
+import { mainCategoriesMetadata, mainCategoriesSchemas } from '@/lib/seo';
+
+export const metadata = mainCategoriesMetadata;
 
 export default function MainCategoriesPage() {
   return (
-    <main className="flex-1 bg-[#f5f6f8] pb-16">
+    <>
+      <SeoScripts data={mainCategoriesSchemas} />
+      <main className="flex-1 bg-[#f5f6f8] pb-16">
       <div className="mx-auto w-full max-w-350 px-4 py-6 lg:px-6">
         <section className="rounded-3xl bg-white p-6 shadow-sm sm:p-8">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#f15a24]">
@@ -48,6 +54,7 @@ export default function MainCategoriesPage() {
           ))}
         </section>
       </div>
-    </main>
+      </main>
+    </>
   );
 }
