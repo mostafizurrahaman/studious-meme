@@ -116,7 +116,7 @@ export default async function ProductPage({ params }: Props) {
 
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
               <AddToCartButton product={product} />
-              <button type="button" className="inline-flex h-12 items-center justify-center rounded-full border border-[#0e2f56]/15 bg-[#0e2f56] px-6 text-sm font-bold text-white shadow-sm">
+              <button type="button" className="inline-flex h-12 cursor-pointer items-center justify-center rounded-full border border-[#0e2f56]/15 bg-[#0e2f56] px-6 text-sm font-bold text-white shadow-sm">
                 Add to wishlist
               </button>
             </div>

@@ -17,7 +17,7 @@ export function AddToCartButton({ product }: { product: Product }) {
         setAdded(true);
         window.setTimeout(() => setAdded(false), 1200);
       }}
-      className="inline-flex h-12 items-center justify-center rounded-full bg-[#0e2f56] px-6 text-[11px] font-semibold text-white transition hover:bg-[#f15a24]"
+      className="inline-flex h-12 cursor-pointer items-center justify-center rounded-full bg-[#0e2f56] px-6 text-[11px] font-semibold text-white transition hover:bg-[#f15a24]"
     >
       {added ? 'Added' : 'Add to cart'}
     </button>

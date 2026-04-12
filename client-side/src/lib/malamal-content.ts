@@ -1,6 +1,6 @@
 export type Product = {
   title: string;
-  href: string;
+  href: '/shop';
   image: string;
   price: string;
   oldPrice?: string;
@@ -15,7 +15,7 @@ export type Product = {
 export type Category = {
   name: string;
   slug: string;
-  href: string;
+  href: `/category/${string}`;
   image: string;
   description: string;
   accent: string;
@@ -23,7 +23,8 @@ export type Category = {
 
 export type Brand = {
   name: string;
-  href: string;
+  href: '/shop-by-brands';
+  image: string;
 };
 
 export const topCategories: Category[] = [
@@ -313,14 +314,54 @@ export const offerProducts: Product[] = [
 ];
 
 export const brands: Brand[] = [
-  { name: 'INGCO', href: '/shop-by-brands' },
-  { name: 'Total', href: '/shop-by-brands' },
-  { name: 'Winner', href: '/shop-by-brands' },
-  { name: 'Rivcen', href: '/shop-by-brands' },
-  { name: 'Sanford', href: '/shop-by-brands' },
-  { name: 'Packwell', href: '/shop-by-brands' },
-  { name: 'DCK', href: '/shop-by-brands' },
-  { name: 'WADFOW', href: '/shop-by-brands' },
+  {
+    name: 'INGCO',
+    href: '/shop-by-brands',
+    image:
+      'https://i0.wp.com/malamal.com.bd/wp-content/uploads/2024/01/openart-image_nfp4GZgE_1771756212999_raw.webp?fit=768%2C768&ssl=1',
+  },
+  {
+    name: 'Total',
+    href: '/shop-by-brands',
+    image:
+      'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a14e018223.png',
+  },
+  {
+    name: 'Winner',
+    href: '/shop-by-brands',
+    image:
+      'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a14e018223.png',
+  },
+  {
+    name: 'Rivcen',
+    href: '/shop-by-brands',
+    image:
+      'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a0f82c3507.png',
+  },
+  {
+    name: 'Sanford',
+    href: '/shop-by-brands',
+    image:
+      'https://i0.wp.com/malamal.com.bd/wp-content/uploads/2024/01/sanford-23litre-vacuum-cleaner-bangladesh-bd.webp?fit=600%2C600&ssl=1',
+  },
+  {
+    name: 'Packwell',
+    href: '/shop-by-brands',
+    image:
+      'https://malamal.com.bd/wp-content/uploads/2025/01/fxc-auto-carton-box-taping-machine.webp',
+  },
+  {
+    name: 'DCK',
+    href: '/shop-by-brands',
+    image:
+      'https://malamal.com.bd/wp-content/uploads/2024/01/Untitled-design-17.png',
+  },
+  {
+    name: 'WADFOW',
+    href: '/shop-by-brands',
+    image:
+      'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a14216ada7.png',
+  },
 ];
 
 export const contactChannels = [
@@ -380,7 +421,15 @@ export const policySections = [
   },
 ];
 
-export const categoryShowcase = [
+type CategoryShowcase = {
+  title: string;
+  slug: string;
+  href: `/category/${string}`;
+  description: string;
+  accent: string;
+};
+
+export const categoryShowcase: CategoryShowcase[] = [
   {
     title: 'Cleaning & maintenance',
     slug: 'cleaning-maintenance',
@@ -426,9 +475,17 @@ export const categoryShowcase = [
   },
 ];
 
-export const categoryPages = Array.from(
-  new Map([...topCategories, ...categoryShowcase].map(category => [category.slug, category])).values(),
-);
+export const categoryPages = (() => {
+  const pages = new Map<string, (typeof topCategories)[number] | (typeof categoryShowcase)[number]>();
+
+  for (const category of [...topCategories, ...categoryShowcase]) {
+    if (!pages.has(category.slug)) {
+      pages.set(category.slug, category);
+    }
+  }
+
+  return Array.from(pages.values());
+})();
 
 export type CategoryPageEntry = (typeof categoryPages)[number];
 

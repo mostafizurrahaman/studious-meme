@@ -59,7 +59,7 @@ export default function QuotationRequestPage() {
                 Message
                 <textarea className="min-h-36 rounded-2xl border border-black/10 px-4 py-3 outline-none" placeholder="Tell us about the project timeline, delivery location and special requirements" />
               </label>
-              <button type="button" className="inline-flex h-11 w-fit items-center justify-center rounded-full bg-[#f15a24] px-6 text-sm font-bold text-white">
+              <button type="button" className="inline-flex h-11 w-fit cursor-pointer items-center justify-center rounded-full bg-[#f15a24] px-6 text-sm font-bold text-white">
                 Request quotation
               </button>
             </form>

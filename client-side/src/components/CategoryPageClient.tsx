@@ -1,5 +1,6 @@
 'use client';
 
+import { type Route } from 'next';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { ProductCard } from '@/components/ProductCard';
@@ -178,7 +179,7 @@ export function CategoryPageClient({ category, products }: Props) {
     }
 
     const query = params.toString();
-    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    router.replace((query ? `${pathname}?${query}` : pathname) as Route, { scroll: false });
   }
 
   const activeLabel = activeFilters.includes('all')
@@ -216,7 +217,7 @@ export function CategoryPageClient({ category, products }: Props) {
                 key={filter.key}
                 type="button"
                 onClick={() => toggleFilter(filter.key)}
-                className={`rounded-full px-3 py-2 transition ${selected ? 'bg-[#0e2f56] text-white' : 'bg-[#f5f6f8] text-black/75'}`}
+                className={`cursor-pointer rounded-full px-3 py-2 transition ${selected ? 'bg-[#0e2f56] text-white' : 'bg-[#f5f6f8] text-black/75'}`}
               >
                 {filter.label}
               </button>
@@ -225,8 +226,8 @@ export function CategoryPageClient({ category, products }: Props) {
           {!activeFilters.includes('all') ? (
             <button
               type="button"
-              onClick={() => router.replace(pathname, { scroll: false })}
-              className="rounded-full bg-[#f15a24] px-3 py-2 text-white transition"
+              onClick={() => router.replace(pathname as never, { scroll: false })}
+              className="cursor-pointer rounded-full bg-[#f15a24] px-3 py-2 text-white transition"
             >
               Clear all
             </button>
@@ -246,7 +247,7 @@ export function CategoryPageClient({ category, products }: Props) {
                   key={filterKey}
                   type="button"
                   onClick={() => toggleFilter(filterKey)}
-                  className="inline-flex items-center gap-2 rounded-full bg-[#0e2f56] px-3 py-2 text-white transition hover:bg-[#163f77]"
+                  className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#0e2f56] px-3 py-2 text-white transition hover:bg-[#163f77]"
                 >
                   <span>{label}</span>
                   <span aria-hidden="true">×</span>

@@ -3,7 +3,7 @@ import type { Product } from '@/lib/malamal-content';
 export type CartItem = {
   sku: string;
   title: string;
-  href: string;
+  href: Product['href'];
   image: string;
   brand: string;
   unitPrice: number;

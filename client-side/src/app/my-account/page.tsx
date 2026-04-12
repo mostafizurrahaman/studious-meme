@@ -28,7 +28,7 @@ export default function MyAccountPage() {
               <div className="mt-5 grid gap-4">
                 <input className="h-11 rounded-xl border border-black/10 px-4 outline-none" placeholder="Email address" />
                 <input className="h-11 rounded-xl border border-black/10 px-4 outline-none" placeholder="Password" />
-                <button type="button" className="inline-flex h-11 w-fit items-center justify-center rounded-full bg-[#f15a24] px-6 text-sm font-bold text-white">
+                <button type="button" className="inline-flex h-11 w-fit cursor-pointer items-center justify-center rounded-full bg-[#f15a24] px-6 text-sm font-bold text-white">
                   Sign in
                 </button>
               </div>

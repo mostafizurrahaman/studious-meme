@@ -534,6 +534,7 @@ export const shopByBrandsSchemas = [
     brands.map(brand => ({
       name: brand.name,
       url: brand.href,
+      image: brand.image,
     })),
   ),
 ];

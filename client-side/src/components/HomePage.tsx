@@ -39,7 +39,7 @@ const heroSlides = [
       'https://malamal.com.bd/wp-content/uploads/2024/11/garage-tools-and-equipment-pc.webp',
     href: '/shop',
   },
-];
+] as const;
 
 function StatCard({ value, label }: { value: string; label: string }) {
   return (
@@ -84,7 +84,7 @@ export function HomePage() {
                 <Link
                   key={category.name}
                   href={category.href}
-                  className="flex items-center gap-3 rounded-xl border border-black/5 px-3 py-2 transition hover:border-[#f15a24]/30 hover:bg-[#fff8f4]"
+                  className="flex cursor-pointer items-center gap-3 rounded-xl border border-black/5 px-3 py-2 transition hover:border-[#f15a24]/30 hover:bg-[#fff8f4]"
                 >
                   <Image
                     src={category.image}
@@ -105,7 +105,7 @@ export function HomePage() {
               ))}
               <Link
                 href="/main-categories"
-                className="flex items-center gap-3 rounded-xl border border-dashed border-[#f15a24]/30 px-3 py-2 text-sm font-semibold text-[#f15a24]"
+                className="flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-[#f15a24]/30 px-3 py-2 text-sm font-semibold text-[#f15a24]"
               >
                 See all categories &gt;&gt;
               </Link>
@@ -130,13 +130,13 @@ export function HomePage() {
                   <div className="mt-7 flex flex-wrap gap-3">
                     <Link
                       href="/shop"
-                      className="inline-flex h-11 items-center justify-center rounded-full bg-[#f15a24] px-6 text-sm font-bold text-white"
+                      className="inline-flex h-11 cursor-pointer items-center justify-center rounded-full bg-[#f15a24] px-6 text-sm font-bold text-white"
                     >
                       Shop Now
                     </Link>
                     <Link
                       href="/promotions"
-                      className="inline-flex h-11 items-center justify-center rounded-full border border-white/20 bg-white/10 px-6 text-sm font-bold text-white"
+                      className="inline-flex h-11 cursor-pointer items-center justify-center rounded-full border border-white/20 bg-white/10 px-6 text-sm font-bold text-white"
                     >
                       View Promotions
                     </Link>
@@ -155,7 +155,7 @@ export function HomePage() {
                   <Link
                     key={slide.title}
                     href={slide.href}
-                    className="group relative min-h-38.5 overflow-hidden rounded-3xl border border-white/10 bg-[#1a2740] p-4 text-white shadow-sm lg:min-h-40"
+                    className="group relative min-h-38.5 cursor-pointer overflow-hidden rounded-3xl border border-white/10 bg-[#1a2740] p-4 text-white shadow-sm lg:min-h-40"
                   >
                     <Image
                       src={slide.image}
@@ -271,7 +271,7 @@ export function HomePage() {
             <Link
               key={card.title}
               href={card.href}
-              className={`group rounded-3xl bg-linear-to-br ${card.accent} p-6 text-white shadow-sm`}
+              className={`group cursor-pointer rounded-3xl bg-linear-to-br ${card.accent} p-6 text-white shadow-sm`}
             >
               <div className="text-[11px] font-semibold uppercase tracking-[0.32em] text-white/70">
                 Category spotlight
@@ -296,9 +296,18 @@ export function HomePage() {
               <Link
                 key={brand.name}
                 href={brand.href}
-                className="rounded-2xl border border-black/10 px-4 py-5 text-center text-sm font-bold text-black transition hover:border-[#f15a24]/30 hover:bg-[#fff8f4]"
+                className="rounded-2xl border border-black/10 px-4 py-5 text-center text-sm font-bold text-black transition hover:border-[#f15a24]/30 hover:bg-[#fff8f4] cursor-pointer"
               >
-                {brand.name}
+                <div className="mx-auto flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl bg-white shadow-sm">
+                  <Image
+                    src={brand.image}
+                    alt={brand.name}
+                    width={64}
+                    height={64}
+                    className="h-full w-full object-contain p-2"
+                  />
+                </div>
+                <div className="mt-3">{brand.name}</div>
               </Link>
             ))}
           </div>

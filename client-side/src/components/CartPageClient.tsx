@@ -80,12 +80,12 @@ export function CartPageClient() {
                   </div>
                   <div className="flex flex-col items-end gap-3">
                     <div className="flex items-center gap-2 rounded-full border border-black/10 px-2 py-1">
-                      <button type="button" onClick={() => decrease(item.sku)} className="px-2 text-lg leading-none text-black/70">−</button>
+                      <button type="button" onClick={() => decrease(item.sku)} className="cursor-pointer px-2 text-lg leading-none text-black/70">−</button>
                       <span className="min-w-6 text-center text-sm font-semibold">{item.quantity}</span>
-                      <button type="button" onClick={() => increase(item.sku)} className="px-2 text-lg leading-none text-black/70">+</button>
+                      <button type="button" onClick={() => increase(item.sku)} className="cursor-pointer px-2 text-lg leading-none text-black/70">+</button>
                     </div>
                     <div className="text-sm font-semibold text-black/70">{formatMoney(item.unitPrice * item.quantity)}</div>
-                    <button type="button" onClick={() => remove(item.sku)} className="text-xs font-semibold text-[#f15a24]">Remove</button>
+                    <button type="button" onClick={() => remove(item.sku)} className="cursor-pointer text-xs font-semibold text-[#f15a24]">Remove</button>
                   </div>
                 </div>
               ))
@@ -113,7 +113,7 @@ export function CartPageClient() {
                     setToast(success ? 'Coupon applied successfully.' : 'Coupon code was not recognized.');
                     window.setTimeout(() => setToast(''), 2200);
                   }}
-                  className="inline-flex h-11 items-center justify-center rounded-full bg-[#0e2f56] px-5 text-sm font-bold text-white"
+                  className="inline-flex h-11 cursor-pointer items-center justify-center rounded-full bg-[#0e2f56] px-5 text-sm font-bold text-white"
                 >
                   Apply coupon
                 </button>
@@ -124,7 +124,7 @@ export function CartPageClient() {
                       clearCoupon();
                       setCouponMessage('');
                     }}
-                    className="inline-flex h-11 items-center justify-center rounded-full border border-black/10 px-5 text-sm font-semibold text-black/70"
+                    className="inline-flex h-11 cursor-pointer items-center justify-center rounded-full border border-black/10 px-5 text-sm font-semibold text-black/70"
                   >
                     Remove
                   </button>
@@ -151,7 +151,7 @@ export function CartPageClient() {
               <Link href="/checkout" className="inline-flex h-11 items-center justify-center rounded-full bg-white px-6 text-sm font-bold text-[#0e2f56]">
                 Proceed to checkout
               </Link>
-              <button type="button" onClick={clear} className="inline-flex h-11 items-center justify-center rounded-full border border-white/20 px-6 text-sm font-bold text-white">
+              <button type="button" onClick={clear} className="inline-flex h-11 cursor-pointer items-center justify-center rounded-full border border-white/20 px-6 text-sm font-bold text-white">
                 Clear cart
               </button>
             </div>

@@ -1,8 +1,9 @@
+import type { Route } from 'next';
 import Link from 'next/link';
 
 type Props = {
   title: string;
-  actionHref?: string;
+  actionHref?: Route;
   actionLabel?: string;
 };
 

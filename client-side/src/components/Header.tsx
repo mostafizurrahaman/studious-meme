@@ -39,7 +39,7 @@ export function Header() {
 
           <div className="hidden items-center lg:flex">
             <details className="group relative">
-              <summary className="list-none rounded-full bg-[#0e2f56] px-4 py-3 text-sm font-semibold text-white outline-none [&::-webkit-details-marker]:hidden">
+              <summary className="list-none cursor-pointer rounded-full bg-[#0e2f56] px-4 py-3 text-sm font-semibold text-white outline-none [&::-webkit-details-marker]:hidden">
                 Categories
               </summary>
               <div className="absolute left-0 top-full z-20 mt-3 hidden w-240 rounded-3xl bg-white p-5 shadow-2xl ring-1 ring-black/5 group-open:block">
@@ -58,14 +58,14 @@ export function Header() {
                   <div>
                     <div className="text-xs font-bold uppercase tracking-[0.28em] text-[#f15a24]">Quick links</div>
                     <div className="mt-4 grid gap-2">
-                      {[
+                    {([
                         ['Shop', '/shop'],
                         ['Promotions', '/promotions'],
                         ['Main Categories', '/main-categories'],
                         ['Brands', '/shop-by-brands'],
                         ['Quotation Request', '/quotation-request'],
                         ['Our Contacts', '/our-contacts'],
-                      ].map(([label, href]) => (
+                      ] as const).map(([label, href]) => (
                         <Link key={label} href={href} className="rounded-2xl border border-black/8 px-4 py-3 hover:border-[#f15a24]/30 hover:bg-[#fff8f4]">
                           {label}
                         </Link>
@@ -96,7 +96,7 @@ export function Header() {
               />
               <button
                 type="button"
-                className="h-11 whitespace-nowrap bg-[#0e2f56] px-6 text-sm font-semibold text-white"
+                className="h-11 cursor-pointer whitespace-nowrap bg-[#0e2f56] px-6 text-sm font-semibold text-white"
               >
                 Search
               </button>
@@ -104,10 +104,10 @@ export function Header() {
           </div>
 
           <div className="ml-auto hidden items-center gap-3 md:flex">
-            {[
+            {([
               ['Compare', '/compare'],
               ['Wishlist', '/wishlist'],
-            ].map(([label, href]) => (
+            ] as const).map(([label, href]) => (
               <Link
                 key={label}
                 href={href}
@@ -149,12 +149,12 @@ export function Header() {
           </nav>
 
           <details className="group py-3 lg:hidden">
-            <summary className="list-none rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-black outline-none [&::-webkit-details-marker]:hidden">
+            <summary className="list-none cursor-pointer rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-black outline-none [&::-webkit-details-marker]:hidden">
               Menu
             </summary>
             <div className="mt-3 rounded-3xl bg-white p-4 shadow-lg ring-1 ring-black/5">
               <div className="grid gap-3">
-                {[
+                {([
                   ['Shop', '/shop'],
                   ['Promotions/Campaigns', '/promotions'],
                   ['Main Categories', '/main-categories'],
@@ -165,7 +165,7 @@ export function Header() {
                   ['Wishlist', '/wishlist'],
                   ['Cart', '/cart'],
                   ['My account', '/my-account'],
-                ].map(([label, href]) => (
+                ] as const).map(([label, href]) => (
                   <Link key={label} href={href} className="rounded-2xl border border-black/8 px-4 py-3 text-sm font-semibold text-black hover:border-[#f15a24]/30 hover:bg-[#fff8f4]">
                     {label}
                   </Link>
@@ -197,7 +197,7 @@ export function Header() {
               />
               <button
                 type="button"
-                className="h-11 whitespace-nowrap bg-[#0e2f56] px-6 text-sm font-semibold text-white"
+                className="h-11 cursor-pointer whitespace-nowrap bg-[#0e2f56] px-6 text-sm font-semibold text-white"
               >
                 Search
               </button>

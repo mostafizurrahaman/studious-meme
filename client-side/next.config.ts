@@ -2,15 +2,19 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   /* config options here */
+  reactStrictMode: true,
+  reactCompiler: true,
   images: {
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'malamal.com.bd',
+        pathname: '/wp-content/uploads/**',
       },
       {
         protocol: 'https',
         hostname: 'i0.wp.com',
+        pathname: '/malamal.com.bd/wp-content/uploads/**',
       },
     ],
   },

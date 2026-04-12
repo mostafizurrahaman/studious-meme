@@ -15,7 +15,7 @@ export function MiniCartDropdown() {
 
   return (
     <details className="group relative hidden md:block">
-      <summary className="list-none outline-none [&::-webkit-details-marker]:hidden">
+        <summary className="list-none cursor-pointer outline-none [&::-webkit-details-marker]:hidden">
         <div className="inline-flex h-11 items-center justify-center rounded-full border border-black/10 px-4 text-sm font-semibold text-black hover:border-[#f15a24]/30 hover:bg-[#fff8f4]">
           Cart
           <span className="ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#f15a24] px-1.5 text-[11px] font-bold leading-none text-white">
@@ -54,7 +54,7 @@ export function MiniCartDropdown() {
         </div>
         <Link
           href="/cart"
-          className="mt-4 inline-flex h-11 w-full items-center justify-center rounded-full bg-[#f15a24] px-6 text-sm font-bold text-white"
+          className="mt-4 inline-flex h-11 w-full cursor-pointer items-center justify-center rounded-full bg-[#f15a24] px-6 text-sm font-bold text-white"
         >
           View cart
         </Link>

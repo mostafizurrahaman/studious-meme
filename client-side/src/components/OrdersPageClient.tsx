@@ -68,7 +68,7 @@ export function OrdersPageClient() {
                   <button
                     type="button"
                     onClick={() => addItems(order.items)}
-                    className="inline-flex h-10 items-center justify-center rounded-full border border-black/10 px-4 text-sm font-semibold text-black/75"
+                      className="inline-flex h-10 cursor-pointer items-center justify-center rounded-full border border-black/10 px-4 text-sm font-semibold text-black/75"
                   >
                     Reorder
                   </button>
@@ -76,7 +76,7 @@ export function OrdersPageClient() {
                     <button
                       type="button"
                       onClick={() => updateOrderStatus(order.id, 'Cancelled')}
-                      className="inline-flex h-10 items-center justify-center rounded-full border border-[#f15a24]/30 px-4 text-sm font-semibold text-[#f15a24]"
+                      className="inline-flex h-10 cursor-pointer items-center justify-center rounded-full border border-[#f15a24]/30 px-4 text-sm font-semibold text-[#f15a24]"
                     >
                       Cancel order
                     </button>
@@ -85,7 +85,7 @@ export function OrdersPageClient() {
                     <button
                       type="button"
                       onClick={() => updateOrderStatus(order.id, 'Processing')}
-                      className="inline-flex h-10 items-center justify-center rounded-full border border-[#0e2f56]/20 px-4 text-sm font-semibold text-[#0e2f56]"
+                      className="inline-flex h-10 cursor-pointer items-center justify-center rounded-full border border-[#0e2f56]/20 px-4 text-sm font-semibold text-[#0e2f56]"
                     >
                       Mark processing
                     </button>
@@ -94,7 +94,7 @@ export function OrdersPageClient() {
                     <button
                       type="button"
                       onClick={() => updateOrderStatus(order.id, 'Delivered')}
-                      className="inline-flex h-10 items-center justify-center rounded-full border border-[#459647]/20 px-4 text-sm font-semibold text-[#459647]"
+                      className="inline-flex h-10 cursor-pointer items-center justify-center rounded-full border border-[#459647]/20 px-4 text-sm font-semibold text-[#459647]"
                     >
                       Mark delivered
                     </button>

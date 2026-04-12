@@ -8,7 +8,7 @@ import { calculateOrderSummary } from '@/lib/coupons';
 type CartItem = {
   sku: string;
   title: string;
-  href: string;
+  href: '/shop';
   image: string;
   brand: string;
   unitPrice: number;

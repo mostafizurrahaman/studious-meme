@@ -168,7 +168,7 @@ export function CheckoutPageClient() {
               <button
                 type="submit"
                 disabled={pending}
-                className="inline-flex h-11 items-center justify-center rounded-full bg-[#f15a24] px-6 text-sm font-bold text-white disabled:opacity-70"
+                className="inline-flex h-11 cursor-pointer items-center justify-center rounded-full bg-[#f15a24] px-6 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {pending ? 'Submitting...' : 'Place order'}
               </button>

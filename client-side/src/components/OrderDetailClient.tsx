@@ -84,13 +84,13 @@ export function OrderDetailClient({ orderId }: { orderId: string }) {
               </div>
             </div>
             <div className="flex flex-wrap gap-2 print:hidden">
-              <button type="button" onClick={() => window.print()} className="inline-flex h-10 items-center justify-center rounded-full bg-[#0e2f56] px-4 text-sm font-semibold text-white">
+              <button type="button" onClick={() => window.print()} className="inline-flex h-10 cursor-pointer items-center justify-center rounded-full bg-[#0e2f56] px-4 text-sm font-semibold text-white">
                 Save PDF
               </button>
-              <button type="button" onClick={exportJson} className="inline-flex h-10 items-center justify-center rounded-full border border-black/10 px-4 text-sm font-semibold text-black/75">
+              <button type="button" onClick={exportJson} className="inline-flex h-10 cursor-pointer items-center justify-center rounded-full border border-black/10 px-4 text-sm font-semibold text-black/75">
                 Export JSON
               </button>
-              <button type="button" onClick={exportCsv} className="inline-flex h-10 items-center justify-center rounded-full border border-black/10 px-4 text-sm font-semibold text-black/75">
+              <button type="button" onClick={exportCsv} className="inline-flex h-10 cursor-pointer items-center justify-center rounded-full border border-black/10 px-4 text-sm font-semibold text-black/75">
                 Export CSV
               </button>
             </div>
@@ -160,21 +160,21 @@ export function OrderDetailClient({ orderId }: { orderId: string }) {
               {order.customer.address || 'No address saved.'}
             </div>
             <div className="mt-6 grid gap-3">
-              <button type="button" onClick={() => addItems(order.items)} className="inline-flex h-11 items-center justify-center rounded-full bg-white px-6 text-sm font-bold text-[#0e2f56]">
+                <button type="button" onClick={() => addItems(order.items)} className="inline-flex h-11 cursor-pointer items-center justify-center rounded-full bg-white px-6 text-sm font-bold text-[#0e2f56]">
                 Reorder
               </button>
               {order.status !== 'Cancelled' ? (
-                <button type="button" onClick={() => updateOrderStatus(order.id, 'Cancelled')} className="inline-flex h-11 items-center justify-center rounded-full border border-white/20 px-6 text-sm font-bold text-white">
+                <button type="button" onClick={() => updateOrderStatus(order.id, 'Cancelled')} className="inline-flex h-11 cursor-pointer items-center justify-center rounded-full border border-white/20 px-6 text-sm font-bold text-white">
                   Cancel order
                 </button>
               ) : null}
               {order.status === 'Placed' ? (
-                <button type="button" onClick={() => updateOrderStatus(order.id, 'Processing')} className="inline-flex h-11 items-center justify-center rounded-full border border-white/20 px-6 text-sm font-bold text-white">
+                <button type="button" onClick={() => updateOrderStatus(order.id, 'Processing')} className="inline-flex h-11 cursor-pointer items-center justify-center rounded-full border border-white/20 px-6 text-sm font-bold text-white">
                   Mark processing
                 </button>
               ) : null}
               {order.status === 'Processing' ? (
-                <button type="button" onClick={() => updateOrderStatus(order.id, 'Delivered')} className="inline-flex h-11 items-center justify-center rounded-full border border-white/20 px-6 text-sm font-bold text-white">
+                <button type="button" onClick={() => updateOrderStatus(order.id, 'Delivered')} className="inline-flex h-11 cursor-pointer items-center justify-center rounded-full border border-white/20 px-6 text-sm font-bold text-white">
                   Mark delivered
                 </button>
               ) : null}

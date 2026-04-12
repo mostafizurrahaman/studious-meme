@@ -50,8 +50,8 @@ export default function ComparePage() {
                     <th className="w-40 border-b border-black/8 bg-[#f5f6f8] px-4 py-4 text-left font-bold text-[#0e2f56]">
                       {label}
                     </th>
-                    {values.map(value => (
-                      <td key={`${label}-${value}`} className="border-b border-black/8 px-4 py-4 text-black/70">
+                    {values.map((value, index) => (
+                      <td key={`${label}-${index}-${products[index]?.sku ?? value}`} className="border-b border-black/8 px-4 py-4 text-black/70">
                         {value}
                       </td>
                     ))}
