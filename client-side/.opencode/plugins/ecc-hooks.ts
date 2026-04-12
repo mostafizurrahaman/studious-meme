@@ -137,8 +137,7 @@ export const ECCHooksPlugin: ECCHooksPluginFn = async ({
      * Action: Runs tsc --noEmit to check for type errors
      */
     "tool.execute.after": async (
-      input: { tool: string; callID?: string; args?: { filePath?: string; file_path?: string; path?: string } },
-      output: unknown
+      input: { tool: string; callID?: string; args?: { filePath?: string; file_path?: string; path?: string } }
     ) => {
       const filePath = getFilePath(input.args as Record<string, unknown>)
       if (input.tool === "edit" && filePath) {
