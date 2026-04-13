@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,7 @@ export function Header() {
     const categoriesRef = useRef<HTMLDetailsElement>(null);
     const menuRef = useRef<HTMLDetailsElement>(null);
     const cartRef = useRef<HTMLDetailsElement>(null);
+    const [mobileDrawerTab, setMobileDrawerTab] = useState<'categories' | 'menu'>('categories');
 
     useEffect(() => {
         const handlePointerDown = (event: PointerEvent) => {
@@ -97,32 +98,67 @@ export function Header() {
                                     className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background text-foreground"
                                     aria-label="My account"
                                 >
-                                    <span className="text-lg leading-none">◔</span>
+                                    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                        <path d="M20 21a8 8 0 0 0-16 0" />
+                                        <circle cx="12" cy="8" r="4" />
+                                    </svg>
                                 </Link>
                             </div>
                         </summary>
-                        <Card className="mt-3 p-4 shadow-lg ring-1 ring-black/5">
-                            <div className="grid gap-3">
-                                {(
-                                    [
-                                        ['Shop', '/shop'],
-                                        ['Promotions/Campaigns', '/promotions'],
-                                        ['Main Categories', '/main-categories'],
-                                        ['Shop By Brands', '/shop-by-brands'],
-                                        ['Delivery & Return', '/delivery-return'],
-                                        ['Terms & Condition', '/terms-and-condition'],
-                                        ['Quotation Request', '/quotation-request'],
-                                        ['Our Contacts', '/our-contacts'],
-                                        ['Compare', '/compare'],
-                                        ['Wishlist', '/wishlist'],
-                                        ['Cart', '/cart'],
-                                        ['My account', '/my-account'],
-                                    ] as const
-                                ).map(([label, href]) => (
-                                    <Link key={label} href={href} className={drawerLinkClass(href)} style={activeDrawerStyle(href)}>
-                                        {label}
-                                    </Link>
-                                ))}
+
+                        <Card className="mt-3 overflow-hidden rounded-none rounded-r-3xl p-0 shadow-2xl">
+                            <div className="grid grid-cols-2 border-b border-border text-sm font-bold uppercase tracking-[0.14em] text-foreground/45">
+                                <button
+                                    type="button"
+                                    onClick={() => setMobileDrawerTab('categories')}
+                                    className={`border-b-2 px-4 py-3 text-left transition ${mobileDrawerTab === 'categories' ? 'border-primary text-foreground' : 'border-transparent'}`}
+                                >
+                                    Categories
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setMobileDrawerTab('menu')}
+                                    className={`border-b-2 px-4 py-3 text-left transition ${mobileDrawerTab === 'menu' ? 'border-primary text-foreground' : 'border-transparent'}`}
+                                >
+                                    Menu
+                                </button>
+                            </div>
+
+                            <div className="max-h-[70vh] overflow-y-auto">
+                                {mobileDrawerTab === 'categories' ? (
+                                    <div className="grid">
+                                        {topCategories.map(category => (
+                                            <Link
+                                                key={category.name}
+                                                href={category.href}
+                                                onClick={() => setMobileDrawerTab('categories')}
+                                                className="border-b border-border px-4 py-4 text-sm font-semibold text-foreground transition hover:text-primary"
+                                            >
+                                                {category.name}
+                                            </Link>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="grid">
+                                        {(
+                                            [
+                                                ['Hardware Store', '/main-categories'],
+                                                ['Our Contacts', '/our-contacts'],
+                                                ['Delivery & Return', '/delivery-return'],
+                                                ['Wishlist', '/wishlist'],
+                                                ['Compare', '/compare'],
+                                            ] as const
+                                        ).map(([label, href], index) => (
+                                            <Link
+                                                key={label}
+                                                href={href}
+                                                className={`border-b border-border px-4 py-4 text-sm font-semibold transition ${index === 0 || index === 2 ? 'text-primary' : 'text-foreground'} hover:text-primary`}
+                                            >
+                                                {label}
+                                            </Link>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </Card>
                     </details>
@@ -137,7 +173,7 @@ export function Header() {
                             <Button
                                 type="button"
                                 variant="secondary"
-                                className="h-11 rounded-none px-4 text-sm font-semibold bg-primary text-white hover:bg-primary/80"
+                                className="h-11 rounded-none bg-primary px-4 text-sm font-semibold text-white hover:bg-primary/80"
                             >
                                 <span className="text-lg leading-none">⌕</span>
                             </Button>
@@ -408,26 +444,6 @@ export function Header() {
                 </Container>
             </div>
 
-            <div className="border-t border-border bg-background xl:hidden">
-                <Container>
-                    <div className="py-3">
-                        <div className="flex overflow-hidden rounded-full border border-border bg-background shadow-sm">
-                            <Input
-                                className="h-11 w-full rounded-none border-0 bg-background px-4 text-sm text-foreground placeholder:text-foreground/45 shadow-none focus-visible:ring-0"
-                                placeholder="Search for products"
-                                aria-label="Search"
-                            />
-                            <Button
-                                type="button"
-                                variant="secondary"
-                                className="h-11 rounded-none px-6 text-sm font-semibold"
-                            >
-                                Search
-                            </Button>
-                        </div>
-                    </div>
-                </Container>
-            </div>
         </header>
     );
 }
