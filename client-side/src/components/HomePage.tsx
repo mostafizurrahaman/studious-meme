@@ -233,9 +233,9 @@ export function HomePage() {
                 <Link
                   key={brand.name}
                   href={brand.href}
-                  className="rounded-xl border border-black/10 px-4 py-5 text-center text-sm font-bold text-black transition hover:border-primary/30 hover:bg-primary cursor-pointer"
+                  className="rounded-xl border border-border px-4 py-5 text-center text-sm font-bold text-foreground transition hover:border-primary/30 hover:bg-primary hover:text-primary-foreground cursor-pointer"
                 >
-                  <div className="mx-auto flex h-20 w-20 items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm">
+                  <div className="mx-auto flex h-20 w-20 items-center justify-center overflow-hidden rounded-lg bg-background shadow-sm">
                     <Image
                       src={brand.image}
                       alt={brand.name}

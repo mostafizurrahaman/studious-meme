@@ -10,7 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { formatMoney } from '@/lib/cart';
 import { useCartStore } from '@/lib/cart-store';
 
-export function MiniCartDropdown() {
+export function MiniCartDropdown({ active = false }: { active?: boolean }) {
   const items = useCartStore(state => state.items);
   const count = useCartStore(state =>
     state.items.reduce((sum, item) => sum + item.quantity, 0),
@@ -22,7 +22,10 @@ export function MiniCartDropdown() {
   return (
     <details className="group relative hidden md:block">
       <summary className="list-none cursor-pointer outline-none [&::-webkit-details-marker]:hidden">
-        <div className="inline-flex h-11 items-center justify-center rounded-full border border-border px-4 text-sm font-semibold text-foreground transition hover:border-primary/30 hover:bg-primary/5">
+        <div
+          className="inline-flex h-11 items-center justify-center rounded-full border border-border px-4 text-sm font-semibold text-foreground transition hover:border-primary/30 hover:bg-primary/5"
+          style={active ? { backgroundColor: 'var(--primary)', borderColor: 'var(--primary)', color: '#ffffff' } : undefined}
+        >
           Cart
           <Badge className="ml-2 h-5 min-w-5 px-1.5 text-[11px] leading-none">{count}</Badge>
         </div>
