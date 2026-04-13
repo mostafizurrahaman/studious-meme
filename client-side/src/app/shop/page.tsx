@@ -1,5 +1,4 @@
 import Link from 'next/link';
-
 import { ProductCard } from '@/components/ProductCard';
 import { SeoScripts } from '@/components/SeoScripts';
 import { featuredProducts, latestProducts, topCategories } from '@/lib/malamal-content';

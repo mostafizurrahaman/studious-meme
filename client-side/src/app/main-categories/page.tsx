@@ -1,5 +1,4 @@
 import Link from 'next/link';
-
 import { categoryShowcase, topCategories } from '@/lib/malamal-content';
 import { SeoScripts } from '@/components/SeoScripts';
 import { mainCategoriesMetadata, mainCategoriesSchemas } from '@/lib/seo';

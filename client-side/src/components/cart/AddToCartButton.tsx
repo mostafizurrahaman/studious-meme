@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-
 import { useCartStore } from '@/lib/cart-store';
 import type { Product } from '@/lib/malamal-content';
 

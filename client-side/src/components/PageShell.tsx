@@ -1,5 +1,4 @@
 import type { PropsWithChildren } from 'react';
-
 import { Container } from '@/components/Container';
 
 type Props = PropsWithChildren<{

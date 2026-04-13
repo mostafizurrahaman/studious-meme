@@ -1,6 +1,5 @@
 import Image from 'next/image';
 import Link from 'next/link';
-
 import { brands } from '@/lib/malamal-content';
 import { SeoScripts } from '@/components/SeoScripts';
 import { shopByBrandsMetadata, shopByBrandsSchemas } from '@/lib/seo';

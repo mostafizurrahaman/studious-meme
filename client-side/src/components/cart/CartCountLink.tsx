@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-
 import { useCartStore } from '@/lib/cart-store';
 
 export function CartCountLink() {

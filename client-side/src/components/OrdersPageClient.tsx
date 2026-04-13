@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-
 import { formatMoney } from '@/lib/cart';
 import { useCartStore } from '@/lib/cart-store';
 

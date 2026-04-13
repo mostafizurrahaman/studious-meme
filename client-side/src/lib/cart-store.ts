@@ -2,7 +2,6 @@
 
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-
 import type { CartItem } from '@/lib/cart';
 import { toCartItem } from '@/lib/cart';
 import { coupons, isCouponActive } from '@/lib/coupons';

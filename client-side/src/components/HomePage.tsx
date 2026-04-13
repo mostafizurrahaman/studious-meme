@@ -1,6 +1,5 @@
 import Image from 'next/image';
 import Link from 'next/link';
-
 import {
   brands,
   categoryShowcase,
@@ -8,7 +7,6 @@ import {
   latestProducts,
   offerProducts,
 } from '@/lib/malamal-content';
-
 import { ProductCard } from '@/components/ProductCard';
 import { SectionHeading } from '@/components/SectionHeading';
 import { Container } from '@/components/Container';

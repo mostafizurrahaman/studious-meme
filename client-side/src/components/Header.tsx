@@ -1,6 +1,5 @@
 import Image from 'next/image';
 import Link from 'next/link';
-
 import { Container } from '@/components/Container';
 import { MiniCartDropdown } from '@/components/cart/MiniCartDropdown';
 import { brands, topCategories } from '@/lib/malamal-content';
@@ -32,38 +31,62 @@ export function Header() {
               <div className="absolute left-0 top-full z-20 mt-3 hidden w-240 rounded-3xl bg-white p-5 shadow-2xl ring-1 ring-black/5 group-open:block">
                 <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr_0.9fr]">
                   <div>
-                    <div className="text-xs font-bold uppercase tracking-[0.28em] text-[#f15a24]">Top categories</div>
+                    <div className="text-xs font-bold uppercase tracking-[0.28em] text-primary">
+                      Top categories
+                    </div>
                     <div className="mt-4 grid gap-2">
                       {topCategories.map(category => (
-                        <Link key={category.name} href={category.href} className="rounded-2xl border border-black/8 px-4 py-3 hover:border-[#f15a24]/30 hover:bg-[#fff8f4]">
-                          <div className="text-sm font-bold text-black">{category.name}</div>
-                          <div className="mt-1 text-xs font-normal text-black/55">{category.description}</div>
+                        <Link
+                          key={category.name}
+                          href={category.href}
+                          className="rounded-2xl border border-black/8 px-4 py-3 hover:border-primary/30 hover:bg-primary"
+                        >
+                          <div className="text-sm font-bold text-black">
+                            {category.name}
+                          </div>
+                          <div className="mt-1 text-xs font-normal text-black/55">
+                            {category.description}
+                          </div>
                         </Link>
                       ))}
                     </div>
                   </div>
                   <div>
-                    <div className="text-xs font-bold uppercase tracking-[0.28em] text-[#f15a24]">Quick links</div>
+                    <div className="text-xs font-bold uppercase tracking-[0.28em] text-primary">
+                      Quick links
+                    </div>
                     <div className="mt-4 grid gap-2">
-                    {([
-                        ['Shop', '/shop'],
-                        ['Promotions', '/promotions'],
-                        ['Main Categories', '/main-categories'],
-                        ['Brands', '/shop-by-brands'],
-                        ['Quotation Request', '/quotation-request'],
-                        ['Our Contacts', '/our-contacts'],
-                      ] as const).map(([label, href]) => (
-                        <Link key={label} href={href} className="rounded-2xl border border-black/8 px-4 py-3 hover:border-[#f15a24]/30 hover:bg-[#fff8f4]">
+                      {(
+                        [
+                          ['Shop', '/shop'],
+                          ['Promotions', '/promotions'],
+                          ['Main Categories', '/main-categories'],
+                          ['Brands', '/shop-by-brands'],
+                          ['Quotation Request', '/quotation-request'],
+                          ['Our Contacts', '/our-contacts'],
+                        ] as const
+                      ).map(([label, href]) => (
+                        <Link
+                          key={label}
+                          href={href}
+                          className="rounded-2xl border border-black/8 px-4 py-3 hover:border-primary/30 hover:bg-primary"
+                        >
                           {label}
                         </Link>
                       ))}
                     </div>
                   </div>
                   <div>
-                    <div className="text-xs font-bold uppercase tracking-[0.28em] text-[#f15a24]">Popular brands</div>
+                    <div className="text-xs font-bold uppercase tracking-[0.28em] text-primary">
+                      Popular brands
+                    </div>
                     <div className="mt-4 grid grid-cols-2 gap-2">
                       {brands.map(brand => (
-                        <Link key={brand.name} href={brand.href} className="rounded-2xl border border-black/8 px-4 py-3 text-center hover:border-[#f15a24]/30 hover:bg-[#fff8f4]">
+                        <Link
+                          key={brand.name}
+                          href={brand.href}
+                          className="rounded-2xl border border-black/8 px-4 py-3 text-center hover:border-primary/30 hover:bg-primary"
+                        >
                           {brand.name}
                         </Link>
                       ))}
@@ -91,14 +114,16 @@ export function Header() {
           </div>
 
           <div className="ml-auto hidden items-center gap-3 md:flex">
-            {([
-              ['Compare', '/compare'],
-              ['Wishlist', '/wishlist'],
-            ] as const).map(([label, href]) => (
+            {(
+              [
+                ['Compare', '/compare'],
+                ['Wishlist', '/wishlist'],
+              ] as const
+            ).map(([label, href]) => (
               <Link
                 key={label}
                 href={href}
-                className="inline-flex h-10 items-center justify-center rounded-full border border-black/10 px-3 text-xs font-semibold text-black hover:border-[#f15a24]/30 hover:bg-[#fff8f4]"
+                className="inline-flex h-10 items-center justify-center rounded-full border border-black/10 px-3 text-xs font-semibold text-black hover:border-primary/30 hover:bg-primary"
               >
                 {label}
               </Link>
@@ -113,7 +138,10 @@ export function Header() {
                 +880 9638212121
               </a>
             </div>
-            <Link className="rounded-full bg-[#f15a24] px-4 py-2 text-sm font-semibold text-white hover:bg-[#e45118]" href="/quotation-request">
+            <Link
+              className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary/80"
+              href="/quotation-request"
+            >
               Quotation Request
             </Link>
           </div>
@@ -125,26 +153,40 @@ export function Header() {
           <nav className="hidden min-h-12 items-center justify-between gap-4 py-2 text-xs font-semibold text-black lg:flex">
             <div className="flex flex-wrap items-center gap-5">
               <Link
-                className="inline-flex items-center rounded-full bg-[#f15a24] px-3 py-1.5 text-white"
+                className="inline-flex items-center rounded-full bg-primary px-3 py-1.5 text-white"
                 href="/main-categories"
               >
                 Categories
               </Link>
-              <Link className="hover:text-[#f15a24]" href="/shop">Shop</Link>
-              <Link className="hover:text-[#f15a24]" href="/promotions">Promotions/Campaigns</Link>
-              <Link className="hover:text-[#f15a24]" href="/shop-by-brands">Shop By Brands</Link>
-              <Link className="hover:text-[#f15a24]" href="/our-contacts">Our Contacts</Link>
+              <Link className="hover:text-primary" href="/shop">
+                Shop
+              </Link>
+              <Link className="hover:text-primary" href="/promotions">
+                Promotions/Campaigns
+              </Link>
+              <Link className="hover:text-primary" href="/shop-by-brands">
+                Shop By Brands
+              </Link>
+              <Link className="hover:text-primary" href="/our-contacts">
+                Our Contacts
+              </Link>
             </div>
             <div className="flex flex-wrap items-center gap-5">
               <Link
-                className="inline-flex items-center rounded-full bg-[#f15a24] px-3 py-1.5 text-white"
+                className="inline-flex items-center rounded-full bg-primary px-3 py-1.5 text-white"
                 href="/main-categories"
               >
                 All Categories
               </Link>
-              <Link className="hover:text-[#f15a24]" href="/delivery-return">Delivery & Return</Link>
-              <Link className="hover:text-[#f15a24]" href="/terms-and-condition">Terms & Condition</Link>
-              <Link className="hover:text-[#f15a24]" href="/my-account">My account</Link>
+              <Link className="hover:text-primary" href="/delivery-return">
+                Delivery & Return
+              </Link>
+              <Link className="hover:text-primary" href="/terms-and-condition">
+                Terms & Condition
+              </Link>
+              <Link className="hover:text-primary" href="/my-account">
+                My account
+              </Link>
             </div>
           </nav>
 
@@ -154,30 +196,42 @@ export function Header() {
             </summary>
             <div className="mt-3 rounded-3xl bg-white p-4 shadow-lg ring-1 ring-black/5">
               <div className="grid gap-3">
-                {([
-                  ['Shop', '/shop'],
-                  ['Promotions/Campaigns', '/promotions'],
-                  ['Main Categories', '/main-categories'],
-                  ['Shop By Brands', '/shop-by-brands'],
-                  ['Delivery & Return', '/delivery-return'],
-                  ['Terms & Condition', '/terms-and-condition'],
-                  ['Quotation Request', '/quotation-request'],
-                  ['Our Contacts', '/our-contacts'],
-                  ['Compare', '/compare'],
-                  ['Wishlist', '/wishlist'],
-                  ['Cart', '/cart'],
-                  ['My account', '/my-account'],
-                ] as const).map(([label, href]) => (
-                  <Link key={label} href={href} className="rounded-2xl border border-black/8 px-4 py-3 text-sm font-semibold text-black hover:border-[#f15a24]/30 hover:bg-[#fff8f4]">
+                {(
+                  [
+                    ['Shop', '/shop'],
+                    ['Promotions/Campaigns', '/promotions'],
+                    ['Main Categories', '/main-categories'],
+                    ['Shop By Brands', '/shop-by-brands'],
+                    ['Delivery & Return', '/delivery-return'],
+                    ['Terms & Condition', '/terms-and-condition'],
+                    ['Quotation Request', '/quotation-request'],
+                    ['Our Contacts', '/our-contacts'],
+                    ['Compare', '/compare'],
+                    ['Wishlist', '/wishlist'],
+                    ['Cart', '/cart'],
+                    ['My account', '/my-account'],
+                  ] as const
+                ).map(([label, href]) => (
+                  <Link
+                    key={label}
+                    href={href}
+                    className="rounded-2xl border border-black/8 px-4 py-3 text-sm font-semibold text-black hover:border-primary/30 hover:bg-primary"
+                  >
                     {label}
                   </Link>
                 ))}
               </div>
               <div className="mt-4">
-                <div className="text-xs font-bold uppercase tracking-[0.28em] text-[#f15a24]">Categories</div>
+                <div className="text-xs font-bold uppercase tracking-[0.28em] text-primary">
+                  Categories
+                </div>
                 <div className="mt-3 grid gap-2">
                   {topCategories.map(category => (
-                    <Link key={category.name} href={category.href} className="rounded-2xl border border-black/8 px-4 py-3 text-sm hover:border-[#f15a24]/30 hover:bg-[#fff8f4]">
+                    <Link
+                      key={category.name}
+                      href={category.href}
+                      className="rounded-2xl border border-black/8 px-4 py-3 text-sm hover:border-primary/30 hover:bg-primary"
+                    >
                       {category.name}
                     </Link>
                   ))}

@@ -1,6 +1,5 @@
 import Image from 'next/image';
 import Link from 'next/link';
-
 import { AddToCartButton } from '@/components/cart/AddToCartButton';
 import type { Product } from '@/lib/malamal-content';
 

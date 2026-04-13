@@ -1,5 +1,4 @@
 import Link from 'next/link';
-
 import { SeoScripts } from '@/components/SeoScripts';
 import { accountBenefits } from '@/lib/malamal-content';
 import { myAccountMetadata, myAccountSchemas } from '@/lib/seo';

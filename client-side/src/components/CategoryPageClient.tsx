@@ -2,7 +2,6 @@
 
 import { type Route } from 'next';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-
 import { ProductCard } from '@/components/ProductCard';
 import { parseMoney } from '@/lib/cart';
 import type { CategoryPageEntry, Product } from '@/lib/malamal-content';

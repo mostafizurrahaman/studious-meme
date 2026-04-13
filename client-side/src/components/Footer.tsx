@@ -1,5 +1,4 @@
 import Link from 'next/link';
-
 import { Container } from '@/components/Container';
 import { brands, contactChannels, topCategories } from '@/lib/malamal-content';
 

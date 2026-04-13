@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-
 import { parseMoney } from '@/lib/cart';
 import {
   brands,

@@ -3,7 +3,6 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import Link from 'next/link';
-
 import { topCategories } from '@/lib/malamal-content';
 
 export function FloatingCategoryRail() {

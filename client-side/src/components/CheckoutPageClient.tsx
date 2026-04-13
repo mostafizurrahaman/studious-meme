@@ -1,10 +1,8 @@
 'use client';
 
 import { useActionState, useEffect } from 'react';
-
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-
 import { formatMoney } from '@/lib/cart';
 import { useCartStore } from '@/lib/cart-store';
 import { submitCheckoutAction } from '@/app/checkout/actions';

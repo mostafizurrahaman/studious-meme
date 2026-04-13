@@ -1,5 +1,4 @@
 import Image from 'next/image';
-
 import { featuredProducts } from '@/lib/malamal-content';
 import { compareMetadata } from '@/lib/seo';
 
