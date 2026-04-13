@@ -23,6 +23,7 @@ export function Header() {
               width={182}
               height={36}
               priority
+              className="h-auto w-36 sm:w-[182px]"
             />
           </Link>
 

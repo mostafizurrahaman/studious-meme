@@ -66,12 +66,12 @@ export function ProductCard({ product }: Props) {
           <span>{product.stock}</span>
           <span>In catalog</span>
         </div>
-        <div className="flex gap-2 pt-1">
+        <div className="grid gap-2 pt-1 sm:flex">
           <AddToCartButton product={product} />
           <Button
             asChild
             variant="outline"
-            className="h-12 rounded-full border-border px-3 text-[11px] font-semibold text-foreground/70"
+            className="h-12 w-full rounded-full border-border px-3 text-[11px] font-semibold text-foreground/70 sm:w-auto"
           >
             <Link href={`/product/${product.sku}`}>View</Link>
           </Button>

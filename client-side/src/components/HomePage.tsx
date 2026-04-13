@@ -66,7 +66,7 @@ export function HomePage() {
           <section>
             <Card className="overflow-hidden shadow-sm">
               <div className="grid h-full gap-4 p-5 sm:p-6 lg:grid-cols-[1.22fr_0.78fr] lg:p-6">
-                <div className="ui-image-card relative min-h-125 overflow-hidden">
+                <div className="ui-image-card relative min-h-96 overflow-hidden sm:min-h-125">
                   <Image
                     src="https://malamal.com.bd/wp-content/uploads/2024/11/winner-welding-machine-pc.webp"
                     alt="Hero banner"
@@ -75,14 +75,14 @@ export function HomePage() {
                     className="object-cover"
                   />
                   <div className="absolute inset-0 bg-black/15" />
-                  <div className="absolute left-6 top-6 z-10 max-w-md text-white">
+                    <div className="absolute left-4 top-4 z-10 max-w-md text-white sm:left-6 sm:top-6">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/80">
                       Best Online Hardware Store
                     </p>
                     <h1 className="mt-2 max-w-lg text-3xl font-black leading-[1.05] sm:text-4xl">
                       The best offers on tools and machinery
                     </h1>
-                    <div className="mt-5 flex flex-wrap gap-2.5">
+                    <div className="mt-5 flex flex-col gap-2.5 sm:flex-row">
                       <Button asChild className="h-10 rounded-full px-4 text-sm font-bold shadow-sm">
                         <Link href="/shop">Shop Now</Link>
                       </Button>
