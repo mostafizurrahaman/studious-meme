@@ -1,42 +1,39 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Poppins, Inter } from 'next/font/google';
 import './globals.css';
-
 import { Footer } from '@/components/Footer';
+import { FloatingCategoryRail } from '@/components/FloatingCategoryRail';
 import { Header } from '@/components/Header';
 import { MobileToolbar } from '@/components/MobileToolbar';
 import { SeoScripts } from '@/components/SeoScripts';
 import { siteMetadata, siteSchemas } from '@/lib/seo';
+import { cn } from "@/lib/utils";
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
+const inter = Inter({subsets:['latin'],variable:'--font-sans'});
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
+const poppins = Poppins({
+    variable: '--font-poppins',
+    subsets: ['latin'],
+    weight: ['400', '500', '600', '700', '800', '900'],
 });
 
 export const metadata: Metadata = siteMetadata;
 
 export default function RootLayout({
-  children,
+    children,
 }: Readonly<{
-  children: React.ReactNode;
+    children: React.ReactNode;
 }>) {
-  return (
-    <html
-      lang="en-US"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-      >
-      <body className="min-h-full flex flex-col bg-white pb-16 text-black lg:pb-0">
-        <SeoScripts data={siteSchemas} />
-        <Header />
-        {children}
-        <Footer />
-        <MobileToolbar />
-      </body>
-    </html>
-  );
+    return (
+        <html lang="en-US" className={cn("h-full", "antialiased", poppins.variable, "font-sans", inter.variable)}>
+            <body className="storefront-layout min-h-full flex flex-col bg-white pb-16 text-black lg:pb-0">
+                <SeoScripts data={siteSchemas} />
+                <Header />
+                <FloatingCategoryRail />
+                {children}
+                <Footer />
+                <MobileToolbar />
+            </body>
+        </html>
+    );
 }

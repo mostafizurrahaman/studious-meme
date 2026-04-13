@@ -43,13 +43,16 @@ export default function MainCategoriesPage() {
             <Link
               key={card.title}
               href={card.href}
-              className="rounded-3xl bg-[#0e2f56] p-6 text-white shadow-sm"
+              className={`rounded-3xl bg-linear-to-br ${card.accent} p-6 text-white shadow-sm`}
             >
               <div className="text-xs font-semibold uppercase tracking-[0.3em] text-white/65">
                 Spotlight
               </div>
-              <h2 className="mt-4 text-2xl font-black">{card.title}</h2>
-              <p className="mt-3 text-sm leading-7 text-white/78">{card.description}</p>
+              <h2 className="mt-4 text-2xl font-black text-white">{card.title}</h2>
+              <p className="mt-3 text-sm leading-7 text-white/90">{card.description}</p>
+              <div className="mt-6 inline-flex items-center rounded-full bg-white/18 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm">
+                Explore category
+              </div>
             </Link>
           ))}
         </section>

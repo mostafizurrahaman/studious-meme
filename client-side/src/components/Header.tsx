@@ -7,22 +7,9 @@ import { brands, topCategories } from '@/lib/malamal-content';
 
 export function Header() {
   return (
-    <header className="w-full border-b border-black/10 bg-white shadow-sm">
-      <div className="bg-[#0e2f56] py-2 text-xs text-white">
-        <Container>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="font-semibold">
-              Welcome to Malamal.com.bd. Thank you for staying with Malamal.
-            </p>
-            <a className="font-semibold text-white/90" href="tel:+8809638212121">
-              Hotline: +880 9638212121
-            </a>
-          </div>
-        </Container>
-      </div>
-      <div className="h-2 bg-[#f15a24]" />
+    <header className="sticky top-0 z-40 w-full border-b border-black/10 bg-white text-black shadow-sm">
       <Container>
-        <div className="flex min-h-20 items-center gap-4 py-3 lg:min-h-20 lg:py-4">
+        <div className="flex min-h-18 items-center gap-4 py-2.5 lg:min-h-18 lg:py-3">
           <Link
             href="/"
             className="flex shrink-0 items-center"
@@ -31,8 +18,8 @@ export function Header() {
             <Image
               src="https://i0.wp.com/malamal.com.bd/wp-content/uploads/2024/01/Logo-Malamal.com_.bd_.png?ssl=1"
               alt="Malamal.com.bd"
-              width={192}
-              height={40}
+              width={182}
+              height={36}
               priority
             />
           </Link>
@@ -87,11 +74,11 @@ export function Header() {
             </details>
           </div>
 
-          <div className="hidden flex-1 items-center xl:flex">
+          <div className="hidden flex-1 items-center lg:flex">
             <div className="flex w-full overflow-hidden rounded-full border border-black/10 bg-white shadow-sm">
               <input
-                className="h-11 w-full px-4 text-sm outline-none"
-                placeholder="Search tools, machines and brands"
+                className="h-11 w-full bg-white px-4 text-sm text-black placeholder:text-black/45 outline-none"
+                placeholder="Search for products"
                 aria-label="Search"
               />
               <button
@@ -111,7 +98,7 @@ export function Header() {
               <Link
                 key={label}
                 href={href}
-                className="inline-flex h-11 items-center justify-center rounded-full border border-black/10 px-4 text-sm font-semibold text-black hover:border-[#f15a24]/30 hover:bg-[#fff8f4]"
+                className="inline-flex h-10 items-center justify-center rounded-full border border-black/10 px-3 text-xs font-semibold text-black hover:border-[#f15a24]/30 hover:bg-[#fff8f4]"
               >
                 {label}
               </Link>
@@ -135,15 +122,28 @@ export function Header() {
 
       <div className="border-t border-black/5 bg-[#f5f6f8]">
         <Container>
-          <nav className="hidden min-h-14 items-center justify-between gap-4 py-3 text-sm font-semibold text-black xl:flex">
-            <div className="flex flex-wrap items-center gap-6">
+          <nav className="hidden min-h-12 items-center justify-between gap-4 py-2 text-xs font-semibold text-black lg:flex">
+            <div className="flex flex-wrap items-center gap-5">
+              <Link
+                className="inline-flex items-center rounded-full bg-[#f15a24] px-3 py-1.5 text-white"
+                href="/main-categories"
+              >
+                Categories
+              </Link>
               <Link className="hover:text-[#f15a24]" href="/shop">Shop</Link>
               <Link className="hover:text-[#f15a24]" href="/promotions">Promotions/Campaigns</Link>
-              <Link className="hover:text-[#f15a24]" href="/main-categories">Main Categories</Link>
               <Link className="hover:text-[#f15a24]" href="/shop-by-brands">Shop By Brands</Link>
               <Link className="hover:text-[#f15a24]" href="/our-contacts">Our Contacts</Link>
             </div>
             <div className="flex flex-wrap items-center gap-5">
+              <Link
+                className="inline-flex items-center rounded-full bg-[#f15a24] px-3 py-1.5 text-white"
+                href="/main-categories"
+              >
+                All Categories
+              </Link>
+              <Link className="hover:text-[#f15a24]" href="/delivery-return">Delivery & Return</Link>
+              <Link className="hover:text-[#f15a24]" href="/terms-and-condition">Terms & Condition</Link>
               <Link className="hover:text-[#f15a24]" href="/my-account">My account</Link>
             </div>
           </nav>
@@ -159,6 +159,8 @@ export function Header() {
                   ['Promotions/Campaigns', '/promotions'],
                   ['Main Categories', '/main-categories'],
                   ['Shop By Brands', '/shop-by-brands'],
+                  ['Delivery & Return', '/delivery-return'],
+                  ['Terms & Condition', '/terms-and-condition'],
                   ['Quotation Request', '/quotation-request'],
                   ['Our Contacts', '/our-contacts'],
                   ['Compare', '/compare'],
@@ -191,8 +193,8 @@ export function Header() {
           <div className="py-3">
             <div className="flex overflow-hidden rounded-full border border-black/10 bg-white shadow-sm">
               <input
-                className="h-11 w-full px-4 text-sm outline-none"
-                placeholder="Search tools, machines and brands"
+                className="h-11 w-full bg-white px-4 text-sm text-black placeholder:text-black/45 outline-none"
+                placeholder="Search for products"
                 aria-label="Search"
               />
               <button

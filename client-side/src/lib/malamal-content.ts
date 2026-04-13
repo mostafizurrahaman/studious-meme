@@ -365,26 +365,31 @@ export const brands: Brand[] = [
 ];
 
 export const contactChannels = [
-  {
-    label: 'Hotline',
-    value: '+880 9638212121',
-    href: 'tel:+8809638212121',
-  },
-  {
-    label: 'Sales',
-    value: 'sales@malamal.com.bd',
-    href: 'mailto:sales@malamal.com.bd',
-  },
-  {
-    label: 'Support',
-    value: 'info@malamal.com.bd',
-    href: 'mailto:info@malamal.com.bd',
-  },
-  {
-    label: 'WhatsApp',
-    value: '+880 1972525821',
-    href: 'tel:+8801972525821',
-  },
+    {
+        label: 'Hotline',
+        value: '+880 9638212121',
+        href: 'tel:+8809638212121',
+    },
+    {
+        label: 'Sales',
+        value: 'sales@malamal.com.bd',
+        href: 'mailto:sales@malamal.com.bd',
+    },
+    {
+        label: 'Support',
+        value: 'info@malamal.com.bd',
+        href: 'mailto:info@malamal.com.bd',
+    },
+    {
+        label: 'WhatsApp',
+        value: '+880 1972525821',
+        href: 'https://wa.me/8801972525821',
+    },
+    {
+        label: 'B2B Sales',
+        value: '+880 1972525828',
+        href: 'tel:+8801972525828',
+    },
 ];
 
 export const accountBenefits = [
