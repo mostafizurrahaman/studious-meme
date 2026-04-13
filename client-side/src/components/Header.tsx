@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Container } from '@/components/Container';
@@ -43,10 +44,10 @@ export function Header() {
                           href={category.href}
                           className="rounded-2xl border border-border px-4 py-3 transition hover:border-primary/30 hover:bg-primary hover:text-primary-foreground"
                         >
-                          <div className="text-sm font-bold text-black">
+                  <div className="text-sm font-bold text-foreground">
                             {category.name}
                           </div>
-                          <div className="mt-1 text-xs font-normal text-black/55">
+                          <div className="mt-1 text-xs font-normal text-foreground/55">
                             {category.description}
                           </div>
                         </Link>
@@ -129,7 +130,7 @@ export function Header() {
             ))}
             <MiniCartDropdown />
             <div className="text-sm leading-tight">
-              <div className="font-semibold text-black">Dedicated Support</div>
+              <div className="font-semibold text-foreground">Dedicated Support</div>
               <a
                 className="font-semibold text-secondary"
                 href="tel:+8809638212121"
@@ -147,9 +148,9 @@ export function Header() {
         </div>
       </Container>
 
-      <div className="border-t border-black/5 bg-[#f5f6f8]">
+      <div className="border-t border-border bg-muted/70">
         <Container>
-          <nav className="hidden min-h-12 items-center justify-between gap-4 py-2 text-xs font-semibold text-black lg:flex">
+          <nav className="hidden min-h-12 items-center justify-between gap-4 py-2 text-xs font-semibold text-foreground lg:flex">
             <div className="flex flex-wrap items-center gap-5">
               <Link
                 className="inline-flex items-center rounded-full bg-primary px-3 py-1.5 text-primary-foreground"
@@ -190,10 +191,10 @@ export function Header() {
           </nav>
 
           <details className="group py-3 lg:hidden">
-            <summary className="list-none cursor-pointer rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-black outline-none [&::-webkit-details-marker]:hidden">
+            <summary className="list-none cursor-pointer rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold text-foreground outline-none [&::-webkit-details-marker]:hidden">
               Menu
             </summary>
-            <div className="mt-3 rounded-3xl bg-white p-4 shadow-lg ring-1 ring-black/5">
+            <Card className="mt-3 p-4 shadow-lg ring-1 ring-black/5">
               <div className="grid gap-3">
                 {(
                   [
@@ -236,17 +237,17 @@ export function Header() {
                   ))}
                 </div>
               </div>
-            </div>
+            </Card>
           </details>
         </Container>
       </div>
 
-      <div className="border-t border-black/5 bg-white xl:hidden">
+      <div className="border-t border-border bg-background xl:hidden">
         <Container>
           <div className="py-3">
-            <div className="flex overflow-hidden rounded-full border border-black/10 bg-white shadow-sm">
+            <div className="flex overflow-hidden rounded-full border border-border bg-background shadow-sm">
               <Input
-                className="h-11 w-full rounded-none border-0 bg-white px-4 text-sm text-black placeholder:text-black/45 shadow-none focus-visible:ring-0"
+                className="h-11 w-full rounded-none border-0 bg-background px-4 text-sm text-foreground placeholder:text-foreground/45 shadow-none focus-visible:ring-0"
                 placeholder="Search for products"
                 aria-label="Search"
               />

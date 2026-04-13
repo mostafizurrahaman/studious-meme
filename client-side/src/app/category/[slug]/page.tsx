@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import { CategoryPageClient } from '@/components/CategoryPageClient';
 import { SeoScripts } from '@/components/SeoScripts';
+import { Card } from '@/components/ui/card';
 import {
   categoryPages,
   findCategoryBySlug,
@@ -46,9 +47,9 @@ export default async function CategoryPage({ params }: Props) {
   return (
     <>
       <SeoScripts data={buildCategorySchemas(category)} />
-      <main className="flex-1 bg-[#f5f6f8] pb-16">
+      <main className="flex-1 bg-background pb-16">
         <div className="mx-auto w-full max-w-350 px-4 py-6 lg:px-6">
-          <nav aria-label="Breadcrumb" className="mb-4 text-sm text-black/55">
+          <nav aria-label="Breadcrumb" className="mb-4 text-sm text-foreground/55">
             <ol className="flex flex-wrap items-center gap-2">
               <li>
                 <Link href="/" className="cursor-pointer hover:text-primary">
@@ -65,27 +66,27 @@ export default async function CategoryPage({ params }: Props) {
                 </Link>
               </li>
               <li>/</li>
-              <li className="font-semibold text-black/75">{title}</li>
+                <li className="font-semibold text-foreground/75">{title}</li>
             </ol>
           </nav>
           <Suspense
             fallback={
-              <div className="rounded-3xl bg-white p-6 shadow-sm">
+              <Card className="p-6 shadow-sm">
                 Loading category...
-              </div>
+              </Card>
             }
           >
             <CategoryPageClient category={category} products={products} />
           </Suspense>
-          <section className="mt-6 flex items-center justify-between rounded-3xl bg-white p-4 text-sm shadow-sm">
-            <span className="text-black/60">Need a broader view?</span>
+          <Card className="mt-6 flex items-center justify-between p-4 text-sm shadow-sm">
+            <span className="text-foreground/60">Need a broader view?</span>
             <Link
               href="/main-categories"
               className="cursor-pointer font-semibold text-primary"
             >
               Back to categories
             </Link>
-          </section>
+          </Card>
         </div>
       </main>
     </>

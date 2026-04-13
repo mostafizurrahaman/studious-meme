@@ -31,7 +31,7 @@ export function MiniCartDropdown() {
       <Card className="absolute right-0 top-full z-30 mt-3 w-90 p-4 shadow-2xl">
         <div className="flex items-center justify-between">
           <div className="text-sm font-bold text-secondary">Mini cart</div>
-          <div className="text-xs font-semibold text-black/55">
+          <div className="text-xs font-semibold text-foreground/55">
             {count} items
           </div>
         </div>
@@ -51,10 +51,10 @@ export function MiniCartDropdown() {
                   />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="line-clamp-2 text-sm font-semibold text-black">
+                  <div className="line-clamp-2 text-sm font-semibold text-foreground">
                     {item.title}
                   </div>
-                  <div className="mt-1 text-xs text-black/55">
+                  <div className="mt-1 text-xs text-foreground/55">
                     Qty {item.quantity}
                   </div>
                 </div>
@@ -64,7 +64,7 @@ export function MiniCartDropdown() {
               </div>
             ))
           ) : (
-            <div className="rounded-2xl border border-dashed border-black/15 p-4 text-sm text-black/55">
+            <div className="rounded-2xl border border-dashed border-border p-4 text-sm text-foreground/55">
               Your cart is empty.
             </div>
           )}
@@ -75,7 +75,7 @@ export function MiniCartDropdown() {
         </div>
         <Button
           asChild
-          className="mt-4 h-11 w-full rounded-full px-6 text-sm font-bold"
+          className="mt-4 h-11 w-full rounded-full px-6 text-sm font-bold shadow-sm"
         >
           <Link href="/cart">View cart</Link>
         </Button>

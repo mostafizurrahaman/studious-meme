@@ -12,7 +12,7 @@ export default function DeliveryReturnPage() {
         title="Delivery & Return Policy"
         description="Delivery, return and refund policy for the storefront."
       >
-        <div className="grid gap-4 text-sm leading-7 text-black/70">
+        <div className="grid gap-4 text-sm leading-7 text-foreground/70">
           <p>
             Delivery details, shipping zones, return conditions and refund handling are
             outlined for the store experience.

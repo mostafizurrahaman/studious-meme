@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import Link from 'next/link';
+import { Card } from '@/components/ui/card';
 import { topCategories } from '@/lib/malamal-content';
 
 export function FloatingCategoryRail() {
@@ -14,8 +15,8 @@ export function FloatingCategoryRail() {
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
     >
-      <div
-        className={`overflow-hidden rounded-2xl bg-white/97 shadow-md ring-1 ring-black/10 backdrop-blur transition-[width] duration-200 ${
+      <Card
+        className={`overflow-hidden rounded-2xl shadow-md ring-1 ring-black/10 backdrop-blur transition-[width] duration-200 ${
           open ? 'w-72' : 'w-10'
         }`}
       >
@@ -25,9 +26,9 @@ export function FloatingCategoryRail() {
               =
             </span>
             <span
-              className={`text-sm font-bold text-white transition ${
+              className={`rounded-full bg-primary px-4 py-1.5 text-sm font-bold text-primary-foreground transition ${
                 open ? 'opacity-100' : 'w-0 overflow-hidden opacity-0'
-              } rounded-full bg-primary px-4 py-1.5 whitespace-nowrap`}
+              } whitespace-nowrap`}
             >
               Categories
             </span>
@@ -37,9 +38,9 @@ export function FloatingCategoryRail() {
             <Link
               key={category.name}
               href={category.href}
-              className="flex items-center gap-2 rounded-md px-0.5 py-1.5 hover:bg-[#f7f7f7]"
+              className="flex items-center gap-2 rounded-md px-0.5 py-1.5 hover:bg-muted"
             >
-              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border border-black/10 bg-white">
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border border-border bg-background">
                 <Image
                   src={category.image}
                   alt={category.name}
@@ -49,7 +50,7 @@ export function FloatingCategoryRail() {
                 />
               </span>
               <span
-                className={`text-sm text-black/85 whitespace-nowrap transition ${
+                className={`text-sm text-foreground/85 whitespace-nowrap transition ${
                   open ? 'opacity-100' : 'w-0 overflow-hidden opacity-0'
                 }`}
               >
@@ -60,16 +61,16 @@ export function FloatingCategoryRail() {
 
           <Link
             href="/main-categories"
-            className={`rounded-md px-1 py-1.5 text-sm font-semibold text-black/85 hover:bg-[#f7f7f7] whitespace-nowrap transition ${
+            className={`rounded-md px-1 py-1.5 text-sm font-semibold text-foreground/85 hover:bg-muted whitespace-nowrap transition ${
               open ? 'opacity-100' : 'h-0 overflow-hidden p-0 opacity-0'
             }`}
           >
             See All Categories &gt;&gt;
           </Link>
         </div>
-      </div>
+      </Card>
       <div
-        className={`pointer-events-none fixed inset-0 z-[-1] bg-black/35 transition ${
+        className={`pointer-events-none fixed inset-0 z-[-1] bg-secondary/35 transition ${
           open ? 'opacity-100' : 'opacity-0'
         }`}
       />

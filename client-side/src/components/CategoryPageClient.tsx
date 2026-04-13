@@ -4,6 +4,7 @@ import { type Route } from 'next';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { ProductCard } from '@/components/ProductCard';
 import { parseMoney } from '@/lib/cart';
 import type { CategoryPageEntry, Product } from '@/lib/malamal-content';
@@ -221,9 +222,7 @@ export function CategoryPageClient({ category, products }: Props) {
 
   return (
     <>
-      <section
-        className={`rounded-3xl bg-linear-to-r ${category.accent} p-6 text-white shadow-sm sm:p-8`}
-      >
+      <section className={`rounded-3xl bg-linear-to-r ${category.accent} p-6 text-white shadow-sm sm:p-8`}>
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-white/65">
           Category page
         </p>
@@ -233,16 +232,16 @@ export function CategoryPageClient({ category, products }: Props) {
         </p>
       </section>
 
-      <section className="mt-6 flex items-center justify-between rounded-3xl bg-white p-4 text-sm shadow-sm">
-        <span className="text-black/60">
+      <Card className="mt-6 flex items-center justify-between p-4 text-sm shadow-sm">
+        <span className="text-foreground/60">
           {visibleProducts.length} of {products.length} products shown
         </span>
         <span className="font-semibold text-primary capitalize">
           {activeLabel}
         </span>
-      </section>
+      </Card>
 
-      <section className="mt-6 rounded-3xl bg-white p-4 shadow-sm">
+      <Card className="mt-6 p-4 shadow-sm">
         <div className="flex flex-wrap gap-2 text-xs font-semibold">
           {filters.map(filter => {
             const selected = activeFilters.includes(filter.key);
@@ -252,7 +251,7 @@ export function CategoryPageClient({ category, products }: Props) {
                 key={filter.key}
                 type="button"
                 onClick={() => toggleFilter(filter.key)}
-                className={`h-auto cursor-pointer rounded-full px-3 py-2 text-xs font-semibold transition ${selected ? 'bg-[#0e2f56] text-white hover:bg-[#0e2f56]/90' : 'bg-[#f5f6f8] text-black/75 hover:bg-[#f5f6f8]/70'}`}
+                className={`h-auto cursor-pointer rounded-full px-3 py-2 text-xs font-semibold transition ${selected ? 'bg-secondary text-secondary-foreground hover:bg-secondary/90' : 'bg-muted text-foreground/75 hover:bg-muted/70'}`}
               >
                 {filter.label}
               </Button>
@@ -270,12 +269,12 @@ export function CategoryPageClient({ category, products }: Props) {
             </Button>
           ) : null}
         </div>
-      </section>
+      </Card>
 
       {selectedFilters.length > 0 ? (
-        <section className="mt-4 rounded-3xl bg-white p-4 shadow-sm">
+        <Card className="mt-4 p-4 shadow-sm">
           <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
-            <span className="text-black/50">Selected:</span>
+            <span className="text-foreground/50">Selected:</span>
             {selectedFilters.map(filterKey => {
               const label =
                 filters.find(filter => filter.key === filterKey)?.label ??
@@ -286,7 +285,7 @@ export function CategoryPageClient({ category, products }: Props) {
                   key={filterKey}
                   type="button"
                   onClick={() => toggleFilter(filterKey)}
-                  className="inline-flex h-auto cursor-pointer items-center gap-2 rounded-full bg-[#0e2f56] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#163f77]"
+                  className="inline-flex h-auto cursor-pointer items-center gap-2 rounded-full bg-secondary px-3 py-2 text-xs font-semibold text-secondary-foreground transition hover:bg-secondary/90"
                 >
                   <span>{label}</span>
                   <span aria-hidden="true">×</span>
@@ -294,7 +293,7 @@ export function CategoryPageClient({ category, products }: Props) {
               );
             })}
           </div>
-        </section>
+        </Card>
       ) : null}
 
       <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
@@ -304,9 +303,9 @@ export function CategoryPageClient({ category, products }: Props) {
       </section>
 
       {visibleProducts.length === 0 ? (
-        <section className="mt-6 rounded-3xl bg-white p-6 text-sm text-black/65 shadow-sm">
+        <Card className="mt-6 p-6 text-sm text-foreground/65 shadow-sm">
           No products match the current filter.
-        </section>
+        </Card>
       ) : null}
     </>
   );
