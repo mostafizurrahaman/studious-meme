@@ -75,7 +75,77 @@ export function Header() {
         <header className="sticky top-0 z-40 w-full border-b border-border bg-background text-foreground shadow-sm">
             {/* 1st layer */}
             <Container>
-                <div className="flex min-h-18 items-center gap-4 py-2.5 lg:min-h-18 lg:py-3">
+                <div className="lg:hidden">
+                    <details ref={menuRef} className="group">
+                        <summary className="list-none cursor-pointer outline-none [&::-webkit-details-marker]:hidden">
+                            <div className="grid grid-cols-[36px_1fr_36px] items-center gap-2 py-2.5">
+                                <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background text-lg leading-none text-foreground">
+                                    ☰
+                                </span>
+                                <Link href="/" className="flex justify-center" aria-label="Malamal Home">
+                                    <Image
+                                        src="https://i0.wp.com/malamal.com.bd/wp-content/uploads/2024/01/Logo-Malamal.com_.bd_.png?ssl=1"
+                                        alt="Malamal.com.bd"
+                                        width={160}
+                                        height={32}
+                                        priority
+                                        className="h-auto w-32"
+                                    />
+                                </Link>
+                                <Link
+                                    href="/my-account"
+                                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background text-foreground"
+                                    aria-label="My account"
+                                >
+                                    <span className="text-lg leading-none">◔</span>
+                                </Link>
+                            </div>
+                        </summary>
+                        <Card className="mt-3 p-4 shadow-lg ring-1 ring-black/5">
+                            <div className="grid gap-3">
+                                {(
+                                    [
+                                        ['Shop', '/shop'],
+                                        ['Promotions/Campaigns', '/promotions'],
+                                        ['Main Categories', '/main-categories'],
+                                        ['Shop By Brands', '/shop-by-brands'],
+                                        ['Delivery & Return', '/delivery-return'],
+                                        ['Terms & Condition', '/terms-and-condition'],
+                                        ['Quotation Request', '/quotation-request'],
+                                        ['Our Contacts', '/our-contacts'],
+                                        ['Compare', '/compare'],
+                                        ['Wishlist', '/wishlist'],
+                                        ['Cart', '/cart'],
+                                        ['My account', '/my-account'],
+                                    ] as const
+                                ).map(([label, href]) => (
+                                    <Link key={label} href={href} className={drawerLinkClass(href)} style={activeDrawerStyle(href)}>
+                                        {label}
+                                    </Link>
+                                ))}
+                            </div>
+                        </Card>
+                    </details>
+
+                    <div className="pb-3">
+                        <div className="flex overflow-hidden rounded-full border border-border bg-background shadow-sm">
+                            <Input
+                                className="h-11 w-full rounded-none border-0 bg-background px-4 text-sm text-foreground placeholder:text-foreground/45 shadow-none focus-visible:ring-0"
+                                placeholder="Search for products"
+                                aria-label="Search"
+                            />
+                            <Button
+                                type="button"
+                                variant="secondary"
+                                className="h-11 rounded-none px-4 text-sm font-semibold bg-primary text-white hover:bg-primary/80"
+                            >
+                                <span className="text-lg leading-none">⌕</span>
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="hidden min-h-18 items-center gap-4 py-2.5 lg:flex lg:min-h-18 lg:py-3">
                     <Link href="/" className="flex shrink-0 items-center" aria-label="Malamal Home">
                         <Image
                             src="https://i0.wp.com/malamal.com.bd/wp-content/uploads/2024/01/Logo-Malamal.com_.bd_.png?ssl=1"
@@ -284,7 +354,7 @@ export function Header() {
                         </div>
                     </nav>
 
-                    <details ref={menuRef} className="group py-3 lg:hidden">
+                    <details className="hidden py-3 lg:hidden">
                         <summary className="list-none cursor-pointer rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold text-foreground outline-none [&::-webkit-details-marker]:hidden">
                             Menu
                         </summary>

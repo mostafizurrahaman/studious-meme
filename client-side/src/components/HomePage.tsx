@@ -63,10 +63,19 @@ export function HomePage() {
     <main className="flex-1 bg-background pb-16">
       <Container>
         <div className="py-6">
+          <div className="mb-4 flex justify-center lg:hidden">
+            <Link
+              href="/main-categories"
+              className="inline-flex h-11 items-center justify-center rounded-full bg-primary px-6 text-sm font-bold text-white shadow-sm"
+            >
+              All Categories
+            </Link>
+          </div>
+
           <section>
             <Card className="overflow-hidden shadow-sm">
-              <div className="grid h-full gap-4 p-5 sm:p-6 lg:grid-cols-[1.22fr_0.78fr] lg:p-6">
-                <div className="ui-image-card relative min-h-96 overflow-hidden sm:min-h-125">
+              <div className="grid h-full gap-4 p-3 sm:p-6 lg:grid-cols-[1.22fr_0.78fr] lg:p-6">
+                <div className="ui-image-card relative min-h-[420px] overflow-hidden sm:min-h-125 lg:min-h-125">
                   <Image
                     src="https://malamal.com.bd/wp-content/uploads/2024/11/winner-welding-machine-pc.webp"
                     alt="Hero banner"
@@ -75,7 +84,7 @@ export function HomePage() {
                     className="object-cover"
                   />
                   <div className="absolute inset-0 bg-black/15" />
-                    <div className="absolute left-4 top-4 z-10 max-w-md text-white sm:left-6 sm:top-6">
+                  <div className="absolute left-4 top-4 z-10 max-w-md text-white sm:left-6 sm:top-6">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/80">
                       Best Online Hardware Store
                     </p>
@@ -100,7 +109,7 @@ export function HomePage() {
                   </div>
                 </div>
 
-                <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+                <div className="hidden gap-4 lg:grid lg:grid-cols-1">
                   {heroSlides.map((slide, index) => (
                     <Link
                       key={slide.title}
