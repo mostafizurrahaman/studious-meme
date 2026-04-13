@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import * as React from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -10,7 +11,10 @@ import { Separator } from '@/components/ui/separator';
 import { formatMoney } from '@/lib/cart';
 import { useCartStore } from '@/lib/cart-store';
 
-export function MiniCartDropdown({ active = false }: { active?: boolean }) {
+export const MiniCartDropdown = React.forwardRef<HTMLDetailsElement, { active?: boolean }>(function MiniCartDropdown(
+    { active = false },
+    ref,
+) {
     const items = useCartStore(state => state.items);
     const count = useCartStore(state => state.items.reduce((sum, item) => sum + item.quantity, 0));
     const subtotal = useCartStore(state =>
@@ -18,7 +22,7 @@ export function MiniCartDropdown({ active = false }: { active?: boolean }) {
     );
 
     return (
-        <details className="group relative hidden md:block">
+        <details ref={ref} className="group relative hidden md:block">
             <summary className="list-none cursor-pointer outline-none [&::-webkit-details-marker]:hidden">
                 <div
                     className="inline-flex h-11 items-center justify-center rounded-full border border-border px-4 text-sm font-semibold text-foreground transition hover:border-primary/30 hover:bg-primary/5"
@@ -86,4 +90,4 @@ export function MiniCartDropdown({ active = false }: { active?: boolean }) {
             </Card>
         </details>
     );
-}
+});

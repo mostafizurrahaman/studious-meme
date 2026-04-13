@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,31 @@ import { brands, topCategories } from '@/lib/malamal-content';
 
 export function Header() {
     const pathname = usePathname();
+    const categoriesRef = useRef<HTMLDetailsElement>(null);
+    const menuRef = useRef<HTMLDetailsElement>(null);
+    const cartRef = useRef<HTMLDetailsElement>(null);
+
+    useEffect(() => {
+        const handlePointerDown = (event: PointerEvent) => {
+            const target = event.target as Node | null;
+
+            if (categoriesRef.current && target && !categoriesRef.current.contains(target)) {
+                categoriesRef.current.open = false;
+            }
+
+            if (menuRef.current && target && !menuRef.current.contains(target)) {
+                menuRef.current.open = false;
+            }
+
+            if (cartRef.current && target && !cartRef.current.contains(target)) {
+                cartRef.current.open = false;
+            }
+        };
+
+        document.addEventListener('pointerdown', handlePointerDown);
+
+        return () => document.removeEventListener('pointerdown', handlePointerDown);
+    }, []);
 
     const isActive = (href: string) => {
         if (href === '/') return pathname === '/';
@@ -63,7 +89,7 @@ export function Header() {
 
                     {/* categories */}
                     <div className="hidden items-center lg:flex">
-                        <details className="group relative">
+                        <details ref={categoriesRef} className="group relative">
                             <summary className="list-none cursor-pointer rounded-full bg-secondary px-4 py-3 text-sm font-semibold text-secondary-foreground outline-none [&::-webkit-details-marker]:hidden">
                                 Categories
                             </summary>
@@ -171,7 +197,7 @@ export function Header() {
                                 {label}
                             </Link>
                         ))}
-                        <MiniCartDropdown active={pathname === '/cart'} />
+                        <MiniCartDropdown ref={cartRef} active={pathname === '/cart'} />
                         <div className="text-sm leading-tight">
                             <div className="font-semibold text-foreground">Dedicated Support</div>
                             <a className="font-semibold text-secondary" href="tel:+8809638212121">
@@ -258,7 +284,7 @@ export function Header() {
                         </div>
                     </nav>
 
-                    <details className="group py-3 lg:hidden">
+                    <details ref={menuRef} className="group py-3 lg:hidden">
                         <summary className="list-none cursor-pointer rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold text-foreground outline-none [&::-webkit-details-marker]:hidden">
                             Menu
                         </summary>
