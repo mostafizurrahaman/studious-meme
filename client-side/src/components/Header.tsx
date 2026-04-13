@@ -1,5 +1,8 @@
+"use client";
+
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +11,26 @@ import { MiniCartDropdown } from '@/components/cart/MiniCartDropdown';
 import { brands, topCategories } from '@/lib/malamal-content';
 
 export function Header() {
+  const pathname = usePathname();
+
+  const isActive = (href: string) => {
+    if (href === '/') return pathname === '/';
+    if (href === '/shop') return pathname === '/shop' || pathname.startsWith('/product/');
+    if (href === '/main-categories') return pathname === '/main-categories' || pathname.startsWith('/category/');
+    if (href === '/my-account') return pathname === '/my-account' || pathname.startsWith('/my-account/');
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
+
+  const navLinkClass = (href: string) =>
+    `inline-flex items-center rounded-full px-3 py-1.5 transition ${isActive(href)
+      ? 'bg-primary text-primary-foreground'
+      : 'text-foreground hover:bg-primary hover:text-primary-foreground'}`;
+
+  const drawerLinkClass = (href: string) =>
+    `rounded-2xl border px-4 py-3 text-sm font-semibold transition ${isActive(href)
+      ? 'border-primary bg-primary text-primary-foreground'
+      : 'border-border text-foreground hover:border-primary/30 hover:bg-primary hover:text-primary-foreground'}`;
+
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background text-foreground shadow-sm">
       <Container>
@@ -23,7 +46,7 @@ export function Header() {
               width={182}
               height={36}
               priority
-              className="h-auto w-36 sm:w-[182px]"
+              className="h-auto w-36 sm:w-45.5"
             />
           </Link>
 
@@ -153,39 +176,33 @@ export function Header() {
         <Container>
           <nav className="hidden min-h-12 items-center justify-between gap-4 py-2 text-xs font-semibold text-foreground lg:flex">
             <div className="flex flex-wrap items-center gap-5">
-              <Link
-                className="inline-flex items-center rounded-full bg-primary px-3 py-1.5 text-primary-foreground"
-                href="/main-categories"
-              >
+              <Link className={navLinkClass('/main-categories')} href="/main-categories">
                 Categories
               </Link>
-              <Link className="hover:text-primary" href="/shop">
+              <Link className={navLinkClass('/shop')} href="/shop">
                 Shop
               </Link>
-              <Link className="hover:text-primary" href="/promotions">
+              <Link className={navLinkClass('/promotions')} href="/promotions">
                 Promotions/Campaigns
               </Link>
-              <Link className="hover:text-primary" href="/shop-by-brands">
+              <Link className={navLinkClass('/shop-by-brands')} href="/shop-by-brands">
                 Shop By Brands
               </Link>
-              <Link className="hover:text-primary" href="/our-contacts">
+              <Link className={navLinkClass('/our-contacts')} href="/our-contacts">
                 Our Contacts
               </Link>
             </div>
             <div className="flex flex-wrap items-center gap-5">
-              <Link
-                className="inline-flex items-center rounded-full bg-primary px-3 py-1.5 text-primary-foreground"
-                href="/main-categories"
-              >
+              <Link className={navLinkClass('/main-categories')} href="/main-categories">
                 All Categories
               </Link>
-              <Link className="hover:text-primary" href="/delivery-return">
+              <Link className={navLinkClass('/delivery-return')} href="/delivery-return">
                 Delivery & Return
               </Link>
-              <Link className="hover:text-primary" href="/terms-and-condition">
+              <Link className={navLinkClass('/terms-and-condition')} href="/terms-and-condition">
                 Terms & Condition
               </Link>
-              <Link className="hover:text-primary" href="/my-account">
+              <Link className={navLinkClass('/my-account')} href="/my-account">
                 My account
               </Link>
             </div>
@@ -213,11 +230,7 @@ export function Header() {
                     ['My account', '/my-account'],
                   ] as const
                 ).map(([label, href]) => (
-                  <Link
-                    key={label}
-                    href={href}
-                    className="rounded-2xl border border-border px-4 py-3 text-sm font-semibold text-foreground transition hover:border-primary/30 hover:bg-primary hover:text-primary-foreground"
-                  >
+                  <Link key={label} href={href} className={drawerLinkClass(href)}>
                     {label}
                   </Link>
                 ))}
@@ -228,11 +241,7 @@ export function Header() {
                 </div>
                 <div className="mt-3 grid gap-2">
                   {topCategories.map(category => (
-                    <Link
-                      key={category.name}
-                      href={category.href}
-                      className="rounded-2xl border border-border px-4 py-3 text-sm transition hover:border-primary/30 hover:bg-primary hover:text-primary-foreground"
-                    >
+                    <Link key={category.name} href={category.href} className={drawerLinkClass(category.href)}>
                       {category.name}
                     </Link>
                   ))}
