@@ -16,9 +16,9 @@ export function MobileToolbar() {
           <Link
             key={label}
             href={href}
-            className="flex flex-col items-center gap-1 rounded-2xl py-1.5 transition hover:bg-[#fff8f4] hover:text-[#f15a24]"
+            className="flex flex-col items-center gap-1 rounded-2xl py-1.5 transition hover:bg-primary/5 hover:text-primary"
           >
-            <span className="h-2 w-2 rounded-full bg-[#f15a24]" />
+            <span className="h-2 w-2 rounded-full bg-primary" />
             {label}
           </Link>
         ))}

@@ -1,5 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Container } from '@/components/Container';
 import { MiniCartDropdown } from '@/components/cart/MiniCartDropdown';
 import { brands, topCategories } from '@/lib/malamal-content';
@@ -99,17 +101,14 @@ export function Header() {
 
           <div className="hidden flex-1 items-center lg:flex">
             <div className="flex w-full overflow-hidden rounded-full border border-black/10 bg-white shadow-sm">
-              <input
-                className="h-11 w-full bg-white px-4 text-sm text-black placeholder:text-black/45 outline-none"
+              <Input
+                className="h-11 w-full rounded-none border-0 bg-white px-4 text-sm text-black placeholder:text-black/45 shadow-none focus-visible:ring-0"
                 placeholder="Search for products"
                 aria-label="Search"
               />
-              <button
-                type="button"
-                className="h-11 cursor-pointer whitespace-nowrap bg-[#0e2f56] px-6 text-sm font-semibold text-white"
-              >
+              <Button type="button" className="h-11 rounded-none bg-[#0e2f56] px-6 text-sm font-semibold text-white hover:bg-[#0e2f56]/90">
                 Search
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -246,17 +245,14 @@ export function Header() {
         <Container>
           <div className="py-3">
             <div className="flex overflow-hidden rounded-full border border-black/10 bg-white shadow-sm">
-              <input
-                className="h-11 w-full bg-white px-4 text-sm text-black placeholder:text-black/45 outline-none"
+              <Input
+                className="h-11 w-full rounded-none border-0 bg-white px-4 text-sm text-black placeholder:text-black/45 shadow-none focus-visible:ring-0"
                 placeholder="Search for products"
                 aria-label="Search"
               />
-              <button
-                type="button"
-                className="h-11 cursor-pointer whitespace-nowrap bg-[#0e2f56] px-6 text-sm font-semibold text-white"
-              >
+              <Button type="button" className="h-11 rounded-none bg-[#0e2f56] px-6 text-sm font-semibold text-white hover:bg-[#0e2f56]/90">
                 Search
-              </button>
+              </Button>
             </div>
           </div>
         </Container>

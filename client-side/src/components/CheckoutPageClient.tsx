@@ -3,6 +3,9 @@
 import { useActionState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { formatMoney } from '@/lib/cart';
 import { useCartStore } from '@/lib/cart-store';
 import { submitCheckoutAction } from '@/app/checkout/actions';
@@ -71,7 +74,7 @@ export function CheckoutPageClient() {
         ) : null}
 
         <section className="rounded-3xl bg-white p-6 shadow-sm sm:p-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#f15a24]">
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">
             Checkout
           </p>
           <h1 className="mt-4 text-3xl font-black text-[#0e2f56] sm:text-4xl">
@@ -101,7 +104,7 @@ export function CheckoutPageClient() {
                   className="grid gap-2 text-sm font-semibold text-black"
                 >
                   {label}
-                  <input
+                  <Input
                     name={key}
                     value={value}
                     onChange={event =>
@@ -110,7 +113,7 @@ export function CheckoutPageClient() {
                         event.target.value,
                       )
                     }
-                    className="h-11 rounded-xl border border-black/10 px-4 outline-none"
+                    className="h-11 rounded-xl border border-black/10 px-4"
                   />
                 </label>
               ))}
@@ -163,19 +166,20 @@ export function CheckoutPageClient() {
               </select>
             </label>
             <div className="mt-6 flex flex-wrap gap-3">
-              <button
+              <Button
                 type="submit"
                 disabled={pending}
-                className="inline-flex h-11 cursor-pointer items-center justify-center rounded-full bg-[#f15a24] px-6 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-70"
+                className="h-11 rounded-full bg-primary px-6 text-sm font-bold text-primary-foreground disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {pending ? 'Submitting...' : 'Place order'}
-              </button>
-              <Link
-                href="/cart"
-                className="inline-flex h-11 items-center justify-center rounded-full border border-black/10 px-6 text-sm font-bold text-black/75"
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                className="h-11 rounded-full border border-black/10 px-6 text-sm font-bold text-black/75"
               >
-                Back to cart
-              </Link>
+                <Link href="/cart">Back to cart</Link>
+              </Button>
             </div>
           </form>
 

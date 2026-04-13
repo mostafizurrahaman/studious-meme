@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+
+import { Button } from '@/components/ui/button';
 import { useCartStore } from '@/lib/cart-store';
 import type { Product } from '@/lib/malamal-content';
 
@@ -9,16 +11,16 @@ export function AddToCartButton({ product }: { product: Product }) {
   const [added, setAdded] = useState(false);
 
   return (
-    <button
+    <Button
       type="button"
       onClick={() => {
         addProduct(product);
         setAdded(true);
         window.setTimeout(() => setAdded(false), 1200);
       }}
-      className="inline-flex h-12 cursor-pointer items-center justify-center rounded-full bg-[#0e2f56] px-6 text-[11px] font-semibold text-white transition hover:bg-[#f15a24]"
+      className="h-12 rounded-full bg-[#0e2f56] px-6 text-[11px] font-semibold text-white transition hover:bg-primary"
     >
       {added ? 'Added' : 'Add to cart'}
-    </button>
+    </Button>
   );
 }

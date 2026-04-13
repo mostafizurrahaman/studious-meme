@@ -1,5 +1,8 @@
 import Link from 'next/link';
 import { SeoScripts } from '@/components/SeoScripts';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { accountBenefits } from '@/lib/malamal-content';
 import { myAccountMetadata, myAccountSchemas } from '@/lib/seo';
 
@@ -12,12 +15,15 @@ export default function MyAccountPage() {
       <main className="flex-1 bg-[#f5f6f8] pb-16">
         <div className="mx-auto w-full max-w-350 px-4 py-6 lg:px-6">
           <section className="rounded-3xl bg-white p-6 shadow-sm sm:p-8">
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#f15a24]">
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">
               Account access
             </p>
-            <h1 className="mt-4 text-3xl font-black text-[#0e2f56] sm:text-4xl">My Account</h1>
+            <h1 className="mt-4 text-3xl font-black text-[#0e2f56] sm:text-4xl">
+              My Account
+            </h1>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-black/65 sm:text-base">
-              Account login and registration area for the storefront customer dashboard.
+              Account login and registration area for the storefront customer
+              dashboard.
             </p>
           </section>
 
@@ -25,14 +31,27 @@ export default function MyAccountPage() {
             <div className="rounded-3xl bg-white p-6 shadow-sm">
               <h2 className="text-2xl font-black text-[#0e2f56]">Login</h2>
               <div className="mt-5 grid gap-4">
-                <input className="h-11 rounded-xl border border-black/10 px-4 outline-none" placeholder="Email address" />
-                <input className="h-11 rounded-xl border border-black/10 px-4 outline-none" placeholder="Password" />
-                <button type="button" className="inline-flex h-11 w-fit cursor-pointer items-center justify-center rounded-full bg-[#f15a24] px-6 text-sm font-bold text-white">
+                <Input
+                  className="h-11 rounded-xl border border-black/10 px-4"
+                  placeholder="Email address"
+                />
+                <Input
+                  className="h-11 rounded-xl border border-black/10 px-4"
+                  placeholder="Password"
+                  type="password"
+                />
+                <Button
+                  type="button"
+                  className="h-11 w-fit rounded-full bg-primary px-6 text-sm font-bold text-primary-foreground hover:bg-primary/90"
+                >
                   Sign in
-                </button>
+                </Button>
               </div>
               <div className="mt-6 text-sm text-black/55">
-                New user? <span className="font-semibold text-[#0e2f56]">Create account</span>
+                New user?{' '}
+                <span className="font-semibold text-[#0e2f56]">
+                  Create account
+                </span>
               </div>
             </div>
 
@@ -45,9 +64,13 @@ export default function MyAccountPage() {
                   </div>
                 ))}
               </div>
-              <Link href="/quotation-request" className="mt-6 inline-flex h-11 items-center justify-center rounded-full border border-white/20 px-6 text-sm font-bold text-white">
-                Request B2B quotation
-              </Link>
+              <Button
+                asChild
+                variant="outline"
+                className="mt-6 h-11 rounded-full border-white/20 px-6 text-sm font-bold text-white hover:bg-white/10"
+              >
+                <Link href="/quotation-request">Request B2B quotation</Link>
+              </Button>
             </div>
           </section>
         </div>

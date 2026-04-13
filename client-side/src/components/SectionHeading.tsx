@@ -1,6 +1,8 @@
 import type { Route } from 'next';
 import Link from 'next/link';
 
+import { Button } from '@/components/ui/button';
+
 type Props = {
   title: string;
   actionHref?: Route;
@@ -18,13 +20,16 @@ export function SectionHeading({
         {title}
       </h2>
       {actionHref ? (
-        <Link
-          className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-[#f15a24] shadow-sm"
-          href={actionHref}
+        <Button
+          asChild
+          variant="outline"
+          className="rounded-full border-black/10 bg-white px-4 py-2 text-sm font-semibold text-primary shadow-sm hover:bg-primary/5"
         >
-          {actionLabel}
-          <span aria-hidden="true">›</span>
-        </Link>
+          <Link href={actionHref}>
+            {actionLabel}
+            <span aria-hidden="true">›</span>
+          </Link>
+        </Button>
       ) : null}
     </div>
   );

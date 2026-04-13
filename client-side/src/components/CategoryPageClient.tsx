@@ -2,6 +2,8 @@
 
 import { type Route } from 'next';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+
+import { Button } from '@/components/ui/button';
 import { ProductCard } from '@/components/ProductCard';
 import { parseMoney } from '@/lib/cart';
 import type { CategoryPageEntry, Product } from '@/lib/malamal-content';
@@ -65,11 +67,15 @@ function matchesFilters(product: Product, filters: FilterKey[]) {
     { brand: [], stock: [], price: [] },
   );
 
-  const brandMatches = grouped.brand.length === 0 || grouped.brand.some(filter => item.brand === filter.slice(6));
-  const stockMatches = grouped.stock.length === 0 || grouped.stock.some(filter => filter === 'stock:in-stock' && item.inStock);
+  const brandMatches =
+    grouped.brand.length === 0 ||
+    grouped.brand.some(filter => item.brand === filter.slice(6));
+  const stockMatches =
+    grouped.stock.length === 0 ||
+    grouped.stock.some(filter => filter === 'stock:in-stock' && item.inStock);
   const priceMatches =
-    grouped.price.length === 0
-    || grouped.price.some(filter => {
+    grouped.price.length === 0 ||
+    grouped.price.some(filter => {
       if (filter === 'price:under-10000') return item.under10000;
       if (filter === 'price:10000-50000') return item.between10000And50000;
       return item.over50000;
@@ -85,14 +91,25 @@ function parseGroupValues(value: string | null) {
     .filter(Boolean);
 }
 
-function parseFilterState(searchParams: URLSearchParams, allowed: FilterKey[]): FilterKey[] {
+function parseFilterState(
+  searchParams: URLSearchParams,
+  allowed: FilterKey[],
+): FilterKey[] {
   const allowedSet = new Set(allowed);
 
-  const brand = parseGroupValues(searchParams.get('b')).map(value => `brand:${value}` as const);
-  const stock = parseGroupValues(searchParams.get('s')).map(value => `stock:${value}` as const);
-  const price = parseGroupValues(searchParams.get('p')).map(value => `price:${value}` as const);
+  const brand = parseGroupValues(searchParams.get('b')).map(
+    value => `brand:${value}` as const,
+  );
+  const stock = parseGroupValues(searchParams.get('s')).map(
+    value => `stock:${value}` as const,
+  );
+  const price = parseGroupValues(searchParams.get('p')).map(
+    value => `price:${value}` as const,
+  );
 
-  const parsed = [...brand, ...stock, ...price].filter(item => allowedSet.has(item as FilterKey)) as SelectedFilterKey[];
+  const parsed = [...brand, ...stock, ...price].filter(item =>
+    allowedSet.has(item as FilterKey),
+  ) as SelectedFilterKey[];
 
   return parsed.length > 0 ? parsed : ['all'];
 }
@@ -129,15 +146,22 @@ export function CategoryPageClient({ category, products }: Props) {
     { key: 'price:under-10000' as const, label: 'Under Tk. 10k' },
     { key: 'price:10000-50000' as const, label: 'Tk. 10k-50k' },
     { key: 'price:50000-plus' as const, label: 'Tk. 50k+' },
-    ...Array.from(new Set(products.map(product => product.brand))).map(brand => ({
-      key: `brand:${brand}` as const,
-      label: brand,
-    })),
+    ...Array.from(new Set(products.map(product => product.brand))).map(
+      brand => ({
+        key: `brand:${brand}` as const,
+        label: brand,
+      }),
+    ),
   ];
 
-  const activeFilters = parseFilterState(searchParams, filters.map(filter => filter.key));
+  const activeFilters = parseFilterState(
+    searchParams,
+    filters.map(filter => filter.key),
+  );
 
-  const visibleProducts = products.filter(product => matchesFilters(product, activeFilters));
+  const visibleProducts = products.filter(product =>
+    matchesFilters(product, activeFilters),
+  );
 
   function toggleFilter(filter: FilterKey) {
     const params = new URLSearchParams(searchParams.toString());
@@ -151,21 +175,27 @@ export function CategoryPageClient({ category, products }: Props) {
 
       if (filter.startsWith('brand:')) {
         const value = filter.slice(6);
-        next.brand = next.brand.includes(value) ? next.brand.filter(item => item !== value) : [...next.brand, value];
+        next.brand = next.brand.includes(value)
+          ? next.brand.filter(item => item !== value)
+          : [...next.brand, value];
         if (next.brand.length > 0) params.set('b', next.brand.join(','));
         else params.delete('b');
       }
 
       if (filter.startsWith('stock:')) {
         const value = filter.slice(6);
-        next.stock = next.stock.includes(value) ? next.stock.filter(item => item !== value) : [...next.stock, value];
+        next.stock = next.stock.includes(value)
+          ? next.stock.filter(item => item !== value)
+          : [...next.stock, value];
         if (next.stock.length > 0) params.set('s', next.stock.join(','));
         else params.delete('s');
       }
 
       if (filter.startsWith('price:')) {
         const value = filter.slice(6);
-        next.price = next.price.includes(value) ? next.price.filter(item => item !== value) : [...next.price, value];
+        next.price = next.price.includes(value)
+          ? next.price.filter(item => item !== value)
+          : [...next.price, value];
         if (next.price.length > 0) params.set('p', next.price.join(','));
         else params.delete('p');
       }
@@ -178,7 +208,9 @@ export function CategoryPageClient({ category, products }: Props) {
     }
 
     const query = params.toString();
-    router.replace((query ? `${pathname}?${query}` : pathname) as Route, { scroll: false });
+    router.replace((query ? `${pathname}?${query}` : pathname) as Route, {
+      scroll: false,
+    });
   }
 
   const activeLabel = activeFilters.includes('all')
@@ -189,7 +221,9 @@ export function CategoryPageClient({ category, products }: Props) {
 
   return (
     <>
-      <section className={`rounded-3xl bg-linear-to-r ${category.accent} p-6 text-white shadow-sm sm:p-8`}>
+      <section
+        className={`rounded-3xl bg-linear-to-r ${category.accent} p-6 text-white shadow-sm sm:p-8`}
+      >
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-white/65">
           Category page
         </p>
@@ -203,7 +237,9 @@ export function CategoryPageClient({ category, products }: Props) {
         <span className="text-black/60">
           {visibleProducts.length} of {products.length} products shown
         </span>
-        <span className="font-semibold text-[#f15a24] capitalize">{activeLabel}</span>
+        <span className="font-semibold text-primary capitalize">
+          {activeLabel}
+        </span>
       </section>
 
       <section className="mt-6 rounded-3xl bg-white p-4 shadow-sm">
@@ -212,24 +248,26 @@ export function CategoryPageClient({ category, products }: Props) {
             const selected = activeFilters.includes(filter.key);
 
             return (
-              <button
+              <Button
                 key={filter.key}
                 type="button"
                 onClick={() => toggleFilter(filter.key)}
-                className={`cursor-pointer rounded-full px-3 py-2 transition ${selected ? 'bg-[#0e2f56] text-white' : 'bg-[#f5f6f8] text-black/75'}`}
+                className={`h-auto cursor-pointer rounded-full px-3 py-2 text-xs font-semibold transition ${selected ? 'bg-[#0e2f56] text-white hover:bg-[#0e2f56]/90' : 'bg-[#f5f6f8] text-black/75 hover:bg-[#f5f6f8]/70'}`}
               >
                 {filter.label}
-              </button>
+              </Button>
             );
           })}
           {!activeFilters.includes('all') ? (
-            <button
+            <Button
               type="button"
-              onClick={() => router.replace(pathname as never, { scroll: false })}
-              className="cursor-pointer rounded-full bg-[#f15a24] px-3 py-2 text-white transition"
+              onClick={() =>
+                router.replace(pathname as never, { scroll: false })
+              }
+              className="h-auto cursor-pointer rounded-full bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground transition hover:bg-primary/90"
             >
               Clear all
-            </button>
+            </Button>
           ) : null}
         </div>
       </section>
@@ -239,18 +277,20 @@ export function CategoryPageClient({ category, products }: Props) {
           <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
             <span className="text-black/50">Selected:</span>
             {selectedFilters.map(filterKey => {
-              const label = filters.find(filter => filter.key === filterKey)?.label ?? filterKey;
+              const label =
+                filters.find(filter => filter.key === filterKey)?.label ??
+                filterKey;
 
               return (
-                <button
+                <Button
                   key={filterKey}
                   type="button"
                   onClick={() => toggleFilter(filterKey)}
-                  className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#0e2f56] px-3 py-2 text-white transition hover:bg-[#163f77]"
+                  className="inline-flex h-auto cursor-pointer items-center gap-2 rounded-full bg-[#0e2f56] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#163f77]"
                 >
                   <span>{label}</span>
                   <span aria-hidden="true">×</span>
-                </button>
+                </Button>
               );
             })}
           </div>

@@ -21,13 +21,13 @@ export function FloatingCategoryRail() {
       >
         <div className="grid gap-1.5 px-1.5 py-2.5">
           <div className="flex items-center gap-2 rounded-full">
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#f15a24] text-xs font-bold text-white">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
               =
             </span>
             <span
               className={`text-sm font-bold text-white transition ${
                 open ? 'opacity-100' : 'w-0 overflow-hidden opacity-0'
-              } rounded-full bg-[#f15a24] px-4 py-1.5 whitespace-nowrap`}
+              } rounded-full bg-primary px-4 py-1.5 whitespace-nowrap`}
             >
               Categories
             </span>
