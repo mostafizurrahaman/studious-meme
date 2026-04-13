@@ -75,8 +75,13 @@ export function MiniCartDropdown({ active = false }: { active?: boolean }) {
                 <div className="rounded-2xl bg-muted px-4 py-3 text-sm font-semibold text-foreground">
                     Subtotal: {formatMoney(subtotal)}
                 </div>
-                <Button asChild className="mt-4 h-11 w-full rounded-full px-6 text-sm font-bold shadow-sm">
-                    <Link href="/cart">View cart</Link>
+                <Button
+                    asChild
+                    className="mt-4 h-11 w-full rounded-full bg-primary/90 px-6 text-sm font-bold text-white shadow-sm transition-all duration-200 ease-out hover:bg-primary/60 hover:shadow-md hover:-translate-y-px"
+                >
+                    <Link href="/cart">
+                        <span className="text-white transition group-hover/button:text-black">View cart</span>
+                    </Link>
                 </Button>
             </Card>
         </details>
