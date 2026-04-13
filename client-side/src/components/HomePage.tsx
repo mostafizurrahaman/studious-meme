@@ -86,15 +86,15 @@ export function HomePage() {
 
                     <section>
                         <Card className="overflow-hidden shadow-sm">
-                            <div className="grid h-full gap-4 p-3 sm:p-6 lg:grid-cols-[1.22fr_0.78fr] lg:p-6">
-                                <div className="ui-image-card relative min-h-105 overflow-hidden rounded-3xl bg-muted sm:min-h-125 lg:min-h-125">
+                            <div className="grid h-full gap-0 p-0 sm:gap-4 sm:p-6 lg:grid-cols-[1.22fr_0.78fr] lg:p-6">
+                                <div className="ui-image-card relative min-h-105 overflow-hidden rounded-3xl bg-background sm:min-h-125 lg:min-h-125">
                                     {/* image */}
                                     <Image
                                         src={heroSlides[heroIndex].image}
                                         alt={heroSlides[heroIndex].title}
                                         fill
                                         sizes="(max-width: 1024px) 100vw, 760px"
-                                        className="object-cover object-[center_top] p-2 transition duration-500 ease-out sm:p-4"
+                                        className="object-cover object-[center_top] transition duration-500 ease-out"
                                     />
 
                                     {/* next nad previous button */}
@@ -207,7 +207,7 @@ export function HomePage() {
                             <SectionHeading title="The Best Offers" actionHref="/shop" />
                         </CardHeader>
                         <CardContent className="px-5 pb-5 pt-6 sm:px-6">
-                            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+                            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-5">
                                 {offerProducts.map(product => (
                                     <ProductCard key={product.sku} product={product} />
                                 ))}
@@ -220,7 +220,7 @@ export function HomePage() {
                             <SectionHeading title="Featured products" actionHref="/shop" />
                         </CardHeader>
                         <CardContent className="px-5 pb-5 pt-6 sm:px-6">
-                            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+                            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-5">
                                 {featuredProducts.map(product => (
                                     <ProductCard key={product.sku} product={product} />
                                 ))}
@@ -233,7 +233,7 @@ export function HomePage() {
                             <SectionHeading title="Latest Products" actionHref="/shop" />
                         </CardHeader>
                         <CardContent className="px-5 pb-5 pt-6 sm:px-6">
-                            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+                            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-5">
                                 {latestProducts.map(product => (
                                     <ProductCard key={product.sku} product={product} />
                                 ))}

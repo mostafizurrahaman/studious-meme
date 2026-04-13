@@ -1,5 +1,6 @@
 import type { Route } from 'next';
 import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 
@@ -19,18 +20,18 @@ export function SectionHeading({
       <h2 className="text-lg font-extrabold tracking-tight text-secondary sm:text-xl">
         {title}
       </h2>
-      {actionHref ? (
-        <Button
-          asChild
-          variant="outline"
-          className="rounded-full border-border bg-background px-4 py-2 text-sm font-semibold text-primary shadow-sm hover:bg-primary/5"
-        >
-          <Link href={actionHref}>
-            {actionLabel}
-            <span aria-hidden="true">›</span>
-          </Link>
-        </Button>
-      ) : null}
+        {actionHref ? (
+          <Button
+            asChild
+            variant="outline"
+            className="rounded-full border-0 bg-[#dbe7ff] px-4 py-2 text-sm font-semibold text-[#2e5bcb] shadow-sm hover:bg-[#c9dcff]"
+          >
+            <Link href={actionHref}>
+              {actionLabel}
+              <ArrowRight className="ml-1 h-4 w-4" />
+            </Link>
+          </Button>
+        ) : null}
     </div>
   );
 }
