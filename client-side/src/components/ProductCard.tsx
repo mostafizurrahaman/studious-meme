@@ -40,13 +40,13 @@ export function ProductCard({ product }: Props) {
           </div>
         </div>
       </Link>
-      <CardContent className="space-y-2 p-4 pt-4">
+      <CardContent className="space-y-2.5 p-4 pt-4">
         <Link href={`/product/${product.sku}`} className="block">
-          <h3 className="line-clamp-2 min-h-[2.9rem] text-[13px] font-semibold leading-5 text-foreground transition hover:text-primary">
+          <h3 className="line-clamp-2 min-h-[3.1rem] text-[13px] font-semibold leading-5 text-foreground transition hover:text-primary">
             {product.title}
           </h3>
         </Link>
-        <div className="flex items-center gap-2 text-[11px] text-foreground/55">
+        <div className="flex items-center gap-1.5 text-[11px] text-foreground/55">
           <span>Brand: {product.brand}</span>
           <span>SKU {product.sku}</span>
         </div>

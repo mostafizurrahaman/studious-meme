@@ -79,23 +79,23 @@ export function HomePage() {
                     <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/80">
                       Best Online Hardware Store
                     </p>
-                    <h1 className="mt-2 text-3xl font-black leading-tight sm:text-4xl">
+                    <h1 className="mt-2 max-w-lg text-3xl font-black leading-[1.05] sm:text-4xl">
                       The best offers on tools and machinery
                     </h1>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                    <Button asChild className="h-10 rounded-full px-4 text-sm font-bold">
-                      <Link href="/shop">Shop Now</Link>
-                    </Button>
+                    <div className="mt-5 flex flex-wrap gap-2.5">
+                      <Button asChild className="h-10 rounded-full px-4 text-sm font-bold shadow-sm">
+                        <Link href="/shop">Shop Now</Link>
+                      </Button>
                       <Button
                         asChild
                         variant="outline"
-                        className="rounded-full h-10 px-4 text-sm font-bold border-white/35 bg-white/15 text-white hover:bg-white/25"
+                        className="h-10 rounded-full border-white/35 bg-white/15 px-4 text-sm font-bold text-white hover:bg-white/25"
                       >
                         <Link href="/promotions">View Promotions</Link>
                       </Button>
                     </div>
                   </div>
-                  <div className="absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-black/65">
+                  <div className="absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-full bg-background/90 px-3 py-1 text-xs font-semibold text-foreground/65 backdrop-blur-sm">
                     ● ● ●
                   </div>
                 </div>
@@ -105,7 +105,7 @@ export function HomePage() {
                     <Link
                       key={slide.title}
                       href={slide.href}
-                      className="ui-image-card group relative min-h-38.5 cursor-pointer border border-black/8 bg-white p-4 text-white shadow-sm lg:min-h-40"
+                      className="ui-image-card group relative min-h-38.5 cursor-pointer border border-border bg-card p-4 text-white shadow-sm lg:min-h-40"
                     >
                       <Image
                         src={slide.image}
@@ -114,15 +114,15 @@ export function HomePage() {
                         sizes="(max-width: 1024px) 33vw, 300px"
                         className="object-cover opacity-95 transition duration-300 group-hover:scale-105"
                       />
-                  <div className="absolute inset-0 bg-linear-to-r from-secondary/88 via-secondary/45 to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-r from-secondary/90 via-secondary/45 to-transparent" />
                       <div className="relative z-10 flex h-full flex-col">
-                      <Badge variant="secondary" className="w-fit rounded-full px-3 py-1 text-[10px] uppercase tracking-[0.28em]">
-                        Featured {index + 1}
-                      </Badge>
+                        <Badge variant="secondary" className="w-fit rounded-full px-3 py-1 text-[10px] uppercase tracking-[0.28em]">
+                          Featured {index + 1}
+                        </Badge>
                         <div className="mt-auto">
-                            <h2 className="max-w-72 text-[17px] font-extrabold leading-6 text-white lg:text-[17px]">
-                              {slide.title}
-                            </h2>
+                          <h2 className="max-w-72 text-[17px] font-extrabold leading-6 text-white lg:text-[17px]">
+                            {slide.title}
+                          </h2>
                           <p className="mt-2 max-w-80 text-[13px] leading-5 text-white/85">
                             {slide.description}
                           </p>
@@ -163,11 +163,11 @@ export function HomePage() {
               <SectionHeading title="The Best Offers" actionHref="/shop" />
             </CardHeader>
             <CardContent className="px-5 pb-5 pt-6 sm:px-6">
-            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-              {offerProducts.map(product => (
-                <ProductCard key={product.sku} product={product} />
-              ))}
-            </div>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+                {offerProducts.map(product => (
+                  <ProductCard key={product.sku} product={product} />
+                ))}
+              </div>
             </CardContent>
           </Card>
 
@@ -176,11 +176,11 @@ export function HomePage() {
               <SectionHeading title="Featured products" actionHref="/shop" />
             </CardHeader>
             <CardContent className="px-5 pb-5 pt-6 sm:px-6">
-            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-              {featuredProducts.map(product => (
-                <ProductCard key={product.sku} product={product} />
-              ))}
-            </div>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+                {featuredProducts.map(product => (
+                  <ProductCard key={product.sku} product={product} />
+                ))}
+              </div>
             </CardContent>
           </Card>
 
@@ -189,11 +189,11 @@ export function HomePage() {
               <SectionHeading title="Latest Products" actionHref="/shop" />
             </CardHeader>
             <CardContent className="px-5 pb-5 pt-6 sm:px-6">
-            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-              {latestProducts.map(product => (
-                <ProductCard key={product.sku} product={product} />
-              ))}
-            </div>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+                {latestProducts.map(product => (
+                  <ProductCard key={product.sku} product={product} />
+                ))}
+              </div>
             </CardContent>
           </Card>
 
@@ -281,35 +281,35 @@ export function HomePage() {
 
           <Card className="mt-8 shadow-sm">
             <CardContent className="p-6">
-            <h2 className="text-xl font-black text-secondary sm:text-2xl">
-              Malamal.com.bd hardware store overview
-            </h2>
-            <Separator className="my-5" />
-            <div className="mt-5 grid gap-6 text-sm leading-7 text-foreground/70 lg:grid-cols-2">
-              <div className="space-y-4">
-                <p>
-                  Malamal.com.bd is positioned as a trusted online hardware and
-                  industrial supply store in Bangladesh, serving workshop,
-                  maintenance and project buyers with a broad catalog.
-                </p>
-                <p>
-                  This frontend keeps the storefront hierarchy, brand focus and
-                  product merchandising style while staying easy to connect to
-                  live data.
-                </p>
+              <h2 className="text-xl font-black text-secondary sm:text-2xl">
+                Malamal.com.bd hardware store overview
+              </h2>
+              <Separator className="my-5" />
+              <div className="grid gap-6 text-sm leading-7 text-foreground/70 lg:grid-cols-2">
+                <div className="space-y-4">
+                  <p>
+                    Malamal.com.bd is positioned as a trusted online hardware and
+                    industrial supply store in Bangladesh, serving workshop,
+                    maintenance and project buyers with a broad catalog.
+                  </p>
+                  <p>
+                    This frontend keeps the storefront hierarchy, brand focus and
+                    product merchandising style while staying easy to connect to
+                    live data.
+                  </p>
+                </div>
+                <div className="space-y-4">
+                  <p>
+                    Product grids, account areas and quotation forms are laid out
+                    so the site can connect to live data without changing the
+                    structure.
+                  </p>
+                  <p>
+                    The current build intentionally keeps the homepage mostly
+                    server-rendered and lightweight for fast initial load.
+                  </p>
+                </div>
               </div>
-              <div className="space-y-4">
-                <p>
-                  Product grids, account areas and quotation forms are laid out
-                  so the site can connect to live data without changing the
-                  structure.
-                </p>
-                <p>
-                  The current build intentionally keeps the homepage mostly
-                  server-rendered and lightweight for fast initial load.
-                </p>
-              </div>
-            </div>
             </CardContent>
           </Card>
         </div>
