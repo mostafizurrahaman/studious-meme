@@ -96,17 +96,42 @@ export function HomePage() {
                       <Card className="overflow-hidden shadow-sm">
                           <div className="grid h-full gap-4 p-3 sm:p-6 lg:grid-cols-[1.22fr_0.78fr] lg:p-6">
                               <div className="ui-image-card relative min-h-105 overflow-hidden rounded-3xl bg-muted sm:min-h-125 lg:min-h-125">
-                                  <Image
-                                      src={heroSlides[heroIndex].image}
-                                      alt={heroSlides[heroIndex].title}
-                                      fill
-                                      sizes="(max-width: 1024px) 100vw, 760px"
-                                      className="object-cover object-[center_top] p-2 transition duration-500 ease-out sm:p-4"
-                                  />
+                  <Image
+                    src={heroSlides[heroIndex].image}
+                    alt={heroSlides[heroIndex].title}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 760px"
+                    className="object-cover object-[center_top] p-2 transition duration-500 ease-out sm:p-4"
+                  />
 
-                                  <Button
-                                      type="button"
-                                      onClick={goToPrevious}
+                  <div className="absolute inset-0 bg-linear-to-r from-black/10 via-black/5 to-transparent" />
+                  <div className="absolute left-4 top-4 z-10 max-w-md text-white sm:left-6 sm:top-6">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/80">
+                      Best Online Hardware Store
+                    </p>
+                    <h1 className="mt-2 max-w-lg text-3xl font-black leading-[1.05] sm:text-4xl">
+                      {heroSlides[heroIndex].title}
+                    </h1>
+                    <p className="mt-2 max-w-md text-sm leading-6 text-white/85 sm:text-base">
+                      {heroSlides[heroIndex].description}
+                    </p>
+                    <div className="mt-4 flex flex-col gap-2.5 sm:flex-row">
+                      <Button asChild className="h-10 rounded-full px-4 text-sm font-bold shadow-sm">
+                        <Link href={heroSlides[heroIndex].href}>Shop Now</Link>
+                      </Button>
+                      <Button
+                        asChild
+                        variant="outline"
+                        className="h-10 rounded-full border-white/35 bg-white/15 px-4 text-sm font-bold text-white hover:bg-white/25"
+                      >
+                        <Link href="/promotions">View Promotions</Link>
+                      </Button>
+                    </div>
+                  </div>
+
+                  <Button
+                    type="button"
+                    onClick={goToPrevious}
                                       aria-label="Previous banner"
                                       variant="secondary"
                                       size="icon"
@@ -138,34 +163,7 @@ export function HomePage() {
                                   </div>
                               </div>
 
-                              <div className="space-y-4 rounded-3xl border border-border bg-card p-4 sm:p-5 lg:space-y-5 lg:p-6">
-                                  <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-primary">
-                                      Best Online Hardware Store
-                                  </p>
-                                  <h1 className="max-w-lg text-3xl font-black leading-[1.05] text-secondary sm:text-4xl">
-                                      {heroSlides[heroIndex].title}
-                                  </h1>
-                                  <p className="text-sm leading-6 text-foreground/70 sm:text-base">
-                                      {heroSlides[heroIndex].description}
-                                  </p>
-                                  <div className="flex flex-col gap-2.5 sm:flex-row">
-                                      <Button
-                                          asChild
-                                          className="h-10 rounded-full px-4 text-sm font-bold shadow-sm"
-                                      >
-                                          <Link href={heroSlides[heroIndex].href}>Shop Now</Link>
-                                      </Button>
-                                      <Button
-                                          asChild
-                                          variant="outline"
-                                          className="h-10 rounded-full border-border px-4 text-sm font-bold text-foreground hover:bg-primary hover:text-white"
-                                      >
-                                          <Link href="/promotions">View Promotions</Link>
-                                      </Button>
-                                  </div>
-                              </div>
-
-                              <div className="hidden gap-4 lg:grid lg:grid-cols-1">
+                <div className="hidden gap-4 lg:grid lg:grid-cols-1">
                                   <Link
                                       href={heroSlides[1].href}
                                       className="ui-image-card group relative min-h-80 cursor-pointer overflow-hidden rounded-3xl border border-border bg-muted shadow-sm"
