@@ -15,24 +15,24 @@ export function ProductCard({ product }: Props) {
   return (
     <Card className="group overflow-hidden border-border transition hover:-translate-y-0.5 hover:shadow-md">
       <Link href={`/product/${product.sku}`} className="block">
-        <div className="relative aspect-square bg-muted p-2.5">
+        <div className="relative aspect-square bg-muted p-2">
           <Image
             src={product.image}
             alt={product.title}
             fill
             sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
-            className="ui-image-card object-contain p-2.5 transition duration-300 group-hover:scale-105"
+            className="ui-image-card object-contain p-2 transition duration-300 group-hover:scale-105"
           />
           {product.badge ? (
-            <Badge className="absolute left-2.5 top-2.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] shadow-sm">
+            <Badge className="absolute left-2 top-2 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em] shadow-sm">
               {product.badge}
             </Badge>
           ) : null}
-          <div className="absolute right-2.5 top-2.5 flex flex-col gap-2 opacity-0 transition duration-300 group-hover:opacity-100">
+          <div className="absolute right-2 top-2 flex flex-col gap-1.5 opacity-0 transition duration-300 group-hover:opacity-100">
             {['Compare', 'Quick view', 'Wishlist'].map(label => (
               <span
                 key={label}
-                className="rounded-full border border-border bg-background px-2.5 py-1 text-[10px] font-semibold text-foreground/70 shadow-sm"
+                className="rounded-full border border-border bg-background px-2 py-0.5 text-[10px] font-semibold text-foreground/70 shadow-sm"
               >
                 {label}
               </span>
@@ -40,21 +40,21 @@ export function ProductCard({ product }: Props) {
           </div>
         </div>
       </Link>
-      <CardContent className="space-y-2.5 p-4 pt-4">
+      <CardContent className="space-y-1.5 p-2.5 pt-2.5 sm:space-y-2 sm:p-4 sm:pt-4">
         <Link href={`/product/${product.sku}`} className="block">
-          <h3 className="line-clamp-2 min-h-[3.1rem] text-[13px] font-semibold leading-5 text-foreground transition hover:text-primary">
+          <h3 className="line-clamp-2 min-h-[2.4rem] text-[11px] font-semibold leading-5 text-foreground transition hover:text-primary sm:min-h-[3.1rem] sm:text-[13px]">
             {product.title}
           </h3>
         </Link>
-        <div className="flex items-center gap-1.5 text-[11px] text-foreground/55">
+        <div className="flex items-center gap-1 text-[9px] text-foreground/55 sm:text-[11px]">
           <span>Brand: {product.brand}</span>
           <span>SKU {product.sku}</span>
         </div>
-        <div className="flex items-center gap-1 text-[11px] text-primary">
+        <div className="flex items-center gap-1 text-[9px] text-primary sm:text-[11px]">
           <span>★★★★★</span>
           <span className="text-foreground/50">({product.rating})</span>
         </div>
-        <div className="flex items-center gap-2 text-[13px]">
+        <div className="flex items-center gap-2 text-[11px] sm:text-[13px]">
           <span className="font-extrabold text-primary">{product.price}</span>
           {product.oldPrice ? (
             <span className="text-foreground/45 line-through">
@@ -62,16 +62,16 @@ export function ProductCard({ product }: Props) {
             </span>
           ) : null}
         </div>
-        <div className="flex items-center justify-between text-[11px] text-foreground/60">
+        <div className="flex items-center justify-between text-[9px] text-foreground/60 sm:text-[11px]">
           <span>{product.stock}</span>
           <span>In catalog</span>
         </div>
-        <div className="grid gap-2 pt-1 sm:flex">
+        <div className="grid gap-1.5 pt-1 sm:flex sm:gap-2">
           <AddToCartButton product={product} />
           <Button
             asChild
             variant="outline"
-            className="h-12 w-full rounded-full border-border px-3 text-[11px] font-semibold text-foreground/70 sm:w-auto"
+            className="h-8 w-full rounded-full border-border px-3 text-[8px] font-semibold text-foreground/70 sm:h-12 sm:w-auto sm:text-[11px]"
           >
             <Link href={`/product/${product.sku}`}>View</Link>
           </Button>

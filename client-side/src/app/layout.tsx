@@ -26,7 +26,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en-US" className={cn('h-full', 'antialiased', poppins.variable, 'font-sans', inter.variable)}>
-          <body className="storefront-layout min-h-full flex flex-col bg-background pb-16 text-foreground lg:pb-0">
+          <body className="storefront-layout min-h-full flex flex-col bg-background pb-28 text-foreground lg:pb-0">
             <SeoScripts data={siteSchemas} />
             <Header />
             <FloatingCategoryRail />

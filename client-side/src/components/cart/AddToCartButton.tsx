@@ -18,7 +18,7 @@ export function AddToCartButton({ product }: { product: Product }) {
         setAdded(true);
         window.setTimeout(() => setAdded(false), 1200);
       }}
-      className="h-12 w-full rounded-full px-6 text-[11px] font-semibold shadow-sm sm:w-auto"
+      className="h-9 w-full rounded-full px-3 text-[9px] font-semibold shadow-sm sm:h-12 sm:w-auto sm:px-6 sm:text-[11px]"
     >
       {added ? 'Added' : 'Add to cart'}
     </Button>
