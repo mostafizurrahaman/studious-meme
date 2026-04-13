@@ -1,7 +1,10 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import {
   brands,
   categoryShowcase,
@@ -45,23 +48,23 @@ function SectionMarquee() {
     'Welcome to Malamal.com.bd. Thank you for staying with Malamal | Malamal এর পক্ষ থেকে সবাইকে জানাই স্বাগত ও শুভকামনা ।';
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-primary/20 bg-white py-3 shadow-sm">
+    <Card className="overflow-hidden border-primary/20 py-3 shadow-sm">
       <div className="animate-[marquee_28s_linear_infinite] whitespace-nowrap text-sm font-semibold text-primary">
         <span className="inline-block px-6">{message}</span>
         <span className="inline-block px-6">{message}</span>
         <span className="inline-block px-6">{message}</span>
       </div>
-    </div>
+    </Card>
   );
 }
 
 export function HomePage() {
   return (
-    <main className="flex-1 bg-[#f5f6f8] pb-16">
+    <main className="flex-1 bg-background pb-16">
       <Container>
         <div className="py-6">
           <section>
-            <div className="ui-image-card bg-white shadow-sm">
+            <Card className="overflow-hidden shadow-sm">
               <div className="grid h-full gap-4 p-5 sm:p-6 lg:grid-cols-[1.22fr_0.78fr] lg:p-6">
                 <div className="ui-image-card relative min-h-125 overflow-hidden">
                   <Image
@@ -80,12 +83,9 @@ export function HomePage() {
                       The best offers on tools and machinery
                     </h1>
                     <div className="mt-4 flex flex-wrap gap-2">
-                      <Button
-                        asChild
-                        className="rounded-full h-10 px-4 text-sm font-bold"
-                      >
-                        <Link href="/shop">Shop Now</Link>
-                      </Button>
+                    <Button asChild className="h-10 rounded-full px-4 text-sm font-bold">
+                      <Link href="/shop">Shop Now</Link>
+                    </Button>
                       <Button
                         asChild
                         variant="outline"
@@ -114,15 +114,15 @@ export function HomePage() {
                         sizes="(max-width: 1024px) 33vw, 300px"
                         className="object-cover opacity-95 transition duration-300 group-hover:scale-105"
                       />
-                      <div className="absolute inset-0 bg-linear-to-r from-[#0e2f56]/88 via-[#0e2f56]/45 to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-r from-secondary/88 via-secondary/45 to-transparent" />
                       <div className="relative z-10 flex h-full flex-col">
-                        <div className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/75">
-                          Featured {index + 1}
-                        </div>
+                      <Badge variant="secondary" className="w-fit rounded-full px-3 py-1 text-[10px] uppercase tracking-[0.28em]">
+                        Featured {index + 1}
+                      </Badge>
                         <div className="mt-auto">
-                          <h2 className="max-w-72 text-[17px] font-extrabold leading-6 text-white lg:text-[17px]">
-                            {slide.title}
-                          </h2>
+                            <h2 className="max-w-72 text-[17px] font-extrabold leading-6 text-white lg:text-[17px]">
+                              {slide.title}
+                            </h2>
                           <p className="mt-2 max-w-80 text-[13px] leading-5 text-white/85">
                             {slide.description}
                           </p>
@@ -132,7 +132,7 @@ export function HomePage() {
                   ))}
                 </div>
               </div>
-            </div>
+            </Card>
           </section>
 
           <div className="mt-4">
@@ -148,42 +148,54 @@ export function HomePage() {
             ].map(item => (
               <div
                 key={item}
-                className="rounded-2xl border border-black/10 bg-white p-4 text-center shadow-sm"
+                className="rounded-2xl border border-border bg-card p-4 text-center shadow-sm"
               >
                 <div className="mb-2 mx-auto h-2.5 w-2.5 rounded-full bg-primary" />
-                <div className="text-[11px] font-extrabold tracking-[0.18em] text-[#0e2f56]">
+                <div className="text-[11px] font-extrabold tracking-[0.18em] text-secondary">
                   {item}
                 </div>
               </div>
             ))}
           </section>
 
-          <section className="mt-8 rounded-3xl bg-white p-5 shadow-sm sm:p-6">
-            <SectionHeading title="The Best Offers" actionHref="/shop" />
+          <Card className="mt-8 shadow-sm">
+            <CardHeader className="px-5 pb-0 pt-5 sm:px-6">
+              <SectionHeading title="The Best Offers" actionHref="/shop" />
+            </CardHeader>
+            <CardContent className="px-5 pb-5 pt-6 sm:px-6">
             <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
               {offerProducts.map(product => (
                 <ProductCard key={product.sku} product={product} />
               ))}
             </div>
-          </section>
+            </CardContent>
+          </Card>
 
-          <section className="mt-8 rounded-3xl bg-white p-5 shadow-sm sm:p-6">
-            <SectionHeading title="Featured products" actionHref="/shop" />
+          <Card className="mt-8 shadow-sm">
+            <CardHeader className="px-5 pb-0 pt-5 sm:px-6">
+              <SectionHeading title="Featured products" actionHref="/shop" />
+            </CardHeader>
+            <CardContent className="px-5 pb-5 pt-6 sm:px-6">
             <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
               {featuredProducts.map(product => (
                 <ProductCard key={product.sku} product={product} />
               ))}
             </div>
-          </section>
+            </CardContent>
+          </Card>
 
-          <section className="mt-8 rounded-3xl bg-white p-5 shadow-sm sm:p-6">
-            <SectionHeading title="Latest Products" actionHref="/shop" />
+          <Card className="mt-8 shadow-sm">
+            <CardHeader className="px-5 pb-0 pt-5 sm:px-6">
+              <SectionHeading title="Latest Products" actionHref="/shop" />
+            </CardHeader>
+            <CardContent className="px-5 pb-5 pt-6 sm:px-6">
             <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
               {latestProducts.map(product => (
                 <ProductCard key={product.sku} product={product} />
               ))}
             </div>
-          </section>
+            </CardContent>
+          </Card>
 
           <section className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {categoryShowcase.map(card => (
@@ -192,27 +204,30 @@ export function HomePage() {
                 href={card.href}
                 className={`ui-card group flex h-full cursor-pointer flex-col bg-linear-to-br ${card.accent} p-6 text-white shadow-sm`}
               >
-                <div className="text-[11px] font-semibold uppercase tracking-[0.32em] text-white/70">
+                <Badge variant="secondary" className="w-fit rounded-full px-3 py-1 text-[10px] uppercase tracking-[0.32em]">
                   Category spotlight
-                </div>
+                </Badge>
                 <h3 className="mt-6 text-[26px] font-black leading-tight text-white">
                   {card.title}
                 </h3>
                 <p className="mt-3 max-w-md text-sm leading-7 text-white/90">
                   {card.description}
                 </p>
-                <Button className="mt-auto self-center rounded-full bg-white/18 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm transition group-hover:bg-white/24 hover:bg-white/24">
+                <span className="mt-auto self-center rounded-full bg-white/18 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm transition group-hover:bg-white/24">
                   Explore category
-                </Button>
+                </span>
               </Link>
             ))}
           </section>
 
-          <section className="mt-8 rounded-3xl bg-white p-5 shadow-sm sm:p-6">
-            <SectionHeading
-              title="Shop By Brands"
-              actionHref="/shop-by-brands"
-            />
+          <Card className="mt-8 shadow-sm">
+            <CardHeader className="px-5 pb-0 pt-5 sm:px-6">
+              <SectionHeading
+                title="Shop By Brands"
+                actionHref="/shop-by-brands"
+              />
+            </CardHeader>
+            <CardContent className="px-5 pb-5 pt-6 sm:px-6">
             <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
               {brands.map(brand => (
                 <Link
@@ -233,17 +248,18 @@ export function HomePage() {
                 </Link>
               ))}
             </div>
-          </section>
+            </CardContent>
+          </Card>
 
-          <section className="mt-8 grid gap-6 rounded-3xl bg-[#0e2f56] p-6 text-white shadow-sm lg:grid-cols-[1.1fr_0.9fr] lg:p-8">
+          <Card className="mt-8 grid gap-6 border-0 bg-secondary p-6 text-secondary-foreground shadow-sm lg:grid-cols-[1.1fr_0.9fr] lg:p-8">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-white/65">
+              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-secondary-foreground/65">
                 Built for the storefront workflow
               </p>
               <h2 className="mt-4 text-3xl font-black leading-tight sm:text-4xl">
                 Catalog, cart and checkout flows are all covered here.
               </h2>
-              <p className="mt-4 max-w-2xl text-sm leading-7 text-white/78 sm:text-base">
+              <p className="mt-4 max-w-2xl text-sm leading-7 text-secondary-foreground/78 sm:text-base">
                 The structure mirrors the storefront and keeps product, cart and
                 checkout sections aligned for the full shopping experience.
               </p>
@@ -257,17 +273,19 @@ export function HomePage() {
               ].map(([title, text]) => (
                 <div key={title} className="rounded-2xl bg-white/10 p-4">
                   <div className="font-semibold">{title}</div>
-                  <div className="mt-1 text-sm text-white/75">{text}</div>
+                  <div className="mt-1 text-sm text-secondary-foreground/75">{text}</div>
                 </div>
               ))}
             </div>
-          </section>
+          </Card>
 
-          <section className="mt-8 rounded-3xl bg-white p-6 shadow-sm">
-            <h2 className="text-xl font-black text-[#0e2f56] sm:text-2xl">
+          <Card className="mt-8 shadow-sm">
+            <CardContent className="p-6">
+            <h2 className="text-xl font-black text-secondary sm:text-2xl">
               Malamal.com.bd hardware store overview
             </h2>
-            <div className="mt-5 grid gap-6 text-sm leading-7 text-black/70 lg:grid-cols-2">
+            <Separator className="my-5" />
+            <div className="mt-5 grid gap-6 text-sm leading-7 text-foreground/70 lg:grid-cols-2">
               <div className="space-y-4">
                 <p>
                   Malamal.com.bd is positioned as a trusted online hardware and
@@ -292,7 +310,8 @@ export function HomePage() {
                 </p>
               </div>
             </div>
-          </section>
+            </CardContent>
+          </Card>
         </div>
       </Container>
     </main>

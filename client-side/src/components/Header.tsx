@@ -8,7 +8,7 @@ import { brands, topCategories } from '@/lib/malamal-content';
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-black/10 bg-white text-black shadow-sm">
+    <header className="sticky top-0 z-40 w-full border-b border-border bg-background text-foreground shadow-sm">
       <Container>
         <div className="flex min-h-18 items-center gap-4 py-2.5 lg:min-h-18 lg:py-3">
           <Link
@@ -27,10 +27,10 @@ export function Header() {
 
           <div className="hidden items-center lg:flex">
             <details className="group relative">
-              <summary className="list-none cursor-pointer rounded-full bg-[#0e2f56] px-4 py-3 text-sm font-semibold text-white outline-none [&::-webkit-details-marker]:hidden">
+              <summary className="list-none cursor-pointer rounded-full bg-secondary px-4 py-3 text-sm font-semibold text-secondary-foreground outline-none [&::-webkit-details-marker]:hidden">
                 Categories
               </summary>
-              <div className="absolute left-0 top-full z-20 mt-3 hidden w-240 rounded-3xl bg-white p-5 shadow-2xl ring-1 ring-black/5 group-open:block">
+              <div className="absolute left-0 top-full z-20 mt-3 hidden w-240 rounded-3xl border border-border bg-card p-5 shadow-2xl ring-1 ring-black/5 group-open:block">
                 <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr_0.9fr]">
                   <div>
                     <div className="text-xs font-bold uppercase tracking-[0.28em] text-primary">
@@ -41,7 +41,7 @@ export function Header() {
                         <Link
                           key={category.name}
                           href={category.href}
-                          className="rounded-2xl border border-black/8 px-4 py-3 hover:border-primary/30 hover:bg-primary"
+                          className="rounded-2xl border border-border px-4 py-3 transition hover:border-primary/30 hover:bg-primary hover:text-primary-foreground"
                         >
                           <div className="text-sm font-bold text-black">
                             {category.name}
@@ -71,7 +71,7 @@ export function Header() {
                         <Link
                           key={label}
                           href={href}
-                          className="rounded-2xl border border-black/8 px-4 py-3 hover:border-primary/30 hover:bg-primary"
+                          className="rounded-2xl border border-border px-4 py-3 transition hover:border-primary/30 hover:bg-primary hover:text-primary-foreground"
                         >
                           {label}
                         </Link>
@@ -87,7 +87,7 @@ export function Header() {
                         <Link
                           key={brand.name}
                           href={brand.href}
-                          className="rounded-2xl border border-black/8 px-4 py-3 text-center hover:border-primary/30 hover:bg-primary"
+                          className="rounded-2xl border border-border px-4 py-3 text-center transition hover:border-primary/30 hover:bg-primary hover:text-primary-foreground"
                         >
                           {brand.name}
                         </Link>
@@ -100,13 +100,13 @@ export function Header() {
           </div>
 
           <div className="hidden flex-1 items-center lg:flex">
-            <div className="flex w-full overflow-hidden rounded-full border border-black/10 bg-white shadow-sm">
+              <div className="flex w-full overflow-hidden rounded-full border border-border bg-background shadow-sm">
               <Input
-                className="h-11 w-full rounded-none border-0 bg-white px-4 text-sm text-black placeholder:text-black/45 shadow-none focus-visible:ring-0"
+                className="h-11 w-full rounded-none border-0 bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground shadow-none focus-visible:ring-0"
                 placeholder="Search for products"
                 aria-label="Search"
               />
-              <Button type="button" className="h-11 rounded-none bg-[#0e2f56] px-6 text-sm font-semibold text-white hover:bg-[#0e2f56]/90">
+              <Button type="button" variant="secondary" className="h-11 rounded-none px-6 text-sm font-semibold">
                 Search
               </Button>
             </div>
@@ -122,7 +122,7 @@ export function Header() {
               <Link
                 key={label}
                 href={href}
-                className="inline-flex h-10 items-center justify-center rounded-full border border-black/10 px-3 text-xs font-semibold text-black hover:border-primary/30 hover:bg-primary"
+                className="inline-flex h-10 items-center justify-center rounded-full border border-border px-3 text-xs font-semibold text-foreground transition hover:border-primary/30 hover:bg-primary hover:text-primary-foreground"
               >
                 {label}
               </Link>
@@ -131,14 +131,14 @@ export function Header() {
             <div className="text-sm leading-tight">
               <div className="font-semibold text-black">Dedicated Support</div>
               <a
-                className="font-semibold text-[#0e2f56]"
+                className="font-semibold text-secondary"
                 href="tel:+8809638212121"
               >
                 +880 9638212121
               </a>
             </div>
             <Link
-              className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary/80"
+              className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
               href="/quotation-request"
             >
               Quotation Request
@@ -152,7 +152,7 @@ export function Header() {
           <nav className="hidden min-h-12 items-center justify-between gap-4 py-2 text-xs font-semibold text-black lg:flex">
             <div className="flex flex-wrap items-center gap-5">
               <Link
-                className="inline-flex items-center rounded-full bg-primary px-3 py-1.5 text-white"
+                className="inline-flex items-center rounded-full bg-primary px-3 py-1.5 text-primary-foreground"
                 href="/main-categories"
               >
                 Categories
@@ -172,7 +172,7 @@ export function Header() {
             </div>
             <div className="flex flex-wrap items-center gap-5">
               <Link
-                className="inline-flex items-center rounded-full bg-primary px-3 py-1.5 text-white"
+                className="inline-flex items-center rounded-full bg-primary px-3 py-1.5 text-primary-foreground"
                 href="/main-categories"
               >
                 All Categories
@@ -214,7 +214,7 @@ export function Header() {
                   <Link
                     key={label}
                     href={href}
-                    className="rounded-2xl border border-black/8 px-4 py-3 text-sm font-semibold text-black hover:border-primary/30 hover:bg-primary"
+                    className="rounded-2xl border border-border px-4 py-3 text-sm font-semibold text-foreground transition hover:border-primary/30 hover:bg-primary hover:text-primary-foreground"
                   >
                     {label}
                   </Link>
@@ -229,7 +229,7 @@ export function Header() {
                     <Link
                       key={category.name}
                       href={category.href}
-                      className="rounded-2xl border border-black/8 px-4 py-3 text-sm hover:border-primary/30 hover:bg-primary"
+                      className="rounded-2xl border border-border px-4 py-3 text-sm transition hover:border-primary/30 hover:bg-primary hover:text-primary-foreground"
                     >
                       {category.name}
                     </Link>
@@ -250,7 +250,7 @@ export function Header() {
                 placeholder="Search for products"
                 aria-label="Search"
               />
-              <Button type="button" className="h-11 rounded-none bg-[#0e2f56] px-6 text-sm font-semibold text-white hover:bg-[#0e2f56]/90">
+              <Button type="button" variant="secondary" className="h-11 rounded-none px-6 text-sm font-semibold">
                 Search
               </Button>
             </div>

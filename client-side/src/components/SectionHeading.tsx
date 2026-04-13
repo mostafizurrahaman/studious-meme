@@ -16,14 +16,14 @@ export function SectionHeading({
 }: Props) {
   return (
     <div className="flex items-end justify-between gap-4">
-      <h2 className="text-lg font-extrabold tracking-tight text-[#0e2f56] sm:text-xl">
+      <h2 className="text-lg font-extrabold tracking-tight text-secondary sm:text-xl">
         {title}
       </h2>
       {actionHref ? (
         <Button
           asChild
           variant="outline"
-          className="rounded-full border-black/10 bg-white px-4 py-2 text-sm font-semibold text-primary shadow-sm hover:bg-primary/5"
+          className="rounded-full border-border bg-background px-4 py-2 text-sm font-semibold text-primary shadow-sm hover:bg-primary/5"
         >
           <Link href={actionHref}>
             {actionLabel}

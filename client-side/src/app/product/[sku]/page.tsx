@@ -2,7 +2,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { ProductCard } from '@/components/ProductCard';
 import { AddToCartButton } from '@/components/cart/AddToCartButton';
 import { allProducts, findProductBySku } from '@/lib/malamal-content';
@@ -39,24 +41,19 @@ export default async function ProductPage({ params }: Props) {
   const { sku } = await params;
   const product = findProductBySku(sku);
 
-  if (!product) {
-    notFound();
-  }
+  if (!product) notFound();
 
   const related = allProducts
     .filter(item => item.sku !== product.sku)
     .slice(0, 4);
-  const gallery = [product.image, ...related.map(item => item.image)].slice(
-    0,
-    4,
-  );
+  const gallery = [product.image, ...related.map(item => item.image)].slice(0, 4);
 
   return (
     <>
       <SeoScripts data={buildProductSchemas(product)} />
-      <main className="flex-1 bg-[#f5f6f8] pb-16">
+      <main className="flex-1 bg-background pb-16">
         <div className="mx-auto w-full max-w-310 px-4 py-6 lg:px-0">
-          <nav className="text-xs font-semibold uppercase tracking-[0.24em] text-black/45">
+          <nav className="text-xs font-semibold uppercase tracking-[0.24em] text-foreground/45">
             <Link href="/" className="hover:text-primary">
               Home
             </Link>{' '}
@@ -68,13 +65,13 @@ export default async function ProductPage({ params }: Props) {
           </nav>
 
           <section className="mt-4 grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
-            <div className="rounded-3xl bg-white p-4 shadow-sm sm:p-6">
+            <Card className="p-4 shadow-sm sm:p-6">
               <div className="grid gap-4 lg:grid-cols-[92px_minmax(0,1fr)]">
                 <div className="order-2 grid grid-cols-4 gap-3 lg:order-1 lg:grid-cols-1">
                   {gallery.map((image, index) => (
                     <div
                       key={`${image}-${index}`}
-                      className="relative aspect-square overflow-hidden rounded-2xl border border-black/8 bg-[#f5f6f8]"
+                      className="relative aspect-square overflow-hidden rounded-2xl border border-border bg-muted"
                     >
                       <Image
                         src={image}
@@ -87,7 +84,7 @@ export default async function ProductPage({ params }: Props) {
                   ))}
                 </div>
                 <div className="order-1 lg:order-2">
-                  <div className="relative aspect-square overflow-hidden rounded-3xl bg-[#f5f6f8]">
+                  <div className="relative aspect-square overflow-hidden rounded-3xl bg-muted">
                     <Image
                       src={product.image}
                       alt={product.title}
@@ -96,138 +93,117 @@ export default async function ProductPage({ params }: Props) {
                       className="object-cover"
                     />
                     {product.badge ? (
-                      <span className="absolute left-4 top-4 rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-foreground shadow-sm">
+                      <Badge className="absolute left-4 top-4 rounded-full px-3 py-1 text-xs font-bold shadow-sm">
                         {product.badge}
-                      </span>
+                      </Badge>
                     ) : null}
                   </div>
                 </div>
               </div>
-            </div>
+            </Card>
 
-            <div className="rounded-3xl bg-white p-6 shadow-sm">
+            <Card className="p-6 shadow-sm">
               <p className="text-xs font-semibold uppercase tracking-[0.28em] text-primary">
                 Product details
               </p>
-              <h1 className="mt-4 text-[28px] font-black leading-tight text-[#0e2f56] sm:text-[34px]">
+              <h1 className="mt-4 text-[28px] font-black leading-tight text-secondary sm:text-[34px]">
                 {product.title}
               </h1>
 
-              <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-black/60">
-                <span className="rounded-full bg-[#f5f6f8] px-3 py-1 font-semibold text-black/70">
-                  Brand: {product.brand}
-                </span>
-                <span className="rounded-full bg-[#f5f6f8] px-3 py-1 font-semibold text-black/70">
-                  SKU: {product.sku}
-                </span>
-                <span className="rounded-full bg-[#f5f6f8] px-3 py-1 font-semibold text-black/70">
-                  {product.stock}
-                </span>
-                <span className="rounded-full bg-[#f5f6f8] px-3 py-1 font-semibold text-black/70">
-                  Free consultation
-                </span>
+              <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-foreground/60">
+                {[
+                  `Brand: ${product.brand}`,
+                  `SKU: ${product.sku}`,
+                  product.stock,
+                  'Free consultation',
+                ].map(item => (
+                  <span key={item} className="rounded-full bg-muted px-3 py-1 font-semibold text-foreground/70">
+                    {item}
+                  </span>
+                ))}
               </div>
 
-              <div className="mt-5 flex items-center gap-2 text-sm text-black/60">
+              <div className="mt-5 flex items-center gap-2 text-sm text-foreground/60">
                 <div className="text-primary">★★★★★</div>
                 <span>Rated {product.rating}/5</span>
-                <span className="mx-1 h-1 w-1 rounded-full bg-black/25" />
+                <span className="mx-1 h-1 w-1 rounded-full bg-foreground/25" />
                 <span>Verified store listing</span>
               </div>
 
-              <div className="mt-6 rounded-3xl border border-black/8 bg-[#f5f6f8] p-5">
+              <Card className="mt-6 border-border bg-muted p-5">
                 <div className="flex items-end gap-3">
                   <div className="text-4xl font-black text-primary">
                     {product.price}
                   </div>
                   {product.oldPrice ? (
-                    <div className="pb-1 text-lg text-black/40 line-through">
+                    <div className="pb-1 text-lg text-foreground/40 line-through">
                       {product.oldPrice}
                     </div>
                   ) : null}
                 </div>
-                <div className="mt-2 text-sm text-black/55">
+                <div className="mt-2 text-sm text-foreground/55">
                   Price includes standard store margin and catalog discount.
                 </div>
-              </div>
+              </Card>
 
-              <p className="mt-5 text-[13px] leading-7 text-black/65">
+              <p className="mt-5 text-[13px] leading-7 text-foreground/65">
                 Built for workshop buyers and procurement teams, this product
-                detail view keeps the same buying rhythm used across the
-                storefront.
+                detail view keeps the same buying rhythm used across the storefront.
               </p>
 
-              <div className="mt-5 grid gap-3 rounded-3xl bg-[#0e2f56] p-4 text-sm text-white sm:grid-cols-2">
-                <div className="rounded-2xl bg-white/10 px-4 py-3">
-                  Immediate order support
-                </div>
-                <div className="rounded-2xl bg-white/10 px-4 py-3">
-                  Bulk quotation available
-                </div>
-              </div>
+              <Card className="mt-5 grid gap-3 border-0 bg-secondary p-4 text-sm text-secondary-foreground sm:grid-cols-2">
+                <div className="rounded-2xl bg-white/10 px-4 py-3">Immediate order support</div>
+                <div className="rounded-2xl bg-white/10 px-4 py-3">Bulk quotation available</div>
+              </Card>
 
               <div className="mt-6 grid gap-3 sm:grid-cols-2">
                 <AddToCartButton product={product} />
-                <Button
-                  type="button"
-                  className="h-12 rounded-full border border-[#0e2f56]/15 bg-[#0e2f56] px-6 text-sm font-bold text-white shadow-sm hover:bg-[#0e2f56]/90"
-                >
+                <Button type="button" variant="secondary" className="h-12 rounded-full px-6 text-sm font-bold shadow-sm">
                   Add to wishlist
                 </Button>
               </div>
 
-              <div className="mt-6 grid gap-3 rounded-3xl bg-[#0e2f56] p-4 text-sm text-white sm:grid-cols-3">
+              <Card className="mt-6 grid gap-3 border-0 bg-secondary p-4 text-sm text-secondary-foreground sm:grid-cols-3">
                 {[
                   ['Delivery', 'Across Bangladesh'],
                   ['Support', 'Dedicated sales team'],
                   ['Quotation', 'Bulk order ready'],
                 ].map(([label, value]) => (
-                  <div
-                    key={label}
-                    className="rounded-2xl bg-white/10 px-4 py-3"
-                  >
-                    <div className="text-xs uppercase tracking-[0.22em] text-white/65">
+                  <div key={label} className="rounded-2xl bg-white/10 px-4 py-3">
+                    <div className="text-xs uppercase tracking-[0.22em] text-secondary-foreground/65">
                       {label}
                     </div>
-                    <div className="mt-1 font-semibold text-white">{value}</div>
+                    <div className="mt-1 font-semibold text-secondary-foreground">{value}</div>
                   </div>
                 ))}
-              </div>
-            </div>
+              </Card>
+            </Card>
           </section>
 
           <section className="mt-6 grid gap-4 lg:grid-cols-[1fr_300px]">
-            <div className="rounded-3xl bg-white p-6 shadow-sm">
+            <Card className="p-6 shadow-sm">
               <div className="flex flex-wrap gap-2 text-sm font-semibold">
                 {['Description', 'Specifications', 'Reviews'].map(tab => (
-                  <span
-                    key={tab}
-                    className="rounded-full bg-[#f5f6f8] px-4 py-2 text-black/70"
-                  >
+                  <span key={tab} className="rounded-full bg-muted px-4 py-2 text-foreground/70">
                     {tab}
                   </span>
                 ))}
               </div>
               <div className="mt-6 grid gap-6 lg:grid-cols-2">
                 <div>
-                  <h2 className="text-xl font-black text-[#0e2f56]">
-                    Description
-                  </h2>
-                  <p className="mt-3 text-sm leading-7 text-black/65">
+                  <h2 className="text-xl font-black text-secondary">Description</h2>
+                  <p className="mt-3 text-sm leading-7 text-foreground/65">
                     {product.title} is displayed here with store-ready details,
                     product benefits and a clean purchase path for buyers.
                   </p>
-                  <p className="mt-3 text-sm leading-7 text-black/65">
+                  <p className="mt-3 text-sm leading-7 text-foreground/65">
                     The layout is designed to feel familiar to Malamal shoppers,
-                    with the main focus on product image, price, stock and
-                    action buttons.
+                    with the main focus on product image, price, stock and action buttons.
                   </p>
                 </div>
                 <div>
-                  <h2 className="text-xl font-black text-[#0e2f56]">
-                    Specifications
-                  </h2>
-                  <div className="mt-4 overflow-hidden rounded-2xl border border-black/8">
+                  <h2 className="text-xl font-black text-secondary">Specifications</h2>
+                  <div className="mt-4 overflow-hidden rounded-2xl border border-border">
                     {[
                       ['Brand', product.brand],
                       ['SKU', product.sku],
@@ -235,63 +211,48 @@ export default async function ProductPage({ params }: Props) {
                       ['Condition', 'Brand new'],
                       ['Warranty', 'As per manufacturer policy'],
                     ].map(([label, value]) => (
-                      <div
-                        key={label}
-                        className="grid grid-cols-[180px_1fr] border-b border-black/8 last:border-b-0"
-                      >
-                        <div className="bg-[#f5f6f8] px-4 py-3 font-semibold text-[#0e2f56]">
-                          {label}
-                        </div>
-                        <div className="px-4 py-3 text-black/65">{value}</div>
+                      <div key={label} className="grid grid-cols-[180px_1fr] border-b border-border last:border-b-0">
+                        <div className="bg-muted px-4 py-3 font-semibold text-secondary">{label}</div>
+                        <div className="px-4 py-3 text-foreground/65">{value}</div>
                       </div>
                     ))}
                   </div>
                 </div>
               </div>
-              <div className="mt-6 rounded-3xl bg-[#f5f6f8] p-5 text-sm leading-7 text-black/65">
+              <Card className="mt-6 bg-muted p-5 text-sm leading-7 text-foreground/65">
                 <p>
-                  This product page mirrors a shop-first layout with the
-                  gallery, price block, description, and specification table
-                  arranged for quick buyer decisions.
+                  This product page mirrors a shop-first layout with the gallery,
+                  price block, description, and specification table arranged for
+                  quick buyer decisions.
                 </p>
-              </div>
-            </div>
-            <aside className="rounded-3xl bg-[#0e2f56] p-6 text-white shadow-sm">
+              </Card>
+            </Card>
+
+            <Card className="border-0 bg-secondary p-6 text-secondary-foreground shadow-sm">
               <h2 className="text-xl font-black">Need bulk pricing?</h2>
-              <p className="mt-3 text-sm leading-7 text-white/78">
+              <p className="mt-3 text-sm leading-7 text-secondary-foreground/78">
                 Send your quantity and delivery location to receive a quotation
                 for project or retail purchase.
               </p>
-              <Button
-                asChild
-                className="mt-6 h-11 rounded-full bg-white px-6 text-sm font-bold text-[#0e2f56] hover:bg-white/90"
-              >
+              <Button asChild className="mt-6 h-11 rounded-full bg-white px-6 text-sm font-bold text-secondary hover:bg-white/90">
                 <Link href="/quotation-request">Request quotation</Link>
               </Button>
-              <div className="mt-6 space-y-3 text-sm text-white/80">
-                <div className="rounded-2xl bg-white/10 px-4 py-3">
-                  Bulk order support
-                </div>
-                <div className="rounded-2xl bg-white/10 px-4 py-3">
-                  Corporate procurement
-                </div>
-                <div className="rounded-2xl bg-white/10 px-4 py-3">
-                  Delivery coordination
-                </div>
+              <div className="mt-6 space-y-3 text-sm text-secondary-foreground/80">
+                <div className="rounded-2xl bg-white/10 px-4 py-3">Bulk order support</div>
+                <div className="rounded-2xl bg-white/10 px-4 py-3">Corporate procurement</div>
+                <div className="rounded-2xl bg-white/10 px-4 py-3">Delivery coordination</div>
               </div>
-            </aside>
+            </Card>
           </section>
 
-          <section className="mt-10 rounded-3xl bg-white p-5 shadow-sm sm:p-6">
-            <h2 className="text-xl font-black text-[#0e2f56]">
-              Related products
-            </h2>
+          <Card className="mt-10 p-5 shadow-sm sm:p-6">
+            <h2 className="text-xl font-black text-secondary">Related products</h2>
             <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
               {related.map(item => (
                 <ProductCard key={item.sku} product={item} />
               ))}
             </div>
-          </section>
+          </Card>
         </div>
       </main>
     </>

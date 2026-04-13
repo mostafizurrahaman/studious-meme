@@ -66,7 +66,7 @@ export const topCategories: Category[] = [
     href: '/category/power-tools',
     image: '/category-power-tools.svg',
     description: 'Drills, saws, grinders and workshop tools.',
-    accent: 'from-[#f15a24] to-[#f89c57]',
+    accent: 'from-primary to-secondary',
   },
   {
     name: 'Welding & Cutting',
@@ -455,7 +455,7 @@ export const categoryShowcase: CategoryShowcase[] = [
     slug: 'power-tools',
     href: '/category/power-tools',
     description: 'Drills, saws, routers and workshop essentials.',
-    accent: 'from-[#f15a24] to-[#f89c57]',
+    accent: 'from-primary to-secondary',
   },
   {
     title: 'Welding & cutting',

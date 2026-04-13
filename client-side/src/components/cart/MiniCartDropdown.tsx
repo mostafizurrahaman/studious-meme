@@ -3,7 +3,10 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { formatMoney } from '@/lib/cart';
 import { useCartStore } from '@/lib/cart-store';
 
@@ -19,17 +22,15 @@ export function MiniCartDropdown() {
   return (
     <details className="group relative hidden md:block">
       <summary className="list-none cursor-pointer outline-none [&::-webkit-details-marker]:hidden">
-        <div className="inline-flex h-11 items-center justify-center rounded-full border border-black/10 px-4 text-sm font-semibold text-black hover:border-primary/30 hover:bg-primary/5">
+        <div className="inline-flex h-11 items-center justify-center rounded-full border border-border px-4 text-sm font-semibold text-foreground transition hover:border-primary/30 hover:bg-primary/5">
           Cart
-          <span className="ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[11px] font-bold leading-none text-primary-foreground">
-            {count}
-          </span>
+          <Badge className="ml-2 h-5 min-w-5 px-1.5 text-[11px] leading-none">{count}</Badge>
         </div>
       </summary>
 
-      <div className="absolute right-0 top-full z-30 mt-3 w-90 rounded-3xl bg-white p-4 shadow-2xl ring-1 ring-black/5">
+      <Card className="absolute right-0 top-full z-30 mt-3 w-90 p-4 shadow-2xl">
         <div className="flex items-center justify-between">
-          <div className="text-sm font-bold text-[#0e2f56]">Mini cart</div>
+          <div className="text-sm font-bold text-secondary">Mini cart</div>
           <div className="text-xs font-semibold text-black/55">
             {count} items
           </div>
@@ -39,9 +40,9 @@ export function MiniCartDropdown() {
             items.slice(0, 3).map(item => (
               <div
                 key={item.sku}
-                className="flex gap-3 rounded-2xl border border-black/8 p-3"
+                className="flex gap-3 rounded-2xl border border-border p-3"
               >
-                <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-[#f5f6f8]">
+                <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-muted">
                   <Image
                     src={item.image}
                     alt={item.title}
@@ -68,7 +69,8 @@ export function MiniCartDropdown() {
             </div>
           )}
         </div>
-        <div className="mt-4 rounded-2xl bg-[#f5f6f8] px-4 py-3 text-sm font-semibold text-black">
+        <Separator className="my-4" />
+        <div className="rounded-2xl bg-muted px-4 py-3 text-sm font-semibold text-foreground">
           Subtotal: {formatMoney(subtotal)}
         </div>
         <Button
@@ -77,7 +79,7 @@ export function MiniCartDropdown() {
         >
           <Link href="/cart">View cart</Link>
         </Button>
-      </div>
+      </Card>
     </details>
   );
 }
