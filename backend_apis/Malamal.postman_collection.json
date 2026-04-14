@@ -1,0 +1,929 @@
+{
+    "info": {
+        "_postman_id": "BasBanGeet1-API-Collection",
+        "name": "BasBanGeet1 API",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "User",
+            "item": [
+                {
+                    "name": "Signup",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"Password123\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/user/signup",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["user", "signup"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Send Signup OTP Again",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"userEmail\": \"john@example.com\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/user/send-signup-otp-again",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["user", "send-signup-otp-again"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Verify Signup OTP",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"userEmail\": \"john@example.com\",\n  \"otp\": \"123456\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/user/verify-signup-otp",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["user", "verify-signup-otp"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Signin",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"Password123\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/user/signin",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["user", "signin"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Profile Photo",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{userAccessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "user",
+                                    "type": "file",
+                                    "src": []
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/user/update-profile-photo",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["user", "update-profile-photo"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Profile Data",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{userAccessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"John Updated\",\n  \"phone\": \"+1234567890\",\n  \"dob\": \"1990-01-01T00:00:00.000Z\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/user/update-profile-data",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["user", "update-profile-data"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Change Password",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{userAccessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"oldPassword\": \"OldPass123!\",\n  \"newPassword\": \"NewPass123!\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/user/change-password",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["user", "change-password"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Forgot Password",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"john@example.com\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/user/forgot-password",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["user", "forgot-password"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Send Forgot Password OTP Again",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"userAccessToken\": \"your_forgot_password_userAccessToken\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/user/send-forgot-password-otp-again",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["user", "send-forgot-password-otp-again"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Verify Forgot Password OTP",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"userAccessToken\": \"your_forgot_password_userAccessToken\",\n  \"otp\": \"123456\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/user/verify-forgot-password-otp",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["user", "verify-forgot-password-otp"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Reset Password",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"resetPassworduserAccessToken\": \"your_reset_userAccessToken\",\n  \"newPassword\": \"ResetPass123!\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/user/reset-password",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["user", "reset-password"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Fetch Profile",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{userAccessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/user/profile",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["user", "profile"]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Admin",
+            "item": [
+                {
+                    "name": "Get All Users",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{userAccessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/admin/users",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["admin", "users"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Change User Active Status",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{userAccessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/admin/user-isactive-status-change/:userId",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["admin", "user-isactive-status-change", ":userId"],
+                            "variable": [
+                                {
+                                    "key": "userId",
+                                    "value": "user_id_here"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Unique Product Categories",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{userAccessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/admin/products/categories",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["admin", "products", "categories"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Unique Categories and Names",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{userAccessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/admin/products/categories-and-names",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["admin", "products", "categories-and-names"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Product Category Image",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{userAccessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "category",
+                                    "value": "Dairy",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "image",
+                                    "type": "file",
+                                    "src": []
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/admin/products/category-image",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["admin", "products", "category-image"]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Pricing/Product",
+            "item": [
+                {
+                    "name": "Ingest Data",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/pricing/ingest",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["pricing", "ingest"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Search",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/pricing/search?lat=23.8103&lng=90.4125&radiusKm=5&q=Milk",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["pricing", "search"],
+                            "query": [
+                                {
+                                    "key": "lat",
+                                    "value": "23.8103"
+                                },
+                                {
+                                    "key": "lng",
+                                    "value": "90.4125"
+                                },
+                                {
+                                    "key": "radiusKm",
+                                    "value": "5"
+                                },
+                                {
+                                    "key": "q",
+                                    "value": "Milk"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Top 6 Price Drops",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/pricing/price-drops/top6",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["pricing", "price-drops", "top6"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "All Price Drops",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/pricing/price-drops",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["pricing", "price-drops"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Search Aggregate",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/pricing/search-aggregate?searchTerm=Milk",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["pricing", "search-aggregate"],
+                            "query": [
+                                {
+                                    "key": "searchTerm",
+                                    "value": "Milk"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get All Products",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/pricing/all",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["pricing", "all"]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Grocery List",
+            "item": [
+                {
+                    "name": "Get My Grocery Lists",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{userAccessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/grocery-list",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["grocery-list"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Grocery List",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{userAccessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Weekly Grocery\",\n  \"items\": [\n    {\n      \"name\": \"Milk\"   },\n    {\n      \"name\": \"Eggs\",\n  }\n  ]\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/grocery-list",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["grocery-list"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Grocery List",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{userAccessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Updated Weekly Grocery\",\n  \"items\": [\n    {\n      \"name\": \"Milk\"  }\n  ]\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/grocery-list/:id",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["grocery-list", ":id"],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "list_id_here"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Grocery List",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{userAccessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/grocery-list/:id",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["grocery-list", ":id"],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "list_id_here"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Compare Grocery List",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{userAccessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/grocery-list/:id/compare",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["grocery-list", ":id", "compare"],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "list_id_here"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Comparison History",
+            "item": [
+                {
+                    "name": "Get My Comparison Histories",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{userAccessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/comparison-history",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["comparison-history"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Single Comparison History",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{userAccessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/comparison-history/:id",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["comparison-history", ":id"],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "history_id_here"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Payment",
+            "item": [
+                {
+                    "name": "Create Premium Checkout",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{userAccessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/payments/premium/checkout",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["payments", "premium", "checkout"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Stripe Webhook",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"id\": \"evt_123\",\n  \"type\": \"checkout.session.completed\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/payments/webhook",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["payments", "webhook"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get My Current Status",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{userAccessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/payments/status",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["payments", "status"]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Page",
+            "item": [
+                {
+                    "name": "Create or Update Page",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{userAccessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"slug\": \"about-us\",\n  \"title\": \"About Our Platform\",\n  \"content\": \"This is the content for the about us page. It should be at least 10 characters long.\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/page/create-or-update",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["page", "create-or-update"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Retrieve All Pages",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/page/retrieve",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["page", "retrieve"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Retrieve Page By Slug",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/page/retrieve/:slug",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["page", "retrieve", ":slug"],
+                            "variable": [
+                                {
+                                    "key": "slug",
+                                    "value": "about-us"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Contact",
+            "item": [
+                {
+                    "name": "Get All Contacts (Admin)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{userAccessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/contact",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["contact"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Contact",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{userAccessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"subject\": \"General Inquiry\",\n  \"message\": \"I have a question about your pricing and services. Please get back to me.\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/contact",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["contact"]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Monitor",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/monitor",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["monitor"]
+                }
+            },
+            "response": []
+        }
+    ],
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:5000/api/v1",
+            "type": "string"
+        },
+        {
+            "key": "vercelUrl",
+            "value": "https://bas-ban-geet1-apis.vercel.app/api/v1",
+            "type": "string"
+        },
+        {
+            "key": "superAdminAccessToken",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "adminAccessToken",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "userAccessToken",
+            "value": "",
+            "type": "string"
+        }
+    ]
+}
