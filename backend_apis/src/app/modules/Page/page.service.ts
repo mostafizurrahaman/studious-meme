@@ -1,7 +1,7 @@
 import { IPagePayload } from './page.interface';
 import { Page } from './page.model';
 
-// createOrUpdatePageIntoDB
+// 1. createOrUpdatePageIntoDB
 const createOrUpdatePageIntoDB = async (payload: IPagePayload) => {
     const result = await Page.findOneAndUpdate({ slug: payload.slug }, payload, {
         upsert: true,
@@ -11,14 +11,14 @@ const createOrUpdatePageIntoDB = async (payload: IPagePayload) => {
     return result;
 };
 
-// getAllPagesFromDB
+// 2. getAllPagesFromDB
 const getAllPagesFromDB = async () => {
     const result = await Page.find();
 
     return result;
 };
 
-// getPageBySlugFromDB
+// 3. getPageBySlugFromDB
 const getPageBySlugFromDB = async (slug: string) => {
     const result = await Page.findOne({ slug });
 

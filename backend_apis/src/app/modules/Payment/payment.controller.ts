@@ -2,7 +2,7 @@ import httpStatus from 'http-status';
 import { asyncHandler, sendResponse } from '../../utils';
 import { PaymentService } from './payment.service';
 
-// createPremiumCheckout
+// 1. createPremiumCheckout
 const createPremiumCheckout = asyncHandler(async (req, res) => {
     const result = await PaymentService.createPremiumCheckoutSession(req.user);
 
@@ -13,7 +13,7 @@ const createPremiumCheckout = asyncHandler(async (req, res) => {
     });
 });
 
-// stripeWebhook
+// 2. stripeWebhook
 const stripeWebhook = asyncHandler(async (req, res) => {
     const signature = req.headers['stripe-signature'];
     const rawBody: Buffer = (req as { rawBody?: Buffer }).rawBody!;
@@ -23,7 +23,7 @@ const stripeWebhook = asyncHandler(async (req, res) => {
     res.status(httpStatus.OK).json(result);
 });
 
-// getMyCurrentStatus
+// 3. getMyCurrentStatus
 const getMyCurrentStatus = asyncHandler(async (req, res) => {
     const result = await PaymentService.getMyCurrentStatus(req.user);
 
@@ -34,7 +34,7 @@ const getMyCurrentStatus = asyncHandler(async (req, res) => {
     });
 });
 
-// getAllPaymentsForAdmin
+// 4. getAllPaymentsForAdmin
 const getAllPaymentsForAdmin = asyncHandler(async (req, res) => {
     const result = await PaymentService.getAllPaymentsForAdminFromDB(req.query);
 

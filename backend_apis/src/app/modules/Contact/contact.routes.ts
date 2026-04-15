@@ -6,10 +6,10 @@ import { ContactController } from './contact.controller';
 
 const router = Router();
 
-// adminGetAllContacts
+// 1. adminGetAllContacts
 router.route('/').get(auth(ROLE.ADMIN, ROLE.SUPER_ADMIN), ContactController.adminGetAllContacts);
 
-// createContact
+// 2. createContact
 router
     .route('/')
     .post(

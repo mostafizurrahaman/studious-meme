@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-// createContactValidation
+// 1. createContactValidation
 export const createContactValidation = z.object({
     body: z.object({
         // name: z.string({

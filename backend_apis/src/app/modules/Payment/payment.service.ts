@@ -250,6 +250,7 @@ type PaymentServiceResult = {
     summary?: { totalAmount: number };
 };
 
+// 1. unsupportedPaymentFeature
 const unsupportedPaymentFeature = async (...args: unknown[]): Promise<PaymentServiceResult> => {
     void args;
 

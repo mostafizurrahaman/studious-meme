@@ -2,7 +2,7 @@ import { asyncHandler, sendResponse } from '../../utils';
 import { ContactService } from './contact.service';
 import httpStatus from 'http-status';
 
-// adminGetAllContacts
+// 1. adminGetAllContacts
 const adminGetAllContacts = asyncHandler(async (req, res) => {
     const result = await ContactService.adminGetAllContactsFromDB(req.query);
 
@@ -14,7 +14,7 @@ const adminGetAllContacts = asyncHandler(async (req, res) => {
     });
 });
 
-// createContact
+// 2. createContact
 const createContact = asyncHandler(async (req, res) => {
     const result = await ContactService.createContactInDB(req.user, req.body);
 

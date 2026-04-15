@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { PageSlugs, TPageSlugs } from './page.constant';
 
+// 1. createOrUpdatePageSchema
 const createOrUpdatePageSchema = z.object({
     body: z.object({
         slug: z

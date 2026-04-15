@@ -2,6 +2,7 @@ import httpStatus from 'http-status';
 import { asyncHandler, sendResponse } from '../../utils';
 import { ComparisonHistoryService } from './comparisonHistory.service';
 
+// 1. getComparisonSuggestions
 const getComparisonSuggestions = asyncHandler(async (_req, res) => {
     const result = await ComparisonHistoryService.getComparisonSuggestionsFromDB();
 
@@ -12,6 +13,7 @@ const getComparisonSuggestions = asyncHandler(async (_req, res) => {
     });
 });
 
+// 2. compareProducts
 const compareProducts = asyncHandler(async (req, res) => {
     const { IDs } = req.body as { IDs: string[] };
     const result = await ComparisonHistoryService.compareProductsFromDB(IDs);
@@ -23,6 +25,7 @@ const compareProducts = asyncHandler(async (req, res) => {
     });
 });
 
+// 3. getComparisonHistory
 const getComparisonHistory = asyncHandler(async (_req, res) => {
     const result = await ComparisonHistoryService.getComparisonHistoryFromDB();
 
@@ -33,6 +36,7 @@ const getComparisonHistory = asyncHandler(async (_req, res) => {
     });
 });
 
+// 4. clearComparisonHistory
 const clearComparisonHistory = asyncHandler(async (_req, res) => {
     await ComparisonHistoryService.clearComparisonHistoryFromDB();
 

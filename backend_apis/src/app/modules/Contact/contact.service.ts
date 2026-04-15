@@ -5,7 +5,7 @@ import httpStatus from 'http-status';
 import { IUser } from '../User/user.interface';
 import { IMeta } from '../../types';
 
-// adminGetAllContactsFromDB
+// 1. adminGetAllContactsFromDB
 const adminGetAllContactsFromDB = async (
     query: Record<string, unknown>,
 ): Promise<{ data: IContact[]; meta: IMeta }> => {
@@ -41,7 +41,7 @@ const adminGetAllContactsFromDB = async (
     return { data: contacts, meta };
 };
 
-// createContactInDB
+// 2. createContactInDB
 const createContactInDB = async (userData: IUser, contactData: IContact) => {
     contactData.name = userData?.name;
     contactData.email = userData?.email;

@@ -3,7 +3,7 @@ import { asyncHandler } from '../../utils';
 import { sendResponse } from '../../utils';
 import { PageService } from './page.service';
 
-// createOrUpdatePage
+// 1. createOrUpdatePage
 const createOrUpdatePage = asyncHandler(async (req, res) => {
     const result = await PageService.createOrUpdatePageIntoDB(req.body);
 
@@ -14,7 +14,7 @@ const createOrUpdatePage = asyncHandler(async (req, res) => {
     });
 });
 
-// getAllPages
+// 2. getAllPages
 const getAllPages = asyncHandler(async (req, res) => {
     const result = await PageService.getAllPagesFromDB();
 
@@ -25,7 +25,7 @@ const getAllPages = asyncHandler(async (req, res) => {
     });
 });
 
-// getPageBySlug
+// 3. getPageBySlug
 const getPageBySlug = asyncHandler(async (req, res) => {
     const { slug } = req.params;
     const result = await PageService.getPageBySlugFromDB(slug as string);

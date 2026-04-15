@@ -7,19 +7,25 @@ const getComparisonSuggestionsFromDB = async () => {
     return ProductModel.find({ isActive: true, isFeatured: true }).sort({ createdAt: -1 }).limit(3).lean();
 };
 
+// 1. compareProductsFromDB
 const compareProductsFromDB = async (IDs: string[]) => {
-    if (IDs.length < 2) {
+    const uniqueIDs = [...new Set(IDs)];
+
+    if (uniqueIDs.length < 2) {
         throw new AppError(httpStatus.BAD_REQUEST, 'At least two valid IDs are required!');
     }
 
-    const selectedProducts = await ProductModel.find({ _id: { $in: IDs }, isActive: true })
+    const selectedProducts = await ProductModel.find({ _id: { $in: uniqueIDs }, isActive: true })
         .populate('brand')
         .populate('category')
-        .populate('subCategory')
         .lean();
 
+    if (selectedProducts.length !== uniqueIDs.length) {
+        throw new AppError(httpStatus.NOT_FOUND, 'One or more products were not found or are inactive!');
+    }
+
     const record = await ComparisonHistoryModel.create({
-        IDs,
+        IDs: uniqueIDs,
         products: selectedProducts.map(product => ({
             title: product.title,
             brand: (product.brand as unknown as { name: string }).name,
@@ -46,10 +52,6 @@ const compareProductsFromDB = async (IDs: string[]) => {
             { label: 'SKU', values: selectedProducts.map(product => product.sku) },
             { label: 'Title', values: selectedProducts.map(product => product.title) },
             { label: 'Slug', values: selectedProducts.map(product => product.slug) },
-            {
-                label: 'Brand',
-                values: selectedProducts.map(product => (product.brand as unknown as { name: string }).name),
-            },
             { label: 'Image', values: selectedProducts.map(product => product.image) },
             {
                 label: 'Category',
