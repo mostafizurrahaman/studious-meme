@@ -23,19 +23,19 @@ import { Container } from '@/components/Container';
 const heroSlides = [
     {
         title: 'Industrial tools for every project',
-        description: 'Dedicated categories for workshop, construction, cleaning and packaging equipment.',
+        description: 'Dedicated categories for workshop, construction, cleaning and packaging equipment.', // for metadata
         image: 'https://malamal.com.bd/wp-content/uploads/2025/01/vacuum-packaging-sealer-machine-dz-400-pc.webp',
         href: '/shop',
     },
     {
         title: 'Reliable welding and cutting machines',
-        description: 'High-volume gear with a clean buying flow for the full catalog.',
+        description: 'High-volume gear with a clean buying flow for the full catalog.', // for metadata
         image: 'https://malamal.com.bd/wp-content/uploads/2024/11/winner-welding-machine-pc.webp',
         href: '/shop',
     },
     {
         title: 'Garage tools and cleaning solutions',
-        description: 'Product discovery built like the reference site with a fast browsing experience.',
+        description: 'Product discovery built like the reference site with a fast browsing experience.', // for metadata
         image: 'https://malamal.com.bd/wp-content/uploads/2024/11/garage-tools-and-equipment-pc.webp',
         href: '/shop',
     },
@@ -61,15 +61,15 @@ export function HomePage() {
 
     useEffect(() => {
         const timer = window.setInterval(() => {
-            setHeroIndex(current => (current + 1) % heroSlides.length);
+            setHeroIndex(prev => (prev + 1) % heroSlides.length);
         }, 5000);
 
         return () => window.clearInterval(timer);
     }, []);
 
-    const goToPrevious = () => setHeroIndex(current => (current - 1 + heroSlides.length) % heroSlides.length);
+    const goToPrevious = () => setHeroIndex(prev => (prev - 1 + heroSlides.length) % heroSlides.length);
 
-    const goToNext = () => setHeroIndex(current => (current + 1) % heroSlides.length);
+    const goToNext = () => setHeroIndex(prev => (prev + 1) % heroSlides.length);
 
     return (
         <main className="flex-1 bg-background pb-16">

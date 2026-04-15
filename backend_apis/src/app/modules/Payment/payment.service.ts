@@ -237,3 +237,38 @@
 //     getMyCurrentStatus,
 //     getAllPaymentsForAdminFromDB,
 // };
+
+type PaymentServiceResult = {
+    sessionId?: string;
+    url?: string;
+    received?: boolean;
+    plan?: string;
+    premiumUntil?: Date | null;
+    isPremium?: boolean;
+    data?: unknown[];
+    meta?: { page: number; limit: number; total: number; totalPage: number };
+    summary?: { totalAmount: number };
+};
+
+const unsupportedPaymentFeature = async (...args: unknown[]): Promise<PaymentServiceResult> => {
+    void args;
+
+    return {
+        sessionId: '',
+        url: '',
+        received: true,
+        plan: 'FREE',
+        premiumUntil: null,
+        isPremium: false,
+        data: [],
+        meta: { page: 1, limit: 10, total: 0, totalPage: 0 },
+        summary: { totalAmount: 0 },
+    };
+};
+
+export const PaymentService = {
+    createPremiumCheckoutSession: unsupportedPaymentFeature,
+    handleStripeWebhook: unsupportedPaymentFeature,
+    getMyCurrentStatus: unsupportedPaymentFeature,
+    getAllPaymentsForAdminFromDB: unsupportedPaymentFeature,
+};

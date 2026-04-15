@@ -143,7 +143,7 @@ async function main() {
             // '55 8 * * *', // 8:55 AM every day
             '0 0 * * *', // 12:00 AM every day
             () => {
-                PricingService.ingestOnce().catch(e => console.error(e));
+                PricingService.ingestOnce().catch((e: unknown) => console.error(e));
             },
             {
                 timezone: 'Europe/Amsterdam',
@@ -156,13 +156,13 @@ async function main() {
         process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
         // Handling uncaught exceptions
-        process.on('uncaughtException', error => {
+        process.on('uncaughtException', (error: unknown) => {
             console.error(colors.red('😈 Uncaught Exception:'), error);
             gracefulShutdown('uncaughtException');
         });
 
         // Handling unhandled promise rejections
-        process.on('unhandledRejection', error => {
+        process.on('unhandledRejection', (error: unknown) => {
             console.error(colors.red('😈 Unhandled Rejection:'), error);
             gracefulShutdown('unhandledRejection');
         });

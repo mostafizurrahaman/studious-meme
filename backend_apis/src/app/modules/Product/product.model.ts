@@ -1,84 +1,63 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+export { ProductModel, type IProduct } from '../Storefront/Product/product.model';
+import { model, Schema } from 'mongoose';
 
-export interface IShop extends Document {
-    name: string;
-    website?: string;
-
-    address?: string;
-    location: {
-        type: 'Point';
-        coordinates: [number, number]; // [lng, lat]
-    };
-    createdAt: Date;
-    updatedAt: Date;
-}
-
-export interface IProductPrice extends Document {
+export interface IProductPrice {
     productId?: string;
-    productName: string;
+    productName?: string;
     category?: string;
-    price: number;
-    unitPrice: number;
-    currency: string;
-    unit: string; // e.g., kg, L, piece
-    unitSize: string;
+    unit?: string;
+    unitSize?: string;
+    currency?: string;
+    price?: number;
+    unitPrice?: number;
     discount?: number;
-    shop: Types.ObjectId;
-    // raw source refs to help debug
-    sourceActor?: string;
     sourceUrl?: string;
     imageUrl?: string;
-    updatedAt: Date;
-    createdAt: Date;
+    shop?: string;
 }
 
-const ShopSchema = new Schema<IShop>(
-    {
-        name: { type: String, required: true, index: true },
-        website: { type: String },
+export interface IShop {
+    name: string;
+    website?: string;
+    address?: string;
+    location?: { type: 'Point'; coordinates: [number, number] };
+    createdAt?: Date;
+    updatedAt?: Date;
+}
 
-        address: { type: String },
-        location: {
-            type: { type: String, enum: ['Point'], default: 'Point' },
-            coordinates: { type: [Number], index: '2dsphere' },
-        },
-    },
-    { timestamps: true, versionKey: false },
-);
-
-const ProductPriceSchema = new Schema<IProductPrice>(
+const productPriceSchema = new Schema<IProductPrice>(
     {
-        productId: { type: String, index: true },
-        productName: { type: String, required: true, index: true },
-        category: { type: String, index: true },
-        price: { type: Number, required: true, index: true },
-        unitPrice: { type: Number, required: true, index: true },
-        currency: { type: String, required: true, default: 'EUR' },
+        productId: { type: String },
+        productName: { type: String },
+        category: { type: String },
         unit: { type: String },
         unitSize: { type: String },
+        currency: { type: String },
+        price: { type: Number },
+        unitPrice: { type: Number },
         discount: { type: Number },
-        shop: {
-            type: Schema.Types.ObjectId,
-            ref: 'Shop',
-            required: true,
-            index: true,
-        },
-        sourceActor: { type: String },
         sourceUrl: { type: String },
         imageUrl: { type: String },
+        shop: { type: String },
     },
     { timestamps: true, versionKey: false },
 );
 
-// Useful compound index to avoid duplicates on periodic runs
-ProductPriceSchema.index({ productName: 1, unit: 1, shop: 1 }, { name: 'uniq_product_shop', unique: false });
+const shopSchema = new Schema<IShop>(
+    {
+        name: { type: String },
+        website: { type: String },
+        address: { type: String },
+        location: {
+            type: {
+                type: String,
+                default: 'Point',
+            },
+            coordinates: { type: [Number], default: undefined },
+        },
+    },
+    { timestamps: true, versionKey: false },
+);
 
-// TTL (Time To Live) index... this will remove a document after 7 days
-// ProductPriceSchema.index(
-//   { createdAt: 1 },
-//   { expireAfterSeconds: 7 * 24 * 60 * 60 },
-// );
-
-export const ShopModel = mongoose.model<IShop>('Shop', ShopSchema);
-
-export const ProductPriceModel = mongoose.model<IProductPrice>('ProductPrice', ProductPriceSchema);
+export const ProductPriceModel = model<IProductPrice>('ProductPrice', productPriceSchema);
+export const ShopModel = model<IShop>('Shop', shopSchema);

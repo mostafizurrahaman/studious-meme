@@ -380,9 +380,9 @@ const getUniqueProductCategoriesFromDB = async (): Promise<string[]> => {
     const categories = await ProductPriceModel.distinct('category', filter);
 
     return categories
-        .map(c => String(c).trim())
+        .map((c: unknown) => String(c).trim())
         .filter(Boolean)
-        .sort((a, b) => a.localeCompare(b));
+        .sort((a: string, b: string) => a.localeCompare(b));
 };
 
 // 6. getUniqueProductNamesFromDB
@@ -394,9 +394,9 @@ const getUniqueProductNamesFromDB = async (): Promise<string[]> => {
     const names = await ProductPriceModel.distinct('productName', filter);
 
     return names
-        .map(n => String(n).trim())
+        .map((n: unknown) => String(n).trim())
         .filter(Boolean)
-        .sort((a, b) => a.localeCompare(b));
+        .sort((a: string, b: string) => a.localeCompare(b));
 };
 
 // 7. getUniqueProductCategoriesAndNamesFromDB
@@ -418,7 +418,7 @@ const getUniqueProductCategoriesAndNamesFromDB = async (): Promise<string[]> => 
     ]);
 
     // flatMap to get a single array of category and names
-    return result.flatMap(item => {
+    return result.flatMap((item: { _id: string; names: string[] }) => {
         const sortedNames = item.names.sort((a: string, b: string) => a.localeCompare(b));
         return [item._id, ...sortedNames]; // First category, then its names
     });
@@ -473,7 +473,17 @@ const getProductsAvailableInAtLeastTwoShopsFromDB = async () => {
         },
     ]);
 
-    return result.map(item => ({
+    return result.map((item: {
+        _id: {
+            productName?: string;
+            category?: string;
+            unit?: string;
+            unitSize?: string;
+            currency?: string;
+        };
+        shopCount?: number;
+        offers?: Array<Record<string, unknown>>;
+    }) => ({
         productName: item?._id?.productName,
         category: item?._id?.category,
         unit: item?._id?.unit,
@@ -538,7 +548,15 @@ const getAllShopsFromDB = async () => {
         .sort({ name: 1 })
         .lean();
 
-    return shops.map(shop => ({
+    return shops.map((shop: {
+        _id: unknown;
+        name: string;
+        website?: string;
+        address?: string;
+        location?: { coordinates?: [number, number] };
+        createdAt?: Date;
+        updatedAt?: Date;
+    }) => ({
         id: String(shop._id),
         name: shop.name,
         website: shop.website,
