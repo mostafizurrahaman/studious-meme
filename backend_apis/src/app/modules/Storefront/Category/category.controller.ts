@@ -5,7 +5,7 @@ import { CategoryService } from './category.service';
 const getParam = (value: string | string[]) => (Array.isArray(value) ? value[0] : value);
 
 const createCategory = asyncHandler(async (req, res) => {
-    const result = await CategoryService.createCategoryIntoDB(req.body);
+    const result = await CategoryService.createCategoryIntoDB(req.body, req.file);
     sendResponse(res, { statusCode: httpStatus.CREATED, message: 'Category created successfully!', data: result });
 });
 
@@ -20,7 +20,7 @@ const getCategory = asyncHandler(async (req, res) => {
 });
 
 const updateCategory = asyncHandler(async (req, res) => {
-    const result = await CategoryService.updateCategoryIntoDB(getParam(req.params.slug), req.body);
+    const result = await CategoryService.updateCategoryIntoDB(getParam(req.params.slug), req.body, req.file);
     if (!result) throw new AppError(httpStatus.NOT_FOUND, 'Category not found!');
     sendResponse(res, { statusCode: httpStatus.OK, message: 'Category updated successfully!', data: result });
 });
@@ -32,12 +32,17 @@ const deleteCategory = asyncHandler(async (req, res) => {
 });
 
 const createCategorySubCategory = asyncHandler(async (req, res) => {
-    const result = await CategoryService.createCategorySubCategoryIntoDB(getParam(req.params.slug), req.body);
+    const result = await CategoryService.createCategorySubCategoryIntoDB(getParam(req.params.slug), req.body, req.file);
     sendResponse(res, { statusCode: httpStatus.CREATED, message: 'Subcategory created successfully!', data: result });
 });
 
 const updateCategorySubCategory = asyncHandler(async (req, res) => {
-    const result = await CategoryService.updateCategorySubCategoryIntoDB(getParam(req.params.slug), getParam(req.params.subCategorySlug), req.body);
+    const result = await CategoryService.updateCategorySubCategoryIntoDB(
+        getParam(req.params.slug),
+        getParam(req.params.subCategorySlug),
+        req.body,
+        req.file,
+    );
     if (!result) throw new AppError(httpStatus.NOT_FOUND, 'Subcategory not found!');
     sendResponse(res, { statusCode: httpStatus.OK, message: 'Subcategory updated successfully!', data: result });
 });

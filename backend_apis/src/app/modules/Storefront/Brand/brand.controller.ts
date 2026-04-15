@@ -5,7 +5,7 @@ import { BrandService } from './brand.service';
 const getParam = (value: string | string[]) => (Array.isArray(value) ? value[0] : value);
 
 const createBrand = asyncHandler(async (req, res) => {
-    const result = await BrandService.createBrandIntoDB(req.body);
+    const result = await BrandService.createBrandIntoDB(req.body, req.file);
     sendResponse(res, { statusCode: httpStatus.CREATED, message: 'Brand created successfully!', data: result });
 });
 
@@ -20,7 +20,7 @@ const getBrand = asyncHandler(async (req, res) => {
 });
 
 const updateBrand = asyncHandler(async (req, res) => {
-    const result = await BrandService.updateBrandIntoDB(getParam(req.params.slug), req.body);
+    const result = await BrandService.updateBrandIntoDB(getParam(req.params.slug), req.body, req.file);
     if (!result) throw new AppError(httpStatus.NOT_FOUND, 'Brand not found!');
     sendResponse(res, { statusCode: httpStatus.OK, message: 'Brand updated successfully!', data: result });
 });

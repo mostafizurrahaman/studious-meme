@@ -5,7 +5,7 @@ import { AdminService } from './admin.service';
 const getSingleParam = (value: string | string[]) => (Array.isArray(value) ? value[0] : value);
 
 const createAdmin = asyncHandler(async (req, res) => {
-    const result = await AdminService.createAdminIntoDB(req.body);
+    const result = await AdminService.createAdminIntoDB(req.body, req.file);
     sendResponse(res, { statusCode: httpStatus.CREATED, message: 'Admin created successfully!', data: result });
 });
 
@@ -20,7 +20,7 @@ const getAdmin = asyncHandler(async (req, res) => {
 });
 
 const updateAdmin = asyncHandler(async (req, res) => {
-    const result = await AdminService.updateAdminIntoDB(getSingleParam(req.params.userId), req.body);
+    const result = await AdminService.updateAdminIntoDB(getSingleParam(req.params.userId), req.body, req.file);
     sendResponse(res, { statusCode: httpStatus.OK, message: 'Admin updated successfully!', data: result });
 });
 

@@ -5,7 +5,7 @@ import { ProductService } from './product.service';
 const getParam = (value: string | string[]) => (Array.isArray(value) ? value[0] : value);
 
 const createProduct = asyncHandler(async (req, res) => {
-    const result = await ProductService.createProductIntoDB(req.body);
+    const result = await ProductService.createProductIntoDB(req.body, req.file);
     sendResponse(res, { statusCode: httpStatus.CREATED, message: 'Product created successfully!', data: result });
 });
 
@@ -20,7 +20,7 @@ const getProduct = asyncHandler(async (req, res) => {
 });
 
 const updateProduct = asyncHandler(async (req, res) => {
-    const result = await ProductService.updateProductIntoDB(getParam(req.params.slug), req.body);
+    const result = await ProductService.updateProductIntoDB(getParam(req.params.slug), req.body, req.file);
     if (!result) throw new AppError(httpStatus.NOT_FOUND, 'Product not found!');
     sendResponse(res, { statusCode: httpStatus.OK, message: 'Product updated successfully!', data: result });
 });
