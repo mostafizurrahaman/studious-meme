@@ -1,4 +1,13 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Malamal storefront/dashboard built with [Next.js 16.2.3](https://nextjs.org), React 19, TypeScript, Tailwind, Radix/shadcn UI, and Zustand.
+
+## Project Rules
+
+- Prefer Server Components first.
+- Use Server Actions (`'use server'`) for mutations when possible.
+- Keep Client Components minimal.
+- Avoid `app/api` unless a Route Handler is necessary.
+- Use `generateMetadata`, JSON-LD/schema, and page metadata for SEO.
+- Use cache tags and revalidation helpers (`revalidatePath`, `revalidateTag`, `updateTag`) for fast updates.
 
 ## Getting Started
 
@@ -16,9 +25,9 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+You can start editing the page by modifying files under `src/app/`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load local fonts.
 
 ## Learn More
 

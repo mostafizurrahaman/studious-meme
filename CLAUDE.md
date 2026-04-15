@@ -2,8 +2,8 @@
 
 ## Project
 
-React 19 + TypeScript + Vite dashboard. Primary stack: React Router, Redux Toolkit, Redux Persist, Tailwind,
-Radix/shadcn UI.
+Monorepo with a Next.js 16.2.3 storefront/dashboard in `client-side/` and an Express/Mongo backend in `backend_apis/`.
+Primary frontend stack: Next.js App Router, React 19, TypeScript, Tailwind, Radix/shadcn UI, Zustand.
 
 ## Main Agent
 
@@ -12,7 +12,9 @@ Use the main agent as the coordinator. It should:
 - break work into small tasks
 - assign one subagent per concern
 - merge findings before editing code
-- keep route, state, and UI changes aligned
+- keep route, state, SEO, and UI changes aligned
+- prefer Server Components and Server Actions; keep Client Components minimal
+- use metadata/generateMetadata and schema/script data for SEO when appropriate
 - verify with `pnpm lint` and `pnpm build` when relevant
 
 ## Shared Context
@@ -130,6 +132,6 @@ The main agent then decides the final implementation order.
 ## Notes
 
 - Keep changes minimal.
-- Prefer existing folder structure in `src/`.
+- Prefer existing folder structure in `client-side/src/` and `backend_apis/src/`.
 - Do not touch unrelated files.
 - Treat previous agent output as the current working context.
