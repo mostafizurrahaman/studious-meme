@@ -26,7 +26,7 @@ const moduleRoutes = [
         route: AdminRoutes,
     },
     {
-        path: '/payments',
+        path: '/payment',
         route: PaymentRoutes,
     },
     {
@@ -38,19 +38,19 @@ const moduleRoutes = [
         route: ContactRoutes,
     },
     {
-        path: '/storefront',
+        path: '/hero',
         route: HeroSectionRoutes,
     },
     {
-        path: '/storefront',
+        path: '/brand',
         route: BrandRoutes,
     },
     {
-        path: '/storefront',
+        path: '/category',
         route: CategoryRoutes,
     },
     {
-        path: '/storefront',
+        path: '/product',
         route: ProductRoutes,
     },
 ];

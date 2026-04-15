@@ -1,6 +1,10 @@
 import { createAccessToken, createRefreshToken, verifyToken } from './token';
 import generateOtp from './generateOtp';
-import multerUpload, { sendImageToCloudinary, deleteImageFromCloudinary } from './upload';
+import multerUpload, {
+    deleteImageFromCloudinary,
+    sendImageToCloudinary,
+    uploadFilesAndInjectUrls,
+} from './upload';
 
 export {
     createAccessToken,
@@ -10,4 +14,5 @@ export {
     multerUpload,
     sendImageToCloudinary,
     deleteImageFromCloudinary,
+    uploadFilesAndInjectUrls,
 };

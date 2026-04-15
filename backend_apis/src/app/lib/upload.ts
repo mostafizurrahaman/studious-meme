@@ -209,6 +209,73 @@ import type { Express } from 'express';
 
 export type MulterFile = Express.Multer.File;
 
+export const uploadFilesAndInjectUrls = async <T extends Record<string, unknown>>(
+    payload: T,
+    files: MulterFile[] = [],
+): Promise<T> => {
+    const nextPayload = JSON.parse(JSON.stringify(payload)) as T;
+    const uploadedUrls: string[] = [];
+
+    const toPathSegments = (fieldname: string) =>
+        fieldname
+            .replace(/\[(\d+)\]/g, '.$1')
+            .split('.')
+            .map(segment => segment.trim())
+            .filter(Boolean);
+
+    const setNestedValue = (target: Record<string, unknown>, segments: string[], value: string) => {
+        let current: Record<string, unknown> | unknown[] = target;
+
+        segments.forEach((segment, index) => {
+            const isLast = index === segments.length - 1;
+            const nextSegment = segments[index + 1];
+            const isIndex = /^\d+$/.test(segment);
+
+            if (isLast) {
+                if (Array.isArray(current) && isIndex) {
+                    current[Number(segment)] = value;
+                    return;
+                }
+
+                (current as Record<string, unknown>)[segment] = value;
+                return;
+            }
+
+            const shouldBeArray = /^\d+$/.test(nextSegment || '');
+
+            if (Array.isArray(current) && isIndex) {
+                if (current[Number(segment)] == null) {
+                    current[Number(segment)] = shouldBeArray ? [] : {};
+                }
+
+                current = current[Number(segment)] as Record<string, unknown> | unknown[];
+                return;
+            }
+
+            const existingValue = (current as Record<string, unknown>)[segment];
+
+            if (existingValue == null || typeof existingValue !== 'object') {
+                (current as Record<string, unknown>)[segment] = shouldBeArray ? [] : {};
+            }
+
+            current = (current as Record<string, unknown>)[segment] as Record<string, unknown> | unknown[];
+        });
+    };
+
+    try {
+        for (const file of files) {
+            const { secure_url } = await sendImageToCloudinary(file);
+            uploadedUrls.push(secure_url);
+            setNestedValue(nextPayload as Record<string, unknown>, toPathSegments(file.fieldname), secure_url);
+        }
+
+        return nextPayload;
+    } catch (error) {
+        await Promise.all(uploadedUrls.map(url => deleteImageFromCloudinary(url)));
+        throw error;
+    }
+};
+
 /* ------------------------------------------------------- */
 /*                Cloudinary Configuration                 */
 /* ------------------------------------------------------- */

@@ -5,6 +5,18 @@ import { CategoryModel } from '../Category/category.model';
 import { HeroSectionModel } from './heroSection.model';
 import { ProductModel } from '../Product/product.model';
 import { IHeroSection } from './heroSection.interface';
+import { deleteImageFromCloudinary, uploadFilesAndInjectUrls } from '../../../lib';
+import { MulterFile } from '../../../lib/upload';
+
+const ensureHeroSectionImages = (payload: Partial<IHeroSection>) => {
+    const cards = [...(payload.slides || []), ...(payload.features || [])];
+
+    const missing = cards.some(card => !card.image);
+
+    if (missing) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'Hero section image is required for every slide and feature card!');
+    }
+};
 
 const getHomeContentFromDB = async () => {
     const [heroSection, brands, categories, featuredProducts, latestProducts] = await Promise.all([
@@ -34,15 +46,54 @@ const getHomeContentFromDB = async () => {
     };
 };
 
-const createHeroSectionIntoDB = async (payload: Partial<IHeroSection>) => HeroSectionModel.create(payload);
+const createHeroSectionIntoDB = async (payload: Partial<IHeroSection>, files?: MulterFile[] | unknown) => {
+    const nextPayload = await uploadFilesAndInjectUrls(payload, Array.isArray(files) ? files : []);
+    ensureHeroSectionImages(nextPayload);
+    return HeroSectionModel.create(nextPayload);
+};
 const getAllHeroSectionsFromDB = async () => HeroSectionModel.find({}).sort({ createdAt: -1 }).lean();
 const getHeroSectionByIdFromDB = async (id: string) => {
     const doc = await HeroSectionModel.findById(id).lean();
     if (!doc) throw new AppError(httpStatus.NOT_FOUND, 'Hero section not found!');
     return doc;
 };
-const updateHeroSectionIntoDB = async (id: string, payload: Partial<IHeroSection>) =>
-    HeroSectionModel.findByIdAndUpdate(id, payload, { new: true, runValidators: true });
+const updateHeroSectionIntoDB = async (id: string, payload: Partial<IHeroSection>, files?: MulterFile[] | unknown) => {
+    const existing = await HeroSectionModel.findById(id);
+
+    if (!existing) {
+        return null;
+    }
+
+    const previousImages = [...existing.slides, ...existing.features].map(card => card.image).filter(Boolean);
+    let updatedPayload: Partial<IHeroSection> | undefined;
+
+    try {
+        updatedPayload = await uploadFilesAndInjectUrls(payload, Array.isArray(files) ? files : []);
+        ensureHeroSectionImages(updatedPayload);
+
+        const updated = await HeroSectionModel.findByIdAndUpdate(id, updatedPayload, {
+            new: true,
+            runValidators: true,
+        });
+
+        if (!updated) {
+            return null;
+        }
+
+        const nextImages = [...updated.slides, ...updated.features].map(card => card.image).filter(Boolean);
+        await Promise.all(previousImages.filter(image => !nextImages.includes(image)).map(image => deleteImageFromCloudinary(image)));
+
+        return updated;
+    } catch (error) {
+        if (updatedPayload) {
+            const nextImages = [...(updatedPayload.slides || []), ...(updatedPayload.features || [])].map(card => card.image).filter(Boolean);
+            const newImages = nextImages.filter(image => !previousImages.includes(image));
+            await Promise.all(newImages.map(image => deleteImageFromCloudinary(image)));
+        }
+
+        throw error;
+    }
+};
 const deleteHeroSectionFromDB = async (id: string) => HeroSectionModel.findByIdAndDelete(id);
 
 export const HeroSectionService = {

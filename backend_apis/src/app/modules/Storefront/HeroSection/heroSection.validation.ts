@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 const heroCardSchema = z.object({
-    image: z.string().min(1),
+    image: z.string().min(1).optional(),
     imageAlt: z.string().min(1),
     title: z.string().min(1),
     clickUrl: z.string().min(1),
