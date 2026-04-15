@@ -2,6 +2,7 @@
     "name": "malamal",
     "version": "0.1.0",
     "private": true,
+    "license": "UNLICENSED",
     "author": {
         "name": "Khaled Siddique",
         "email": "khaledssbd@gmail.com",
@@ -22,7 +23,6 @@
         "smart-shopping",
         "backend-architecture"
     ],
-    "license": "UNLICENSED",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/khaledssbd/Malamal-SV.git"
