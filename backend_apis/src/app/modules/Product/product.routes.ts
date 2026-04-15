@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { auth, validateRequestFromFormData } from '../../../middlewares';
-import { multerUpload } from '../../../lib';
-import { ROLE } from '../../User/user.constant';
+import { auth, validateRequestFromFormData } from '../../middlewares';
+import { multerUpload } from '../../lib';
+import { ROLE } from '../User/user.constant';
 import { ProductController } from './product.controller';
 import { ProductValidation } from './product.validation';
 
@@ -33,6 +33,8 @@ router
 // 3. getProductsByCategorySlug
 router.route('/products/by-category/:slug').get(ProductController.getProductsByCategorySlug);
 // 4. getProductsBySubCategorySlug
-router.route('/products/by-sub-category/:subCategorySlug').get(ProductController.getProductsBySubCategorySlug);
+router
+    .route('/products/by-sub-category/:subCategorySlug')
+    .get(ProductController.getProductsBySubCategorySlug);
 
 export const ProductRoutes = router;

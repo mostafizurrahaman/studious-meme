@@ -1,12 +1,12 @@
 import httpStatus from 'http-status';
-import { AppError } from '../../../utils';
+import { AppError } from '../../utils';
 import { BrandModel } from '../Brand/brand.model';
 import { CategoryModel } from '../Category/category.model';
 import { HeroSectionModel } from './heroSection.model';
 import { ProductModel } from '../Product/product.model';
 import { IHeroSection } from './heroSection.interface';
-import { deleteImageFromCloudinary, uploadFilesAndInjectUrls } from '../../../lib';
-import { MulterFile } from '../../../lib/upload';
+import { deleteImageFromCloudinary, uploadFilesAndInjectUrls } from '../../lib';
+import { MulterFile } from '../../lib/upload';
 
 // 1. ensureHeroSectionImages
 const ensureHeroSectionImages = (payload: Partial<IHeroSection>) => {
@@ -15,7 +15,10 @@ const ensureHeroSectionImages = (payload: Partial<IHeroSection>) => {
     const missing = cards.some(card => !card.image);
 
     if (missing) {
-        throw new AppError(httpStatus.BAD_REQUEST, 'Hero section image is required for every slide and feature card!');
+        throw new AppError(
+            httpStatus.BAD_REQUEST,
+            'Hero section image is required for every slide and feature card!',
+        );
     }
 };
 
@@ -66,7 +69,11 @@ const getHeroSectionByIdFromDB = async (id: string) => {
 };
 
 // 6. updateHeroSectionIntoDB
-const updateHeroSectionIntoDB = async (id: string, payload: Partial<IHeroSection>, files?: MulterFile[] | unknown) => {
+const updateHeroSectionIntoDB = async (
+    id: string,
+    payload: Partial<IHeroSection>,
+    files?: MulterFile[] | unknown,
+) => {
     const existing = await HeroSectionModel.findById(id);
 
     if (!existing) {
@@ -90,12 +97,18 @@ const updateHeroSectionIntoDB = async (id: string, payload: Partial<IHeroSection
         }
 
         const nextImages = [...updated.slides, ...updated.features].map(card => card.image).filter(Boolean);
-        await Promise.all(previousImages.filter(image => !nextImages.includes(image)).map(image => deleteImageFromCloudinary(image)));
+        await Promise.all(
+            previousImages
+                .filter(image => !nextImages.includes(image))
+                .map(image => deleteImageFromCloudinary(image)),
+        );
 
         return updated;
     } catch (error) {
         if (updatedPayload) {
-            const nextImages = [...(updatedPayload.slides || []), ...(updatedPayload.features || [])].map(card => card.image).filter(Boolean);
+            const nextImages = [...(updatedPayload.slides || []), ...(updatedPayload.features || [])]
+                .map(card => card.image)
+                .filter(Boolean);
             const newImages = nextImages.filter(image => !previousImages.includes(image));
             await Promise.all(newImages.map(image => deleteImageFromCloudinary(image)));
         }

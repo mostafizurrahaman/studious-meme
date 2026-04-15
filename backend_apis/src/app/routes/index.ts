@@ -5,10 +5,10 @@ import { ComparisonHistoryRoutes } from '../modules/ComparisonHistory/comparison
 import { PaymentRoutes } from '../modules/Payment/payment.routes';
 import { PageRoutes } from '../modules/Page/page.route';
 import { ContactRoutes } from '../modules/Contact/contact.routes';
-import { HeroSectionRoutes } from '../modules/Storefront/HeroSection/heroSection.routes';
-import { BrandRoutes } from '../modules/Storefront/Brand/brand.routes';
-import { CategoryRoutes } from '../modules/Storefront/Category/category.routes';
-import { ProductRoutes } from '../modules/Storefront/Product/product.routes';
+import { HeroSectionRoutes } from '../modules/HeroSection/heroSection.routes';
+import { BrandRoutes } from '../modules/Brand/brand.routes';
+import { CategoryRoutes } from '../modules/Category/category.routes';
+import { ProductRoutes } from '../modules/Product/product.routes';
 
 const router = Router();
 

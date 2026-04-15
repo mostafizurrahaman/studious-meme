@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { auth, validateRequestFromFormData } from '../../../middlewares';
-import { multerUpload } from '../../../lib';
-import { ROLE } from '../../User/user.constant';
+import { auth, validateRequestFromFormData } from '../../middlewares';
+import { multerUpload } from '../../lib';
+import { ROLE } from '../User/user.constant';
 import { CategoryController } from './category.controller';
 import { CategoryValidation } from './category.validation';
 

@@ -1,10 +1,10 @@
 import httpStatus from 'http-status';
-import { AppError } from '../../../utils';
-import { deleteImageFromCloudinary, sendImageToCloudinary } from '../../../lib';
+import { AppError } from '../../utils';
+import { deleteImageFromCloudinary, sendImageToCloudinary } from '../../lib';
 import { ProductModel } from './product.model';
 import { IProduct } from './product.interface';
 import { CategoryModel } from '../Category/category.model';
-import { MulterFile } from '../../../lib/upload';
+import { MulterFile } from '../../lib/upload';
 
 // 1. createProductIntoDB
 const createProductIntoDB = async (payload: Partial<IProduct>, imageFile?: MulterFile) => {

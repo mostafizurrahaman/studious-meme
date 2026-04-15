@@ -1,7 +1,7 @@
 import httpStatus from 'http-status';
-import { AppError, asyncHandler, sendResponse } from '../../../utils';
+import { AppError, asyncHandler, sendResponse } from '../../utils';
 import { BrandService } from './brand.service';
-import { getParam } from '../../../lib/getParam';
+import { getParam } from '../../lib/getParam';
 
 // 1. createBrand
 const createBrand = asyncHandler(async (req, res) => {

@@ -1,7 +1,7 @@
 import httpStatus from 'http-status';
-import { AppError, asyncHandler, sendResponse } from '../../../utils';
+import { AppError, asyncHandler, sendResponse } from '../../utils';
 import { HeroSectionService } from './heroSection.service';
-import { getParam } from '../../../lib/getParam';
+import { getParam } from '../../lib/getParam';
 
 // 1. getHomeContent
 const getHomeContent = asyncHandler(async (_req, res) => {

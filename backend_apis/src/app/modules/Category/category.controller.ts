@@ -1,7 +1,7 @@
 import httpStatus from 'http-status';
-import { AppError, asyncHandler, sendResponse } from '../../../utils';
+import { AppError, asyncHandler, sendResponse } from '../../utils';
 import { CategoryService } from './category.service';
-import { getParam } from '../../../lib/getParam';
+import { getParam } from '../../lib/getParam';
 
 // 1. createCategory
 const createCategory = asyncHandler(async (req, res) => {

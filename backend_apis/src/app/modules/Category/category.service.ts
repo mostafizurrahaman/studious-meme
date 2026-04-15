@@ -1,9 +1,9 @@
 import httpStatus from 'http-status';
-import { AppError } from '../../../utils';
-import { deleteImageFromCloudinary, sendImageToCloudinary } from '../../../lib';
+import { AppError } from '../../utils';
+import { deleteImageFromCloudinary, sendImageToCloudinary } from '../../lib';
 import { CategoryModel } from './category.model';
 import { ICategory, ISubCategoryItem } from './category.interface';
-import { MulterFile } from '../../../lib/upload';
+import { MulterFile } from '../../lib/upload';
 
 // 1. createCategoryIntoDB
 const createCategoryIntoDB = async (payload: Partial<ICategory>, imageFile?: MulterFile) => {

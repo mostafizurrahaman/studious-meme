@@ -1,9 +1,9 @@
 import httpStatus from 'http-status';
-import { AppError } from '../../../utils';
-import { deleteImageFromCloudinary, sendImageToCloudinary } from '../../../lib';
+import { AppError } from '../../utils';
+import { deleteImageFromCloudinary, sendImageToCloudinary } from '../../lib';
 import { BrandModel } from './brand.model';
 import { IBrand } from './brand.interface';
-import { MulterFile } from '../../../lib/upload';
+import { MulterFile } from '../../lib/upload';
 
 // 1. createBrandIntoDB
 const createBrandIntoDB = async (payload: Partial<IBrand>, imageFile?: MulterFile) => {
