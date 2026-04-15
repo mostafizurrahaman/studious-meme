@@ -88,8 +88,6 @@ import app from './app';
 import config from './app/config';
 import seedSuperAdmin from './app/seed';
 import colors from 'colors';
-import { PricingService } from './app/modules/Product/product.service';
-import nodeCron from 'node-cron';
 
 let server: Server | null = null;
 
@@ -124,9 +122,11 @@ function gracefulShutdown(signal: string) {
 async function main() {
     try {
         await connectToDatabase();
+
         // Seed function
         await seedSuperAdmin();
 
+        // listen app
         server = app.listen(config.port, () => {
             console.log(
                 colors.green(
@@ -134,22 +134,6 @@ async function main() {
                 ),
             );
         });
-
-        // start daily ingestion scheduler for pricing module
-        // PricingService.ensureDailyIngestScheduler();
-
-        // schedule daily ingestion for pricing module by node-cron cron job
-        nodeCron.schedule(
-            // '55 8 * * *', // 8:55 AM every day
-            '0 0 * * *', // 12:00 AM every day
-            () => {
-                PricingService.ingestOnce().catch((e: unknown) => console.error(e));
-            },
-            {
-                timezone: 'Europe/Amsterdam',
-                // timezone: 'Asia/Dhaka',
-            },
-        );
 
         // Listen for OS termination signals (Ctrl+C or server stop)
         process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));

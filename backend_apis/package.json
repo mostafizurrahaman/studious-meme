@@ -33,8 +33,6 @@
         "create-module": "npx ts-node ./src/scripts/createModule.ts",
         "deploy": "pnpm build && vercel && vercel --prod",
         "format": "prettier . --write",
-
-        
         "dev2": "cross-env NODE_ENV=development tsx watch ./src/server.ts",
         "build2": "tsc && tsc-alias",
         "prod:dev": "cross-env NODE_ENV=production tsx watch ./src/server.ts",
@@ -60,7 +58,6 @@
         "mongoose": "^9.4.1",
         "multer": "2.1.1",
         "multer-storage-cloudinary": "^4.0.0",
-        "node-cron": "^4.2.1",
         "nodemailer": "^8.0.5",
         "os-utils": "^0.0.14",
         "otp-generator": "^4.0.1",

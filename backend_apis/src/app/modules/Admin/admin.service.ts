@@ -3,7 +3,7 @@ import { ROLE } from '../User/user.constant';
 import { OTP_EXPIRY_MINUTES } from '../User/user.constant';
 import UserModel from '../User/user.model';
 import httpStatus from 'http-status';
-import { ProductPriceModel, ShopModel } from '../Product/product.model';
+import { ProductPriceModel, ShopModel } from './admin-compat.model';
 import { deleteImageFromCloudinary, sendImageToCloudinary } from '../../lib';
 import { generateOtp } from '../../lib';
 import { MulterFile } from '../../lib/upload';
