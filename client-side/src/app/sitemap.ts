@@ -1,139 +1,93 @@
-import { siteUrl } from '@/constants';
-import { getLastTwoDaysNews } from '@/services/News';
-import { TNews } from '@/types';
+import { siteConfig } from '@/lib/seo';
+import { allProducts, categoryPages } from '@/lib/malamal-content';
 import type { MetadataRoute } from 'next';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = (siteUrl ?? '').replace(/\/+$/, '');
+    const baseUrl = (siteConfig.url ?? '').replace(/\/+$/, '');
 
-  if (!baseUrl) {
-    return [];
-  }
+    if (!baseUrl) {
+        return [];
+    }
 
-  const toAbsoluteUrl = (path: string) => new URL(path, baseUrl).toString();
+    const toAbsoluteUrl = (path: string) => new URL(path, baseUrl).toString();
+    const now = new Date();
 
-  const { data } = await getLastTwoDaysNews();
-  const news = Array.isArray(data) ? (data as TNews[]) : [];
+    const staticRoutes: MetadataRoute.Sitemap = [
+        {
+            url: toAbsoluteUrl('/'),
+            lastModified: now,
+            changeFrequency: 'daily',
+            priority: 1,
+        },
+        {
+            url: toAbsoluteUrl('/shop'),
+            lastModified: now,
+            changeFrequency: 'daily',
+            priority: 0.9,
+        },
+        {
+            url: toAbsoluteUrl('/main-categories'),
+            lastModified: now,
+            changeFrequency: 'weekly',
+            priority: 0.7,
+        },
+        {
+            url: toAbsoluteUrl('/shop-by-brands'),
+            lastModified: now,
+            changeFrequency: 'weekly',
+            priority: 0.6,
+        },
+        {
+            url: toAbsoluteUrl('/promotions'),
+            lastModified: now,
+            changeFrequency: 'weekly',
+            priority: 0.6,
+        },
+        {
+            url: toAbsoluteUrl('/our-contacts'),
+            lastModified: now,
+            changeFrequency: 'yearly',
+            priority: 0.4,
+        },
+        {
+            url: toAbsoluteUrl('/quotation-request'),
+            lastModified: now,
+            changeFrequency: 'yearly',
+            priority: 0.4,
+        },
+        {
+            url: toAbsoluteUrl('/terms-and-condition'),
+            lastModified: now,
+            changeFrequency: 'yearly',
+            priority: 0.2,
+        },
+        {
+            url: toAbsoluteUrl('/privacy-policy'),
+            lastModified: now,
+            changeFrequency: 'yearly',
+            priority: 0.2,
+        },
+        {
+            url: toAbsoluteUrl('/delivery-return'),
+            lastModified: now,
+            changeFrequency: 'yearly',
+            priority: 0.2,
+        },
+    ];
 
-  const staticRoutes: MetadataRoute.Sitemap = [
-    {
-      url: toAbsoluteUrl('/'),
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 1,
-    },
-    {
-      url: toAbsoluteUrl('/about-us'),
-      lastModified: new Date(),
-      changeFrequency: 'yearly',
-      priority: 0.4,
-    },
-    {
-      url: toAbsoluteUrl('/business'),
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.7,
-    },
-    {
-      url: toAbsoluteUrl('/crime'),
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.7,
-    },
-    {
-      url: toAbsoluteUrl('/donation'),
-      lastModified: new Date(),
-      changeFrequency: 'yearly',
-      priority: 0.3,
-    },
-    {
-      url: toAbsoluteUrl('/editorial'),
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.6,
-    },
-    {
-      url: toAbsoluteUrl('/elections-2026'),
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.6,
-    },
-    {
-      url: toAbsoluteUrl('/local'),
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.8,
-    },
-    {
-      url: toAbsoluteUrl('/national'),
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.7,
-    },
-    {
-      url: toAbsoluteUrl('/real-estate'),
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.6,
-    },
-    {
-      url: toAbsoluteUrl('/state'),
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.7,
-    },
-    {
-      url: toAbsoluteUrl('/weather'),
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.7,
-    },
-    {
-      url: toAbsoluteUrl('/contact'),
-      lastModified: new Date(),
-      changeFrequency: 'yearly',
-      priority: 0.3,
-    },
-    {
-      url: toAbsoluteUrl('/terms-and-conditions'),
-      lastModified: new Date(),
-      changeFrequency: 'yearly',
-      priority: 0.3,
-    },
-    {
-      url: toAbsoluteUrl('/privacy-policy'),
-      lastModified: new Date(),
-      changeFrequency: 'yearly',
-      priority: 0.3,
-    },
-    {
-      url: toAbsoluteUrl('/news'),
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.8,
-    },
-    {
-      url: toAbsoluteUrl('/feed'),
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.6,
-    },
-    {
-      url: toAbsoluteUrl('/google-news-sitemap.xml'),
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.8,
-    },
-  ];
-
-  const newsRoutes: MetadataRoute.Sitemap = news
-    .filter(item => Boolean(item?.slug))
-    .map(item => ({
-      url: toAbsoluteUrl(`/news/${item.slug}`),
-      lastModified: item?.updatedAt ? new Date(item.updatedAt) : new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.9,
+    const categoryRoutes: MetadataRoute.Sitemap = categoryPages.map(category => ({
+        url: toAbsoluteUrl(`/category/${category.slug}`),
+        lastModified: now,
+        changeFrequency: 'weekly',
+        priority: 0.7,
     }));
 
-  return [...staticRoutes, ...newsRoutes];
+    const productRoutes: MetadataRoute.Sitemap = allProducts.map(product => ({
+        url: toAbsoluteUrl(`/product/${product.sku}`),
+        lastModified: now,
+        changeFrequency: 'weekly',
+        priority: 0.8,
+    }));
+
+    return [...staticRoutes, ...categoryRoutes, ...productRoutes];
 }

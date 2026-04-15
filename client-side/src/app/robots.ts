@@ -1,18 +1,15 @@
-import { siteUrl } from '@/constants';
-import { MetadataRoute } from 'next';
+import { siteConfig } from '@/lib/seo';
+import type { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
-  return {
-    rules: {
-      userAgent: '*',
-      allow: '/',
-      disallow: [
-        '/reporter/', // disallowed all paths under /reporter/
-        '/editor/', // disallowed all paths under /editor/
-        '/publisher/', // disallowed all paths under /publisher/
-        '/login',
-      ],
-    },
-    sitemap: `${siteUrl}/sitemap.xml`, // sitemap URL
-  };
+    const baseUrl = (siteConfig.url ?? '').replace(/\/+$/, '');
+
+    return {
+        rules: {
+            userAgent: '*',
+            allow: '/',
+            disallow: ['/my-account', '/checkout', '/cart', '/wishlist', '/compare'],
+        },
+        sitemap: baseUrl ? `${baseUrl}/sitemap.xml` : undefined,
+    };
 }
