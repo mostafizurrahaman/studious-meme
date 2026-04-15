@@ -29,7 +29,7 @@ export const createOrUpdatePageByType = async (data: FieldValues): Promise<any> 
 
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/page/create-or-update`, {
-            method: 'POST',
+            method: 'PUT',
             body: JSON.stringify(data),
             headers: {
                 Authorization: `Bearer ${accessToken}`,

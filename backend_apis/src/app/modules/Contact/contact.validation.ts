@@ -3,24 +3,24 @@ import { z } from 'zod';
 // 1. createContactValidation
 export const createContactValidation = z.object({
     body: z.object({
-        // name: z.string({
-        //   error: 'Name is required',
-        // }),
+        name: z.string({
+            error: 'Name is required',
+        }),
 
-        // email: z
-        //   .string({
-        //     error: 'Email is required!',
-        //   })
-        //   .email({ message: 'Invalid email format!' }) // Ensure it's a valid email
-        //   .transform((email) => email.toLowerCase()) // Convert email to lowercase
-        //   .refine((email) => email !== '', { message: 'Email is required!' }) // Check that email is not empty
-        //   .refine((value) => typeof value === 'string', {
-        //     message: 'Email must be string!', // Check that email is string
-        //   }),
+        email: z
+            .string({
+                error: 'Email is required!',
+            })
+            .email({ message: 'Invalid email format!' }) // Ensure it's a valid email
+            .transform(email => email.toLowerCase()) // Convert email to lowercase
+            .refine(email => email !== '', { message: 'Email is required!' }) // Check that email is not empty
+            .refine(value => typeof value === 'string', {
+                message: 'Email must be string!', // Check that email is string
+            }),
 
-        // phone: z.string({
-        //   error: 'Phone is required',
-        // }),
+        phone: z.string({
+            error: 'Phone is required',
+        }),
 
         subject: z
             .string({

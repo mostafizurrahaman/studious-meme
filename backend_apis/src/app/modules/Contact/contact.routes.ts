@@ -10,12 +10,10 @@ const router = Router();
 router.route('/').get(auth(ROLE.ADMIN, ROLE.SUPER_ADMIN), ContactController.adminGetAllContacts);
 
 // 2. createContact
-router
-    .route('/')
-    .post(
-        auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN),
-        validateRequest(ContactValidation.createContactValidation),
-        ContactController.createContact,
-    );
+router.route('/').post(
+    // auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN),
+    validateRequest(ContactValidation.createContactValidation),
+    ContactController.createContact,
+);
 
 export const ContactRoutes = router;

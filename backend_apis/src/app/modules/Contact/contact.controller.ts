@@ -16,7 +16,7 @@ const adminGetAllContacts = asyncHandler(async (req, res) => {
 
 // 2. createContact
 const createContact = asyncHandler(async (req, res) => {
-    const result = await ContactService.createContactInDB(req.user, req.body);
+    const result = await ContactService.createContactInDB(req.body);
 
     sendResponse(res, {
         statusCode: httpStatus.OK,

@@ -2,7 +2,6 @@ import ContactModel from './contact.model';
 import { IContact } from './contact.interface';
 import { AppError } from '../../utils';
 import httpStatus from 'http-status';
-import { IUser } from '../User/user.interface';
 import { IMeta } from '../../types';
 
 // 1. adminGetAllContactsFromDB
@@ -42,11 +41,7 @@ const adminGetAllContactsFromDB = async (
 };
 
 // 2. createContactInDB
-const createContactInDB = async (userData: IUser, contactData: IContact) => {
-    contactData.name = userData?.name;
-    contactData.email = userData?.email;
-    contactData.phone = userData?.phone;
-
+const createContactInDB = async (contactData: IContact) => {
     const contact = await ContactModel.create(contactData);
 
     if (!contact) {

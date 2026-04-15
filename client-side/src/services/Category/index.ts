@@ -13,18 +13,15 @@ export const getAllCategoriesWithTotalNewsCount = async (): Promise<any> => {
     const accessToken = await getValidAccessTokenForServerHandlerGet();
 
     try {
-        const res = await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/category/with-total-news-count`,
-            {
-                method: 'GET',
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                },
-                next: {
-                    tags: ['CATEGORIES'],
-                },
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/category/categories`, {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
             },
-        );
+            next: {
+                tags: ['CATEGORIES'],
+            },
+        });
 
         const result = await res.json();
         return result;
@@ -38,7 +35,7 @@ export const getAllCategoriesNameAndId = async (): Promise<any> => {
     const accessToken = await getValidAccessTokenForServerHandlerGet();
 
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/category/all`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/category/categories`, {
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${accessToken}`,
@@ -64,7 +61,7 @@ export const createCategory = async (payload: AddCategoryFormValues): Promise<an
             name: payload.name.trim(),
         };
 
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/category`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/category/categories`, {
             method: 'POST',
             body: JSON.stringify(body),
             headers: {
@@ -91,8 +88,8 @@ export const updateCategory = async (id: string, payload: AddCategoryFormValues)
             name: payload.name.trim(),
         };
 
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/category/${id}`, {
-            method: 'PUT',
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/category/categories/${id}`, {
+            method: 'PATCH',
             body: JSON.stringify(body),
             headers: {
                 Authorization: `Bearer ${accessToken}`,
@@ -113,7 +110,7 @@ export const updateCategory = async (id: string, payload: AddCategoryFormValues)
 export const deleteCategory = async (id: string): Promise<any> => {
     const accessToken = await getValidAccessTokenForServerActions();
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/category/${id}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/category/categories/${id}`, {
             method: 'DELETE',
             headers: {
                 Authorization: `Bearer ${accessToken}`,
