@@ -1,4 +1,4 @@
-import { model, Schema } from 'mongoose';
+import { model, Schema, Types } from 'mongoose';
 
 type ComparisonProductSnapshot = {
     title: string;
@@ -15,6 +15,7 @@ type ComparisonProductSnapshot = {
 };
 
 type ComparisonHistoryDoc = {
+    user: Types.ObjectId;
     IDs: string[];
     products: ComparisonProductSnapshot[];
     createdAt?: Date;
@@ -40,6 +41,7 @@ const comparisonProductSnapshotSchema = new Schema<ComparisonProductSnapshot>(
 
 const comparisonHistorySchema = new Schema<ComparisonHistoryDoc>(
     {
+        user: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
         IDs: { type: [String], required: true },
         products: { type: [comparisonProductSnapshotSchema], default: [] },
     },

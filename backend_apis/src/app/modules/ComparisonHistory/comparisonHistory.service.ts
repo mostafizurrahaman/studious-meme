@@ -2,13 +2,14 @@ import { AppError } from '../../utils';
 import httpStatus from 'http-status';
 import { ComparisonHistoryModel } from './comparisonHistory.model';
 import { ProductModel } from '../Product/product.model';
+import { IUser } from '../User/user.interface';
 
 const getComparisonSuggestionsFromDB = async () => {
     return ProductModel.find({ isActive: true, isFeatured: true }).sort({ createdAt: -1 }).limit(3).lean();
 };
 
 // 1. compareProductsFromDB
-const compareProductsFromDB = async (IDs: string[]) => {
+const compareProductsFromDB = async (user: IUser, IDs: string[]) => {
     const uniqueIDs = [...new Set(IDs)];
 
     if (uniqueIDs.length < 2) {
@@ -25,6 +26,7 @@ const compareProductsFromDB = async (IDs: string[]) => {
     }
 
     const record = await ComparisonHistoryModel.create({
+        user: user._id.toString(),
         IDs: uniqueIDs,
         products: selectedProducts.map(product => ({
             title: product.title,
@@ -69,10 +71,20 @@ const compareProductsFromDB = async (IDs: string[]) => {
     };
 };
 
-const getComparisonHistoryFromDB = async () => {
-    return ComparisonHistoryModel.find({}).sort({ createdAt: -1 }).lean();
+// 2. getMyComparisonHistoryFromDB
+const getMyComparisonHistoryFromDB = async (user: IUser) => {
+    return ComparisonHistoryModel.find({ user: user._id.toString() }).sort({ createdAt: -1 }).lean();
 };
 
+// 3. getAllComparisonHistoryFromDB
+const getAllComparisonHistoryFromDB = async () => {
+    return ComparisonHistoryModel.find({})
+        .populate('user', 'name email phone image role isActive')
+        .sort({ createdAt: -1 })
+        .lean();
+};
+
+// 4. clearComparisonHistoryFromDB
 const clearComparisonHistoryFromDB = async () => {
     await ComparisonHistoryModel.deleteMany({});
     return null;
@@ -81,6 +93,7 @@ const clearComparisonHistoryFromDB = async () => {
 export const ComparisonHistoryService = {
     getComparisonSuggestionsFromDB,
     compareProductsFromDB,
-    getComparisonHistoryFromDB,
+    getMyComparisonHistoryFromDB,
+    getAllComparisonHistoryFromDB,
     clearComparisonHistoryFromDB,
 };

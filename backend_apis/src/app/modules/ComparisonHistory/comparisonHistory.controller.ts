@@ -16,7 +16,7 @@ const getComparisonSuggestions = asyncHandler(async (_req, res) => {
 // 2. compareProducts
 const compareProducts = asyncHandler(async (req, res) => {
     const { IDs } = req.body as { IDs: string[] };
-    const result = await ComparisonHistoryService.compareProductsFromDB(IDs);
+    const result = await ComparisonHistoryService.compareProductsFromDB(req.user, IDs);
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
@@ -25,9 +25,9 @@ const compareProducts = asyncHandler(async (req, res) => {
     });
 });
 
-// 3. getComparisonHistory
-const getComparisonHistory = asyncHandler(async (_req, res) => {
-    const result = await ComparisonHistoryService.getComparisonHistoryFromDB();
+// 3. getMyComparisonHistory
+const getMyComparisonHistory = asyncHandler(async (req, res) => {
+    const result = await ComparisonHistoryService.getMyComparisonHistoryFromDB(req.user);
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
@@ -36,7 +36,18 @@ const getComparisonHistory = asyncHandler(async (_req, res) => {
     });
 });
 
-// 4. clearComparisonHistory
+// 4. getAllComparisonHistory
+const getAllComparisonHistory = asyncHandler(async (_req, res) => {
+    const result = await ComparisonHistoryService.getAllComparisonHistoryFromDB();
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        message: 'Comparison history fetched successfully!',
+        data: result,
+    });
+});
+
+// 5. clearComparisonHistory
 const clearComparisonHistory = asyncHandler(async (_req, res) => {
     await ComparisonHistoryService.clearComparisonHistoryFromDB();
 
@@ -50,6 +61,7 @@ const clearComparisonHistory = asyncHandler(async (_req, res) => {
 export const ComparisonHistoryController = {
     getComparisonSuggestions,
     compareProducts,
-    getComparisonHistory,
+    getMyComparisonHistory,
+    getAllComparisonHistory,
     clearComparisonHistory,
 };
