@@ -5,6 +5,7 @@ import { CategoryModel } from './category.model';
 import { ICategory, ISubCategoryItem } from './category.interface';
 import { MulterFile } from '../../../lib/upload';
 
+// 1. createCategoryIntoDB
 const createCategoryIntoDB = async (payload: Partial<ICategory>, imageFile?: MulterFile) => {
     let uploadedImage: string | undefined;
 
@@ -23,12 +24,18 @@ const createCategoryIntoDB = async (payload: Partial<ICategory>, imageFile?: Mul
         throw error;
     }
 };
+
+// 2. getAllCategoriesFromDB
 const getAllCategoriesFromDB = async () => CategoryModel.find({}).sort({ createdAt: -1 }).lean();
+
+// 3. getCategoryBySlugFromDB
 const getCategoryBySlugFromDB = async (slug: string) => {
     const doc = await CategoryModel.findOne({ slug }).lean();
     if (!doc) throw new AppError(httpStatus.NOT_FOUND, 'Category not found!');
     return doc;
 };
+
+// 4. updateCategoryIntoDB
 const updateCategoryIntoDB = async (slug: string, payload: Partial<ICategory>, imageFile?: MulterFile) => {
     const existingCategory = await CategoryModel.findOne({ slug }).select('image');
 
@@ -70,8 +77,11 @@ const updateCategoryIntoDB = async (slug: string, payload: Partial<ICategory>, i
         throw error;
     }
 };
+
+// 5. deleteCategoryFromDB
 const deleteCategoryFromDB = async (slug: string) => CategoryModel.findOneAndDelete({ slug });
 
+// 6. createCategorySubCategoryIntoDB
 const createCategorySubCategoryIntoDB = async (
     categorySlug: string,
     subCategory: ISubCategoryItem,
@@ -99,6 +109,7 @@ const createCategorySubCategoryIntoDB = async (
     }
 };
 
+// 7. updateCategorySubCategoryIntoDB
 const updateCategorySubCategoryIntoDB = async (
     categorySlug: string,
     subCategorySlug: string,
@@ -136,6 +147,7 @@ const updateCategorySubCategoryIntoDB = async (
     }
 };
 
+// 8. deleteCategorySubCategoryFromDB
 const deleteCategorySubCategoryFromDB = async (categorySlug: string, subCategorySlug: string) => {
     const category = await CategoryModel.findOne({ slug: categorySlug });
     if (!category) throw new AppError(httpStatus.NOT_FOUND, 'Category not found!');

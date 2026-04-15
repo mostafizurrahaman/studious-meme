@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+// 1. adminCreateSchema
 const adminCreateSchema = z.object({
     body: z.object({
         name: z.string().trim().min(3),
@@ -17,6 +18,7 @@ const adminCreateSchema = z.object({
     }),
 });
 
+// 2. adminUpdateSchema
 const adminUpdateSchema = z.object({
     params: z.object({ userId: z.string().min(1) }),
     body: z.object({

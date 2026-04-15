@@ -7,6 +7,7 @@ import { AdminValidation } from './admin.validation';
 
 const router = Router();
 
+// 1. createAdmin
 router
     .route('/admins')
     .post(
@@ -17,6 +18,7 @@ router
     )
     .get(auth(ROLE.SUPER_ADMIN), AdminController.getAllAdmins);
 
+// 2. getAdmin, updateAdmin, deleteAdmin
 router
     .route('/admins/:userId')
     .get(auth(ROLE.SUPER_ADMIN), AdminController.getAdmin)

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+// 1. heroCardSchema
 const heroCardSchema = z.object({
     image: z.string().min(1).optional(),
     imageAlt: z.string().min(1),
@@ -7,6 +8,7 @@ const heroCardSchema = z.object({
     clickUrl: z.string().min(1),
 });
 
+// 2. HeroSectionValidation
 export const HeroSectionValidation = {
     heroSectionCreateSchema: z.object({
         body: z.object({

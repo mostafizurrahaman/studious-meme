@@ -7,6 +7,7 @@ import { BrandValidation } from './brand.validation';
 
 const router = Router();
 
+// 1. createBrand
 router
     .route('/brands')
     .post(
@@ -17,6 +18,7 @@ router
     )
     .get(BrandController.getAllBrands);
 
+// 2. getBrand, updateBrand, deleteBrand
 router
     .route('/brands/:slug')
     .get(BrandController.getBrand)

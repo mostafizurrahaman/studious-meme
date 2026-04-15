@@ -6,6 +6,7 @@ import UserModel from '../User/user.model';
 import { IAdminCreatePayload } from './admin.interface';
 import { MulterFile } from '../../lib/upload';
 
+// 1. createAdminIntoDB
 const createAdminIntoDB = async (payload: IAdminCreatePayload, imageFile?: MulterFile) => {
     const existing = await UserModel.isUserExistsByEmailWithPassword(payload.email);
 
@@ -47,6 +48,7 @@ const createAdminIntoDB = async (payload: IAdminCreatePayload, imageFile?: Multe
     }
 };
 
+// 2. getAllAdminsFromDB
 const getAllAdminsFromDB = async () => {
     return UserModel.find({ role: ROLE.ADMIN })
         .select('name email phone image role isActive createdAt updatedAt')
@@ -54,6 +56,7 @@ const getAllAdminsFromDB = async () => {
         .lean();
 };
 
+// 3. getAdminByIdFromDB
 const getAdminByIdFromDB = async (userId: string) => {
     const admin = await UserModel.findOne({ _id: userId, role: ROLE.ADMIN })
         .select('name email phone image role isActive createdAt updatedAt')
@@ -66,6 +69,7 @@ const getAdminByIdFromDB = async (userId: string) => {
     return admin;
 };
 
+// 4. updateAdminIntoDB
 const updateAdminIntoDB = async (
     userId: string,
     payload: Partial<IAdminCreatePayload> & { isActive?: boolean },
@@ -112,6 +116,7 @@ const updateAdminIntoDB = async (
     }
 };
 
+// 5. deleteAdminFromDB
 const deleteAdminFromDB = async (userId: string) => {
     const admin = await UserModel.findOneAndUpdate(
         { _id: userId, role: ROLE.ADMIN },

@@ -7,8 +7,10 @@ import { HeroSectionValidation } from './heroSection.validation';
 
 const router = Router();
 
+// 1. getHomeContent
 router.route('/home').get(HeroSectionController.getHomeContent);
 
+// 2. createHeroSection, getAllHeroSections
 router
     .route('/heroes')
     .post(
@@ -19,6 +21,7 @@ router
     )
     .get(HeroSectionController.getAllHeroSections);
 
+// 3. getHeroSection, updateHeroSection, deleteHeroSection
 router
     .route('/heroes/:heroSectionId')
     .get(HeroSectionController.getHeroSection)

@@ -3,6 +3,7 @@ import { AppError, asyncHandler, sendResponse } from '../../../utils';
 import { ProductService } from './product.service';
 import { getParam } from '../../../lib/getParam';
 
+// 1. createProduct
 const createProduct = asyncHandler(async (req, res) => {
     const result = await ProductService.createProductIntoDB(req.body, req.file);
 
@@ -13,6 +14,7 @@ const createProduct = asyncHandler(async (req, res) => {
     });
 });
 
+// 2. getAllProducts
 const getAllProducts = asyncHandler(async (_req, res) => {
     const result = await ProductService.getAllProductsFromDB();
 
@@ -23,6 +25,7 @@ const getAllProducts = asyncHandler(async (_req, res) => {
     });
 });
 
+// 3. getProduct
 const getProduct = asyncHandler(async (req, res) => {
     const result = await ProductService.getProductBySlugFromDB(getParam(req.params.slug));
 
@@ -33,6 +36,7 @@ const getProduct = asyncHandler(async (req, res) => {
     });
 });
 
+// 4. updateProduct
 const updateProduct = asyncHandler(async (req, res) => {
     const result = await ProductService.updateProductIntoDB(getParam(req.params.slug), req.body, req.file);
 
@@ -45,6 +49,7 @@ const updateProduct = asyncHandler(async (req, res) => {
     });
 });
 
+// 5. deleteProduct
 const deleteProduct = asyncHandler(async (req, res) => {
     const result = await ProductService.deleteProductFromDB(getParam(req.params.slug));
 
@@ -57,6 +62,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
     });
 });
 
+// 6. getProductsByCategorySlug
 const getProductsByCategorySlug = asyncHandler(async (req, res) => {
     const result = await ProductService.getProductsByCategorySlugFromDB(getParam(req.params.slug));
 
@@ -67,6 +73,7 @@ const getProductsByCategorySlug = asyncHandler(async (req, res) => {
     });
 });
 
+// 7. getProductsBySubCategorySlug
 const getProductsBySubCategorySlug = asyncHandler(async (req, res) => {
     const result = await ProductService.getProductsBySubCategorySlugFromDB(
         getParam(req.params.subCategorySlug),

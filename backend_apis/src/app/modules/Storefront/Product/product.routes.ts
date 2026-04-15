@@ -7,6 +7,7 @@ import { ProductValidation } from './product.validation';
 
 const router = Router();
 
+// 1. createProduct
 router
     .route('/products')
     .post(
@@ -17,6 +18,7 @@ router
     )
     .get(ProductController.getAllProducts);
 
+// 2. getProduct, updateProduct, deleteProduct
 router
     .route('/products/:slug')
     .get(ProductController.getProduct)
@@ -28,7 +30,9 @@ router
     )
     .delete(auth(ROLE.ADMIN, ROLE.SUPER_ADMIN), ProductController.deleteProduct);
 
+// 3. getProductsByCategorySlug
 router.route('/products/by-category/:slug').get(ProductController.getProductsByCategorySlug);
+// 4. getProductsBySubCategorySlug
 router.route('/products/by-sub-category/:subCategorySlug').get(ProductController.getProductsBySubCategorySlug);
 
 export const ProductRoutes = router;

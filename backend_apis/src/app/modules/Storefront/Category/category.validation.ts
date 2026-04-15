@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+// 1. categorySubCategorySchema
 const categorySubCategorySchema = z.object({
     name: z.string().min(1),
     slug: z.string().min(1),
@@ -9,6 +10,7 @@ const categorySubCategorySchema = z.object({
     isActive: z.boolean().optional(),
 });
 
+// 2. categoryBaseSchema
 const categoryBaseSchema = z.object({
     name: z.string().min(1),
     slug: z.string().min(1),

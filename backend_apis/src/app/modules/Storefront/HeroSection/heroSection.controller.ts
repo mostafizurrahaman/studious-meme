@@ -3,6 +3,7 @@ import { AppError, asyncHandler, sendResponse } from '../../../utils';
 import { HeroSectionService } from './heroSection.service';
 import { getParam } from '../../../lib/getParam';
 
+// 1. getHomeContent
 const getHomeContent = asyncHandler(async (_req, res) => {
     const result = await HeroSectionService.getHomeContentFromDB();
 
@@ -13,6 +14,7 @@ const getHomeContent = asyncHandler(async (_req, res) => {
     });
 });
 
+// 2. createHeroSection
 const createHeroSection = asyncHandler(async (req, res) => {
     const result = await HeroSectionService.createHeroSectionIntoDB(req.body, req.files);
 
@@ -23,6 +25,7 @@ const createHeroSection = asyncHandler(async (req, res) => {
     });
 });
 
+// 3. getAllHeroSections
 const getAllHeroSections = asyncHandler(async (_req, res) => {
     const result = await HeroSectionService.getAllHeroSectionsFromDB();
 
@@ -33,6 +36,7 @@ const getAllHeroSections = asyncHandler(async (_req, res) => {
     });
 });
 
+// 4. getHeroSection
 const getHeroSection = asyncHandler(async (req, res) => {
     const result = await HeroSectionService.getHeroSectionByIdFromDB(getParam(req.params.heroSectionId));
 
@@ -43,6 +47,7 @@ const getHeroSection = asyncHandler(async (req, res) => {
     });
 });
 
+// 5. updateHeroSection
 const updateHeroSection = asyncHandler(async (req, res) => {
     const result = await HeroSectionService.updateHeroSectionIntoDB(
         getParam(req.params.heroSectionId),
@@ -59,6 +64,7 @@ const updateHeroSection = asyncHandler(async (req, res) => {
     });
 });
 
+// 6. deleteHeroSection
 const deleteHeroSection = asyncHandler(async (req, res) => {
     const result = await HeroSectionService.deleteHeroSectionFromDB(getParam(req.params.heroSectionId));
 

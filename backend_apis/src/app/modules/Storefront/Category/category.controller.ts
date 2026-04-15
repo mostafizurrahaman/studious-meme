@@ -3,6 +3,7 @@ import { AppError, asyncHandler, sendResponse } from '../../../utils';
 import { CategoryService } from './category.service';
 import { getParam } from '../../../lib/getParam';
 
+// 1. createCategory
 const createCategory = asyncHandler(async (req, res) => {
     const result = await CategoryService.createCategoryIntoDB(req.body, req.file);
 
@@ -13,6 +14,7 @@ const createCategory = asyncHandler(async (req, res) => {
     });
 });
 
+// 2. getAllCategories
 const getAllCategories = asyncHandler(async (_req, res) => {
     const result = await CategoryService.getAllCategoriesFromDB();
 
@@ -23,6 +25,7 @@ const getAllCategories = asyncHandler(async (_req, res) => {
     });
 });
 
+// 3. getCategory
 const getCategory = asyncHandler(async (req, res) => {
     const result = await CategoryService.getCategoryBySlugFromDB(getParam(req.params.slug));
 
@@ -33,6 +36,7 @@ const getCategory = asyncHandler(async (req, res) => {
     });
 });
 
+// 4. updateCategory
 const updateCategory = asyncHandler(async (req, res) => {
     const result = await CategoryService.updateCategoryIntoDB(getParam(req.params.slug), req.body, req.file);
 
@@ -45,6 +49,7 @@ const updateCategory = asyncHandler(async (req, res) => {
     });
 });
 
+// 5. deleteCategory
 const deleteCategory = asyncHandler(async (req, res) => {
     const result = await CategoryService.deleteCategoryFromDB(getParam(req.params.slug));
 
@@ -57,6 +62,7 @@ const deleteCategory = asyncHandler(async (req, res) => {
     });
 });
 
+// 6. createCategorySubCategory
 const createCategorySubCategory = asyncHandler(async (req, res) => {
     const result = await CategoryService.createCategorySubCategoryIntoDB(
         getParam(req.params.slug),
@@ -71,6 +77,7 @@ const createCategorySubCategory = asyncHandler(async (req, res) => {
     });
 });
 
+// 7. updateCategorySubCategory
 const updateCategorySubCategory = asyncHandler(async (req, res) => {
     const result = await CategoryService.updateCategorySubCategoryIntoDB(
         getParam(req.params.slug),
@@ -88,6 +95,7 @@ const updateCategorySubCategory = asyncHandler(async (req, res) => {
     });
 });
 
+// 8. deleteCategorySubCategory
 const deleteCategorySubCategory = asyncHandler(async (req, res) => {
     const result = await CategoryService.deleteCategorySubCategoryFromDB(
         getParam(req.params.slug),

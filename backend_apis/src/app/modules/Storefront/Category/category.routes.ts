@@ -7,6 +7,7 @@ import { CategoryValidation } from './category.validation';
 
 const router = Router();
 
+// 1. createCategory
 router
     .route('/categories')
     .post(
@@ -17,6 +18,7 @@ router
     )
     .get(CategoryController.getAllCategories);
 
+// 2. getCategory, updateCategory, deleteCategory
 router
     .route('/categories/:slug')
     .get(CategoryController.getCategory)
@@ -28,6 +30,7 @@ router
     )
     .delete(auth(ROLE.ADMIN, ROLE.SUPER_ADMIN), CategoryController.deleteCategory);
 
+// 3. createCategorySubCategory
 router
     .route('/categories/:slug/sub-categories')
     .post(
@@ -37,6 +40,7 @@ router
         CategoryController.createCategorySubCategory,
     );
 
+// 4. updateCategorySubCategory, deleteCategorySubCategory
 router
     .route('/categories/:slug/sub-categories/:subCategorySlug')
     .patch(

@@ -6,6 +6,7 @@ import { IProduct } from './product.interface';
 import { CategoryModel } from '../Category/category.model';
 import { MulterFile } from '../../../lib/upload';
 
+// 1. createProductIntoDB
 const createProductIntoDB = async (payload: Partial<IProduct>, imageFile?: MulterFile) => {
     let uploadedImage: string | undefined;
 
@@ -24,13 +25,19 @@ const createProductIntoDB = async (payload: Partial<IProduct>, imageFile?: Multe
         throw error;
     }
 };
+
+// 2. getAllProductsFromDB
 const getAllProductsFromDB = async () =>
     ProductModel.find({}).populate('brand').populate('category').sort({ createdAt: -1 }).lean();
+
+// 3. getProductBySlugFromDB
 const getProductBySlugFromDB = async (slug: string) => {
     const doc = await ProductModel.findOne({ slug }).populate('brand').populate('category').lean();
     if (!doc) throw new AppError(httpStatus.NOT_FOUND, 'Product not found!');
     return doc;
 };
+
+// 4. updateProductIntoDB
 const updateProductIntoDB = async (slug: string, payload: Partial<IProduct>, imageFile?: MulterFile) => {
     const existingProduct = await ProductModel.findOne({ slug }).select('image');
 
@@ -72,8 +79,11 @@ const updateProductIntoDB = async (slug: string, payload: Partial<IProduct>, ima
         throw error;
     }
 };
+
+// 5. deleteProductFromDB
 const deleteProductFromDB = async (slug: string) => ProductModel.findOneAndDelete({ slug });
 
+// 6. getProductsByCategorySlugFromDB
 const getProductsByCategorySlugFromDB = async (slug: string) => {
     const category = await CategoryModel.findOne({ slug, isActive: true }).lean();
     if (!category) return [];
@@ -83,6 +93,7 @@ const getProductsByCategorySlugFromDB = async (slug: string) => {
         .lean();
 };
 
+// 7. getProductsBySubCategorySlugFromDB
 const getProductsBySubCategorySlugFromDB = async (subCategorySlug: string) =>
     ProductModel.find({ subCategorySlug, isActive: true }).populate('brand').populate('category').lean();
 

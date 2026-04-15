@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+// 1. productBaseSchema
 const productBaseSchema = z.object({
     title: z.string().min(1),
     slug: z.string().min(1),

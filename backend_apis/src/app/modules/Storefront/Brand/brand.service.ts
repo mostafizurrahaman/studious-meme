@@ -5,6 +5,7 @@ import { BrandModel } from './brand.model';
 import { IBrand } from './brand.interface';
 import { MulterFile } from '../../../lib/upload';
 
+// 1. createBrandIntoDB
 const createBrandIntoDB = async (payload: Partial<IBrand>, imageFile?: MulterFile) => {
     let uploadedImage: string | undefined;
 
@@ -23,12 +24,18 @@ const createBrandIntoDB = async (payload: Partial<IBrand>, imageFile?: MulterFil
         throw error;
     }
 };
+
+// 2. getAllBrandsFromDB
 const getAllBrandsFromDB = async () => BrandModel.find({}).sort({ createdAt: -1 }).lean();
+
+// 3. getBrandBySlugFromDB
 const getBrandBySlugFromDB = async (slug: string) => {
     const doc = await BrandModel.findOne({ slug }).lean();
     if (!doc) throw new AppError(httpStatus.NOT_FOUND, 'Brand not found!');
     return doc;
 };
+
+// 4. updateBrandIntoDB
 const updateBrandIntoDB = async (slug: string, payload: Partial<IBrand>, imageFile?: MulterFile) => {
     const existingBrand = await BrandModel.findOne({ slug }).select('image');
 
@@ -70,6 +77,8 @@ const updateBrandIntoDB = async (slug: string, payload: Partial<IBrand>, imageFi
         throw error;
     }
 };
+
+// 5. deleteBrandFromDB
 const deleteBrandFromDB = async (slug: string) => BrandModel.findOneAndDelete({ slug });
 
 export const BrandService = {

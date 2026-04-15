@@ -3,6 +3,7 @@ import { AppError, asyncHandler, sendResponse } from '../../../utils';
 import { BrandService } from './brand.service';
 import { getParam } from '../../../lib/getParam';
 
+// 1. createBrand
 const createBrand = asyncHandler(async (req, res) => {
     const result = await BrandService.createBrandIntoDB(req.body, req.file);
 
@@ -13,6 +14,7 @@ const createBrand = asyncHandler(async (req, res) => {
     });
 });
 
+// 2. getAllBrands
 const getAllBrands = asyncHandler(async (_req, res) => {
     const result = await BrandService.getAllBrandsFromDB();
 
@@ -23,6 +25,7 @@ const getAllBrands = asyncHandler(async (_req, res) => {
     });
 });
 
+// 3. getBrand
 const getBrand = asyncHandler(async (req, res) => {
     const result = await BrandService.getBrandBySlugFromDB(getParam(req.params.slug));
 
@@ -33,6 +36,7 @@ const getBrand = asyncHandler(async (req, res) => {
     });
 });
 
+// 4. updateBrand
 const updateBrand = asyncHandler(async (req, res) => {
     const result = await BrandService.updateBrandIntoDB(getParam(req.params.slug), req.body, req.file);
 
@@ -45,6 +49,7 @@ const updateBrand = asyncHandler(async (req, res) => {
     });
 });
 
+// 5. deleteBrand
 const deleteBrand = asyncHandler(async (req, res) => {
     const result = await BrandService.deleteBrandFromDB(getParam(req.params.slug));
 

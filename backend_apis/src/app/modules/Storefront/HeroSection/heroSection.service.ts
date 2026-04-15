@@ -8,6 +8,7 @@ import { IHeroSection } from './heroSection.interface';
 import { deleteImageFromCloudinary, uploadFilesAndInjectUrls } from '../../../lib';
 import { MulterFile } from '../../../lib/upload';
 
+// 1. ensureHeroSectionImages
 const ensureHeroSectionImages = (payload: Partial<IHeroSection>) => {
     const cards = [...(payload.slides || []), ...(payload.features || [])];
 
@@ -18,6 +19,7 @@ const ensureHeroSectionImages = (payload: Partial<IHeroSection>) => {
     }
 };
 
+// 2. getHomeContentFromDB
 const getHomeContentFromDB = async () => {
     const [heroSection, brands, categories, featuredProducts, latestProducts] = await Promise.all([
         HeroSectionModel.findOne({ isActive: true }).lean(),
@@ -46,17 +48,24 @@ const getHomeContentFromDB = async () => {
     };
 };
 
+// 3. createHeroSectionIntoDB
 const createHeroSectionIntoDB = async (payload: Partial<IHeroSection>, files?: MulterFile[] | unknown) => {
     const nextPayload = await uploadFilesAndInjectUrls(payload, Array.isArray(files) ? files : []);
     ensureHeroSectionImages(nextPayload);
     return HeroSectionModel.create(nextPayload);
 };
+
+// 4. getAllHeroSectionsFromDB
 const getAllHeroSectionsFromDB = async () => HeroSectionModel.find({}).sort({ createdAt: -1 }).lean();
+
+// 5. getHeroSectionByIdFromDB
 const getHeroSectionByIdFromDB = async (id: string) => {
     const doc = await HeroSectionModel.findById(id).lean();
     if (!doc) throw new AppError(httpStatus.NOT_FOUND, 'Hero section not found!');
     return doc;
 };
+
+// 6. updateHeroSectionIntoDB
 const updateHeroSectionIntoDB = async (id: string, payload: Partial<IHeroSection>, files?: MulterFile[] | unknown) => {
     const existing = await HeroSectionModel.findById(id);
 
@@ -94,6 +103,8 @@ const updateHeroSectionIntoDB = async (id: string, payload: Partial<IHeroSection
         throw error;
     }
 };
+
+// 7. deleteHeroSectionFromDB
 const deleteHeroSectionFromDB = async (id: string) => HeroSectionModel.findByIdAndDelete(id);
 
 export const HeroSectionService = {
