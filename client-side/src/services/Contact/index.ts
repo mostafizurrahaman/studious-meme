@@ -1,51 +1,34 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use server';
 
-import { getValidAccessTokenForServerHandlerGet } from '@/lib/getValidAccessToken';
-import { updateTag } from 'next/cache';
 import type { FieldValues } from 'react-hook-form';
+import { updateTag } from 'next/cache';
 
-// createContact
-export const createContact = async (contactData: FieldValues): Promise<any> => {
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/contact`, {
-            method: 'POST',
-            body: JSON.stringify(contactData),
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
+import { requestBackendJson } from '@/lib/backend-api';
+import { getValidAccessTokenForServerHandlerGet } from '@/lib/getValidAccessToken';
 
-        updateTag('CONTACTS');
-
-        const result = await res.json();
-        return result;
-    } catch (error: any) {
-        return Error(error);
-    }
+type BackendEnvelope<T> = {
+    success?: boolean;
+    message?: string;
+    data?: T;
+    error?: string;
 };
 
-// getAllContacts
-export const getAllContacts = async (page: string = '1', limit: string = '20'): Promise<any> => {
+export const createContact = async (contactData: FieldValues): Promise<BackendEnvelope<unknown>> => {
+    const result = await requestBackendJson<BackendEnvelope<unknown>>('/contact', {
+        method: 'POST',
+        body: contactData as Record<string, unknown>,
+    });
+
+    updateTag('CONTACTS');
+    return result;
+};
+
+export const getAllContacts = async (page: string = '1', limit: string = '20'): Promise<BackendEnvelope<unknown>> => {
     const accessToken = await getValidAccessTokenForServerHandlerGet();
 
-    try {
-        const res = await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/contact?page=${page}&limit=${limit}`,
-            {
-                method: 'GET',
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                },
-                next: {
-                    tags: ['CONTACTS'],
-                },
-            },
-        );
-
-        const result = await res.json();
-        return result;
-    } catch (error: any) {
-        return Error(error);
-    }
+    const query = new URLSearchParams({ page, limit });
+    return requestBackendJson<BackendEnvelope<unknown>>(`/contact?${query.toString()}`, {
+        method: 'GET',
+        token: accessToken ?? undefined,
+    });
 };

@@ -9,11 +9,16 @@ import {
   topCategories,
 } from '@/lib/malamal-content';
 import { shopMetadata, shopSchemas } from '@/lib/seo';
+import { getAllProducts, mapBackendProductToStorefrontProduct } from '@/services/Product';
 
 export const metadata = shopMetadata;
+export const dynamic = 'force-dynamic';
 
-export default function ShopPage() {
-  const products = [...featuredProducts, ...latestProducts];
+export default async function ShopPage() {
+  const productsResult = await getAllProducts().catch(() => null);
+  const products = productsResult?.data?.length
+    ? productsResult.data.map(mapBackendProductToStorefrontProduct)
+    : [...featuredProducts, ...latestProducts];
 
   return (
     <>

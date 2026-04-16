@@ -4,10 +4,17 @@ import { Card } from '@/components/ui/card';
 import { brands } from '@/lib/malamal-content';
 import { SeoScripts } from '@/components/SeoScripts';
 import { shopByBrandsMetadata, shopByBrandsSchemas } from '@/lib/seo';
+import { getAllBrands, mapBackendBrandToStorefrontBrand } from '@/services/Brand';
 
 export const metadata = shopByBrandsMetadata;
+export const dynamic = 'force-dynamic';
 
-export default function ShopByBrandsPage() {
+export default async function ShopByBrandsPage() {
+  const brandsResult = await getAllBrands().catch(() => null);
+  const brandItems = brandsResult?.data?.length
+    ? brandsResult.data.map(mapBackendBrandToStorefrontBrand)
+    : brands;
+
   return (
     <>
       <SeoScripts data={shopByBrandsSchemas} />
@@ -24,7 +31,7 @@ export default function ShopByBrandsPage() {
           </Card>
 
           <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {brands.map(brand => (
+            {brandItems.map(brand => (
               <Link key={brand.name} href={brand.href} className="group">
                 <Card className="h-full p-6 text-center shadow-sm transition group-hover:-translate-y-0.5 group-hover:shadow-md">
                   <div className="mx-auto flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl border border-border bg-muted">

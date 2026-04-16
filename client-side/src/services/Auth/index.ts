@@ -1,249 +1,245 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use server';
 
 import { cookies } from 'next/headers';
 import { jwtDecode } from 'jwt-decode';
-import { FieldValues } from 'react-hook-form';
+import type { FieldValues } from 'react-hook-form';
+
+import { requestBackendJson } from '@/lib/backend-api';
 import { getValidAccessTokenForServerActions } from '@/lib/getValidAccessToken';
+import type { AuthUser } from '@/types';
+
+type BackendEnvelope<T> = {
+    success?: boolean;
+    message?: string;
+    data?: T;
+    error?: string;
+};
+
+type AuthTokens = {
+    accessToken: string;
+    refreshToken?: string;
+};
+
+type ForgotPasswordToken = {
+    token: string;
+};
+
+type ResetPasswordToken = {
+    resetPasswordToken: string;
+};
+
+async function getCookieStore() {
+    return cookies();
+}
+
+async function setAuthCookies(tokens: AuthTokens) {
+    const cookieStore = await getCookieStore();
+
+    cookieStore.set('accessToken', tokens.accessToken, {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+    });
+
+    if (tokens.refreshToken) {
+        cookieStore.set('refreshToken', tokens.refreshToken, {
+            httpOnly: true,
+            sameSite: 'lax',
+            secure: process.env.NODE_ENV === 'production',
+            path: '/',
+        });
+    }
+}
+
+async function clearAuthCookies() {
+    const cookieStore = await getCookieStore();
+
+    cookieStore.delete('accessToken');
+    cookieStore.delete('refreshToken');
+}
+
+async function setPasswordFlowCookies(token: string) {
+    const cookieStore = await getCookieStore();
+
+    cookieStore.set('forgotPassToken', token, {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+    });
+}
 
 // signInUser
-export const signInUser = async (userData: FieldValues): Promise<any> => {
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/user/signin`, {
-            method: 'POST',
-            body: JSON.stringify(userData),
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
+export const signInUser = async (userData: FieldValues): Promise<BackendEnvelope<AuthTokens>> => {
+    const result = await requestBackendJson<BackendEnvelope<AuthTokens>>('/user/signin', {
+        method: 'POST',
+        body: userData as Record<string, unknown>,
+    });
 
-        const result = await res.json();
-
-        if (result?.success) {
-            (await cookies()).set('accessToken', result?.data?.accessToken);
-            (await cookies()).set('refreshToken', result?.data?.refreshToken);
-        }
-
-        return result;
-    } catch (error: any) {
-        return Error(error);
+    if (result?.success && result.data?.accessToken) {
+        await setAuthCookies(result.data);
     }
+
+    return result;
 };
 
 // updateProfilePhoto
-export const updateProfilePhoto = async (data: FormData): Promise<any> => {
+export const updateProfilePhoto = async (data: FormData): Promise<BackendEnvelope<AuthTokens>> => {
     const accessToken = await getValidAccessTokenForServerActions();
 
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/user/update-profile-photo`, {
-            method: 'PUT',
-            body: data,
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-            },
-        });
-
-        const result = await res.json();
-
-        if (result?.success) {
-            (await cookies()).set('accessToken', result?.data?.accessToken);
-        }
-
-        return result;
-    } catch (error: any) {
-        return Error(error);
-    }
+    return requestBackendJson<BackendEnvelope<AuthTokens>>('/user/update-profile-photo', {
+        method: 'PUT',
+        body: data,
+        token: accessToken ?? undefined,
+    });
 };
+
 // updateProfileData
-export const updateProfileData = async (data: FieldValues): Promise<any> => {
+export const updateProfileData = async (data: FieldValues): Promise<BackendEnvelope<AuthTokens>> => {
     const accessToken = await getValidAccessTokenForServerActions();
 
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/user/update-profile-data`, {
-            method: 'PATCH',
-            body: JSON.stringify(data),
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-                'Content-Type': 'application/json',
-            },
-        });
-
-        const result = await res.json();
-
-        if (result?.success) {
-            (await cookies()).set('accessToken', result?.data?.accessToken);
-        }
-
-        return result;
-    } catch (error: any) {
-        return Error(error);
-    }
+    return requestBackendJson<BackendEnvelope<AuthTokens>>('/user/update-profile-data', {
+        method: 'PATCH',
+        body: data as Record<string, unknown>,
+        token: accessToken ?? undefined,
+    });
 };
 
 // changePassword
-export const changePassword = async (data: { oldPassword: string; newPassword: string }): Promise<any> => {
+export const changePassword = async (data: { oldPassword: string; newPassword: string }): Promise<BackendEnvelope<AuthTokens>> => {
     const accessToken = await getValidAccessTokenForServerActions();
 
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/user/change-password`, {
-            method: 'PATCH',
-            body: JSON.stringify(data),
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-                'Content-Type': 'application/json',
-            },
-        });
+    const result = await requestBackendJson<BackendEnvelope<AuthTokens>>('/user/change-password', {
+        method: 'PATCH',
+        body: data,
+        token: accessToken ?? undefined,
+    });
 
-        const result = await res.json();
-
-        if (result?.success) {
-            (await cookies()).set('accessToken', result?.data?.accessToken);
-            (await cookies()).set('refreshToken', result?.data?.refreshToken);
-        }
-
-        return result;
-    } catch (error: any) {
-        return Error(error);
+    if (result?.success && result.data?.accessToken) {
+        await setAuthCookies(result.data);
     }
+
+    return result;
 };
 
 // forgotPassword
-export const forgotPassword = async (email: string): Promise<any> => {
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/user/forgot-password`, {
-            method: 'POST',
-            body: JSON.stringify({ email }),
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
+export const forgotPassword = async (email: string): Promise<BackendEnvelope<ForgotPasswordToken>> => {
+    const result = await requestBackendJson<BackendEnvelope<ForgotPasswordToken>>('/user/forgot-password', {
+        method: 'POST',
+        body: { email },
+    });
 
-        const result = await res.json();
-
-        if (result?.success) {
-            (await cookies()).set('forgotPassToken', result?.data?.token);
-        }
-
-        return result;
-    } catch (error: any) {
-        return Error(error);
+    if (result?.success && result.data?.token) {
+        await setPasswordFlowCookies(result.data.token);
     }
+
+    return result;
 };
 
 // sendForgotPasswordOtpAgain
-export const sendForgotPasswordOtpAgain = async (): Promise<any> => {
-    const cookieStore = await cookies();
+export const sendForgotPasswordOtpAgain = async (): Promise<BackendEnvelope<unknown>> => {
+    const cookieStore = await getCookieStore();
     const token = cookieStore.get('forgotPassToken')?.value;
 
-    try {
-        const res = await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/user/send-forgot-password-otp-again`,
-            {
-                method: 'POST',
-                body: JSON.stringify({ token }),
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            },
-        );
-
-        const result = await res.json();
-        return result;
-    } catch (error: any) {
-        return Error(error);
-    }
+    return requestBackendJson<BackendEnvelope<unknown>>('/user/send-forgot-password-otp-again', {
+        method: 'POST',
+        body: { token },
+    });
 };
 
 // verifyOtpForForgotPassword
-export const verifyOtpForForgotPassword = async (otp: string): Promise<any> => {
-    const cookieStore = await cookies();
+export const verifyOtpForForgotPassword = async (otp: string): Promise<BackendEnvelope<ResetPasswordToken>> => {
+    const cookieStore = await getCookieStore();
     const token = cookieStore.get('forgotPassToken')?.value;
 
-    try {
-        const res = await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/user/verify-forgot-password-otp`,
-            {
-                method: 'POST',
-                body: JSON.stringify({ token, otp }),
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            },
-        );
+    const result = await requestBackendJson<BackendEnvelope<ResetPasswordToken>>('/user/verify-forgot-password-otp', {
+        method: 'POST',
+        body: { token, otp },
+    });
 
-        const result = await res.json();
-
-        if (result?.success) {
-            cookieStore.set('resetPasswordToken', result?.data?.resetPasswordToken);
-        }
-
-        return result;
-    } catch (error: any) {
-        return Error(error);
+    if (result?.success && result.data?.resetPasswordToken) {
+        cookieStore.set('resetPasswordToken', result.data.resetPasswordToken, {
+            httpOnly: true,
+            sameSite: 'lax',
+            secure: process.env.NODE_ENV === 'production',
+            path: '/',
+        });
     }
+
+    return result;
 };
 
 // setNewPasswordIntoDB
-export const setNewPasswordIntoDB = async (newPassword: string): Promise<any> => {
-    const cookieStore = await cookies();
+export const setNewPasswordIntoDB = async (newPassword: string): Promise<BackendEnvelope<unknown>> => {
+    const cookieStore = await getCookieStore();
     const resetPasswordToken = cookieStore.get('resetPasswordToken')?.value;
 
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/user/reset-password`, {
-            method: 'POST',
-            body: JSON.stringify({ resetPasswordToken, newPassword }),
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
+    const result = await requestBackendJson<BackendEnvelope<unknown>>('/user/reset-password', {
+        method: 'POST',
+        body: { resetPasswordToken, newPassword },
+    });
 
-        const result = await res.json();
-
-        if (result?.success) {
-            cookieStore.delete('forgotPassToken');
-            cookieStore.delete('resetPasswordToken');
-        }
-
-        return result;
-    } catch (error: any) {
-        return Error(error);
+    if (result?.success) {
+        cookieStore.delete('forgotPassToken');
+        cookieStore.delete('resetPasswordToken');
     }
+
+    return result;
 };
 
-// ----------------------
+function toAuthUser(payload: Record<string, unknown>): AuthUser | null {
+    const id = typeof payload._id === 'string' ? payload._id : typeof payload.id === 'string' ? payload.id : null;
+    const name = typeof payload.name === 'string' ? payload.name : null;
+    const email = typeof payload.email === 'string' ? payload.email : null;
+    const image = typeof payload.image === 'string' ? payload.image : '';
+    const role = typeof payload.role === 'string' ? payload.role : null;
+
+    if (!id || !name || !email || !role) {
+        return null;
+    }
+
+    return {
+        _id: id,
+        name,
+        email,
+        image,
+        role,
+    };
+}
 
 // getCurrentUser
-export const getCurrentUser = async (): Promise<any> => {
-    const accessToken = (await cookies()).get('accessToken')?.value;
-    let decodedData = null;
+export const getCurrentUser = async (): Promise<AuthUser | null> => {
+    const cookieStore = await getCookieStore();
+    const accessToken = cookieStore.get('accessToken')?.value;
 
-    if (accessToken) {
-        decodedData = await jwtDecode(accessToken);
-        return decodedData;
-    } else {
+    if (!accessToken) {
+        return null;
+    }
+
+    try {
+        const decoded = jwtDecode<Record<string, unknown>>(accessToken);
+        return toAuthUser(decoded);
+    } catch {
         return null;
     }
 };
 
 // logOut
 export const logOut = async (): Promise<void> => {
-    (await cookies()).delete('accessToken');
-    (await cookies()).delete('refreshToken');
+    await clearAuthCookies();
 };
 
 // getNewAccessToken
-export const getNewAccessToken = async (refreshToken: string): Promise<any> => {
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/user/access-token`, {
-            method: 'GET',
-            headers: {
-                Authorization: `Bearer ${refreshToken}`,
-            },
-        });
+export const getNewAccessToken = async (refreshToken: string): Promise<BackendEnvelope<AuthTokens>> => {
+    const result = await requestBackendJson<BackendEnvelope<AuthTokens>>('/user/access-token', {
+        method: 'GET',
+        token: refreshToken,
+    });
 
-        const result = await res.json();
-        return result;
-    } catch (error: any) {
-        return Error(error);
+    if (result?.success && result.data?.accessToken) {
+        await setAuthCookies(result.data);
     }
+
+    return result;
 };

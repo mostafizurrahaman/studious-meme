@@ -1,127 +1,65 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use server';
 
-import {
-    getValidAccessTokenForServerActions,
-    getValidAccessTokenForServerHandlerGet,
-} from '@/lib/getValidAccessToken';
-import { AddCategoryFormValues } from '@/utils/addCategoryValidation';
 import { updateTag } from 'next/cache';
 
-// get All Categories
-export const getAllCategoriesWithTotalNewsCount = async (): Promise<any> => {
+import { requestBackendJson } from '@/lib/backend-api';
+import { getValidAccessTokenForServerActions, getValidAccessTokenForServerHandlerGet } from '@/lib/getValidAccessToken';
+import type { AddCategoryFormValues } from '@/utils/addCategoryValidation';
+
+type BackendEnvelope<T> = {
+    success?: boolean;
+    message?: string;
+    data?: T;
+    error?: string;
+};
+
+export const getAllCategoriesWithTotalNewsCount = async (): Promise<BackendEnvelope<unknown>> => {
     const accessToken = await getValidAccessTokenForServerHandlerGet();
-
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/category/categories`, {
-            method: 'GET',
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-            },
-            next: {
-                tags: ['CATEGORIES'],
-            },
-        });
-
-        const result = await res.json();
-        return result;
-    } catch (error: any) {
-        return Error(error.message);
-    }
+    return requestBackendJson<BackendEnvelope<unknown>>('/category/categories', {
+        method: 'GET',
+        token: accessToken ?? undefined,
+    });
 };
 
-// getAllCategories
-export const getAllCategoriesNameAndId = async (): Promise<any> => {
+export const getAllCategoriesNameAndId = async (): Promise<BackendEnvelope<unknown>> => {
     const accessToken = await getValidAccessTokenForServerHandlerGet();
-
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/category/categories`, {
-            method: 'GET',
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-            },
-            next: {
-                tags: ['CATEGORIES'],
-            },
-        });
-
-        const result = await res.json();
-        return result;
-    } catch (error: any) {
-        return Error(error.message);
-    }
+    return requestBackendJson<BackendEnvelope<unknown>>('/category/categories', {
+        method: 'GET',
+        token: accessToken ?? undefined,
+    });
 };
 
-// createCategory
-export const createCategory = async (payload: AddCategoryFormValues): Promise<any> => {
+export const createCategory = async (payload: AddCategoryFormValues): Promise<BackendEnvelope<unknown>> => {
     const accessToken = await getValidAccessTokenForServerActions();
-    try {
-        // Only send the fields that API expects
-        const body = {
-            name: payload.name.trim(),
-        };
+    const result = await requestBackendJson<BackendEnvelope<unknown>>('/category/categories', {
+        method: 'POST',
+        body: { name: payload.name.trim() },
+        token: accessToken ?? undefined,
+    });
 
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/category/categories`, {
-            method: 'POST',
-            body: JSON.stringify(body),
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-                'Content-Type': 'application/json',
-            },
-        });
-
-        updateTag('CATEGORIES');
-
-        const result = await res.json();
-        return result;
-    } catch (error: any) {
-        return Error(error);
-    }
+    updateTag('CATEGORIES');
+    return result;
 };
 
-// updateCategory
-export const updateCategory = async (id: string, payload: AddCategoryFormValues): Promise<any> => {
+export const updateCategory = async (id: string, payload: AddCategoryFormValues): Promise<BackendEnvelope<unknown>> => {
     const accessToken = await getValidAccessTokenForServerActions();
-    try {
-        // Only send the fields that API expects
-        const body = {
-            name: payload.name.trim(),
-        };
+    const result = await requestBackendJson<BackendEnvelope<unknown>>(`/category/categories/${id}`, {
+        method: 'PATCH',
+        body: { name: payload.name.trim() },
+        token: accessToken ?? undefined,
+    });
 
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/category/categories/${id}`, {
-            method: 'PATCH',
-            body: JSON.stringify(body),
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-                'Content-Type': 'application/json',
-            },
-        });
-
-        updateTag('CATEGORIES');
-
-        const result = await res.json();
-        return result;
-    } catch (error: any) {
-        return Error(error);
-    }
+    updateTag('CATEGORIES');
+    return result;
 };
 
-// deleteCategory
-export const deleteCategory = async (id: string): Promise<any> => {
+export const deleteCategory = async (id: string): Promise<BackendEnvelope<unknown>> => {
     const accessToken = await getValidAccessTokenForServerActions();
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/category/categories/${id}`, {
-            method: 'DELETE',
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-            },
-        });
+    const result = await requestBackendJson<BackendEnvelope<unknown>>(`/category/categories/${id}`, {
+        method: 'DELETE',
+        token: accessToken ?? undefined,
+    });
 
-        updateTag('CATEGORIES');
-
-        const result = await res.json();
-        return result;
-    } catch (error: any) {
-        return Error(error);
-    }
+    updateTag('CATEGORIES');
+    return result;
 };

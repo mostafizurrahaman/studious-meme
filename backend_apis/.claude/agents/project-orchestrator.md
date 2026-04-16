@@ -90,7 +90,7 @@ Before declaring the project complete, verify:
 - [ ] Frontend successfully connected to backend APIs
 - [ ] Environment variables configured
 - [ ] Setup instructions written
-- [ ] Local run instructions provided (frontend:3000, backend:5000)
+- [ ] Local run instructions provided (frontend:3000, backend:5003)
 - [ ] All features functional (browse, add to cart, view cart, place order)
 
 -----------------------------------

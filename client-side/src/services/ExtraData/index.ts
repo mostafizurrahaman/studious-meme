@@ -1,89 +1,55 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use server';
 
-import { getValidAccessTokenForServerActions } from '@/lib/getValidAccessToken';
 import { updateTag } from 'next/cache';
 
-// getAllUrls
-export const getAllUrls = async (): Promise<any> => {
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/data`, {
-            method: 'GET',
-            next: {
-                tags: ['EXTRA_DATA_URLS'],
-            },
-        });
+import { requestBackendJson } from '@/lib/backend-api';
+import { getValidAccessTokenForServerActions } from '@/lib/getValidAccessToken';
 
-        const result = await res.json();
-        return result;
-    } catch (error: any) {
-        return Error(error);
-    }
+type BackendEnvelope<T> = {
+    success?: boolean;
+    message?: string;
+    data?: T;
+    error?: string;
 };
 
-// updateSponsorLogoUrl
-export const updateSponsorLogoUrl = async (data: FormData): Promise<any> => {
-    const accessToken = await getValidAccessTokenForServerActions();
-
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/data/sponsorLogoUrl`, {
-            method: 'PUT',
-            body: data,
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-            },
-        });
-
-        updateTag('EXTRA_DATA_URLS');
-
-        const result = await res.json();
-        return result;
-    } catch (error: any) {
-        return Error(error);
-    }
+export const getAllUrls = async (): Promise<BackendEnvelope<unknown>> => {
+    return requestBackendJson<BackendEnvelope<unknown>>('/data', {
+        method: 'GET',
+    });
 };
 
-// updateSingleUrl
-export const updateSingleLink = async (platform: string, link: string): Promise<any> => {
+export const updateSponsorLogoUrl = async (data: FormData): Promise<BackendEnvelope<unknown>> => {
     const accessToken = await getValidAccessTokenForServerActions();
+    const result = await requestBackendJson<BackendEnvelope<unknown>>('/data/sponsorLogoUrl', {
+        method: 'PUT',
+        body: data,
+        token: accessToken ?? undefined,
+    });
 
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/data/${platform}`, {
-            method: 'PUT',
-            body: JSON.stringify({ url: link }),
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-                'Content-Type': 'application/json',
-            },
-        });
-
-        updateTag('EXTRA_DATA_URLS');
-
-        const result = await res.json();
-        return result;
-    } catch (error: any) {
-        return Error(error);
-    }
+    updateTag('EXTRA_DATA_URLS');
+    return result;
 };
 
-// updatePrintStory
-export const updatePrintStory = async (data: FormData): Promise<any> => {
+export const updateSingleLink = async (platform: string, link: string): Promise<BackendEnvelope<unknown>> => {
     const accessToken = await getValidAccessTokenForServerActions();
+    const result = await requestBackendJson<BackendEnvelope<unknown>>(`/data/${platform}`, {
+        method: 'PUT',
+        body: { url: link },
+        token: accessToken ?? undefined,
+    });
 
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/data/print-story`, {
-            method: 'PUT',
-            body: data,
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-            },
-        });
+    updateTag('EXTRA_DATA_URLS');
+    return result;
+};
 
-        updateTag('EXTRA_DATA_URLS');
+export const updatePrintStory = async (data: FormData): Promise<BackendEnvelope<unknown>> => {
+    const accessToken = await getValidAccessTokenForServerActions();
+    const result = await requestBackendJson<BackendEnvelope<unknown>>('/data/print-story', {
+        method: 'PUT',
+        body: data,
+        token: accessToken ?? undefined,
+    });
 
-        const result = await res.json();
-        return result;
-    } catch (error: any) {
-        return Error(error);
-    }
+    updateTag('EXTRA_DATA_URLS');
+    return result;
 };

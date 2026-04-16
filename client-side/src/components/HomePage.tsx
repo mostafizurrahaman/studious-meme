@@ -20,7 +20,25 @@ import { ProductCard } from '@/components/ProductCard';
 import { SectionHeading } from '@/components/SectionHeading';
 import { Container } from '@/components/Container';
 
-const heroSlides = [
+type HeroSlide = {
+    title: string;
+    description: string;
+    image: string;
+    href: string;
+};
+
+type HomePageProps = {
+    heroContent?: {
+        slides?: Array<{
+            title: string;
+            description: string;
+            image: string;
+            clickUrl: string;
+        }>;
+    } | null;
+};
+
+const defaultHeroSlides: HeroSlide[] = [
     {
         title: 'Industrial tools for every project',
         description: 'Dedicated categories for workshop, construction, cleaning and packaging equipment.', // for metadata
@@ -56,8 +74,16 @@ function SectionMarquee() {
     );
 }
 
-export function HomePage() {
+export function HomePage({ heroContent }: HomePageProps) {
     const [heroIndex, setHeroIndex] = useState(0);
+    const heroSlides: HeroSlide[] = heroContent?.slides?.length
+        ? heroContent.slides.map(slide => ({
+              title: slide.title,
+              description: slide.description,
+              image: slide.image,
+              href: slide.clickUrl || '/shop',
+          }))
+        : (defaultHeroSlides as HeroSlide[]);
 
     useEffect(() => {
         const timer = window.setInterval(() => {
@@ -65,7 +91,7 @@ export function HomePage() {
         }, 5000);
 
         return () => window.clearInterval(timer);
-    }, []);
+    }, [heroSlides.length]);
 
     const goToPrevious = () => setHeroIndex(prev => (prev - 1 + heroSlides.length) % heroSlides.length);
 

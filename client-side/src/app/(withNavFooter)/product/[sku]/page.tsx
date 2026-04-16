@@ -10,14 +10,19 @@ import { AddToCartButton } from '@/components/cart/AddToCartButton';
 import { allProducts, findProductBySku } from '@/lib/malamal-content';
 import { SeoScripts } from '@/components/SeoScripts';
 import { buildProductMetadata, buildProductSchemas } from '@/lib/seo';
+import { getAllProducts, mapBackendProductToStorefrontProduct } from '@/services/Product';
 
 type Props = {
   params: Promise<{ sku: string }>;
 };
 
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata({ params }: Props) {
   const { sku } = await params;
-  const product = findProductBySku(sku);
+  const productsResult = await getAllProducts().catch(() => null);
+  const backendProduct = productsResult?.data?.find(item => item.sku === sku);
+  const product = backendProduct ? mapBackendProductToStorefrontProduct(backendProduct) : findProductBySku(sku);
 
   if (!product) {
     return {
@@ -39,13 +44,18 @@ export function generateStaticParams() {
 
 export default async function ProductPage({ params }: Props) {
   const { sku } = await params;
-  const product = findProductBySku(sku);
+  const productsResult = await getAllProducts().catch(() => null);
+  const backendProduct = productsResult?.data?.find(item => item.sku === sku);
+  const product = backendProduct ? mapBackendProductToStorefrontProduct(backendProduct) : findProductBySku(sku);
 
   if (!product) notFound();
 
-  const related = allProducts
-    .filter(item => item.sku !== product.sku)
-    .slice(0, 4);
+  const related = productsResult?.data?.length
+    ? productsResult.data
+        .filter(item => item.sku !== product.sku)
+        .slice(0, 4)
+        .map(mapBackendProductToStorefrontProduct)
+    : allProducts.filter(item => item.sku !== product.sku).slice(0, 4);
   const gallery = [product.image, ...related.map(item => item.image)].slice(0, 4);
 
   return (

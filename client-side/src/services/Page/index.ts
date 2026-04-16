@@ -1,47 +1,32 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use server';
 
-import { getValidAccessTokenForServerActions } from '@/lib/getValidAccessToken';
+import type { FieldValues } from 'react-hook-form';
 import { updateTag } from 'next/cache';
-import { FieldValues } from 'react-hook-form';
 
-// getPageByType
-export const getPageByType = async (type: string): Promise<any> => {
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/page/retrieve/${type}`, {
-            method: 'GET',
+import { requestBackendJson } from '@/lib/backend-api';
+import { getValidAccessTokenForServerActions } from '@/lib/getValidAccessToken';
 
-            next: {
-                tags: ['PAGES'],
-            },
-        });
-
-        const result = await res.json();
-        return result;
-    } catch (error: any) {
-        return Error(error);
-    }
+type BackendEnvelope<T> = {
+    success?: boolean;
+    message?: string;
+    data?: T;
+    error?: string;
 };
 
-// createOrUpdatePageByType
-export const createOrUpdatePageByType = async (data: FieldValues): Promise<any> => {
+export const getPageByType = async (type: string): Promise<BackendEnvelope<unknown>> => {
+    return requestBackendJson<BackendEnvelope<unknown>>(`/page/retrieve/${type}`, {
+        method: 'GET',
+    });
+};
+
+export const createOrUpdatePageByType = async (data: FieldValues): Promise<BackendEnvelope<unknown>> => {
     const accessToken = await getValidAccessTokenForServerActions();
+    const result = await requestBackendJson<BackendEnvelope<unknown>>('/page/create-or-update', {
+        method: 'PUT',
+        body: data as Record<string, unknown>,
+        token: accessToken ?? undefined,
+    });
 
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/page/create-or-update`, {
-            method: 'PUT',
-            body: JSON.stringify(data),
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-                'Content-Type': 'application/json',
-            },
-        });
-
-        updateTag('PAGES');
-
-        const result = await res.json();
-        return result;
-    } catch (error: any) {
-        return Error(error);
-    }
+    updateTag('PAGES');
+    return result;
 };

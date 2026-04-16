@@ -10,6 +10,7 @@ import {
   getProductsByCategory,
 } from '@/lib/malamal-content';
 import { buildCategoryMetadata, buildCategorySchemas } from '@/lib/seo';
+import { getProductsByCategorySlug, mapBackendProductToStorefrontProduct } from '@/services/Product';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -18,6 +19,8 @@ type Props = {
 export function generateStaticParams() {
   return categoryPages.map(category => ({ slug: category.slug }));
 }
+
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
@@ -42,7 +45,10 @@ export default async function CategoryPage({ params }: Props) {
   }
 
   const title = 'name' in category ? category.name : category.title;
-  const products = getProductsByCategory(title);
+  const productsResult = await getProductsByCategorySlug(slug).catch(() => null);
+  const products = productsResult?.data?.length
+    ? productsResult.data.map(mapBackendProductToStorefrontProduct)
+    : getProductsByCategory(title);
 
   return (
     <>

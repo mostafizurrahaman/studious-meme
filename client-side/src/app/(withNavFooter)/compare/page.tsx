@@ -4,11 +4,18 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { featuredProducts } from '@/lib/malamal-content';
 import { compareMetadata } from '@/lib/seo';
+import { getComparisonSuggestions } from '@/services/ComparisonHistory';
+import { mapBackendProductToStorefrontProduct, type BackendProduct } from '@/services/Product';
 
 export const metadata = compareMetadata;
+export const dynamic = 'force-dynamic';
 
-export default function ComparePage() {
-  const products = featuredProducts.slice(0, 3);
+export default async function ComparePage() {
+  const suggestionsResult = await getComparisonSuggestions().catch(() => null);
+  const backendProducts = suggestionsResult?.data?.length
+    ? suggestionsResult.data.map(item => mapBackendProductToStorefrontProduct(item as BackendProduct))
+    : featuredProducts.slice(0, 3);
+  const products = backendProducts.slice(0, 3);
 
   return (
     <main className="flex-1 bg-background pb-16">
