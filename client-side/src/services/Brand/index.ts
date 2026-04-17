@@ -22,7 +22,7 @@ export type BackendBrand = {
     isActive: boolean;
 };
 
-export function mapBackendBrandToStorefrontBrand(brand: BackendBrand): StorefrontBrand {
+export async function mapBackendBrandToStorefrontBrand(brand: BackendBrand): Promise<StorefrontBrand> {
     return {
         name: brand.name,
         href: '/shop-by-brands',

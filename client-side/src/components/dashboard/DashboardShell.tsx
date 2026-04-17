@@ -64,6 +64,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
             : [
                   { href: getDashboardPath(role), label: 'Overview', icon: LayoutDashboard },
                   { href: '/dashboard/orders', label: 'Orders', icon: ReceiptText },
+                  { href: '/dashboard/payments', label: 'Payments', icon: ReceiptText },
                   { href: '/dashboard/products', label: 'Products', icon: Package },
                   { href: '/dashboard/categories', label: 'Categories', icon: Tags },
                   { href: '/dashboard/brands', label: 'Brands', icon: Boxes },

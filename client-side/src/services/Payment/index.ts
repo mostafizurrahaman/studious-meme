@@ -30,3 +30,11 @@ export const getMyPayments = async (): Promise<BackendEnvelope<unknown[]>> => {
         token: accessToken ?? undefined,
     });
 };
+
+export const getAllPaymentsForAdmin = async (): Promise<BackendEnvelope<unknown[]>> => {
+    const accessToken = await getValidAccessTokenForServerHandlerGet();
+    return requestBackendJson<BackendEnvelope<unknown[]>>('/payment/admin', {
+        method: 'GET',
+        token: accessToken ?? undefined,
+    });
+};

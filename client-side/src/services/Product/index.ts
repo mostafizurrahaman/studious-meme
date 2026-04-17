@@ -44,6 +44,7 @@ function resolveName(value: BackendProductRef): string {
 export function mapBackendProductToStorefrontProduct(product: BackendProduct): StorefrontProduct {
     return {
         title: product.title,
+        slug: product.slug,
         href: '/shop',
         image: product.image,
         price: product.price,
