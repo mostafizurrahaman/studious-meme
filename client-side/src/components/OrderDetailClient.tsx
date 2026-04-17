@@ -6,13 +6,12 @@ import { useMemo } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { formatMoney } from '@/lib/cart';
+import { formatMoney, type CartItem } from '@/lib/cart';
 import { useCartStore } from '@/lib/cart-store';
+import type { BackendOrder } from '@/services/Order';
 
-export function OrderDetailClient({ orderId }: { orderId: string }) {
-  const order = useCartStore(state => state.orders.find(item => item.id === orderId));
+export function OrderDetailClient({ order }: { order: BackendOrder | null }) {
   const addItems = useCartStore(state => state.addItems);
-  const updateOrderStatus = useCartStore(state => state.updateOrderStatus);
 
   const timeline = useMemo(() => ([
     { key: 'Placed', label: 'Placed' },
@@ -33,7 +32,17 @@ export function OrderDetailClient({ orderId }: { orderId: string }) {
     );
   }
 
-  const activeIndex = order.status === 'Delivered' ? 2 : order.status === 'Processing' ? 1 : 0;
+  const activeIndex = order.status === 'DELIVERED' ? 2 : order.status === 'PROCESSING' ? 1 : 0;
+  const cartItems: CartItem[] = order.items.map(item => ({
+    sku: item.sku,
+    title: item.title,
+    href: '/shop',
+    image: item.image,
+    brand: item.brand,
+    unitPrice: item.unitPrice,
+    unitPriceLabel: formatMoney(item.unitPrice),
+    quantity: item.quantity,
+  }));
 
   const download = (filename: string, content: string, type: string) => {
     const blob = new Blob([content], { type });
@@ -45,15 +54,15 @@ export function OrderDetailClient({ orderId }: { orderId: string }) {
     URL.revokeObjectURL(url);
   };
 
-  const exportJson = () => download(`${order.id}.json`, JSON.stringify(order, null, 2), 'application/json');
+  const exportJson = () => download(`${order.orderId}.json`, JSON.stringify(order, null, 2), 'application/json');
   const exportCsv = () => {
     const rows = [
       ['Order ID', 'Item', 'SKU', 'Qty', 'Unit Price', 'Line Total'],
-      ...order.items.map(item => [order.id, item.title, item.sku, String(item.quantity), item.unitPriceLabel, formatMoney(item.unitPrice * item.quantity)]),
+      ...order.items.map(item => [order.orderId, item.title, item.sku, String(item.quantity), formatMoney(item.unitPrice), formatMoney(item.unitPrice * item.quantity)]),
     ];
 
     const csv = rows.map(row => row.map(value => `"${String(value).replaceAll('"', '""')}"`).join(',')).join('\n');
-    download(`${order.id}.csv`, csv, 'text/csv');
+    download(`${order.orderId}.csv`, csv, 'text/csv');
   };
 
   return (
@@ -63,11 +72,12 @@ export function OrderDetailClient({ orderId }: { orderId: string }) {
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">Order detail</p>
           <div className="mt-4 flex flex-wrap items-start justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-black text-secondary sm:text-4xl">{order.id}</h1>
+              <h1 className="text-3xl font-black text-secondary sm:text-4xl">{order.orderId}</h1>
               <div className="mt-3 flex flex-wrap gap-3 text-sm text-foreground/65">
                 <span>{new Date(order.createdAt).toLocaleString('en-US')}</span>
                 <span>{order.status}</span>
-                <span>{order.payment}</span>
+                <span>{order.paymentMethod}</span>
+                <span>{order.paymentStatus}</span>
               </div>
             </div>
             <div className="flex flex-wrap gap-2 print:hidden">
@@ -95,7 +105,7 @@ export function OrderDetailClient({ orderId }: { orderId: string }) {
               <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4 print:hidden">
                 {timeline.map((step, index) => {
                   const isActive = index <= activeIndex;
-                  const isCancelled = order.status === 'Cancelled';
+                  const isCancelled = order.status === 'CANCELLED';
 
                   return (
                     <div key={step.key} className={`rounded-2xl border px-4 py-3 text-sm ${isActive ? 'border-primary/30 bg-background' : 'border-border bg-background/70'}`}>
@@ -104,7 +114,7 @@ export function OrderDetailClient({ orderId }: { orderId: string }) {
                     </div>
                   );
                 })}
-                {order.status === 'Cancelled' ? <div className="rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3 text-sm text-primary sm:col-span-2 xl:col-span-4">This order was cancelled.</div> : null}
+                {order.status === 'CANCELLED' ? <div className="rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3 text-sm text-primary sm:col-span-2 xl:col-span-4">This order was cancelled.</div> : null}
               </div>
             </Card>
 
@@ -116,7 +126,7 @@ export function OrderDetailClient({ orderId }: { orderId: string }) {
                 <div className="min-w-0 flex-1">
                   <div className="font-semibold text-foreground">{item.title}</div>
                   <div className="mt-1 text-sm text-foreground/55">SKU {item.sku} · Qty {item.quantity}</div>
-                  <div className="mt-2 text-sm font-bold text-primary">{item.unitPriceLabel}</div>
+                  <div className="mt-2 text-sm font-bold text-primary">{formatMoney(item.unitPrice)}</div>
                 </div>
                 <div className="text-sm font-semibold text-foreground/70">{formatMoney(item.unitPrice * item.quantity)}</div>
               </div>
@@ -135,12 +145,9 @@ export function OrderDetailClient({ orderId }: { orderId: string }) {
               {order.customer.address || 'No address saved.'}
             </div>
             <div className="mt-6 grid gap-3">
-              <Button type="button" onClick={() => addItems(order.items)} className="h-11 rounded-full bg-white px-6 text-sm font-bold text-secondary hover:bg-white/90">Reorder</Button>
-              {order.status !== 'Cancelled' ? <Button type="button" variant="outline" onClick={() => updateOrderStatus(order.id, 'Cancelled')} className="h-11 rounded-full border-white/20 px-6 text-sm font-bold text-white hover:bg-white/10">Cancel order</Button> : null}
-              {order.status === 'Placed' ? <Button type="button" variant="outline" onClick={() => updateOrderStatus(order.id, 'Processing')} className="h-11 rounded-full border-white/20 px-6 text-sm font-bold text-white hover:bg-white/10">Mark processing</Button> : null}
-              {order.status === 'Processing' ? <Button type="button" variant="outline" onClick={() => updateOrderStatus(order.id, 'Delivered')} className="h-11 rounded-full border-white/20 px-6 text-sm font-bold text-white hover:bg-white/10">Mark delivered</Button> : null}
-              <Button asChild variant="outline" className="h-11 rounded-full border-white/20 px-6 text-sm font-bold text-white hover:bg-white/10"><Link href="/my-account/orders">Back to orders</Link></Button>
-            </div>
+                  <Button type="button" onClick={() => addItems(cartItems)} className="h-11 rounded-full bg-white px-6 text-sm font-bold text-secondary hover:bg-white/90">Reorder</Button>
+                  <Button asChild variant="outline" className="h-11 rounded-full border-white/20 px-6 text-sm font-bold text-white hover:bg-white/10"><Link href="/my-account/orders">Back to orders</Link></Button>
+                </div>
           </Card>
         </section>
       </div>

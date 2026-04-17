@@ -79,10 +79,17 @@ export default {
         password: process.env.MONITOR_PASSWORD,
     },
 
-    stripe: {
-        secret_key: process.env.STRIPE_SECRET_KEY,
-        webhook_secret: process.env.STRIPE_WEBHOOK_SECRET,
-        success_url: process.env.STRIPE_SUCCESS_URL,
-        cancel_url: process.env.STRIPE_CANCEL_URL,
+    sslcommerz: {
+        store_id: process.env.SSLCOMMERZ_STORE_ID,
+        store_password: process.env.SSLCOMMERZ_STORE_PASSWORD,
+        init_api: process.env.SSLCOMMERZ_PAYMENT_API ?? 'https://sandbox.sslcommerz.com/gwprocess/v4/api.php',
+        validation_api:
+            process.env.SSLCOMMERZ_VALIDATION_API ??
+            'https://sandbox.sslcommerz.com/validator/api/validationserverAPI.php',
+    },
+
+    urls: {
+        frontend_app: process.env.FRONTEND_APP_URL,
+        backend_public: process.env.BACKEND_PUBLIC_URL,
     },
 };

@@ -27,22 +27,64 @@ export const getAllUsers = async (): Promise<BackendEnvelope<unknown>> => {
     });
 };
 
+export const getAllAdmins = async (): Promise<BackendEnvelope<unknown>> => {
+    const accessToken = await getValidAccessTokenForServerHandlerGet();
+    return requestBackendJson<BackendEnvelope<unknown>>('/admin/admins', {
+        method: 'GET',
+        token: accessToken ?? undefined,
+    });
+};
+
 export const blockUnblockSingleUserById = async (): Promise<BackendEnvelope<unknown>> => unsupported('Endpoint not supported by current backend.');
 
 export const createUser = async (payload: CreateUserFormValues): Promise<BackendEnvelope<unknown>> => {
     const accessToken = await getValidAccessTokenForServerActions();
-    const result = await requestBackendJson<BackendEnvelope<unknown>>('/user/signup', {
-        method: 'POST',
-        body: {
+    const formData = new FormData();
+    formData.set(
+        'data',
+        JSON.stringify({
             name: payload.name.trim(),
             email: payload.email.trim().toLowerCase(),
             phone: payload.phone,
-            role: payload.role,
             password: payload.password,
-        },
+        }),
+    );
+
+    const result = await requestBackendJson<BackendEnvelope<unknown>>('/admin/admins', {
+        method: 'POST',
+        body: formData,
         token: accessToken ?? undefined,
     });
 
-    updateTag('USERS');
+    updateTag('ADMINS');
+    return result;
+};
+
+export const updateAdmin = async (
+    userId: string,
+    payload: { name?: string; email?: string; phone?: string; isActive?: boolean },
+): Promise<BackendEnvelope<unknown>> => {
+    const accessToken = await getValidAccessTokenForServerActions();
+    const formData = new FormData();
+    formData.set('data', JSON.stringify(payload));
+
+    const result = await requestBackendJson<BackendEnvelope<unknown>>(`/admin/admins/${userId}`, {
+        method: 'PATCH',
+        body: formData,
+        token: accessToken ?? undefined,
+    });
+
+    updateTag('ADMINS');
+    return result;
+};
+
+export const deleteAdmin = async (userId: string): Promise<BackendEnvelope<unknown>> => {
+    const accessToken = await getValidAccessTokenForServerActions();
+    const result = await requestBackendJson<BackendEnvelope<unknown>>(`/admin/admins/${userId}`, {
+        method: 'DELETE',
+        token: accessToken ?? undefined,
+    });
+
+    updateTag('ADMINS');
     return result;
 };

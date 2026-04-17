@@ -3,6 +3,7 @@
 import { useActionState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -24,7 +25,6 @@ export function CheckoutPageClient() {
     );
     const updateCheckout = useCartStore(state => state.updateCheckout);
     const clear = useCartStore(state => state.clear);
-    const addOrder = useCartStore(state => state.addOrder);
     const router = useRouter();
     const [result, formAction, pending] = useActionState<CheckoutActionState, FormData>(
         submitCheckoutAction,
@@ -39,14 +39,22 @@ export function CheckoutPageClient() {
     useEffect(() => {
         if (!result.ok) return;
 
-        addOrder(result.order);
         clear();
+        toast.success(
+            result.gatewayUrl ? 'Redirecting to SSLCommerz payment gateway...' : 'Order submitted successfully.',
+        );
+
+        if (result.gatewayUrl) {
+            window.location.href = result.gatewayUrl;
+            return;
+        }
+
         const timeout = window.setTimeout(() => {
-            router.push('/my-account/orders');
-        }, 1200);
+            router.push('/dashboard/user');
+        }, 800);
 
         return () => window.clearTimeout(timeout);
-    }, [addOrder, clear, result, router]);
+    }, [clear, result, router]);
 
     if (!hydrated) {
         return (
@@ -61,22 +69,11 @@ export function CheckoutPageClient() {
     return (
         <main className="flex-1 bg-background pb-16">
             <div className="mx-auto w-full max-w-310 px-4 py-6 lg:px-0">
-                {result.ok ? (
-                    <div className="fixed right-4 top-4 z-50 max-w-sm rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white shadow-lg">
-                        Order submitted successfully. Redirecting to your orders.
-                    </div>
-                ) : result.error ? (
-                    <div className="fixed right-4 top-4 z-50 max-w-sm rounded-2xl bg-destructive px-4 py-3 text-sm font-semibold text-white shadow-lg">
-                        {result.error}
-                    </div>
-                ) : null}
-
                 <Card className="p-6 shadow-sm sm:p-8">
                     <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">Checkout</p>
                     <h1 className="mt-4 text-3xl font-black text-secondary sm:text-4xl">Place order</h1>
                     <p className="mt-3 max-w-3xl text-sm leading-7 text-foreground/65 sm:text-base">
-                        Checkout fields are persisted in this browser and can be wired to server actions later
-                        without changing the UI.
+                        Complete your order with cash on delivery or SSLCommerz online payment.
                     </p>
                 </Card>
 
@@ -136,7 +133,7 @@ export function CheckoutPageClient() {
                                     onChange={event => updateCheckout('payment', event.target.value)}
                                     className="h-11 rounded-2xl border border-input bg-background px-4 outline-none"
                                 >
-                                    {['Cash on delivery', 'Bank transfer', 'bKash', 'Nagad'].map(option => (
+                                    {['Cash on delivery', 'SSLCommerz'].map(option => (
                                         <option key={option}>{option}</option>
                                     ))}
                                 </select>

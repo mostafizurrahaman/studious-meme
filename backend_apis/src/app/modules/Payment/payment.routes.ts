@@ -5,20 +5,16 @@ import { PaymentController } from './payment.controller';
 
 const router = Router();
 
-// 1. createPremiumCheckout
 router
-    .route('/premium/checkout')
-    .post(auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN), PaymentController.createPremiumCheckout);
+    .route('/sslcommerz/init/:orderId')
+    .post(auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN), PaymentController.initiateSslCommerzPayment);
 
-// 2. stripeWebhook
-router.route('/webhook').post(PaymentController.stripeWebhook);
+router.route('/sslcommerz/success').post(PaymentController.sslCommerzSuccess).get(PaymentController.sslCommerzSuccess);
+router.route('/sslcommerz/fail').post(PaymentController.sslCommerzFail).get(PaymentController.sslCommerzFail);
+router.route('/sslcommerz/cancel').post(PaymentController.sslCommerzCancel).get(PaymentController.sslCommerzCancel);
+router.route('/sslcommerz/ipn').post(PaymentController.sslCommerzSuccess);
 
-// 3. getMyCurrentStatus
-router
-    .route('/status')
-    .get(auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN), PaymentController.getMyCurrentStatus);
-
-// 4. getAllPaymentsForAdmin
+router.route('/my-payments').get(auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN), PaymentController.getMyPayments);
 router.route('/admin').get(auth(ROLE.ADMIN, ROLE.SUPER_ADMIN), PaymentController.getAllPaymentsForAdmin);
 
 export const PaymentRoutes = router;

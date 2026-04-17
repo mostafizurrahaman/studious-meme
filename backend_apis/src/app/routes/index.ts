@@ -9,6 +9,7 @@ import { HeroSectionRoutes } from '../modules/HeroSection/heroSection.routes';
 import { BrandRoutes } from '../modules/Brand/brand.routes';
 import { CategoryRoutes } from '../modules/Category/category.routes';
 import { ProductRoutes } from '../modules/Product/product.routes';
+import { OrderRoutes } from '../modules/Order/order.routes';
 
 const router = Router();
 
@@ -52,6 +53,10 @@ const moduleRoutes = [
     {
         path: '/product',
         route: ProductRoutes,
+    },
+    {
+        path: '/order',
+        route: OrderRoutes,
     },
 ];
 

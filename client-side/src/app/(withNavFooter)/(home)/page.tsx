@@ -11,7 +11,7 @@ export default async function Page() {
   return (
     <>
       <SeoScripts data={homeSchemas} />
-      <HomePage heroContent={heroContent?.data?.heroSection ?? null} />
+      <HomePage heroContent={heroContent?.data ?? null} />
     </>
   );
 }

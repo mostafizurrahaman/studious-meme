@@ -4,6 +4,8 @@ export type AuthUser = {
   email: string;
   image: string;
   role: string;
+  phone?: string;
+  dob?: string;
 };
 
 export type TUser = {

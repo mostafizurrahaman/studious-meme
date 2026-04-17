@@ -4,13 +4,24 @@ import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { formatMoney } from '@/lib/cart';
+import { formatMoney, type CartItem } from '@/lib/cart';
 import { useCartStore } from '@/lib/cart-store';
+import type { BackendOrder } from '@/services/Order';
 
-export function OrdersPageClient() {
-  const orders = useCartStore(state => state.orders);
+export function OrdersPageClient({ orders }: { orders: BackendOrder[] }) {
   const addItems = useCartStore(state => state.addItems);
-  const updateOrderStatus = useCartStore(state => state.updateOrderStatus);
+
+  const toCartItems = (order: BackendOrder): CartItem[] =>
+    order.items.map(item => ({
+      sku: item.sku,
+      title: item.title,
+      href: '/shop',
+      image: item.image,
+      brand: item.brand,
+      unitPrice: item.unitPrice,
+      unitPriceLabel: formatMoney(item.unitPrice),
+      quantity: item.quantity,
+    }));
 
   return (
     <main className="flex-1 bg-background pb-16">
@@ -23,18 +34,18 @@ export function OrdersPageClient() {
             Orders
           </h1>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-foreground/65 sm:text-base">
-            Every checkout you place in this browser appears here automatically.
+            Every backend order for your account appears here automatically.
           </p>
         </Card>
 
         <section className="mt-6 grid gap-4">
           {orders.length > 0 ? (
             orders.map(order => (
-              <Card key={order.id} className="p-5 shadow-sm sm:p-6">
+              <Card key={order.orderId} className="p-5 shadow-sm sm:p-6">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div>
-                    <Link href={`/my-account/orders/${order.id}`} className="text-sm font-bold text-secondary hover:text-primary">
-                      {order.id}
+                    <Link href={`/my-account/orders/${order.orderId}`} className="text-sm font-bold text-secondary hover:text-primary">
+                      {order.orderId}
                     </Link>
                     <div className="mt-1 text-xs uppercase tracking-[0.22em] text-foreground/45">
                       {new Date(order.createdAt).toLocaleString('en-US')}
@@ -64,34 +75,20 @@ export function OrdersPageClient() {
                   </div>
                 </div>
 
-                <div className="mt-4 flex flex-wrap gap-3 text-sm text-foreground/65">
-                  <span>Payment: {order.payment}</span>
+                  <div className="mt-4 flex flex-wrap gap-3 text-sm text-foreground/65">
+                  <span>Payment: {order.paymentMethod}</span>
+                  <span>Payment status: {order.paymentStatus}</span>
                   {order.couponCode ? <span>Coupon: {order.couponCode}</span> : null}
                   <span>Items: {order.items.length}</span>
                 </div>
 
                 <div className="mt-5 flex flex-wrap gap-3">
                   <Button asChild className="h-10 rounded-full bg-secondary px-4 text-sm font-semibold text-secondary-foreground hover:bg-secondary/90">
-                    <Link href={`/my-account/orders/${order.id}`}>View details</Link>
+                    <Link href={`/my-account/orders/${order.orderId}`}>View details</Link>
                   </Button>
-                  <Button type="button" variant="outline" onClick={() => addItems(order.items)} className="h-10 rounded-full border-border px-4 text-sm font-semibold text-foreground/75">
+                  <Button type="button" variant="outline" onClick={() => addItems(toCartItems(order))} className="h-10 rounded-full border-border px-4 text-sm font-semibold text-foreground/75">
                     Reorder
                   </Button>
-                  {order.status !== 'Cancelled' ? (
-                    <Button type="button" variant="outline" onClick={() => updateOrderStatus(order.id, 'Cancelled')} className="h-10 rounded-full border-primary/30 px-4 text-sm font-semibold text-primary hover:bg-primary/5">
-                      Cancel order
-                    </Button>
-                  ) : null}
-                  {order.status === 'Placed' ? (
-                    <Button type="button" variant="outline" onClick={() => updateOrderStatus(order.id, 'Processing')} className="h-10 rounded-full border-secondary/20 px-4 text-sm font-semibold text-secondary hover:bg-secondary/5">
-                      Mark processing
-                    </Button>
-                  ) : null}
-                  {order.status === 'Processing' ? (
-                    <Button type="button" variant="outline" onClick={() => updateOrderStatus(order.id, 'Delivered')} className="h-10 rounded-full border-emerald-600/20 px-4 text-sm font-semibold text-emerald-600 hover:bg-emerald-600/5">
-                      Mark delivered
-                    </Button>
-                  ) : null}
                 </div>
               </Card>
             ))

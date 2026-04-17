@@ -1,5 +1,6 @@
 export type Product = {
   title: string;
+  slug: string;
   href: '/shop';
   image: string;
   price: string;
@@ -97,6 +98,7 @@ export const topCategories: Category[] = [
 export const featuredProducts: Product[] = [
   {
     title: 'Mig Welding Machine MIG-250GS Brand- RIVCEN Input – 220Volt',
+    slug: 'mig-welding-machine-mig-250gs-brand-rivcen-input-220volt',
     href: '/shop',
     image:
       'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a0f82c3507.png',
@@ -111,6 +113,7 @@ export const featuredProducts: Product[] = [
   },
   {
     title: '23L Vacuum Cleaner 2100W SANFORD-SF23L-2100W (Malaysia)',
+    slug: '23l-vacuum-cleaner-2100w-sanford-sf23l-2100w-malaysia',
     href: '/shop',
     image:
       'https://i0.wp.com/malamal.com.bd/wp-content/uploads/2024/01/sanford-23litre-vacuum-cleaner-bangladesh-bd.webp?fit=600%2C600&ssl=1',
@@ -125,6 +128,7 @@ export const featuredProducts: Product[] = [
   },
   {
     title: '12V/24V Battery Charger Brand INGCO – ING-CB1601',
+    slug: '12v-24v-battery-charger-brand-ingco-ing-cb1601',
     href: '/shop',
     image:
       'https://i0.wp.com/malamal.com.bd/wp-content/uploads/2024/01/openart-image_nfp4GZgE_1771756212999_raw.webp?fit=768%2C768&ssl=1',
@@ -139,6 +143,7 @@ export const featuredProducts: Product[] = [
   },
   {
     title: 'High Pressure Car Washer 1500W 100bar Brand TOTAL – TGT11236',
+    slug: 'high-pressure-car-washer-1500w-100bar-brand-total-tgt11236',
     href: '/shop',
     image:
       'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a14e018223.png',
@@ -153,6 +158,7 @@ export const featuredProducts: Product[] = [
   },
   {
     title: 'Electric Mini Crane with Rope Hoist 500 Kg 50 Mtr Winch',
+    slug: 'electric-mini-crane-with-rope-hoist-500-kg-50-mtr-winch',
     href: '/shop',
     image:
       'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a14e018223.png',
@@ -170,6 +176,7 @@ export const featuredProducts: Product[] = [
 export const latestProducts: Product[] = [
   {
     title: 'TOTAL Mechanic Gloves TSP1806-XL',
+    slug: 'total-mechanic-gloves-tsp1806-xl',
     href: '/shop',
     image:
       'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a14e018223.png',
@@ -184,6 +191,7 @@ export const latestProducts: Product[] = [
   },
   {
     title: '80L Industrial Vacuum Cleaner 4500W CHINA WET & DRY BAOLYWUD Brand',
+    slug: '80l-industrial-vacuum-cleaner-4500w-china-wet-dry-baolywud-brand',
     href: '/shop',
     image:
       'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a163aad382.jpg',
@@ -198,6 +206,7 @@ export const latestProducts: Product[] = [
   },
   {
     title: 'Electric Router 2200W Brand Total – TR11122',
+    slug: 'electric-router-2200w-brand-total-tr11122',
     href: '/shop',
     image:
       'https://malamal.com.bd/wp-content/uploads/2024/01/Untitled-design-17.png',
@@ -212,6 +221,7 @@ export const latestProducts: Product[] = [
   },
   {
     title: 'Bench Grinder Machine 8" 200mm 350W Brand INGCO – BG83502',
+    slug: 'bench-grinder-machine-8-200mm-350w-brand-ingco-bg83502',
     href: '/shop',
     image:
       'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a0f82c3507.png',
@@ -226,6 +236,7 @@ export const latestProducts: Product[] = [
   },
   {
     title: '13mm Impact Drill 750w Brand Total – TG108136',
+    slug: '13mm-impact-drill-750w-brand-total-tg108136',
     href: '/shop',
     image:
       'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a14e018223.png',
@@ -243,6 +254,7 @@ export const latestProducts: Product[] = [
 export const offerProducts: Product[] = [
   {
     title: 'TOTAL Mechanic Gloves TSP1806-XL',
+    slug: 'total-mechanic-gloves-tsp1806-xl',
     href: '/shop',
     image:
       'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a14e018223.png',
@@ -257,6 +269,7 @@ export const offerProducts: Product[] = [
   },
   {
     title: 'Lithium-Lon Vacuum Cleaner With Battery & Charger Brand Ingco – CVL12001',
+    slug: 'lithium-lon-vacuum-cleaner-with-battery-charger-brand-ingco-cvl12001',
     href: '/shop',
     image:
       'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a163aad382.jpg',
@@ -271,6 +284,7 @@ export const offerProducts: Product[] = [
   },
   {
     title: '235mm (9-1/4”) Circular Saw 2200W INGCO – CS23522',
+    slug: '235mm-9-1-4-circular-saw-2200w-ingco-cs23522',
     href: '/shop',
     image:
       'https://malamal.com.bd/wp-content/uploads/2024/01/Untitled-design-17.png',
@@ -285,6 +299,7 @@ export const offerProducts: Product[] = [
   },
   {
     title: 'Automatic Box Carton Taping Machine – PACKWELL FXC-4030',
+    slug: 'automatic-box-carton-taping-machine-packwell-fxc-4030',
     href: '/shop',
     image:
       'https://malamal.com.bd/wp-content/uploads/2025/01/fxc-auto-carton-box-taping-machine.webp',
@@ -299,6 +314,7 @@ export const offerProducts: Product[] = [
   },
   {
     title: 'Fogger Machine MS/SY-5000 for HouseHold Use Bundle Offer',
+    slug: 'fogger-machine-ms-sy-5000-for-household-use-bundle-offer',
     href: '/shop',
     image:
       'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a14216ada7.png',

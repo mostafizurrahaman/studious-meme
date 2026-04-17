@@ -1,14 +1,18 @@
 import { SeoScripts } from '@/components/SeoScripts';
-import { Button } from '@/components/ui/button';
+import { QuotationRequestFormClient } from '@/components/QuotationRequestFormClient';
 import { Card, CardHeader } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { brands } from '@/lib/malamal-content';
 import { quotationRequestMetadata, quotationRequestSchemas } from '@/lib/seo';
+import { getAllBrands } from '@/services/Brand';
 
 export const metadata = quotationRequestMetadata;
 
-export default function QuotationRequestPage() {
+export default async function QuotationRequestPage() {
+  const brandsResult = await getAllBrands().catch(() => null);
+  const brandNames = brandsResult?.data?.length
+    ? brandsResult.data.map(brand => brand.name)
+    : brands.map(brand => brand.name);
+
   return (
     <>
       <SeoScripts data={quotationRequestSchemas} />
@@ -30,50 +34,7 @@ export default function QuotationRequestPage() {
 
           <section className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
             <Card className="p-6 shadow-sm">
-              <form className="grid gap-4">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <label className="grid gap-2 text-sm font-semibold text-foreground">
-                    Full name
-                    <Input placeholder="Your name" />
-                  </label>
-                  <label className="grid gap-2 text-sm font-semibold text-foreground">
-                    Company
-                    <Input placeholder="Company / organization" />
-                  </label>
-                </div>
-                <div className="grid gap-4 md:grid-cols-2">
-                  <label className="grid gap-2 text-sm font-semibold text-foreground">
-                    Email
-                    <Input placeholder="name@company.com" />
-                  </label>
-                  <label className="grid gap-2 text-sm font-semibold text-foreground">
-                    Phone
-                    <Input placeholder="01XXXXXXXXX" />
-                  </label>
-                </div>
-                <label className="grid gap-2 text-sm font-semibold text-foreground">
-                  Interested products
-                  <Textarea placeholder="List the items, quantity and any specification details" className="min-h-32" />
-                </label>
-                <label className="grid gap-2 text-sm font-semibold text-foreground">
-                  Brand preference
-                  <select className="h-11 rounded-2xl border border-input bg-background px-4 outline-none">
-                    {brands.map(brand => (
-                      <option key={brand.name}>{brand.name}</option>
-                    ))}
-                  </select>
-                </label>
-                <label className="grid gap-2 text-sm font-semibold text-foreground">
-                  Message
-                  <Textarea
-                    placeholder="Tell us about the project timeline, delivery location and special requirements"
-                    className="min-h-36"
-                  />
-                </label>
-                <Button type="button" className="h-11 w-fit rounded-full px-6 text-sm font-bold shadow-sm">
-                  Request quotation
-                </Button>
-              </form>
+              <QuotationRequestFormClient brands={brandNames} />
             </Card>
             <div className="space-y-4">
               <Card className="p-6 shadow-sm">

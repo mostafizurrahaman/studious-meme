@@ -37,7 +37,7 @@ const userSchema = new Schema<IUser, IUserModel>(
         password: {
             type: String,
             required: true,
-            select: 0, // 🔒 by default password will not be returned in response in all find queries, not in save
+            select: 0, // 🔒 by default password will not be returned in response in all find queries, not in save and aggregation
         },
 
         passwordChangedAt: {
@@ -77,17 +77,6 @@ const userSchema = new Schema<IUser, IUserModel>(
 
         deactivationReason: {
             type: String,
-        },
-
-        plan: {
-            type: String,
-            enum: ['FREE', 'PREMIUM'],
-            default: 'FREE',
-            index: true,
-        },
-
-        premiumUntil: {
-            type: Date,
         },
     },
     { timestamps: true, versionKey: false },

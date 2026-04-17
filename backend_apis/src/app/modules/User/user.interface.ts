@@ -21,9 +21,6 @@ export interface IUser extends Document {
     isDeleted: boolean;
     deactivationReason?: string;
 
-    plan?: 'FREE' | 'PREMIUM';
-    premiumUntil?: Date;
-
     createdAt?: Date;
     updatedAt?: Date;
 

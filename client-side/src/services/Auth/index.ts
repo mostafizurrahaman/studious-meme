@@ -28,6 +28,10 @@ type ResetPasswordToken = {
     resetPasswordToken: string;
 };
 
+type SignupOtpResponse = {
+    userEmail?: string;
+};
+
 async function getCookieStore() {
     return cookies();
 }
@@ -84,6 +88,40 @@ export const signInUser = async (userData: FieldValues): Promise<BackendEnvelope
     return result;
 };
 
+export const signUpUser = async (userData: {
+    name: string;
+    email: string;
+    password: string;
+}): Promise<BackendEnvelope<SignupOtpResponse>> => {
+    return requestBackendJson<BackendEnvelope<SignupOtpResponse>>('/user/signup', {
+        method: 'POST',
+        body: userData,
+    });
+};
+
+export const verifySignupOtp = async (payload: {
+    userEmail: string;
+    otp: string;
+}): Promise<BackendEnvelope<AuthTokens>> => {
+    const result = await requestBackendJson<BackendEnvelope<AuthTokens>>('/user/verify-signup-otp', {
+        method: 'POST',
+        body: payload,
+    });
+
+    if (result?.success && result.data?.accessToken) {
+        await setAuthCookies(result.data);
+    }
+
+    return result;
+};
+
+export const sendSignupOtpAgain = async (userEmail: string): Promise<BackendEnvelope<SignupOtpResponse>> => {
+    return requestBackendJson<BackendEnvelope<SignupOtpResponse>>('/user/send-signup-otp-again', {
+        method: 'POST',
+        body: { userEmail },
+    });
+};
+
 // updateProfilePhoto
 export const updateProfilePhoto = async (data: FormData): Promise<BackendEnvelope<AuthTokens>> => {
     const accessToken = await getValidAccessTokenForServerActions();
@@ -102,6 +140,14 @@ export const updateProfileData = async (data: FieldValues): Promise<BackendEnvel
     return requestBackendJson<BackendEnvelope<AuthTokens>>('/user/update-profile-data', {
         method: 'PATCH',
         body: data as Record<string, unknown>,
+        token: accessToken ?? undefined,
+    });
+};
+
+export const fetchProfile = async (): Promise<BackendEnvelope<AuthUser>> => {
+    const accessToken = await getValidAccessTokenForServerActions();
+    return requestBackendJson<BackendEnvelope<AuthUser>>('/user/profile', {
+        method: 'GET',
         token: accessToken ?? undefined,
     });
 };
@@ -194,6 +240,8 @@ function toAuthUser(payload: Record<string, unknown>): AuthUser | null {
     const email = typeof payload.email === 'string' ? payload.email : null;
     const image = typeof payload.image === 'string' ? payload.image : '';
     const role = typeof payload.role === 'string' ? payload.role : null;
+    const phone = typeof payload.phone === 'string' ? payload.phone : undefined;
+    const dob = typeof payload.dob === 'string' ? payload.dob : undefined;
 
     if (!id || !name || !email || !role) {
         return null;
@@ -205,6 +253,8 @@ function toAuthUser(payload: Record<string, unknown>): AuthUser | null {
         email,
         image,
         role,
+        phone,
+        dob,
     };
 }
 

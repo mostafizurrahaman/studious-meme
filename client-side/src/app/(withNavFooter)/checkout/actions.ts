@@ -1,8 +1,7 @@
 'use server';
 
-import { promises as fs } from 'node:fs';
-import path from 'node:path';
-import { calculateOrderSummary } from '@/lib/coupons';
+import { createOrder } from '@/services/Order';
+import { initiateSslCommerzPayment } from '@/services/Payment';
 
 type CartItem = {
   sku: string;
@@ -16,33 +15,9 @@ type CartItem = {
   quantity: number;
 };
 
-type OrderRecord = {
-  id: string;
-  createdAt: string;
-  items: CartItem[];
-  subtotal: number;
-  discount: number;
-  delivery: number;
-  total: number;
-  customer: {
-    name: string;
-    phone: string;
-    email: string;
-    address: string;
-    city: string;
-    note: string;
-    payment: string;
-  };
-  payment: string;
-  couponCode: string;
-  status: 'Placed';
-};
-
 export type CheckoutActionState =
   | { ok: false; error: string }
-  | { ok: true; order: OrderRecord };
-
-const ordersPath = path.join(process.cwd(), 'src', 'lib', 'orders-data.json');
+  | { ok: true; orderId: string; gatewayUrl?: string };
 
 function isCartItem(value: unknown): value is CartItem {
   if (!value || typeof value !== 'object') {
@@ -70,10 +45,6 @@ function readString(formData: FormData, key: string) {
 
 function fail(error: string): CheckoutActionState {
   return { ok: false, error };
-}
-
-function succeed(order: OrderRecord): CheckoutActionState {
-  return { ok: true, order };
 }
 
 export async function submitCheckoutAction(
@@ -108,25 +79,29 @@ export async function submitCheckoutAction(
   }
 
   const couponCode = readString(formData, 'couponCode');
-  const summary = calculateOrderSummary(items, couponCode);
 
-  const order: OrderRecord = {
-    id: `ORD-${Date.now()}`,
-    createdAt: new Date().toISOString(),
-    items,
-    subtotal: summary.subtotal,
-    discount: summary.discount,
-    delivery: summary.delivery,
-    total: summary.total,
+  const normalizedPayment = customer.payment === 'SSLCommerz' ? 'SSL_COMMERZ' : 'CASH_ON_DELIVERY';
+
+  const orderResult = await createOrder({
+    items: items.map(item => ({ sku: item.sku, quantity: item.quantity })),
     customer,
-    payment: customer.payment,
-    couponCode: summary.coupon?.code ?? '',
-    status: 'Placed',
-  };
+    couponCode,
+    paymentMethod: normalizedPayment,
+  });
 
-  const raw = await fs.readFile(ordersPath, 'utf8').catch(() => '[]');
-  const orders = JSON.parse(raw) as OrderRecord[];
-  await fs.writeFile(ordersPath, JSON.stringify([order, ...orders], null, 2), 'utf8');
+  if (!orderResult?.success || !orderResult.data) {
+    return fail(orderResult?.message ?? 'Failed to place order.');
+  }
 
-  return succeed(order);
+  if (normalizedPayment === 'SSL_COMMERZ') {
+    const paymentResult = await initiateSslCommerzPayment(orderResult.data.orderId);
+
+    if (!paymentResult?.success || !paymentResult.data?.url) {
+      return fail(paymentResult?.message ?? 'Failed to initiate SSLCommerz payment.');
+    }
+
+    return { ok: true, orderId: orderResult.data.orderId, gatewayUrl: paymentResult.data.url };
+  }
+
+  return { ok: true, orderId: orderResult.data.orderId };
 }

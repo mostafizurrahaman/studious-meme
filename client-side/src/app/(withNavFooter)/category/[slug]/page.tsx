@@ -10,6 +10,8 @@ import {
   getProductsByCategory,
 } from '@/lib/malamal-content';
 import { buildCategoryMetadata, buildCategorySchemas } from '@/lib/seo';
+import { getCategoryBySlug } from '@/services/Category';
+import { mapBackendCategoryToCategoryPageEntry } from '@/services/Category/mappers';
 import { getProductsByCategorySlug, mapBackendProductToStorefrontProduct } from '@/services/Product';
 
 type Props = {
@@ -24,7 +26,10 @@ export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
-  const category = findCategoryBySlug(slug);
+  const backendCategory = await getCategoryBySlug(slug).catch(() => null);
+  const category = backendCategory?.data
+    ? mapBackendCategoryToCategoryPageEntry(backendCategory.data)
+    : findCategoryBySlug(slug);
 
   if (!category) {
     return {
@@ -38,7 +43,10 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function CategoryPage({ params }: Props) {
   const { slug } = await params;
-  const category = findCategoryBySlug(slug);
+  const backendCategory = await getCategoryBySlug(slug).catch(() => null);
+  const category = backendCategory?.data
+    ? mapBackendCategoryToCategoryPageEntry(backendCategory.data)
+    : findCategoryBySlug(slug);
 
   if (!category) {
     notFound();

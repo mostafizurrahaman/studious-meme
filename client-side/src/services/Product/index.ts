@@ -1,4 +1,9 @@
+'use server';
+
+import { updateTag } from 'next/cache';
+
 import { requestBackendJson } from '@/lib/backend-api';
+import { getValidAccessTokenForServerActions } from '@/lib/getValidAccessToken';
 import type { Product as StorefrontProduct } from '@/lib/malamal-content';
 
 type BackendEnvelope<T> = {
@@ -11,6 +16,7 @@ type BackendEnvelope<T> = {
 type BackendProductRef = { name?: string; slug?: string } | string;
 
 export type BackendProduct = {
+    _id?: string;
     title: string;
     slug: string;
     sku: string;
@@ -65,4 +71,65 @@ export const getProductsByCategorySlug = async (slug: string): Promise<BackendEn
 
 export const getProductsBySubCategorySlug = async (slug: string): Promise<BackendEnvelope<BackendProduct[]>> => {
     return requestBackendJson<BackendEnvelope<BackendProduct[]>>(`/product/products/by-sub-category/${slug}`, { method: 'GET' });
+};
+
+type ProductMutationPayload = {
+    title: string;
+    slug: string;
+    sku: string;
+    image: string;
+    price: string;
+    oldPrice?: string;
+    badge?: string;
+    brand: string;
+    category: string;
+    subCategorySlug?: string;
+    stock: string;
+    rating: string;
+    isFeatured?: boolean;
+    isActive?: boolean;
+};
+
+function toFormData(payload: Record<string, unknown>) {
+    const formData = new FormData();
+    formData.set('data', JSON.stringify(payload));
+    return formData;
+}
+
+export const createProduct = async (payload: ProductMutationPayload): Promise<BackendEnvelope<BackendProduct>> => {
+    const accessToken = await getValidAccessTokenForServerActions();
+    const result = await requestBackendJson<BackendEnvelope<BackendProduct>>('/product/products', {
+        method: 'POST',
+        body: toFormData(payload),
+        token: accessToken ?? undefined,
+    });
+
+    updateTag('PRODUCTS');
+    return result;
+};
+
+export const updateProduct = async (
+    slug: string,
+    payload: Partial<ProductMutationPayload>,
+): Promise<BackendEnvelope<BackendProduct>> => {
+    const accessToken = await getValidAccessTokenForServerActions();
+    const result = await requestBackendJson<BackendEnvelope<BackendProduct>>(`/product/products/${slug}`, {
+        method: 'PATCH',
+        body: toFormData(payload),
+        token: accessToken ?? undefined,
+    });
+
+    updateTag('PRODUCTS');
+    return result;
+};
+
+export const deleteProduct = async (slug: string): Promise<BackendEnvelope<BackendProduct>> => {
+    const accessToken = await getValidAccessTokenForServerActions();
+    const result = await requestBackendJson<BackendEnvelope<BackendProduct>>(`/product/products/${slug}`, {
+        method: 'DELETE',
+        token: accessToken ?? undefined,
+    });
+
+    updateTag('PRODUCTS');
+    return result;
 };

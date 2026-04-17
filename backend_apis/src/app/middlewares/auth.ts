@@ -44,17 +44,6 @@ const auth = (...requiredRoles: TRole[]) => {
             throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized!');
         }
 
-        // Auto-downgrade expired premium
-        if (
-            user.plan === 'PREMIUM' &&
-            user.premiumUntil &&
-            new Date(user.premiumUntil).getTime() <= Date.now()
-        ) {
-            user.plan = 'FREE';
-            user.premiumUntil = undefined;
-            await user.save();
-        }
-
         if (requiredRoles.length && !requiredRoles.includes(user.role)) {
             throw new AppError(httpStatus.UNAUTHORIZED, 'You have no access to this route, Forbidden!');
         }

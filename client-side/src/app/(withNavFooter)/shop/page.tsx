@@ -9,16 +9,25 @@ import {
   topCategories,
 } from '@/lib/malamal-content';
 import { shopMetadata, shopSchemas } from '@/lib/seo';
+import { getAllCategoriesWithTotalNewsCount } from '@/services/Category';
+import { mapBackendCategoryToStorefrontCategory, type BackendCategory } from '@/services/Category/mappers';
 import { getAllProducts, mapBackendProductToStorefrontProduct } from '@/services/Product';
 
 export const metadata = shopMetadata;
 export const dynamic = 'force-dynamic';
 
 export default async function ShopPage() {
-  const productsResult = await getAllProducts().catch(() => null);
+  const [productsResult, categoriesResult] = await Promise.all([
+    getAllProducts().catch(() => null),
+    getAllCategoriesWithTotalNewsCount().catch(() => null),
+  ]);
+
   const products = productsResult?.data?.length
     ? productsResult.data.map(mapBackendProductToStorefrontProduct)
     : [...featuredProducts, ...latestProducts];
+  const backendCategories = Array.isArray(categoriesResult?.data)
+    ? categoriesResult.data.map(item => mapBackendCategoryToStorefrontCategory(item as BackendCategory))
+    : topCategories;
 
   return (
     <>
@@ -66,10 +75,10 @@ export default async function ShopPage() {
               <div className="mt-4 space-y-4 text-sm">
                 <div>
                   <div className="font-semibold text-foreground">Category</div>
-                  <div className="mt-2 grid gap-2 text-foreground/65">
-                    {topCategories.map(category => (
+                    <div className="mt-2 grid gap-2 text-foreground/65">
+                    {backendCategories.map(category => (
                       <Link
-                        key={category.name}
+                        key={category.slug}
                         href={category.href}
                         className="hover:text-primary"
                       >
@@ -99,7 +108,7 @@ export default async function ShopPage() {
               <Card className="p-4 shadow-sm">
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                   <div className="text-sm text-foreground/65">
-                    Showing {products.length} products in this catalog view
+                    Showing {products.length} products across {backendCategories.length} categories
                   </div>
                   <div className="flex flex-wrap gap-2 text-xs font-semibold">
                     {[

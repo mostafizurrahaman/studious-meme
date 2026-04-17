@@ -1,12 +1,7 @@
-'use client';
-
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import {
@@ -19,6 +14,10 @@ import {
 import { ProductCard } from '@/components/ProductCard';
 import { SectionHeading } from '@/components/SectionHeading';
 import { Container } from '@/components/Container';
+import { HomeHeroCarousel } from '@/components/HomeHeroCarousel';
+import { mapBackendBrandToStorefrontBrand, type BackendBrand } from '@/services/Brand';
+import { mapBackendCategoryToStorefrontCategory, type BackendCategory } from '@/services/Category/mappers';
+import { mapBackendProductToStorefrontProduct, type BackendProduct } from '@/services/Product';
 
 type HeroSlide = {
     title: string;
@@ -29,35 +28,26 @@ type HeroSlide = {
 
 type HomePageProps = {
     heroContent?: {
-        slides?: Array<{
-            title: string;
-            description: string;
-            image: string;
-            clickUrl: string;
-        }>;
+        heroSection?: {
+            slides?: Array<{
+                title: string;
+                description: string;
+                image: string;
+                clickUrl: string;
+            }>;
+            features?: Array<{
+                title: string;
+                description: string;
+                image: string;
+                clickUrl: string;
+            }>;
+        } | null;
+        brands?: BackendBrand[];
+        categories?: BackendCategory[];
+        featuredProducts?: BackendProduct[];
+        latestProducts?: BackendProduct[];
     } | null;
 };
-
-const defaultHeroSlides: HeroSlide[] = [
-    {
-        title: 'Industrial tools for every project',
-        description: 'Dedicated categories for workshop, construction, cleaning and packaging equipment.', // for metadata
-        image: 'https://malamal.com.bd/wp-content/uploads/2025/01/vacuum-packaging-sealer-machine-dz-400-pc.webp',
-        href: '/shop',
-    },
-    {
-        title: 'Reliable welding and cutting machines',
-        description: 'High-volume gear with a clean buying flow for the full catalog.', // for metadata
-        image: 'https://malamal.com.bd/wp-content/uploads/2024/11/winner-welding-machine-pc.webp',
-        href: '/shop',
-    },
-    {
-        title: 'Garage tools and cleaning solutions',
-        description: 'Product discovery built like the reference site with a fast browsing experience.', // for metadata
-        image: 'https://malamal.com.bd/wp-content/uploads/2024/11/garage-tools-and-equipment-pc.webp',
-        href: '/shop',
-    },
-] as const;
 
 function SectionMarquee() {
     const message =
@@ -75,27 +65,58 @@ function SectionMarquee() {
 }
 
 export function HomePage({ heroContent }: HomePageProps) {
-    const [heroIndex, setHeroIndex] = useState(0);
-    const heroSlides: HeroSlide[] = heroContent?.slides?.length
-        ? heroContent.slides.map(slide => ({
+    const heroSlides: HeroSlide[] = heroContent?.heroSection?.slides?.length
+        ? heroContent.heroSection.slides.map(slide => ({
               title: slide.title,
               description: slide.description,
               image: slide.image,
               href: slide.clickUrl || '/shop',
           }))
-        : (defaultHeroSlides as HeroSlide[]);
+        : [
+              {
+                  title: 'Industrial tools for every project',
+                  description: 'Dedicated categories for workshop, construction, cleaning and packaging equipment.',
+                  image: 'https://malamal.com.bd/wp-content/uploads/2025/01/vacuum-packaging-sealer-machine-dz-400-pc.webp',
+                  href: '/shop',
+              },
+              {
+                  title: 'Reliable welding and cutting machines',
+                  description: 'High-volume gear with a clean buying flow for the full catalog.',
+                  image: 'https://malamal.com.bd/wp-content/uploads/2024/11/winner-welding-machine-pc.webp',
+                  href: '/shop',
+              },
+              {
+                  title: 'Garage tools and cleaning solutions',
+                  description: 'Product discovery built like the reference site with a fast browsing experience.',
+                  image: 'https://malamal.com.bd/wp-content/uploads/2024/11/garage-tools-and-equipment-pc.webp',
+                  href: '/shop',
+              },
+          ];
 
-    useEffect(() => {
-        const timer = window.setInterval(() => {
-            setHeroIndex(prev => (prev + 1) % heroSlides.length);
-        }, 5000);
+    const heroFeatures: HeroSlide[] = heroContent?.heroSection?.features?.length
+        ? heroContent.heroSection.features.map(card => ({
+              title: card.title,
+              description: card.description,
+              image: card.image,
+              href: card.clickUrl || '/shop',
+          }))
+        : heroSlides;
 
-        return () => window.clearInterval(timer);
-    }, [heroSlides.length]);
+    const featuredCatalog = heroContent?.featuredProducts?.length
+        ? heroContent.featuredProducts.map(mapBackendProductToStorefrontProduct)
+        : featuredProducts;
 
-    const goToPrevious = () => setHeroIndex(prev => (prev - 1 + heroSlides.length) % heroSlides.length);
+    const latestCatalog = heroContent?.latestProducts?.length
+        ? heroContent.latestProducts.map(mapBackendProductToStorefrontProduct)
+        : latestProducts;
 
-    const goToNext = () => setHeroIndex(prev => (prev + 1) % heroSlides.length);
+    const categoryCards = heroContent?.categories?.length
+        ? heroContent.categories.slice(0, 6).map(mapBackendCategoryToStorefrontCategory)
+        : categoryShowcase;
+
+    const brandItems = heroContent?.brands?.length
+        ? heroContent.brands.map(mapBackendBrandToStorefrontBrand)
+        : brands;
 
     return (
         <main className="flex-1 bg-background pb-16">
@@ -111,98 +132,7 @@ export function HomePage({ heroContent }: HomePageProps) {
                     </div>
 
                     <section>
-                        <Card className="overflow-hidden shadow-sm">
-                            <div className="grid h-full gap-0 p-0 sm:gap-4 sm:p-6 lg:grid-cols-[1.22fr_0.78fr] lg:p-6">
-                                <div className="ui-image-card relative min-h-105 overflow-hidden rounded-3xl bg-background sm:min-h-125 lg:min-h-125">
-                                    {/* image */}
-                                    <Image
-                                        src={heroSlides[heroIndex].image}
-                                        alt={heroSlides[heroIndex].title}
-                                        fill
-                                        sizes="(max-width: 1024px) 100vw, 760px"
-                                        className="object-cover object-[center_top] transition duration-500 ease-out"
-                                    />
-
-                                    {/* next nad previous button */}
-                                    <Button
-                                        type="button"
-                                        onClick={goToPrevious}
-                                        aria-label="Previous banner"
-                                        variant="secondary"
-                                        size="icon"
-                                        className="absolute left-3 top-1/2 z-20 h-10 w-10 -translate-y-1/2 rounded-full bg-transparent text-foreground shadow-md backdrop-blur-sm transition hover:bg-background"
-                                    >
-                                        <ArrowLeft className="h-4 w-4" />
-                                    </Button>
-                                    <Button
-                                        type="button"
-                                        onClick={goToNext}
-                                        aria-label="Next banner"
-                                        variant="secondary"
-                                        size="icon"
-                                        className="absolute right-3 top-1/2 z-20 h-10 w-10 -translate-y-1/2 rounded-full bg-transparent text-foreground shadow-md backdrop-blur-sm transition hover:bg-background"
-                                    >
-                                        <ArrowRight className="h-4 w-4" />
-                                    </Button>
-
-                                    {/* bottom buttons to change image */}
-                                    <div className="absolute bottom-3 left-1/2 z-20 flex -translate-x-1/2 gap-2 rounded-full bg-background/90 px-3 py-2 shadow-sm backdrop-blur-sm">
-                                        {heroSlides.map((slide, index) => (
-                                            <button
-                                                key={slide.title}
-                                                type="button"
-                                                onClick={() => setHeroIndex(index)}
-                                                aria-label={`Go to banner ${index + 1}`}
-                                                className={`h-2.5 rounded-full transition-all ${index === heroIndex ? 'w-7 bg-primary' : 'w-2.5 bg-border'}`}
-                                            />
-                                        ))}
-                                    </div>
-                                </div>
-                                {/* features */}
-                                <div className="hidden gap-4 lg:grid lg:grid-cols-1">
-                                    {/* feature-1 */}
-                                    <Link
-                                        href={heroSlides[1].href}
-                                        className="ui-image-card group relative min-h-80 cursor-pointer overflow-hidden rounded-3xl border border-border bg-muted shadow-sm"
-                                    >
-                                        <Image
-                                            src={heroSlides[1].image}
-                                            alt={heroSlides[1].title}
-                                            fill
-                                            sizes="(max-width: 1024px) 33vw, 300px"
-                                            className="object-cover transition duration-300 group-hover:scale-105"
-                                        />
-                                        <div className="absolute inset-0 bg-linear-to-r from-black/10 via-black/5 to-transparent" />
-                                        <Badge className="absolute left-4 top-4 rounded-full bg-primary px-3 py-1 text-[10px] uppercase tracking-[0.28em] text-white shadow-sm">
-                                            Feature 1
-                                        </Badge>
-                                    </Link>
-
-                                    {/* feature 2 and 3 */}
-                                    <div className="grid grid-cols-2 gap-4">
-                                        {[heroSlides[0], heroSlides[2]].map((slide, index) => (
-                                            <Link
-                                                key={slide.title}
-                                                href={slide.href}
-                                                className="ui-image-card group relative min-h-40 cursor-pointer overflow-hidden rounded-3xl border border-border bg-muted shadow-sm"
-                                            >
-                                                <Image
-                                                    src={slide.image}
-                                                    alt={slide.title}
-                                                    fill
-                                                    sizes="(max-width: 1024px) 16vw, 150px"
-                                                    className="object-cover transition duration-300 group-hover:scale-105"
-                                                />
-                                                <div className="absolute inset-0 bg-linear-to-r from-black/10 via-black/5 to-transparent" />
-                                                <Badge className="absolute left-3 top-3 rounded-full bg-primary px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-white shadow-sm">
-                                                    Feature {index + 2}
-                                                </Badge>
-                                            </Link>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        </Card>
+                        <HomeHeroCarousel slides={heroSlides} features={heroFeatures} />
                     </section>
 
                     <div className="mt-4">
@@ -247,7 +177,7 @@ export function HomePage({ heroContent }: HomePageProps) {
                         </CardHeader>
                         <CardContent className="px-5 pb-5 pt-6 sm:px-6">
                             <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-5">
-                                {featuredProducts.map(product => (
+                                {featuredCatalog.map(product => (
                                     <ProductCard key={product.sku} product={product} />
                                 ))}
                             </div>
@@ -260,7 +190,7 @@ export function HomePage({ heroContent }: HomePageProps) {
                         </CardHeader>
                         <CardContent className="px-5 pb-5 pt-6 sm:px-6">
                             <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-5">
-                                {latestProducts.map(product => (
+                                {latestCatalog.map(product => (
                                     <ProductCard key={product.sku} product={product} />
                                 ))}
                             </div>
@@ -268,9 +198,9 @@ export function HomePage({ heroContent }: HomePageProps) {
                     </Card>
 
                     <section className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                        {categoryShowcase.map(card => (
+                        {categoryCards.map(card => (
                             <Link
-                                key={card.title}
+                                key={card.slug}
                                 href={card.href}
                                 className={`ui-card group flex h-full cursor-pointer flex-col bg-linear-to-br ${card.accent} p-6 text-white shadow-sm`}
                             >
@@ -281,7 +211,7 @@ export function HomePage({ heroContent }: HomePageProps) {
                                     Category spotlight
                                 </Badge>
                                 <h3 className="mt-6 text-[26px] font-black leading-tight text-white">
-                                    {card.title}
+                                    {'name' in card ? card.name : card.title}
                                 </h3>
                                 <p className="mt-3 max-w-md text-sm leading-7 text-white/90">
                                     {card.description}
@@ -299,7 +229,7 @@ export function HomePage({ heroContent }: HomePageProps) {
                         </CardHeader>
                         <CardContent className="px-5 pb-5 pt-6 sm:px-6">
                             <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
-                                {brands.map(brand => (
+                                {brandItems.map(brand => (
                                     <Link
                                         key={brand.name}
                                         href={brand.href}

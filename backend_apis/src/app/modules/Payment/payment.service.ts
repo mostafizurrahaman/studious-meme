@@ -1,275 +1,271 @@
-// import Stripe from 'stripe';
-// import httpStatus from 'http-status';
-// import config from '../../config';
-// import { AppError } from '../../utils';
-// import { IUser } from '../User/user.interface';
-// import UserModel from '../User/user.model';
-// import { Payment } from './payment.model';
-// import { IMeta } from '../../types';
-// import { PipelineStage } from 'mongoose';
-
-// const stripe = new Stripe(config.stripe.secret_key as string, {
-//     apiVersion: '2026-03-25.dahlia',
-// });
-
-// const PREMIUM_PRICE_USD = 10.99;
-// const PREMIUM_DURATION_DAYS = 30;
-
-// // createPremiumCheckoutSession
-// const createPremiumCheckoutSession = async (user: IUser) => {
-//     if (!config.stripe.secret_key) {
-//         throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, 'Stripe secret key is missing');
-//     }
-//     if (!config.stripe.success_url || !config.stripe.cancel_url) {
-//         throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, 'Stripe success/cancel URL is missing');
-//     }
-
-//     const payment = await Payment.create({
-//         user: user._id,
-//         amount: PREMIUM_PRICE_USD,
-//         currency: 'USD',
-//         status: 'PENDING',
-//         plan: 'PREMIUM',
-//         durationDays: PREMIUM_DURATION_DAYS,
-//     });
-
-//     const session = await stripe.checkout.sessions.create({
-//         mode: 'payment',
-//         payment_method_types: ['card'],
-//         line_items: [
-//             {
-//                 price_data: {
-//                     currency: 'usd',
-//                     product_data: {
-//                         name: 'Premium Plan (30 days)',
-//                     },
-//                     unit_amount: Math.round(PREMIUM_PRICE_USD * 100),
-//                 },
-//                 quantity: 1,
-//             },
-//         ],
-//         success_url: config.stripe.success_url,
-//         cancel_url: config.stripe.cancel_url,
-//         client_reference_id: String(user._id),
-//         metadata: {
-//             userId: String(user._id),
-//             paymentId: String(payment._id),
-//             durationDays: String(PREMIUM_DURATION_DAYS),
-//         },
-//     });
-
-//     payment.stripeCheckoutSessionId = session.id;
-//     await payment.save();
-
-//     return { sessionId: session.id, url: session.url };
-// };
-
-// // handleStripeWebhook
-// const handleStripeWebhook = async (signature: string | string[] | undefined, rawBody: Buffer) => {
-//     if (!config.stripe.webhook_secret) {
-//         throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, 'Stripe webhook secret is missing');
-//     }
-
-//     const sig = Array.isArray(signature) ? signature[0] : signature;
-//     if (!sig) {
-//         throw new AppError(httpStatus.BAD_REQUEST, 'Stripe signature is missing');
-//     }
-
-//     // let event: Stripe.Event;
-//     let event;
-//     try {
-//         event = stripe.webhooks.constructEvent(rawBody, sig, config.stripe.webhook_secret);
-//         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//     } catch (err: any) {
-//         throw new AppError(httpStatus.BAD_REQUEST, `Invalid Stripe signature: ${err.message}`);
-//     }
-
-//     if (event.type === 'checkout.session.completed') {
-//         const session = event.data.object;
-//         const paymentId = session.metadata?.paymentId;
-//         const userId = session.metadata?.userId || session.client_reference_id;
-
-//         if (paymentId) {
-//             const payment = await Payment.findById(paymentId);
-//             if (payment) {
-//                 payment.status = 'SUCCEEDED';
-//                 payment.stripePaymentIntentId =
-//                     typeof session.payment_intent === 'string' ? session.payment_intent : undefined;
-//                 payment.stripeCustomerId =
-//                     typeof session.customer === 'string' ? session.customer : undefined;
-
-//                 const until = new Date(Date.now() + PREMIUM_DURATION_DAYS * 24 * 60 * 60 * 1000);
-//                 payment.premiumUntil = until;
-//                 await payment.save();
-
-//                 if (userId) {
-//                     await UserModel.findByIdAndUpdate(userId, {
-//                         plan: 'PREMIUM',
-//                         premiumUntil: until,
-//                     });
-//                 }
-//             }
-//         }
-//     }
-
-//     return { received: true };
-// };
-
-// // getMyCurrentStatus
-// const getMyCurrentStatus = async (user: IUser) => {
-//     const premiumUntil = user.premiumUntil ? new Date(user.premiumUntil) : undefined;
-//     const isPremium = user.plan === 'PREMIUM' && (!premiumUntil || premiumUntil.getTime() > Date.now());
-
-//     return {
-//         plan: user.plan || 'FREE',
-//         premiumUntil: premiumUntil || null,
-//         isPremium,
-//     };
-// };
-
-// // getAllPaymentsForAdminFromDB
-// const getAllPaymentsForAdminFromDB = async (
-//     query: Record<string, unknown>,
-// ): Promise<{ data: unknown[]; meta: IMeta; summary: { totalAmount: number } }> => {
-//     const { page, limit, searchTerm, status } = query;
-
-//     const pageNumber = Number(page) || 1;
-//     const limitNumber = Number(limit) || 10;
-//     const skip = (pageNumber - 1) * limitNumber;
-
-//     const matchStage: Record<string, unknown> = {};
-
-//     if (status) {
-//         matchStage.status = status;
-//     }
-
-//     const pipeline: PipelineStage[] = [{ $match: matchStage }];
-
-//     if (searchTerm) {
-//         pipeline.push({
-//             $lookup: {
-//                 from: 'users',
-//                 localField: 'user',
-//                 foreignField: '_id',
-//                 as: 'user',
-//             },
-//         });
-//         pipeline.push({ $unwind: '$user' });
-//         pipeline.push({
-//             $match: {
-//                 $or: [
-//                     { 'user.name': { $regex: searchTerm, $options: 'i' } },
-//                     { 'user.email': { $regex: searchTerm, $options: 'i' } },
-//                     { stripeCheckoutSessionId: { $regex: searchTerm, $options: 'i' } },
-//                     { stripePaymentIntentId: { $regex: searchTerm, $options: 'i' } },
-//                 ],
-//             },
-//         });
-//     } else {
-//         pipeline.push({
-//             $lookup: {
-//                 from: 'users',
-//                 localField: 'user',
-//                 foreignField: '_id',
-//                 as: 'user',
-//             },
-//         });
-//         pipeline.push({ $unwind: '$user' });
-//     }
-
-//     pipeline.push({ $sort: { createdAt: -1 } });
-//     pipeline.push({
-//         $facet: {
-//             data: [
-//                 { $skip: skip },
-//                 { $limit: limitNumber },
-//                 {
-//                     $project: {
-//                         amount: 1,
-//                         currency: 1,
-//                         status: 1,
-//                         plan: 1,
-//                         durationDays: 1,
-//                         premiumUntil: 1,
-//                         stripeCheckoutSessionId: 1,
-//                         stripePaymentIntentId: 1,
-//                         stripeCustomerId: 1,
-//                         createdAt: 1,
-//                         user: {
-//                             _id: '$user._id',
-//                             name: '$user.name',
-//                             email: '$user.email',
-//                             phone: '$user.phone',
-//                             image: '$user.image',
-//                             plan: '$user.plan',
-//                         },
-//                     },
-//                 },
-//             ],
-//             meta: [{ $count: 'total' }],
-//             summary: [{ $group: { _id: null, totalAmount: { $sum: '$amount' } } }],
-//         },
-//     });
-
-//     const result = await Payment.aggregate(pipeline);
-//     const facetResult = result[0] || { data: [], meta: [] };
-
-//     const total = facetResult.meta[0]?.total || 0;
-//     const totalPage = Math.ceil(total / limitNumber) || 1;
-
-//     return {
-//         data: facetResult.data,
-//         meta: {
-//             page: pageNumber,
-//             limit: limitNumber,
-//             total,
-//             totalPage,
-//         },
-//         summary: {
-//             totalAmount: facetResult.summary[0]?.totalAmount || 0,
-//         },
-//     };
-// };
-
-// export const PaymentService = {
-//     createPremiumCheckoutSession,
-//     handleStripeWebhook,
-//     getMyCurrentStatus,
-//     getAllPaymentsForAdminFromDB,
-// };
+import httpStatus from 'http-status';
+import { fetch } from 'undici';
+import { AppError } from '../../utils';
+import config from '../../config';
+import { IUser } from '../User/user.interface';
+import { Payment } from './payment.model';
+import { OrderService } from '../Order/order.service';
+import { OrderModel } from '../Order/order.model';
 
 type PaymentServiceResult = {
-    sessionId?: string;
     url?: string;
-    received?: boolean;
-    plan?: string;
-    premiumUntil?: Date | null;
-    isPremium?: boolean;
+    transactionId?: string;
     data?: unknown[];
     meta?: { page: number; limit: number; total: number; totalPage: number };
     summary?: { totalAmount: number };
 };
 
-// 1. unsupportedPaymentFeature
-const unsupportedPaymentFeature = async (...args: unknown[]): Promise<PaymentServiceResult> => {
-    void args;
+const requireSslConfig = () => {
+    if (!config.sslcommerz.store_id || !config.sslcommerz.store_password) {
+        throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, 'SSLCommerz credentials are not configured.');
+    }
+
+    if (!config.urls.backend_public || !config.urls.frontend_app) {
+        throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, 'Public app URLs are not configured.');
+    }
+};
+
+const buildFrontendRedirect = (path: string) =>
+    `${String(config.urls.frontend_app).replace(/\/$/, '')}${path}`;
+const buildBackendCallback = (path: string) =>
+    `${String(config.urls.backend_public).replace(/\/$/, '')}${path}`;
+
+const initiateSslCommerzPayment = async (user: IUser, orderId: string): Promise<PaymentServiceResult> => {
+    requireSslConfig();
+
+    const order = await OrderModel.findOne({ orderId, user: user._id }).lean();
+
+    if (!order) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Order not found!');
+    }
+
+    if (order.paymentMethod !== 'SSL_COMMERZ') {
+        throw new AppError(httpStatus.BAD_REQUEST, 'This order is not configured for SSLCommerz payment.');
+    }
+
+    if (order.paymentStatus === 'PAID') {
+        throw new AppError(httpStatus.BAD_REQUEST, 'This order is already paid.');
+    }
+
+    const transactionId = order.transactionId ?? `TXN-${order.orderId}-${Date.now()}`;
+
+    const payload = new URLSearchParams({
+        store_id: String(config.sslcommerz.store_id),
+        store_passwd: String(config.sslcommerz.store_password),
+        total_amount: String(order.total),
+        currency: 'BDT',
+        tran_id: transactionId,
+        success_url: buildBackendCallback('/api/v1/payment/sslcommerz/success'),
+        fail_url: buildBackendCallback('/api/v1/payment/sslcommerz/fail'),
+        cancel_url: buildBackendCallback('/api/v1/payment/sslcommerz/cancel'),
+        ipn_url: buildBackendCallback('/api/v1/payment/sslcommerz/ipn'),
+        product_name: `Order ${order.orderId}`,
+        product_category: 'ecommerce',
+        product_profile: 'general',
+        cus_name: order.customer.name,
+        cus_email: order.customer.email || `${user.email}`,
+        cus_add1: order.customer.address,
+        cus_city: order.customer.city,
+        cus_country: 'Bangladesh',
+        cus_phone: order.customer.phone,
+        shipping_method: 'Courier',
+        num_of_item: String(order.items.length),
+        value_a: order.orderId,
+        value_b: String(user._id),
+    });
+
+    const response = await fetch(String(config.sslcommerz.init_api), {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: payload.toString(),
+    });
+
+    const result = (await response.json()) as {
+        GatewayPageURL?: string;
+        sessionkey?: string;
+        failedreason?: string;
+    };
+
+    if (!response.ok || !result.GatewayPageURL) {
+        throw new AppError(
+            httpStatus.BAD_GATEWAY,
+            result.failedreason || 'Failed to initialize SSLCommerz payment.',
+        );
+    }
+
+    await Payment.findOneAndUpdate(
+        { transactionId },
+        {
+            user: user._id,
+            order: order._id,
+            amount: order.total,
+            currency: 'BDT',
+            status: 'PENDING',
+            provider: 'SSL_COMMERZ',
+            transactionId,
+            gatewayUrl: result.GatewayPageURL,
+            sessionKey: result.sessionkey,
+        },
+        { upsert: true, new: true, runValidators: true },
+    );
+
+    await OrderService.updateOrderPaymentIntoDB(order.orderId, {
+        paymentStatus: 'PENDING',
+        transactionId,
+        gatewayUrl: result.GatewayPageURL,
+    });
 
     return {
-        sessionId: '',
-        url: '',
-        received: true,
-        plan: 'FREE',
-        premiumUntil: null,
-        isPremium: false,
-        data: [],
-        meta: { page: 1, limit: 10, total: 0, totalPage: 0 },
-        summary: { totalAmount: 0 },
+        url: result.GatewayPageURL,
+        transactionId,
+    };
+};
+
+const validateSslPayment = async (valId: string) => {
+    requireSslConfig();
+
+    const validationUrl = new URL(String(config.sslcommerz.validation_api));
+    validationUrl.searchParams.set('val_id', valId);
+    validationUrl.searchParams.set('store_id', String(config.sslcommerz.store_id));
+    validationUrl.searchParams.set('store_passwd', String(config.sslcommerz.store_password));
+    validationUrl.searchParams.set('format', 'json');
+
+    const response = await fetch(validationUrl, { method: 'GET' });
+    const result = (await response.json()) as Record<string, unknown>;
+
+    if (!response.ok) {
+        throw new AppError(httpStatus.BAD_GATEWAY, 'Failed to validate SSLCommerz payment.');
+    }
+
+    return result;
+};
+
+const handleSslCommerzSuccess = async (payload: Record<string, unknown>) => {
+    const orderId = typeof payload.value_a === 'string' ? payload.value_a : '';
+    const transactionId = typeof payload.tran_id === 'string' ? payload.tran_id : '';
+    const valId = typeof payload.val_id === 'string' ? payload.val_id : '';
+
+    if (!orderId || !transactionId) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'Invalid payment callback payload.');
+    }
+
+    const payment = await Payment.findOne({ transactionId });
+
+    if (!payment) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Payment record not found.');
+    }
+
+    if (payment.status === 'SUCCEEDED') {
+        return buildFrontendRedirect(`/my-account/orders/${orderId}?payment=success`);
+    }
+
+    const validationPayload = valId ? await validateSslPayment(valId) : payload;
+
+    const validationStatus = typeof validationPayload.status === 'string' ? validationPayload.status.toUpperCase() : '';
+    const validationAmount = Number(validationPayload.amount ?? payload.amount ?? 0);
+
+    if (validationStatus && !['VALID', 'VALIDATED'].includes(validationStatus)) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'Payment validation status is not valid.');
+    }
+
+    if (Number.isFinite(validationAmount) && validationAmount > 0 && validationAmount !== payment.amount) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'Payment amount mismatch detected.');
+    }
+
+    payment.status = 'SUCCEEDED';
+    payment.valId = valId || payment.valId;
+    payment.bankTranId = typeof payload.bank_tran_id === 'string' ? payload.bank_tran_id : payment.bankTranId;
+    payment.gatewayPayload = validationPayload;
+    await payment.save();
+
+    await OrderService.updateOrderPaymentIntoDB(orderId, {
+        paymentStatus: 'PAID',
+        status: 'PLACED',
+        transactionId,
+    });
+
+    return buildFrontendRedirect(`/my-account/orders/${orderId}?payment=success`);
+};
+
+const handleSslCommerzFailure = async (payload: Record<string, unknown>, status: 'FAILED' | 'CANCELED') => {
+    const orderId = typeof payload.value_a === 'string' ? payload.value_a : '';
+    const transactionId = typeof payload.tran_id === 'string' ? payload.tran_id : '';
+
+    if (transactionId) {
+        const existingPayment = await Payment.findOne({ transactionId });
+
+        if (existingPayment?.status === 'SUCCEEDED') {
+            return buildFrontendRedirect(`/my-account/orders/${orderId}?payment=success`);
+        }
+
+        await Payment.findOneAndUpdate(
+            { transactionId },
+            {
+                status,
+                gatewayPayload: payload,
+            },
+        );
+    }
+
+    if (orderId) {
+        await OrderService.updateOrderPaymentIntoDB(orderId, {
+            paymentStatus: status === 'FAILED' ? 'FAILED' : 'CANCELLED',
+            status: 'CANCELLED',
+        });
+    }
+
+    const query = new URLSearchParams({
+        payment: status.toLowerCase(),
+        ...(orderId ? { orderId } : {}),
+    });
+
+    return buildFrontendRedirect(`/checkout?${query.toString()}`);
+};
+
+const getMyPaymentsFromDB = async (user: IUser) => {
+    return Payment.find({ user: user._id })
+        .populate('order', 'orderId total status paymentStatus')
+        .sort({ createdAt: -1 })
+        .lean();
+};
+
+const getAllPaymentsForAdminFromDB = async (query: Record<string, unknown>) => {
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || 20;
+    const skip = (page - 1) * limit;
+
+    const [data, total, summary] = await Promise.all([
+        Payment.find({})
+            .populate('user', 'name email phone role')
+            .populate('order', 'orderId total status paymentStatus')
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+            .lean(),
+        Payment.countDocuments(),
+        Payment.aggregate([{ $group: { _id: null, totalAmount: { $sum: '$amount' } } }]),
+    ]);
+
+    return {
+        data,
+        meta: {
+            page,
+            limit,
+            total,
+            totalPage: Math.ceil(total / limit) || 1,
+        },
+        summary: {
+            totalAmount: summary[0]?.totalAmount || 0,
+        },
     };
 };
 
 export const PaymentService = {
-    createPremiumCheckoutSession: unsupportedPaymentFeature,
-    handleStripeWebhook: unsupportedPaymentFeature,
-    getMyCurrentStatus: unsupportedPaymentFeature,
-    getAllPaymentsForAdminFromDB: unsupportedPaymentFeature,
+    initiateSslCommerzPayment,
+    handleSslCommerzSuccess,
+    handleSslCommerzFailure,
+    getMyPaymentsFromDB,
+    getAllPaymentsForAdminFromDB,
 };

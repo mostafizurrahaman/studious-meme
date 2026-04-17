@@ -267,11 +267,11 @@ export const deliveryReturnSchemas = [
   ),
 ];
 
-export function buildProductMetadata(product: { title: string; brand: string; sku: string; price: string }) {
+export function buildProductMetadata(product: { title: string; brand: string; sku: string; slug: string; price: string }) {
   return buildMetadata({
     title: product.title,
     description: `Buy ${product.title} from ${product.brand} on ${siteConfig.name}. SKU ${product.sku} with catalog pricing and quotation support.`,
-    path: `/product/${product.sku}`,
+    path: `/product/${product.slug}`,
   });
 }
 
@@ -450,7 +450,7 @@ export const shopSchemas = [
     '/shop',
     [...featuredProducts, ...latestProducts].map(product => ({
       name: product.title,
-      url: `/product/${product.sku}`,
+      url: `/product/${product.slug}`,
       image: product.image,
     })),
   ),
@@ -497,7 +497,7 @@ export function buildCategorySchemas(category: { name?: string; title?: string; 
       `/category/${category.slug}`,
       products.map(product => ({
         name: product.title,
-        url: `/product/${product.sku}`,
+        url: `/product/${product.slug}`,
         image: product.image,
       })),
     ),
@@ -549,7 +549,7 @@ export const promotionsSchemas = [
     '/promotions',
     offerProducts.map(product => ({
       name: product.title,
-      url: `/product/${product.sku}`,
+      url: `/product/${product.slug}`,
       image: product.image,
     })),
   ),
@@ -610,8 +610,8 @@ export const quotationRequestSchemas = [
   },
 ];
 
-export function buildProductSchemas(product: { title: string; brand: string; sku: string; image: string; price: string; oldPrice?: string; stock: string; rating: string; category: string }) {
-  const url = absoluteUrl(`/product/${product.sku}`);
+export function buildProductSchemas(product: { title: string; slug: string; brand: string; sku: string; image: string; price: string; oldPrice?: string; stock: string; rating: string; category: string }) {
+  const url = absoluteUrl(`/product/${product.slug}`);
   const currentPrice = parseMoney(product.price);
   const oldPrice = product.oldPrice ? parseMoney(product.oldPrice) : null;
   const ratingValue = Number.parseFloat(product.rating);

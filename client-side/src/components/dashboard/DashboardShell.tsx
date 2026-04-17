@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { LogOut, LayoutDashboard, ListFilter, MessageSquare, Package, Settings, Tags } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { BarChart3, Boxes, LayoutDashboard, LogOut, MessageSquare, Package, ReceiptText, Settings, ShieldUser, Tags, WandSparkles } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -29,15 +30,8 @@ import {
     SidebarRail,
     SidebarTrigger,
 } from '@/components/ui/sidebar';
-
-const navItems = [
-    { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
-    { href: '/dashboard/products', label: 'Products', icon: Package },
-    { href: '/dashboard/categories', label: 'Categories', icon: Tags },
-    { href: '/dashboard/orders', label: 'Orders', icon: ListFilter },
-    { href: '/dashboard/messages', label: 'Messages', icon: MessageSquare },
-    { href: '/dashboard/settings', label: 'Settings', icon: Settings },
-];
+import { submitSignOut } from '@/app/(withNavFooter)/my-account/actions';
+import { getDashboardPath } from '@/lib/dashboard';
 
 type DashboardShellProps = {
     children: React.ReactNode;
@@ -50,6 +44,7 @@ type DashboardShellProps = {
 };
 
 export function DashboardShell({ children, user }: DashboardShellProps) {
+    const pathname = usePathname();
     const initials = user?.name
         ? user.name
               .split(' ')
@@ -58,6 +53,28 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
               .slice(0, 2)
               .toUpperCase()
         : 'M';
+
+    const role = user?.role ?? 'USER';
+    const navItems =
+        role === 'USER'
+            ? [
+                  { href: getDashboardPath(role), label: 'Orders', icon: LayoutDashboard },
+                  { href: '/dashboard/settings', label: 'Settings', icon: Settings },
+              ]
+            : [
+                  { href: getDashboardPath(role), label: 'Overview', icon: LayoutDashboard },
+                  { href: '/dashboard/orders', label: 'Orders', icon: ReceiptText },
+                  { href: '/dashboard/products', label: 'Products', icon: Package },
+                  { href: '/dashboard/categories', label: 'Categories', icon: Tags },
+                  { href: '/dashboard/brands', label: 'Brands', icon: Boxes },
+                  { href: '/dashboard/hero', label: 'Hero section', icon: WandSparkles },
+                  { href: '/dashboard/messages', label: 'Messages', icon: MessageSquare },
+                  { href: '/dashboard/comparisons', label: 'Comparisons', icon: BarChart3 },
+                  ...(role === 'SUPER_ADMIN'
+                      ? [{ href: '/dashboard/admins', label: 'Admins', icon: ShieldUser }]
+                      : []),
+                  { href: '/dashboard/settings', label: 'Settings', icon: Settings },
+              ];
 
     return (
         <SidebarProvider defaultOpen>
@@ -81,7 +98,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
                             <SidebarMenu>
                                 {navItems.map(item => (
                                     <SidebarMenuItem key={item.href}>
-                                        <SidebarMenuButton asChild>
+                                        <SidebarMenuButton asChild isActive={pathname === item.href || pathname.startsWith(`${item.href}/`)}>
                                             <Link href={item.href}>
                                                 <item.icon />
                                                 <span>{item.label}</span>
@@ -118,9 +135,13 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
                                 <Link href="/dashboard/settings">Settings</Link>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-destructive focus:text-destructive">
-                                <LogOut className="mr-2 size-4" />
-                                Sign out
+                            <DropdownMenuItem asChild className="text-destructive focus:text-destructive">
+                                <form action={submitSignOut}>
+                                    <button type="submit" className="flex w-full items-center">
+                                        <LogOut className="mr-2 size-4" />
+                                        Sign out
+                                    </button>
+                                </form>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -129,11 +150,11 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
             </Sidebar>
 
             <SidebarInset>
-                <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:px-6">
+                <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur supports-backdrop-filter:bg-background/60 md:px-6">
                     <SidebarTrigger />
                     <div className="min-w-0 flex-1">
-                        <h1 className="truncate text-base font-semibold text-foreground">Dashboard</h1>
-                        <p className="truncate text-sm text-muted-foreground">Manage catalog, content and support requests.</p>
+                        <h1 className="truncate text-base font-semibold text-foreground">{role.toLowerCase()} dashboard</h1>
+                        <p className="truncate text-sm text-muted-foreground">{role === 'USER' ? 'Track orders and payment progress.' : role === 'SUPER_ADMIN' ? 'Control admins, catalog, content and support.' : 'Manage catalog, content and support requests.'}</p>
                     </div>
                 </header>
 

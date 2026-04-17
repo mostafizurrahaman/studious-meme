@@ -10,8 +10,17 @@ import { Input } from '@/components/ui/input';
 import { Container } from '@/components/Container';
 import { MiniCartDropdown } from '@/components/cart/MiniCartDropdown';
 import { brands, topCategories } from '@/lib/malamal-content';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { useUser } from '@/context/UserContext';
+import { getDashboardPath } from '@/lib/dashboard';
 
 export function Header() {
+    const { user } = useUser();
     const pathname = usePathname();
     const categoriesRef = useRef<HTMLDetailsElement>(null);
     const menuRef = useRef<HTMLDetailsElement>(null);
@@ -94,7 +103,7 @@ export function Header() {
                                     />
                                 </Link>
                                 <Link
-                                    href="/my-account"
+                                    href={user ? getDashboardPath(user.role) : '/my-account'}
                                     className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background text-foreground"
                                     aria-label="My account"
                                 >
@@ -142,6 +151,7 @@ export function Header() {
                                     <div className="grid">
                                         {(
                                             [
+                                                ...(user ? ([['Dashboard', getDashboardPath(user.role)] as const]) : []),
                                                 ['Hardware Store', '/main-categories'],
                                                 ['Our Contacts', '/our-contacts'],
                                                 ['Delivery & Return', '/delivery-return'],
@@ -380,13 +390,35 @@ export function Header() {
                             >
                                 Terms & Condition
                             </Link>
-                            <Link
-                                className={navLinkClass('/my-account')}
-                                href="/my-account"
-                                style={activeStyle('/my-account')}
-                            >
-                                My account
-                            </Link>
+                            {user ? (
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <button
+                                            className={navLinkClass('/my-account')}
+                                            style={activeStyle('/my-account')}
+                                            type="button"
+                                        >
+                                            Account
+                                        </button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem asChild>
+                                            <Link href="/my-account">My account</Link>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem asChild>
+                                            <Link href={getDashboardPath(user.role)}>Dashboard</Link>
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            ) : (
+                                <Link
+                                    className={navLinkClass('/my-account')}
+                                    href="/my-account"
+                                    style={activeStyle('/my-account')}
+                                >
+                                    My account
+                                </Link>
+                            )}
                         </div>
                     </nav>
 

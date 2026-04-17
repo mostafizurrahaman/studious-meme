@@ -38,7 +38,7 @@ app.use(cookieParser());
 app.use(morgan('dev'));
 
 // json parser
-// app.use(express.json());
+app.use(express.json());
 
 // form data parser
 app.use(express.urlencoded({ extended: true }));

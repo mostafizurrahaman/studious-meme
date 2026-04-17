@@ -4,18 +4,25 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { featuredProducts } from '@/lib/malamal-content';
 import { compareMetadata } from '@/lib/seo';
-import { getComparisonSuggestions } from '@/services/ComparisonHistory';
+import { getComparisonSuggestions, getMyComparisonHistory } from '@/services/ComparisonHistory';
 import { mapBackendProductToStorefrontProduct, type BackendProduct } from '@/services/Product';
 
 export const metadata = compareMetadata;
 export const dynamic = 'force-dynamic';
 
 export default async function ComparePage() {
-  const suggestionsResult = await getComparisonSuggestions().catch(() => null);
+  const [suggestionsResult, historyResult] = await Promise.all([
+    getComparisonSuggestions().catch(() => null),
+    getMyComparisonHistory().catch(() => null),
+  ]);
+
   const backendProducts = suggestionsResult?.data?.length
     ? suggestionsResult.data.map(item => mapBackendProductToStorefrontProduct(item as BackendProduct))
     : featuredProducts.slice(0, 3);
   const products = backendProducts.slice(0, 3);
+  const history = Array.isArray(historyResult?.data)
+    ? (historyResult.data as Array<{ _id?: string; createdAt?: string; products?: Array<{ title: string; sku: string; brand: string }> }>).slice(0, 5)
+    : [];
 
   return (
     <main className="flex-1 bg-background pb-16">
@@ -92,6 +99,34 @@ export default async function ComparePage() {
               </TableBody>
             </Table>
           </CardContent>
+        </Card>
+
+        <Card className="mt-6 p-6 shadow-sm">
+          <h2 className="text-xl font-black text-secondary">Recent comparison history</h2>
+          <p className="mt-2 text-sm leading-7 text-foreground/65">
+            Signed-in users can view their latest backend-stored comparison records here.
+          </p>
+
+          <div className="mt-4 grid gap-3">
+            {history.length > 0 ? history.map((entry, index) => (
+              <div key={entry._id ?? `${entry.createdAt ?? 'history'}-${index}`} className="rounded-2xl border border-border p-4">
+                <div className="text-xs uppercase tracking-[0.22em] text-foreground/45">
+                  {entry.createdAt ? new Date(entry.createdAt).toLocaleString('en-US') : 'Recent compare'}
+                </div>
+                <div className="mt-2 flex flex-wrap gap-2 text-sm text-foreground/70">
+                  {entry.products?.map(product => (
+                    <span key={`${entry._id ?? index}-${product.sku}`} className="rounded-full bg-muted px-3 py-1">
+                      {product.brand} · {product.title}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )) : (
+              <div className="rounded-2xl border border-dashed border-border p-4 text-sm text-foreground/60">
+                No comparison history found for the current session.
+              </div>
+            )}
+          </div>
         </Card>
       </div>
     </main>

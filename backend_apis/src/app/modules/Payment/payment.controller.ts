@@ -2,39 +2,55 @@ import httpStatus from 'http-status';
 import { asyncHandler, sendResponse } from '../../utils';
 import { PaymentService } from './payment.service';
 
-// 1. createPremiumCheckout
-const createPremiumCheckout = asyncHandler(async (req, res) => {
-    const result = await PaymentService.createPremiumCheckoutSession(req.user);
+const getSingleParam = (value: string | string[]) => (Array.isArray(value) ? value[0] : value);
+
+const initiateSslCommerzPayment = asyncHandler(async (req, res) => {
+    const result = await PaymentService.initiateSslCommerzPayment(req.user, getSingleParam(req.params.orderId));
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
-        message: 'Checkout session created successfully!',
+        message: 'SSLCommerz session created successfully!',
         data: result,
     });
 });
 
-// 2. stripeWebhook
-const stripeWebhook = asyncHandler(async (req, res) => {
-    const signature = req.headers['stripe-signature'];
-    const rawBody: Buffer = (req as { rawBody?: Buffer }).rawBody!;
+const sslCommerzSuccess = asyncHandler(async (req, res) => {
+    const redirectUrl = await PaymentService.handleSslCommerzSuccess({
+        ...req.query,
+        ...req.body,
+    });
 
-    const result = await PaymentService.handleStripeWebhook(signature, rawBody);
-
-    res.status(httpStatus.OK).json(result);
+    res.redirect(redirectUrl);
 });
 
-// 3. getMyCurrentStatus
-const getMyCurrentStatus = asyncHandler(async (req, res) => {
-    const result = await PaymentService.getMyCurrentStatus(req.user);
+const sslCommerzFail = asyncHandler(async (req, res) => {
+    const redirectUrl = await PaymentService.handleSslCommerzFailure({
+        ...req.query,
+        ...req.body,
+    }, 'FAILED');
+
+    res.redirect(redirectUrl);
+});
+
+const sslCommerzCancel = asyncHandler(async (req, res) => {
+    const redirectUrl = await PaymentService.handleSslCommerzFailure({
+        ...req.query,
+        ...req.body,
+    }, 'CANCELED');
+
+    res.redirect(redirectUrl);
+});
+
+const getMyPayments = asyncHandler(async (req, res) => {
+    const result = await PaymentService.getMyPaymentsFromDB(req.user);
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
-        message: 'Payment status retrieved successfully!',
+        message: 'Payments retrieved successfully!',
         data: result,
     });
 });
 
-// 4. getAllPaymentsForAdmin
 const getAllPaymentsForAdmin = asyncHandler(async (req, res) => {
     const result = await PaymentService.getAllPaymentsForAdminFromDB(req.query);
 
@@ -48,8 +64,10 @@ const getAllPaymentsForAdmin = asyncHandler(async (req, res) => {
 });
 
 export const PaymentController = {
-    createPremiumCheckout,
-    stripeWebhook,
-    getMyCurrentStatus,
+    initiateSslCommerzPayment,
+    sslCommerzSuccess,
+    sslCommerzFail,
+    sslCommerzCancel,
+    getMyPayments,
     getAllPaymentsForAdmin,
 };

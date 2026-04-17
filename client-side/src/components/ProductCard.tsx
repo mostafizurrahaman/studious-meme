@@ -14,7 +14,7 @@ type Props = {
 export function ProductCard({ product }: Props) {
   return (
     <Card className="group overflow-hidden border-border transition hover:-translate-y-0.5 hover:shadow-md">
-      <Link href={`/product/${product.sku}`} className="block">
+      <Link href={`/product/${product.slug}`} className="block">
         <div className="relative aspect-square bg-muted p-2">
           <Image
             src={product.image}
@@ -41,7 +41,7 @@ export function ProductCard({ product }: Props) {
         </div>
       </Link>
       <CardContent className="space-y-1.5 p-2.5 pt-2.5 sm:space-y-2 sm:p-4 sm:pt-4">
-        <Link href={`/product/${product.sku}`} className="block">
+        <Link href={`/product/${product.slug}`} className="block">
           <h3 className="line-clamp-2 min-h-[2.4rem] text-[11px] font-semibold leading-5 text-foreground transition hover:text-primary sm:min-h-[3.1rem] sm:text-[13px]">
             {product.title}
           </h3>
@@ -73,7 +73,7 @@ export function ProductCard({ product }: Props) {
             variant="outline"
             className="h-8 w-full rounded-full border-border px-3 text-[8px] font-semibold text-foreground/70 sm:h-12 sm:w-auto sm:text-[11px]"
           >
-            <Link href={`/product/${product.sku}`}>View</Link>
+            <Link href={`/product/${product.slug}`}>View</Link>
           </Button>
         </div>
       </CardContent>
