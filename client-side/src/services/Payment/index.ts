@@ -10,6 +10,17 @@ type BackendEnvelope<T> = {
     error?: string;
 };
 
+export type BackendPayment = {
+    _id: string;
+    transactionId: string;
+    order: string | { orderId: string };
+    amount: number;
+    status: 'PENDING' | 'SUCCEEDED' | 'FAILED' | 'CANCELED';
+    createdAt: string;
+    bankTranId?: string;
+    valId?: string;
+};
+
 export const initiateSslCommerzPayment = async (
     orderId: string,
 ): Promise<BackendEnvelope<{ url?: string; transactionId?: string }>> => {
@@ -31,9 +42,9 @@ export const getMyPayments = async (): Promise<BackendEnvelope<unknown[]>> => {
     });
 };
 
-export const getAllPaymentsForAdmin = async (): Promise<BackendEnvelope<unknown[]>> => {
+export const getAllPaymentsForAdmin = async (): Promise<BackendEnvelope<{ data: BackendPayment[]; meta: any; summary: any }>> => {
     const accessToken = await getValidAccessTokenForServerHandlerGet();
-    return requestBackendJson<BackendEnvelope<unknown[]>>('/payment/admin', {
+    return requestBackendJson<BackendEnvelope<{ data: BackendPayment[]; meta: any; summary: any }>>('/payment/admin', {
         method: 'GET',
         token: accessToken ?? undefined,
     });

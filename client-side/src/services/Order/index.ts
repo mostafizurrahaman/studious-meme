@@ -88,9 +88,9 @@ export const getMyOrderById = async (orderId: string): Promise<BackendEnvelope<B
     });
 };
 
-export const getAllOrdersForAdmin = async (): Promise<BackendEnvelope<BackendOrder[]>> => {
+export const getAllOrdersForAdmin = async (): Promise<BackendEnvelope<{ data: BackendOrder[]; meta: any }>> => {
     const accessToken = await getValidAccessTokenForServerHandlerGet();
-    return requestBackendJson<BackendEnvelope<BackendOrder[]>>('/order/admin/orders', {
+    return requestBackendJson<BackendEnvelope<{ data: BackendOrder[]; meta: any }>>('/order/admin/orders', {
         method: 'GET',
         token: accessToken ?? undefined,
     });

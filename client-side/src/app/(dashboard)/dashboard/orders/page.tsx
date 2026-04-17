@@ -21,7 +21,7 @@ export const dynamic = 'force-dynamic';
 export default async function DashboardOrdersPage() {
     await requireDashboardRoles(['ADMIN', 'SUPER_ADMIN']);
     const result = await getAllOrdersForAdmin().catch(() => null);
-    const orders = Array.isArray(result?.data) ? result.data : [];
+    const orders = Array.isArray(result?.data?.data) ? result.data.data : [];
 
     async function updateStatus(formData: FormData) {
         'use server';

@@ -41,7 +41,7 @@ function resolveName(value: BackendProductRef): string {
     return value.name ?? value.slug ?? 'Unknown';
 }
 
-export function mapBackendProductToStorefrontProduct(product: BackendProduct): StorefrontProduct {
+export async function mapBackendProductToStorefrontProduct(product: BackendProduct): Promise<StorefrontProduct> {
     return {
         title: product.title,
         slug: product.slug,
