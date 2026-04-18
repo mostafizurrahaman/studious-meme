@@ -379,7 +379,6 @@ export function Header() {
                             >
                                 Terms & Condition
                             </Link>
-                            <UserDropdownMenu />
                         </div>
                     </nav>
 

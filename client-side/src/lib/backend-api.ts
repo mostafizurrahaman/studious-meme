@@ -1,5 +1,3 @@
-const FALLBACK_BACKEND_API_URL = 'http://localhost:5003/api/v1';
-
 export type JsonRecord = Record<string, unknown>;
 
 export interface BackendApiErrorPayload {
@@ -22,11 +20,7 @@ export class BackendApiError extends Error {
 }
 
 export function getBackendApiBase(): string {
-    return (
-        process.env.NEXT_PUBLIC_BACKEND_FULL_URL ??
-        process.env.NEXT_PUBLIC_API_URL ??
-        FALLBACK_BACKEND_API_URL
-    ).replace(/\/$/, '');
+    return (process.env.NEXT_PUBLIC_BACKEND_FULL_URL as string).replace(/\/$/, '');
 }
 
 export function buildBackendApiUrl(path: string): string {
