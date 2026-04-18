@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useMemo, useState, useTransition } from 'react';
+import type React from 'react';
+import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { ImagePlus, Pencil, Plus, Trash2, UploadCloud } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,8 +13,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { TableFilter } from '@/components/ui/table-filter';
 import { TablePagination } from '@/components/ui/table-pagination';
 import { createBrand, deleteBrand, type BackendBrand, updateBrand } from '@/services/Brand';
-import Image from 'next/image';
-
 const initialForm = { name: '', slug: '', image: '', description: '', isActive: true };
 
 // function EmptyCard() {
@@ -29,18 +28,29 @@ function slugify(value: string) {
         .replace(/-+/g, '-');
 }
 
+function sliceText(value?: string, maxLength = 44) {
+    if (!value) return '-';
+    return value.length > maxLength ? `${value.slice(0, maxLength).trim()}…` : value;
+}
+
 export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
     const [form, setForm] = useState(initialForm);
     const [brandImageFile, setBrandImageFile] = useState<File | null>(null);
     const [brandImagePreview, setBrandImagePreview] = useState('');
+    const [isDragging, setIsDragging] = useState(false);
     const [editingSlug, setEditingSlug] = useState<string | null>(null);
     const [editingForm, setEditingForm] = useState(initialForm);
+    const [editingBrandImageFile, setEditingBrandImageFile] = useState<File | null>(null);
+    const [editingBrandImagePreview, setEditingBrandImagePreview] = useState('');
+    const [isEditingDragging, setIsEditingDragging] = useState(false);
     // Filter state
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(10);
+    const imageInputRef = useRef<HTMLInputElement>(null);
+    const editingImageInputRef = useRef<HTMLInputElement>(null);
 
     const filteredData = useMemo(() => {
         const q = search.toLowerCase();
@@ -88,6 +98,29 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
         setBrandImagePreview(URL.createObjectURL(file));
     }
 
+    function handleEditingBrandImageSelect(file?: File) {
+        if (!file) return;
+
+        if (editingBrandImagePreview.startsWith('blob:')) {
+            URL.revokeObjectURL(editingBrandImagePreview);
+        }
+
+        setEditingBrandImageFile(file);
+        setEditingBrandImagePreview(URL.createObjectURL(file));
+    }
+
+    function handleEditingBrandImageDrop(event: React.DragEvent<HTMLDivElement>) {
+        event.preventDefault();
+        setIsEditingDragging(false);
+        handleEditingBrandImageSelect(event.dataTransfer.files?.[0]);
+    }
+
+    function handleBrandImageDrop(event: React.DragEvent<HTMLDivElement>) {
+        event.preventDefault();
+        setIsDragging(false);
+        handleBrandImageSelect(event.dataTransfer.files?.[0]);
+    }
+
     return (
         <div className="space-y-6">
             <Card className="shadow-sm">
@@ -103,35 +136,66 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
                     />
                     <DashboardInput placeholder="Slug" value={form.slug} readOnly />
                     <div className="space-y-2 xl:col-span-2">
-                        <div className="rounded-2xl border border-border/70 bg-background/80 p-3 shadow-sm">
-                            <div className="text-sm font-medium text-foreground">Brand image</div>
-                            <div className="mt-3 flex flex-col gap-3">
-                                {brandImagePreview ? (
-                                    <div className="overflow-hidden rounded-xl border bg-muted">
-                                        <Image
-                                            src={brandImagePreview}
-                                            alt="Brand preview"
-                                            height={500}
-                                            width={500}
-                                            className="h-36 w-full object-cover"
-                                        />
+                        <div
+                            role="button"
+                            tabIndex={0}
+                            onClick={() => imageInputRef.current?.click()}
+                            onKeyDown={event => {
+                                if (event.key === 'Enter' || event.key === ' ') {
+                                    event.preventDefault();
+                                    imageInputRef.current?.click();
+                                }
+                            }}
+                            onDragEnter={() => setIsDragging(true)}
+                            onDragOver={event => {
+                                event.preventDefault();
+                                setIsDragging(true);
+                            }}
+                            onDragLeave={() => setIsDragging(false)}
+                            onDrop={handleBrandImageDrop}
+                            className={`rounded-2xl border-2 border-dashed p-4 transition ${
+                                isDragging
+                                    ? 'border-primary bg-primary/5'
+                                    : 'border-border/70 bg-background/80 hover:border-primary/40 hover:bg-muted/20'
+                            }`}
+                        >
+                            <div className="flex items-start gap-3">
+                                <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                                    <UploadCloud className="size-5" />
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                    <div className="text-sm font-semibold text-foreground">Brand image</div>
+                                    <p className="text-xs text-muted-foreground">
+                                        Drag and drop an image here or click to upload.
+                                    </p>
+                                    <div className="mt-3 overflow-hidden rounded-xl border bg-muted">
+                                        {brandImagePreview ? (
+                                            /* eslint-disable-next-line @next/next/no-img-element */
+                                            <img
+                                                src={brandImagePreview}
+                                                alt="Brand preview"
+                                                className="h-36 w-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="flex h-36 items-center justify-center gap-2 text-sm text-muted-foreground">
+                                                <ImagePlus className="size-4" />
+                                                Preview will appear here
+                                            </div>
+                                        )}
                                     </div>
-                                ) : (
-                                    <div className="rounded-xl border border-dashed border-border/80 px-4 py-8 text-center text-sm text-muted-foreground">
-                                        Select an image to preview it here.
-                                    </div>
-                                )}
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    className="block w-full text-sm file:mr-4 file:rounded-full file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary-foreground hover:file:bg-primary/80"
-                                    onChange={e => {
-                                        handleBrandImageSelect(e.target.files?.[0]);
-                                        e.currentTarget.value = '';
-                                    }}
-                                />
+                                </div>
                             </div>
                         </div>
+                        <input
+                            ref={imageInputRef}
+                            type="file"
+                            accept="image/*"
+                            className="sr-only"
+                            onChange={e => {
+                                handleBrandImageSelect(e.target.files?.[0]);
+                                e.currentTarget.value = '';
+                            }}
+                        />
                     </div>
                     <DashboardInput
                         placeholder="Description"
@@ -197,8 +261,10 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
                     <Table>
                         <TableHeader>
                             <TableRow>
+                                <TableHead>Image</TableHead>
                                 <TableHead>Name</TableHead>
                                 <TableHead>Slug</TableHead>
+                                <TableHead>Description</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
@@ -208,6 +274,82 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
                                 const isEditing = editingSlug === brand.slug;
                                 return (
                                     <TableRow key={brand.slug}>
+                                        <TableCell>
+                                            {isEditing ? (
+                                                <>
+                                                    <div
+                                                        role="button"
+                                                        tabIndex={0}
+                                                        onClick={() => editingImageInputRef.current?.click()}
+                                                        onKeyDown={event => {
+                                                            if (event.key === 'Enter' || event.key === ' ') {
+                                                                event.preventDefault();
+                                                                editingImageInputRef.current?.click();
+                                                            }
+                                                        }}
+                                                        onDragEnter={() => setIsEditingDragging(true)}
+                                                        onDragOver={event => {
+                                                            event.preventDefault();
+                                                            setIsEditingDragging(true);
+                                                        }}
+                                                        onDragLeave={() => setIsEditingDragging(false)}
+                                                        onDrop={handleEditingBrandImageDrop}
+                                                        className={`rounded-xl border-2 border-dashed p-2 transition ${
+                                                            isEditingDragging
+                                                                ? 'border-primary bg-primary/5'
+                                                                : 'border-border/70 bg-background/80 hover:border-primary/40'
+                                                        }`}
+                                                    >
+                                                        <div className="flex flex-col items-center gap-2">
+                                                            <div className="flex size-12 items-center justify-center overflow-hidden rounded-lg border bg-muted">
+                                                                {editingBrandImagePreview ||
+                                                                editingForm.image ? (
+                                                                    /* eslint-disable-next-line @next/next/no-img-element */
+                                                                    <img
+                                                                        src={
+                                                                            editingBrandImagePreview ||
+                                                                            editingForm.image
+                                                                        }
+                                                                        alt={editingForm.name || brand.name}
+                                                                        className="h-full w-full object-cover"
+                                                                    />
+                                                                ) : (
+                                                                    <ImagePlus className="size-4 text-muted-foreground" />
+                                                                )}
+                                                            </div>
+                                                            <div className="text-center text-[11px] text-muted-foreground">
+                                                                Drop or click to replace
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <input
+                                                        ref={editingImageInputRef}
+                                                        type="file"
+                                                        accept="image/*"
+                                                        className="sr-only"
+                                                        onChange={e => {
+                                                            handleEditingBrandImageSelect(
+                                                                e.target.files?.[0],
+                                                            );
+                                                            e.currentTarget.value = '';
+                                                        }}
+                                                    />
+                                                </>
+                                            ) : (
+                                                <div className="flex size-12 items-center justify-center overflow-hidden rounded-xl border bg-muted">
+                                                    {brand.image ? (
+                                                        /* eslint-disable-next-line @next/next/no-img-element */
+                                                        <img
+                                                            src={brand.image}
+                                                            alt={brand.name}
+                                                            className="h-full w-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <ImagePlus className="size-4 text-muted-foreground" />
+                                                    )}
+                                                </div>
+                                            )}
+                                        </TableCell>
                                         <TableCell className="font-medium">
                                             {isEditing ? (
                                                 <DashboardInput
@@ -236,6 +378,22 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
                                                 />
                                             ) : (
                                                 brand.slug
+                                            )}
+                                        </TableCell>
+                                        <TableCell className="max-w-60 text-sm text-muted-foreground">
+                                            {isEditing ? (
+                                                <DashboardInput
+                                                    value={editingForm.description}
+                                                    onChange={e =>
+                                                        setEditingForm({
+                                                            ...editingForm,
+                                                            description: e.target.value,
+                                                        })
+                                                    }
+                                                    placeholder="Description"
+                                                />
+                                            ) : (
+                                                sliceText(brand.description)
                                             )}
                                         </TableCell>
                                         <TableCell>
@@ -270,7 +428,16 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
                                                                 startTransition(async () => {
                                                                     const result = await updateBrand(
                                                                         brand.slug,
-                                                                        editingForm,
+                                                                        {
+                                                                            name: editingForm.name,
+                                                                            slug: editingForm.slug,
+                                                                            image:
+                                                                                editingBrandImageFile ??
+                                                                                undefined,
+                                                                            description:
+                                                                                editingForm.description,
+                                                                            isActive: editingForm.isActive,
+                                                                        },
                                                                     );
                                                                     if (!result?.success)
                                                                         return refresh(
@@ -279,6 +446,8 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
                                                                             'error',
                                                                         );
                                                                     setEditingSlug(null);
+                                                                    setEditingBrandImageFile(null);
+                                                                    setEditingBrandImagePreview('');
                                                                     refresh(
                                                                         result.message ??
                                                                             'Brand updated successfully.',
@@ -292,7 +461,11 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
                                                         <Button
                                                             size="sm"
                                                             variant="outline"
-                                                            onClick={() => setEditingSlug(null)}
+                                                            onClick={() => {
+                                                                setEditingSlug(null);
+                                                                setEditingBrandImageFile(null);
+                                                                setEditingBrandImagePreview('');
+                                                            }}
                                                         >
                                                             Cancel
                                                         </Button>
@@ -311,6 +484,10 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
                                                                     description: brand.description ?? '',
                                                                     isActive: brand.isActive,
                                                                 });
+                                                                setEditingBrandImageFile(null);
+                                                                setEditingBrandImagePreview(
+                                                                    brand.image ?? '',
+                                                                );
                                                             }}
                                                         >
                                                             <Pencil className="size-4" />

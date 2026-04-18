@@ -6,7 +6,6 @@ import {
     getValidAccessTokenForServerActions,
     getValidAccessTokenForServerHandlerGet,
 } from '@/lib/getValidAccessToken';
-import type { AddCategoryFormValues } from '@/utils/addCategoryValidation';
 import type { BackendCategory } from './mappers';
 
 type BackendEnvelope<T> = {
@@ -19,6 +18,7 @@ type BackendEnvelope<T> = {
 type CategorySubCategoryPayload = {
     name: string;
     slug: string;
+    image?: File | string;
     description?: string;
     accent?: string;
     isActive?: boolean;
@@ -26,9 +26,31 @@ type CategorySubCategoryPayload = {
 
 function toFormData(payload: Record<string, unknown>) {
     const formData = new FormData();
-    formData.set('data', JSON.stringify(payload));
+
+    const { image, ...rest } = payload as { image?: File | string; [key: string]: unknown };
+
+    formData.set(
+        'data',
+        JSON.stringify({
+            ...rest,
+            ...(typeof image === 'string' && image ? { image } : {}),
+        }),
+    );
+
+    if (image instanceof File) {
+        formData.append('image', image);
+    }
+
     return formData;
 }
+
+type CategoryMutationPayload = {
+    name: string;
+    image?: File | string;
+    description?: string;
+    accent?: string;
+    isActive?: boolean;
+};
 
 export const getAllCategoriesWithTotalNewsCount = async (): Promise<BackendEnvelope<unknown>> => {
     const accessToken = await getValidAccessTokenForServerHandlerGet();
@@ -52,7 +74,7 @@ export const getCategoryBySlug = async (slug: string): Promise<BackendEnvelope<B
     });
 };
 
-export const createCategory = async (payload: AddCategoryFormValues): Promise<BackendEnvelope<unknown>> => {
+export const createCategory = async (payload: CategoryMutationPayload): Promise<BackendEnvelope<unknown>> => {
     const accessToken = await getValidAccessTokenForServerActions();
     const result = await requestBackendJson<BackendEnvelope<unknown>>('/category/categories', {
         method: 'POST',
@@ -63,6 +85,10 @@ export const createCategory = async (payload: AddCategoryFormValues): Promise<Ba
                 .toLowerCase()
                 .replace(/[^a-z0-9]+/g, '-')
                 .replace(/^-+|-+$/g, ''),
+            image: payload.image,
+            description: payload.description,
+            accent: payload.accent,
+            isActive: payload.isActive,
         }),
         token: accessToken ?? undefined,
     });
@@ -73,12 +99,18 @@ export const createCategory = async (payload: AddCategoryFormValues): Promise<Ba
 
 export const updateCategory = async (
     id: string,
-    payload: AddCategoryFormValues,
+    payload: CategoryMutationPayload,
 ): Promise<BackendEnvelope<unknown>> => {
     const accessToken = await getValidAccessTokenForServerActions();
     const result = await requestBackendJson<BackendEnvelope<unknown>>(`/category/categories/${id}`, {
         method: 'PATCH',
-        body: toFormData({ name: payload.name.trim() }),
+        body: toFormData({
+            name: payload.name.trim(),
+            image: payload.image,
+            description: payload.description,
+            accent: payload.accent,
+            isActive: payload.isActive,
+        }),
         token: accessToken ?? undefined,
     });
 

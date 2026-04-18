@@ -7,22 +7,19 @@ import { MulterFile } from '../../lib/upload';
 
 // 1. createCategoryIntoDB
 const createCategoryIntoDB = async (payload: Partial<ICategory>, imageFile?: MulterFile) => {
-    let uploadedImage: string | undefined;
-
-    try {
-        if (imageFile) {
-            const { secure_url } = await sendImageToCloudinary(imageFile);
-            uploadedImage = secure_url;
-        }
-
-        return CategoryModel.create({ ...payload, image: uploadedImage ?? payload.image });
-    } catch (error) {
-        if (uploadedImage) {
-            await deleteImageFromCloudinary(uploadedImage);
-        }
-
-        throw error;
+    if (!imageFile) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Category image is required!');
     }
+
+    const { secure_url } = await sendImageToCloudinary(imageFile);
+
+    const category = await CategoryModel.create({ ...payload, image: secure_url });
+
+    if (!category) {
+        await deleteImageFromCloudinary(secure_url);
+    }
+
+    return category;
 };
 
 // 2. getAllCategoriesFromDB
@@ -40,7 +37,7 @@ const updateCategoryIntoDB = async (slug: string, payload: Partial<ICategory>, i
     const existingCategory = await CategoryModel.findOne({ slug }).select('image');
 
     if (!existingCategory) {
-        return null;
+        throw new AppError(httpStatus.NOT_FOUND, 'Category not found!');
     }
 
     let uploadedImage: string | undefined;

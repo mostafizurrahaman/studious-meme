@@ -1,9 +1,10 @@
 'use client';
 
-import { Fragment, useMemo, useState, useTransition } from 'react';
+import type React from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { ChevronDown, Pencil, Plus, Trash2 } from 'lucide-react';
+import { ChevronDown, ImagePlus, Pencil, Plus, Trash2, UploadCloud } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { DashboardInput } from '@/components/dashboard/DashboardInput';
@@ -21,11 +22,14 @@ import {
 type CategoryRow = {
     name: string;
     slug?: string;
+    image?: string;
+    description?: string;
     totalNews?: number;
     isActive?: boolean;
     subCategories?: Array<{
         name: string;
         slug: string;
+        image?: string;
         description?: string;
         accent?: string;
         isActive?: boolean;
@@ -40,14 +44,49 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
     const [newName, setNewName] = useState('');
+    const [newDescription, setNewDescription] = useState('');
     const [editingSlug, setEditingSlug] = useState<string | null>(null);
     const [editingName, setEditingName] = useState('');
+    const [editingDescription, setEditingDescription] = useState('');
     const [expandedSlug, setExpandedSlug] = useState<string | null>(null);
-    const [newSubCategory, setNewSubCategory] = useState<Record<string, { name: string; slug: string }>>({});
+    const [newSubCategory, setNewSubCategory] = useState<
+        Record<string, { name: string; slug: string; description: string }>
+    >({});
     const [editingSubCategoryKey, setEditingSubCategoryKey] = useState<string | null>(null);
-    const [editingSubCategory, setEditingSubCategory] = useState({ name: '', slug: '', isActive: true });
+    const [editingSubCategory, setEditingSubCategory] = useState({
+        name: '',
+        slug: '',
+        description: '',
+        isActive: true,
+    });
+    const [categoryImageFile, setCategoryImageFile] = useState<File | null>(null);
+    const [categoryImagePreview, setCategoryImagePreview] = useState('');
+    const [editingCategoryImageFile, setEditingCategoryImageFile] = useState<File | null>(null);
+    const [editingCategoryImagePreview, setEditingCategoryImagePreview] = useState('');
+    const [categoryDragging, setCategoryDragging] = useState(false);
+    const [editingCategoryDragging, setEditingCategoryDragging] = useState(false);
+    const [subCategoryImageFiles, setSubCategoryImageFiles] = useState<Record<string, File | null>>({});
+    const [subCategoryImagePreviews, setSubCategoryImagePreviews] = useState<Record<string, string>>({});
+    const [subCategoryDraggingKey, setSubCategoryDraggingKey] = useState<string | null>(null);
+    const [editingSubCategoryImageFile, setEditingSubCategoryImageFile] = useState<File | null>(null);
+    const [editingSubCategoryImagePreview, setEditingSubCategoryImagePreview] = useState('');
+    const [editingSubCategoryDragging, setEditingSubCategoryDragging] = useState(false);
+    const categoryImageInputRef = useRef<HTMLInputElement>(null);
+    const editingCategoryImageInputRef = useRef<HTMLInputElement>(null);
+    const editingSubCategoryImageInputRef = useRef<HTMLInputElement>(null);
 
     const visibleCategories = useMemo(() => categories.slice(0, 24), [categories]);
+
+    useEffect(() => {
+        return () => {
+            [categoryImagePreview, editingCategoryImagePreview, editingSubCategoryImagePreview]
+                .filter((src): src is string => Boolean(src) && src.startsWith('blob:'))
+                .forEach(src => URL.revokeObjectURL(src));
+            Object.values(subCategoryImagePreviews)
+                .filter((src): src is string => Boolean(src) && src.startsWith('blob:'))
+                .forEach(src => URL.revokeObjectURL(src));
+        };
+    }, [categoryImagePreview, editingCategoryImagePreview, editingSubCategoryImagePreview, subCategoryImagePreviews]);
 
     function toSlug(value: string) {
         return value
@@ -56,6 +95,45 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
             .replace(/[^a-z0-9\s-]/g, '')
             .replace(/\s+/g, '-')
             .replace(/-+/g, '-');
+    }
+
+    function sliceText(value?: string, maxLength = 44) {
+        if (!value) return '-';
+        return value.length > maxLength ? `${value.slice(0, maxLength).trim()}…` : value;
+    }
+
+    function handleCategoryImageSelect(file?: File) {
+        if (!file) return;
+        if (categoryImagePreview.startsWith('blob:')) URL.revokeObjectURL(categoryImagePreview);
+        setCategoryImageFile(file);
+        setCategoryImagePreview(URL.createObjectURL(file));
+    }
+
+    function handleEditingCategoryImageSelect(file?: File) {
+        if (!file) return;
+        if (editingCategoryImagePreview.startsWith('blob:')) URL.revokeObjectURL(editingCategoryImagePreview);
+        setEditingCategoryImageFile(file);
+        setEditingCategoryImagePreview(URL.createObjectURL(file));
+    }
+
+    function handleSubCategoryImageSelect(categorySlug: string, file?: File) {
+        if (!file) return;
+        const current = subCategoryImagePreviews[categorySlug] ?? '';
+        if (current.startsWith('blob:')) URL.revokeObjectURL(current);
+        setSubCategoryImageFiles(currentFiles => ({ ...currentFiles, [categorySlug]: file }));
+        setSubCategoryImagePreviews(currentPreviews => ({
+            ...currentPreviews,
+            [categorySlug]: URL.createObjectURL(file),
+        }));
+    }
+
+    function handleEditingSubCategoryImageSelect(file?: File) {
+        if (!file) return;
+        if (editingSubCategoryImagePreview.startsWith('blob:')) {
+            URL.revokeObjectURL(editingSubCategoryImagePreview);
+        }
+        setEditingSubCategoryImageFile(file);
+        setEditingSubCategoryImagePreview(URL.createObjectURL(file));
     }
 
     function refreshWithToast(message: string, type: 'success' | 'error') {
@@ -74,8 +152,17 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
             return;
         }
 
+        if (!categoryImageFile) {
+            toast.error('Category image is required.');
+            return;
+        }
+
         startTransition(async () => {
-            const result = await createCategory({ name: newName.trim() });
+            const result = await createCategory({
+                name: newName.trim(),
+                image: categoryImageFile,
+                description: newDescription.trim(),
+            });
 
             if (!result?.success) {
                 refreshWithToast(result?.message ?? 'Failed to create category.', 'error');
@@ -83,6 +170,9 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
             }
 
             setNewName('');
+            setNewDescription('');
+            setCategoryImageFile(null);
+            setCategoryImagePreview('');
             refreshWithToast(result.message ?? 'Category created successfully.', 'success');
         });
     }
@@ -112,7 +202,11 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
         }
 
         startTransition(async () => {
-            const result = await updateCategory(slug, { name: editingName.trim() });
+            const result = await updateCategory(slug, {
+                name: editingName.trim(),
+                description: editingDescription.trim(),
+                image: editingCategoryImageFile ?? undefined,
+            });
 
             if (!result?.success) {
                 refreshWithToast(result?.message ?? 'Failed to update category.', 'error');
@@ -121,6 +215,9 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
 
             setEditingSlug(null);
             setEditingName('');
+            setEditingDescription('');
+            setEditingCategoryImageFile(null);
+            setEditingCategoryImagePreview('');
             refreshWithToast(result.message ?? 'Category updated successfully.', 'success');
         });
     }
@@ -141,6 +238,8 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
             const result = await createCategorySubCategory(categorySlug, {
                 name: payload.name.trim(),
                 slug: payload.slug.trim(),
+                description: payload.description.trim(),
+                image: subCategoryImageFiles[categorySlug] ?? undefined,
                 isActive: true,
             });
 
@@ -149,7 +248,12 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                 return;
             }
 
-            setNewSubCategory(current => ({ ...current, [categorySlug]: { name: '', slug: '' } }));
+            setNewSubCategory(current => ({
+                ...current,
+                [categorySlug]: { name: '', slug: '', description: '' },
+            }));
+            setSubCategoryImageFiles(current => ({ ...current, [categorySlug]: null }));
+            setSubCategoryImagePreviews(current => ({ ...current, [categorySlug]: '' }));
             refreshWithToast(result.message ?? 'Sub-category created successfully.', 'success');
         });
     }
@@ -169,7 +273,9 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
             const result = await updateCategorySubCategory(categorySlug, subCategorySlug, {
                 name: editingSubCategory.name.trim(),
                 slug: editingSubCategory.slug.trim(),
+                description: editingSubCategory.description.trim(),
                 isActive: editingSubCategory.isActive,
+                image: editingSubCategoryImageFile ?? undefined,
             });
 
             if (!result?.success) {
@@ -178,6 +284,8 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
             }
 
             setEditingSubCategoryKey(null);
+            setEditingSubCategoryImageFile(null);
+            setEditingSubCategoryImagePreview('');
             refreshWithToast(result.message ?? 'Sub-category updated successfully.', 'success');
         });
     }
@@ -208,11 +316,73 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                         here.
                     </CardDescription>
                 </CardHeader>
-                <CardContent className="flex flex-col gap-3 sm:flex-row">
+                <CardContent className="grid gap-3 lg:grid-cols-[1fr_1fr] xl:grid-cols-[1fr_1fr_1.2fr_auto]">
                     <DashboardInput
                         value={newName}
                         onChange={event => setNewName(event.target.value)}
                         placeholder="Create a new category"
+                    />
+                    <DashboardInput
+                        value={newDescription}
+                        onChange={event => setNewDescription(event.target.value)}
+                        placeholder="Category description"
+                    />
+                    <div
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => categoryImageInputRef.current?.click()}
+                        onKeyDown={event => {
+                            if (event.key === 'Enter' || event.key === ' ') {
+                                event.preventDefault();
+                                categoryImageInputRef.current?.click();
+                            }
+                        }}
+                        onDragOver={event => {
+                            event.preventDefault();
+                            setCategoryDragging(true);
+                        }}
+                        onDragLeave={() => setCategoryDragging(false)}
+                        onDrop={event => {
+                            event.preventDefault();
+                            setCategoryDragging(false);
+                            handleCategoryImageSelect(event.dataTransfer.files?.[0]);
+                        }}
+                        className={`rounded-2xl border-2 border-dashed p-4 transition ${
+                            categoryDragging
+                                ? 'border-primary bg-primary/5'
+                                : 'border-border/70 bg-background/80 hover:border-primary/40'
+                        }`}
+                    >
+                        <div className="flex items-start gap-3">
+                            <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                                <UploadCloud className="size-5" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                                <div className="text-sm font-semibold text-foreground">Category image</div>
+                                <p className="text-xs text-muted-foreground">Drag and drop or click to add.</p>
+                                <div className="mt-3 overflow-hidden rounded-xl border bg-muted">
+                                    {categoryImagePreview ? (
+                                        /* eslint-disable-next-line @next/next/no-img-element */
+                                        <img src={categoryImagePreview} alt="Category preview" className="h-32 w-full object-cover" />
+                                    ) : (
+                                        <div className="flex h-32 items-center justify-center gap-2 text-sm text-muted-foreground">
+                                            <ImagePlus className="size-4" />
+                                            Preview will appear here
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <input
+                        ref={categoryImageInputRef}
+                        type="file"
+                        accept="image/*"
+                        className="sr-only"
+                        onChange={event => {
+                            handleCategoryImageSelect(event.target.files?.[0]);
+                            event.currentTarget.value = '';
+                        }}
                     />
                     <Button
                         type="button"
@@ -231,8 +401,10 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                     <Table>
                         <TableHeader>
                             <TableRow>
+                                <TableHead>Image</TableHead>
                                 <TableHead>Name</TableHead>
                                 <TableHead>Slug</TableHead>
+                                <TableHead>Description</TableHead>
                                 <TableHead>Items</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
@@ -245,6 +417,70 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                 return (
                                     <Fragment key={category.slug ?? category.name}>
                                         <TableRow>
+                                            <TableCell>
+                                                {isEditing ? (
+                                                    <>
+                                                        <div
+                                                            role="button"
+                                                            tabIndex={0}
+                                                            onClick={() => editingCategoryImageInputRef.current?.click()}
+                                                            onKeyDown={event => {
+                                                                if (event.key === 'Enter' || event.key === ' ') {
+                                                                    event.preventDefault();
+                                                                    editingCategoryImageInputRef.current?.click();
+                                                                }
+                                                            }}
+                                                            onDragOver={event => {
+                                                                event.preventDefault();
+                                                                setEditingCategoryDragging(true);
+                                                            }}
+                                                            onDragLeave={() => setEditingCategoryDragging(false)}
+                                                            onDrop={event => {
+                                                                event.preventDefault();
+                                                                setEditingCategoryDragging(false);
+                                                                handleEditingCategoryImageSelect(event.dataTransfer.files?.[0]);
+                                                            }}
+                                                            className={`rounded-xl border-2 border-dashed p-2 transition ${
+                                                                editingCategoryDragging
+                                                                    ? 'border-primary bg-primary/5'
+                                                                    : 'border-border/70 bg-background/80 hover:border-primary/40'
+                                                            }`}
+                                                        >
+                                                            <div className="flex size-12 items-center justify-center overflow-hidden rounded-lg border bg-muted">
+                                                                {(editingCategoryImagePreview || category.image) ? (
+                                                                    /* eslint-disable-next-line @next/next/no-img-element */
+                                                                    <img
+                                                                        src={editingCategoryImagePreview || category.image || ''}
+                                                                        alt={category.name}
+                                                                        className="h-full w-full object-cover"
+                                                                    />
+                                                                ) : (
+                                                                    <ImagePlus className="size-4 text-muted-foreground" />
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                        <input
+                                                            ref={editingCategoryImageInputRef}
+                                                            type="file"
+                                                            accept="image/*"
+                                                            className="sr-only"
+                                                            onChange={event => {
+                                                                handleEditingCategoryImageSelect(event.target.files?.[0]);
+                                                                event.currentTarget.value = '';
+                                                            }}
+                                                        />
+                                                    </>
+                                                ) : (
+                                                    <div className="flex size-12 items-center justify-center overflow-hidden rounded-xl border bg-muted">
+                                                        {category.image ? (
+                                                            /* eslint-disable-next-line @next/next/no-img-element */
+                                                            <img src={category.image} alt={category.name} className="h-full w-full object-cover" />
+                                                        ) : (
+                                                            <ImagePlus className="size-4 text-muted-foreground" />
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </TableCell>
                                             <TableCell className="font-medium">
                                                 <div className="flex items-center gap-2">
                                                     <Button
@@ -267,9 +503,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                                     {isEditing ? (
                                                         <DashboardInput
                                                             value={editingName}
-                                                            onChange={event =>
-                                                                setEditingName(event.target.value)
-                                                            }
+                                                            onChange={event => setEditingName(event.target.value)}
                                                         />
                                                     ) : (
                                                         category.name
@@ -277,6 +511,17 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                                 </div>
                                             </TableCell>
                                             <TableCell>{category.slug ?? '-'}</TableCell>
+                                            <TableCell className="max-w-[240px] text-sm text-muted-foreground">
+                                                {isEditing ? (
+                                                    <DashboardInput
+                                                        value={editingDescription}
+                                                        onChange={event => setEditingDescription(event.target.value)}
+                                                        placeholder="Category description"
+                                                    />
+                                                ) : (
+                                                    sliceText(category.description)
+                                                )}
+                                            </TableCell>
                                             <TableCell>
                                                 {category.subCategories?.length ?? category.totalNews ?? 0}
                                             </TableCell>
@@ -302,9 +547,12 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                                             size="sm"
                                                             variant="outline"
                                                             disabled={isPending}
-                                                            onClick={() => {
+                                                        onClick={() => {
                                                                 setEditingSlug(category.slug ?? null);
                                                                 setEditingName(category.name);
+                                                                setEditingDescription(category.description ?? '');
+                                                                setEditingCategoryImageFile(null);
+                                                                setEditingCategoryImagePreview(category.image ?? '');
                                                             }}
                                                         >
                                                             <Pencil className="size-4" />
@@ -324,9 +572,9 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                         </TableRow>
                                         {expandedSlug === category.slug ? (
                                             <TableRow>
-                                                <TableCell colSpan={5}>
+                                                <TableCell colSpan={6}>
                                                     <div className="space-y-4 rounded-xl border bg-muted/20 p-4">
-                                                        <div className="grid gap-3 md:grid-cols-[1fr_1fr_auto]">
+                                                        <div className="grid gap-3 md:grid-cols-[1fr_1fr_1fr_auto]">
                                                             <DashboardInput
                                                                 placeholder="Sub-category name"
                                                                 value={
@@ -342,7 +590,11 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                                                             [category.slug ?? '']: {
                                                                                 ...(current[
                                                                                     category.slug ?? ''
-                                                                                ] ?? { name: '', slug: '' }),
+                                                                                ] ?? {
+                                                                                    name: '',
+                                                                                    slug: '',
+                                                                                    description: '',
+                                                                                }),
                                                                                 name,
                                                                                 slug: toSlug(name),
                                                                             },
@@ -362,8 +614,30 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                                                         [category.slug ?? '']: {
                                                                             ...(current[
                                                                                 category.slug ?? ''
-                                                                            ] ?? { name: '', slug: '' }),
+                                                                             ] ?? {
+                                                                                 name: '',
+                                                                                 slug: '',
+                                                                                 description: '',
+                                                                             }),
                                                                             slug: toSlug(event.target.value),
+                                                                        },
+                                                                    }))
+                                                                }
+                                                            />
+                                                            <DashboardInput
+                                                                placeholder="Sub-category description"
+                                                                value={
+                                                                    newSubCategory[category.slug ?? '']
+                                                                        ?.description ?? ''
+                                                                }
+                                                                onChange={event =>
+                                                                    setNewSubCategory(current => ({
+                                                                        ...current,
+                                                                        [category.slug ?? '']: {
+                                                                            ...(current[
+                                                                                category.slug ?? ''
+                                                                            ] ?? { name: '', slug: '', description: '' }),
+                                                                            description: event.target.value,
                                                                         },
                                                                     }))
                                                                 }
@@ -380,6 +654,70 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                                             </Button>
                                                         </div>
 
+                                                        <div className="rounded-xl border border-dashed border-border/70 bg-background/80 p-4">
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                                                                    <UploadCloud className="size-5" />
+                                                                </div>
+                                                                <div>
+                                                                    <div className="text-sm font-semibold">Sub-category image</div>
+                                                                    <div className="text-xs text-muted-foreground">Click or drop a file for this category.</div>
+                                                                </div>
+                                                            </div>
+                                                            <label
+                                                                htmlFor={`subcategory-image-${category.slug ?? 'root'}`}
+                                                                onDragOver={event => {
+                                                                    event.preventDefault();
+                                                                    setSubCategoryDraggingKey(category.slug ?? '');
+                                                                }}
+                                                                onDragLeave={() => setSubCategoryDraggingKey(null)}
+                                                                onDrop={event => {
+                                                                    event.preventDefault();
+                                                                    setSubCategoryDraggingKey(null);
+                                                                    handleSubCategoryImageSelect(
+                                                                        category.slug ?? '',
+                                                                        event.dataTransfer.files?.[0],
+                                                                    );
+                                                                }}
+                                                                className={`mt-3 rounded-xl border-2 border-dashed p-3 transition ${
+                                                                    subCategoryDraggingKey === (category.slug ?? '')
+                                                                        ? 'border-primary bg-primary/5'
+                                                                        : 'border-border/70 bg-background/80 hover:border-primary/40'
+                                                                }`}
+                                                            >
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className="flex size-10 items-center justify-center overflow-hidden rounded-lg border bg-muted">
+                                                                        {subCategoryImagePreviews[category.slug ?? ''] ? (
+                                                                            /* eslint-disable-next-line @next/next/no-img-element */
+                                                                            <img
+                                                                                src={subCategoryImagePreviews[category.slug ?? '']}
+                                                                                alt="Sub-category preview"
+                                                                                className="h-full w-full object-cover"
+                                                                            />
+                                                                        ) : (
+                                                                            <ImagePlus className="size-4 text-muted-foreground" />
+                                                                        )}
+                                                                    </div>
+                                                                    <div className="text-xs text-muted-foreground">
+                                                                        Click or drop sub-category image here
+                                                                    </div>
+                                                                </div>
+                                                            </label>
+                                                            <input
+                                                                id={`subcategory-image-${category.slug ?? 'root'}`}
+                                                                type="file"
+                                                                accept="image/*"
+                                                                className="sr-only"
+                                                                onChange={event => {
+                                                                    handleSubCategoryImageSelect(
+                                                                        category.slug ?? '',
+                                                                        event.target.files?.[0],
+                                                                    );
+                                                                    event.currentTarget.value = '';
+                                                                }}
+                                                            />
+                                                        </div>
+
                                                         <div className="grid gap-3">
                                                             {(category.subCategories ?? []).length > 0 ? (
                                                                 category.subCategories?.map(
@@ -394,7 +732,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                                                                 key={subCategoryKey}
                                                                                 className="flex flex-col gap-3 rounded-lg border bg-background p-3 md:flex-row md:items-center"
                                                                             >
-                                                                                <div className="grid flex-1 gap-3 md:grid-cols-3">
+                                                                                <div className="grid flex-1 gap-3 md:grid-cols-4">
                                                                                     {isEditingSubCategory ? (
                                                                                         <>
                                                                                             <DashboardInput
@@ -446,7 +784,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                                                                                     )
                                                                                                 }
                                                                                                 className="h-9 rounded-md border border-input bg-background px-3 text-sm w-fit"
-                                                                                            >
+                                                                                                >
                                                                                                 <option value="true">
                                                                                                     Active
                                                                                                 </option>
@@ -454,6 +792,22 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                                                                                     Inactive
                                                                                                 </option>
                                                                                             </select>
+                                                                                            <DashboardInput
+                                                                                                value={
+                                                                                                    editingSubCategory.description
+                                                                                                }
+                                                                                                onChange={event =>
+                                                                                                    setEditingSubCategory(
+                                                                                                        current => ({
+                                                                                                            ...current,
+                                                                                                            description:
+                                                                                                                event.target.value,
+                                                                                                        }),
+                                                                                                    )
+                                                                                                }
+                                                                                                placeholder="Description"
+                                                                                                className="md:col-span-4"
+                                                                                            />
                                                                                         </>
                                                                                     ) : (
                                                                                         <>
@@ -469,9 +823,10 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                                                                                 </span>
                                                                                             </div>
                                                                                             <div className="font-medium">
-                                                                                                {
-                                                                                                    subCategory.slug
-                                                                                                }
+                                                                                                {subCategory.slug}
+                                                                                            </div>
+                                                                                            <div className="text-sm text-muted-foreground">
+                                                                                                {sliceText(subCategory.description)}
                                                                                             </div>
                                                                                             <Badge
                                                                                                 variant="secondary"
@@ -485,6 +840,74 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                                                                         </>
                                                                                     )}
                                                                                 </div>
+                                                                                {isEditingSubCategory ? (
+                                                                                    <>
+                                                                                        <div
+                                                                                            role="button"
+                                                                                            tabIndex={0}
+                                                                                            onClick={() =>
+                                                                                                editingSubCategoryImageInputRef.current?.click()
+                                                                                            }
+                                                                                            onKeyDown={event => {
+                                                                                                if (event.key === 'Enter' || event.key === ' ') {
+                                                                                                    event.preventDefault();
+                                                                                                    editingSubCategoryImageInputRef.current?.click();
+                                                                                                }
+                                                                                            }}
+                                                                                            onDragOver={event => {
+                                                                                                event.preventDefault();
+                                                                                                setEditingSubCategoryDragging(true);
+                                                                                            }}
+                                                                                            onDragLeave={() =>
+                                                                                                setEditingSubCategoryDragging(false)
+                                                                                            }
+                                                                                            onDrop={event => {
+                                                                                                event.preventDefault();
+                                                                                                setEditingSubCategoryDragging(false);
+                                                                                                handleEditingSubCategoryImageSelect(
+                                                                                                    event.dataTransfer.files?.[0],
+                                                                                                );
+                                                                                            }}
+                                                                                            className={`rounded-xl border-2 border-dashed p-3 transition ${
+                                                                                                editingSubCategoryDragging
+                                                                                                    ? 'border-primary bg-primary/5'
+                                                                                                    : 'border-border/70 bg-background/80 hover:border-primary/40'
+                                                                                            }`}
+                                                                                        >
+                                                                                            <div className="flex items-center gap-3">
+                                                                                                <div className="flex size-10 items-center justify-center overflow-hidden rounded-lg border bg-muted">
+                                                                                                    {editingSubCategoryImagePreview || subCategory.image ? (
+                                                                                                        /* eslint-disable-next-line @next/next/no-img-element */
+                                                                                                        <img
+                                                                                                            src={editingSubCategoryImagePreview || subCategory.image || ''}
+                                                                                                            alt={subCategory.name}
+                                                                                                            className="h-full w-full object-cover"
+                                                                                                        />
+                                                                                                    ) : (
+                                                                                                        <ImagePlus className="size-4 text-muted-foreground" />
+                                                                                                    )}
+                                                                                                </div>
+                                                                                                <div className="text-xs text-muted-foreground">
+                                                                                                    Drop or click to replace sub-category image
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <input
+                                                                                            ref={
+                                                                                                editingSubCategoryImageInputRef
+                                                                                            }
+                                                                                            type="file"
+                                                                                            accept="image/*"
+                                                                                            className="sr-only"
+                                                                                            onChange={event => {
+                                                                                                handleEditingSubCategoryImageSelect(
+                                                                                                    event.target.files?.[0],
+                                                                                                );
+                                                                                                event.currentTarget.value = '';
+                                                                                            }}
+                                                                                        />
+                                                                                    </>
+                                                                                ) : null}
                                                                                 <div className="flex gap-2">
                                                                                     {isEditingSubCategory ? (
                                                                                         <>
@@ -506,9 +929,11 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                                                                                 size="sm"
                                                                                                 variant="outline"
                                                                                                 onClick={() =>
-                                                                                                    setEditingSubCategoryKey(
-                                                                                                        null,
-                                                                                                    )
+                                                                                                    {
+                                                                                                        setEditingSubCategoryKey(null);
+                                                                                                        setEditingSubCategoryImageFile(null);
+                                                                                                        setEditingSubCategoryImagePreview('');
+                                                                                                    }
                                                                                                 }
                                                                                             >
                                                                                                 Cancel
@@ -526,16 +951,22 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                                                                                     setEditingSubCategoryKey(
                                                                                                         subCategoryKey,
                                                                                                     );
-                                                                                                    setEditingSubCategory(
-                                                                                                        {
-                                                                                                            name: subCategory.name,
-                                                                                                            slug: subCategory.slug,
-                                                                                                            isActive:
-                                                                                                                subCategory.isActive !==
-                                                                                                                false,
-                                                                                                        },
-                                                                                                    );
-                                                                                                }}
+                                                                                            setEditingSubCategory(
+                                                                                                {
+                                                                                                    name: subCategory.name,
+                                                                                                    slug: subCategory.slug,
+                                                                                                    description:
+                                                                                                        subCategory.description ?? '',
+                                                                                                    isActive:
+                                                                                                        subCategory.isActive !==
+                                                                                                        false,
+                                                                                                },
+                                                                                            );
+                                                                                                setEditingSubCategoryImageFile(null);
+                                                                                                setEditingSubCategoryImagePreview(
+                                                                                                    subCategory.image ?? '',
+                                                                                                );
+                                                                                        }}
                                                                                             >
                                                                                                 <Pencil className="size-4" />
                                                                                             </Button>
