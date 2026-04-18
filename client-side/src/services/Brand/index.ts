@@ -40,14 +40,27 @@ export const getBrandBySlug = async (slug: string): Promise<BackendEnvelope<Back
 type BrandMutationPayload = {
     name: string;
     slug: string;
-    image?: string;
+    image?: File | string;
     description?: string;
     isActive?: boolean;
 };
 
 function toFormData(payload: Record<string, unknown>) {
     const formData = new FormData();
-    formData.set('data', JSON.stringify(payload));
+    const { image, ...rest } = payload as { image?: File | string; [key: string]: unknown };
+
+    formData.set(
+        'data',
+        JSON.stringify({
+            ...rest,
+            ...(typeof image === 'string' && image ? { image } : {}),
+        }),
+    );
+
+    if (image instanceof File) {
+        formData.append('image', image);
+    }
+
     return formData;
 }
 

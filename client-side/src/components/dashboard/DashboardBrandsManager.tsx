@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useTransition } from 'react';
+import { useEffect, useMemo, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
@@ -9,10 +9,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { DashboardInput } from '@/components/dashboard/DashboardInput';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { FileUpload } from '@/components/ui/file-upload';
 import { TableFilter } from '@/components/ui/table-filter';
 import { TablePagination } from '@/components/ui/table-pagination';
 import { createBrand, deleteBrand, type BackendBrand, updateBrand } from '@/services/Brand';
+import Image from 'next/image';
 
 const initialForm = { name: '', slug: '', image: '', description: '', isActive: true };
 
@@ -20,10 +20,21 @@ const initialForm = { name: '', slug: '', image: '', description: '', isActive: 
 //     return { name: '', slug: '', image: '', description: '', isActive: true };
 // }
 
+function slugify(value: string) {
+    return value
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-');
+}
+
 export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
     const [form, setForm] = useState(initialForm);
+    const [brandImageFile, setBrandImageFile] = useState<File | null>(null);
+    const [brandImagePreview, setBrandImagePreview] = useState('');
     const [editingSlug, setEditingSlug] = useState<string | null>(null);
     const [editingForm, setEditingForm] = useState(initialForm);
     // Filter state
@@ -41,6 +52,14 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
         return filteredData.slice(start, start + limit);
     }, [filteredData, page, limit]);
 
+    useEffect(() => {
+        return () => {
+            if (brandImagePreview.startsWith('blob:')) {
+                URL.revokeObjectURL(brandImagePreview);
+            }
+        };
+    }, [brandImagePreview]);
+
     function refresh(message: string, type: 'success' | 'error') {
         if (type === 'success') {
             toast.success(message);
@@ -48,6 +67,25 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
             toast.error(message);
         }
         router.refresh();
+    }
+
+    function handleBrandNameChange(name: string) {
+        setForm(current => ({
+            ...current,
+            name,
+            slug: slugify(name),
+        }));
+    }
+
+    function handleBrandImageSelect(file?: File) {
+        if (!file) return;
+
+        if (brandImagePreview.startsWith('blob:')) {
+            URL.revokeObjectURL(brandImagePreview);
+        }
+
+        setBrandImageFile(file);
+        setBrandImagePreview(URL.createObjectURL(file));
     }
 
     return (
@@ -61,18 +99,40 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
                     <DashboardInput
                         placeholder="Name"
                         value={form.name}
-                        onChange={e => setForm({ ...form, name: e.target.value })}
+                        onChange={e => handleBrandNameChange(e.target.value)}
                     />
-                    <DashboardInput
-                        placeholder="Slug"
-                        value={form.slug}
-                        onChange={e => setForm({ ...form, slug: e.target.value })}
-                    />
-                    <FileUpload
-                        value={form.image}
-                        onChange={url => setForm({ ...form, image: url })}
-                        placeholder="Brand image"
-                    />
+                    <DashboardInput placeholder="Slug" value={form.slug} readOnly />
+                    <div className="space-y-2 xl:col-span-2">
+                        <div className="rounded-2xl border border-border/70 bg-background/80 p-3 shadow-sm">
+                            <div className="text-sm font-medium text-foreground">Brand image</div>
+                            <div className="mt-3 flex flex-col gap-3">
+                                {brandImagePreview ? (
+                                    <div className="overflow-hidden rounded-xl border bg-muted">
+                                        <Image
+                                            src={brandImagePreview}
+                                            alt="Brand preview"
+                                            height={500}
+                                            width={500}
+                                            className="h-36 w-full object-cover"
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="rounded-xl border border-dashed border-border/80 px-4 py-8 text-center text-sm text-muted-foreground">
+                                        Select an image to preview it here.
+                                    </div>
+                                )}
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="block w-full text-sm file:mr-4 file:rounded-full file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary-foreground hover:file:bg-primary/80"
+                                    onChange={e => {
+                                        handleBrandImageSelect(e.target.files?.[0]);
+                                        e.currentTarget.value = '';
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </div>
                     <DashboardInput
                         placeholder="Description"
                         value={form.description}
@@ -93,12 +153,25 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
                             disabled={isPending}
                             onClick={() =>
                                 startTransition(async () => {
-                                    const result = await createBrand(form);
+                                    if (!brandImageFile) {
+                                        toast.error('Brand image is required.');
+                                        return;
+                                    }
+
+                                    const result = await createBrand({
+                                        name: form.name,
+                                        slug: form.slug,
+                                        image: brandImageFile,
+                                        description: form.description,
+                                        isActive: form.isActive,
+                                    });
 
                                     if (!result?.success)
                                         return refresh(result?.message ?? 'Failed to create brand.', 'error');
 
                                     setForm(initialForm);
+                                    setBrandImageFile(null);
+                                    setBrandImagePreview('');
 
                                     refresh(result.message ?? 'Brand created successfully.', 'success');
                                 })
