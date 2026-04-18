@@ -1,6 +1,5 @@
 import { jwtDecode } from 'jwt-decode';
 import { z } from 'zod';
-import type { NextRequest } from 'next/server';
 import type { AuthUser } from '@/types';
 import { normalizeRole } from './roles';
 
@@ -19,6 +18,10 @@ const authTokenPayloadSchema = z
     .passthrough();
 
 type AuthTokenPayload = z.infer<typeof authTokenPayloadSchema>;
+
+type CookieStoreLike = {
+    get(name: string): { value: string } | undefined;
+};
 
 function toAuthUser(payload: AuthTokenPayload): AuthUser | null {
     const role = normalizeRole(payload.role);
@@ -62,10 +65,10 @@ export function decodeAuthToken(token: string | null | undefined): AuthUser | nu
     }
 }
 
-export function getAuthTokenFromRequest(request: Pick<NextRequest, 'cookies'>): string | null {
+export function getAuthTokenFromRequest(request: { cookies: CookieStoreLike }): string | null {
     return request.cookies.get('accessToken')?.value ?? null;
 }
 
-export function getAuthUserFromRequest(request: Pick<NextRequest, 'cookies'>): AuthUser | null {
+export function getAuthUserFromRequest(request: { cookies: CookieStoreLike }): AuthUser | null {
     return decodeAuthToken(getAuthTokenFromRequest(request));
 }
