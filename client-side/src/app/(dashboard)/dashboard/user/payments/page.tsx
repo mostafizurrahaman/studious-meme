@@ -1,45 +1,28 @@
 import type { Metadata } from 'next';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { requireDashboardRoles } from '@/lib/dashboard-auth';
+import { requireRoleSegment } from '@/lib/dashboard-auth';
 import { buildMetadata } from '@/lib/seo';
-import { getAllPaymentsForAdmin, type BackendPayment } from '@/services/Payment';
+import { getMyPayments, type BackendPayment } from '@/services/Payment';
 
 export const metadata: Metadata = buildMetadata({
     title: 'Payments',
-    description: 'Manage storefront payment history.',
-    path: '/dashboard/payments',
+    description: 'Review your payment history.',
+    path: '/dashboard/user/payments',
     noindex: true,
 });
 
 export const dynamic = 'force-dynamic';
 
-function getStatusVariant(status: BackendPayment['status']) {
-    switch (status) {
-        case 'SUCCEEDED':
-            return 'default';
-        case 'FAILED':
-            return 'destructive';
-        case 'CANCELED':
-            return 'secondary';
-        case 'PENDING':
-            return 'outline';
-        default:
-            return 'secondary';
-    }
-}
-
-export default async function DashboardPaymentsPage() {
-    await requireDashboardRoles(['ADMIN', 'SUPER_ADMIN']);
-    const paymentsResult = await getAllPaymentsForAdmin().catch(() => null);
-    const payments = Array.isArray(paymentsResult?.data?.data) ? paymentsResult.data.data : [];
+export default async function UserPaymentsPage() {
+    await requireRoleSegment('user');
+    const paymentsResult = await getMyPayments().catch(() => null);
+    const payments = Array.isArray(paymentsResult?.data) ? (paymentsResult.data as BackendPayment[]) : [];
 
     return (
         <Card className="shadow-sm">
             <CardHeader>
                 <CardTitle>Payments</CardTitle>
-                <CardDescription>Browse through all the payments received via SSLCommerz.</CardDescription>
             </CardHeader>
             <CardContent>
                 <Table>
@@ -67,9 +50,7 @@ export default async function DashboardPaymentsPage() {
                                     <TableCell className="font-medium">{item.transactionId}</TableCell>
                                     <TableCell>{orderId}</TableCell>
                                     <TableCell>Tk. {item.amount}</TableCell>
-                                    <TableCell>
-                                        <Badge variant={getStatusVariant(item.status)}>{item.status}</Badge>
-                                    </TableCell>
+                                    <TableCell>{item.status}</TableCell>
                                     <TableCell>{new Date(item.createdAt).toLocaleDateString()}</TableCell>
                                 </TableRow>
                             );

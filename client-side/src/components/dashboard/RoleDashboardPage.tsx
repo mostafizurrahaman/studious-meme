@@ -142,6 +142,22 @@ export async function RoleDashboardPage({ role }: { role: AuthRole }) {
                     </CardContent>
                 </Card>
 
+                <Card className="shadow-sm">
+                    <CardHeader>
+                        <CardTitle>Quick links</CardTitle>
+                        <CardDescription>Jump into your role-prefixed dashboard sections.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                        {config.navigationItems
+                            .filter(item => item.label !== 'Dashboard' && item.label !== 'Profile')
+                            .map(item => (
+                                <Button asChild key={item.href} variant="outline" className="justify-start">
+                                    <Link href={item.href}>{item.label}</Link>
+                                </Button>
+                            ))}
+                    </CardContent>
+                </Card>
+
                 <MetricCards metrics={metrics} />
 
                 <Card className="shadow-sm">

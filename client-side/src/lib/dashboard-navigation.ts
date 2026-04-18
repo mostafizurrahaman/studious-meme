@@ -1,6 +1,6 @@
 import type { AuthRole } from '@/types';
 
-import { getAdminsPathByRole, getDashboardPathByRole, getProfilePathByRole } from './auth/roles';
+import { getDashboardPathByRole, getProfilePathByRole } from './auth/roles';
 
 export type DashboardNavigationItem = {
     label: string;
@@ -14,7 +14,71 @@ export type DashboardRoleConfig = {
     eyebrow: string;
     responsibilities: string[];
     metricsLabel: string;
+    navigationItems: DashboardNavigationItem[];
 };
+
+function getCommonNavigationItems(role: AuthRole): DashboardNavigationItem[] {
+    return [
+        {
+            label: 'Dashboard',
+            href: getDashboardPathByRole(role) ?? '/dashboard',
+            description: 'Role overview',
+        },
+        {
+            label: 'Profile',
+            href: getProfilePathByRole(role) ?? '/my-account',
+            description: 'Update profile',
+        },
+    ];
+}
+
+function getUserNavigationItems(role: AuthRole): DashboardNavigationItem[] {
+    return [
+        getCommonNavigationItems(role)[0],
+        {
+            label: 'Orders',
+            href: `${getDashboardPathByRole(role) ?? '/dashboard/user'}/orders`,
+            description: 'View your orders',
+        },
+        {
+            label: 'Payments',
+            href: `${getDashboardPathByRole(role) ?? '/dashboard/user'}/payments`,
+            description: 'Review payments',
+        },
+        getCommonNavigationItems(role)[1],
+    ];
+}
+
+function getAdminNavigationItems(role: AuthRole): DashboardNavigationItem[] {
+    const base = getDashboardPathByRole(role) ?? '/dashboard/admin';
+
+    return [
+        { label: 'Dashboard', href: base, description: 'Role overview' },
+        { label: 'Products', href: `${base}/products`, description: 'Manage product catalog' },
+        { label: 'Brands', href: `${base}/brands`, description: 'Manage brands' },
+        { label: 'Categories', href: `${base}/categories`, description: 'Manage categories' },
+        { label: 'Orders', href: `${base}/orders`, description: 'View and update orders' },
+        { label: 'Payments', href: `${base}/payments`, description: 'Review payments' },
+        { label: 'Users', href: `${base}/users`, description: 'Manage users' },
+        { label: 'Profile', href: `${base}/profile`, description: 'Update profile' },
+    ];
+}
+
+function getSuperAdminNavigationItems(role: AuthRole): DashboardNavigationItem[] {
+    const base = getDashboardPathByRole(role) ?? '/dashboard/super-admin';
+
+    return [
+        { label: 'Dashboard', href: base, description: 'Role overview' },
+        { label: 'Admins', href: `${base}/admins`, description: 'Manage admins' },
+        { label: 'Users', href: `${base}/users`, description: 'Manage users' },
+        { label: 'Products', href: `${base}/products`, description: 'Manage product catalog' },
+        { label: 'Brands', href: `${base}/brands`, description: 'Manage brands' },
+        { label: 'Categories', href: `${base}/categories`, description: 'Manage categories' },
+        { label: 'Orders', href: `${base}/orders`, description: 'View and update orders' },
+        { label: 'Payments', href: `${base}/payments`, description: 'Review payments' },
+        { label: 'Profile', href: `${base}/profile`, description: 'Update profile' },
+    ];
+}
 
 const ROLE_CONFIG: Record<AuthRole, DashboardRoleConfig> = {
     USER: {
@@ -27,6 +91,7 @@ const ROLE_CONFIG: Record<AuthRole, DashboardRoleConfig> = {
             'Keep tabs on delivery and payment status',
         ],
         metricsLabel: 'Customer activity',
+        navigationItems: getUserNavigationItems('USER'),
     },
     ADMIN: {
         title: 'Admin dashboard',
@@ -38,6 +103,7 @@ const ROLE_CONFIG: Record<AuthRole, DashboardRoleConfig> = {
             'Update your own profile securely',
         ],
         metricsLabel: 'Operational health',
+        navigationItems: getAdminNavigationItems('ADMIN'),
     },
     SUPER_ADMIN: {
         title: 'Super admin dashboard',
@@ -49,6 +115,7 @@ const ROLE_CONFIG: Record<AuthRole, DashboardRoleConfig> = {
             'Update your own profile securely',
         ],
         metricsLabel: 'Platform health',
+        navigationItems: getSuperAdminNavigationItems('SUPER_ADMIN'),
     },
 };
 
@@ -57,28 +124,7 @@ export function getDashboardRoleConfig(role: AuthRole): DashboardRoleConfig {
 }
 
 export function getDashboardNavigationItems(role: AuthRole): DashboardNavigationItem[] {
-    const items: DashboardNavigationItem[] = [
-        {
-            label: 'Dashboard',
-            href: getDashboardPathByRole(role) ?? '/dashboard',
-            description: 'Role overview',
-        },
-        {
-            label: 'Profile',
-            href: getProfilePathByRole(role) ?? '/my-account',
-            description: 'Update profile',
-        },
-    ];
-
-    if (role === 'SUPER_ADMIN') {
-        items.splice(1, 0, {
-            label: 'Admins',
-            href: getAdminsPathByRole(role) ?? '/dashboard/super-admin/admins',
-            description: 'Manage admin accounts',
-        });
-    }
-
-    return items;
+    return ROLE_CONFIG[role].navigationItems;
 }
 
 export function getRoleShortDescription(role: AuthRole): string {

@@ -8,7 +8,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatMoney } from '@/lib/cart';
 import type { BackendOrder } from '@/services/Order';
 
-export function OrderDetailAdminClient({ order }: { order: BackendOrder | null }) {
+export function OrderDetailAdminClient({
+    order,
+    backHref = '/dashboard/admin/orders',
+}: {
+    order: BackendOrder | null;
+    backHref?: string;
+}) {
     const timeline = useMemo(
         () => [
             { key: 'PLACED', label: 'Placed' },
@@ -39,7 +45,7 @@ export function OrderDetailAdminClient({ order }: { order: BackendOrder | null }
                 </div>
                 <div className="flex flex-wrap gap-2">
                     <Button asChild variant="outline">
-                        <Link href="/dashboard/orders">Back to Orders</Link>
+                        <Link href={backHref}>Back to Orders</Link>
                     </Button>
                 </div>
             </div>

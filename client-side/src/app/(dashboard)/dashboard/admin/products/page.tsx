@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-
 import { DashboardProductsManager } from '@/components/dashboard/DashboardProductsManager';
 import { requireDashboardRoles } from '@/lib/dashboard-auth';
 import { buildMetadata } from '@/lib/seo';
@@ -10,13 +9,13 @@ import { getAllCategoriesWithTotalNewsCount } from '@/services/Category';
 export const metadata: Metadata = buildMetadata({
     title: 'Products',
     description: 'Manage product catalog entries and inventory status.',
-    path: '/dashboard/products',
+    path: '/dashboard/admin/products',
     noindex: true,
 });
 
 export const dynamic = 'force-dynamic';
 
-export default async function DashboardProductsPage() {
+export default async function AdminProductsPage() {
     await requireDashboardRoles(['ADMIN', 'SUPER_ADMIN']);
     const [productsResult, brandsResult, categoriesResult] = await Promise.all([
         getAllProducts().catch(() => null),

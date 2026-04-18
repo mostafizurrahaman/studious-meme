@@ -1,14 +1,19 @@
 'use client';
 
 import Link from 'next/link';
-
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { formatMoney, type CartItem } from '@/lib/cart';
 import { useCartStore } from '@/lib/cart-store';
 import type { BackendOrder } from '@/services/Order';
 
-export function OrdersPageClient({ orders }: { orders: BackendOrder[] }) {
+export function OrdersPageClient({
+    orders,
+    baseHref = '/my-account',
+}: {
+    orders: BackendOrder[];
+    baseHref?: string;
+}) {
     const addItems = useCartStore(state => state.addItems);
 
     const toCartItems = (order: BackendOrder): CartItem[] =>
@@ -41,7 +46,7 @@ export function OrdersPageClient({ orders }: { orders: BackendOrder[] }) {
                                 <div className="flex flex-wrap items-start justify-between gap-4">
                                     <div>
                                         <Link
-                                            href={`/my-account/orders/${order.orderId}`}
+                                            href={`${baseHref}/orders/${order.orderId}`}
                                             className="text-sm font-bold text-secondary hover:text-primary"
                                         >
                                             {order.orderId}

@@ -1,46 +1,29 @@
-import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { requireDashboardRoles } from '@/lib/dashboard-auth';
-import { buildMetadata } from '@/lib/seo';
-import { getAllOrdersForAdmin, updateOrderStatus } from '@/services/Order';
+import type { BackendOrder } from '@/services/Order';
 
-export const metadata: Metadata = buildMetadata({
-    title: 'Orders',
-    description: 'Manage customer orders and order status.',
-    path: '/dashboard/orders',
-    noindex: true,
-});
-
-export const dynamic = 'force-dynamic';
-
-export default async function DashboardOrdersPage() {
-    await requireDashboardRoles(['ADMIN', 'SUPER_ADMIN']);
-    const result = await getAllOrdersForAdmin().catch(() => null);
-    const orders = Array.isArray(result?.data?.data) ? result.data.data : [];
-
-    async function updateStatus(formData: FormData) {
-        'use server';
-
-        const orderId = String(formData.get('orderId') ?? '');
-        const status = String(formData.get('status') ?? '') as
-            | 'PLACED'
-            | 'PROCESSING'
-            | 'DELIVERED'
-            | 'CANCELLED';
-
-        await updateOrderStatus(orderId, status);
-    }
-
+export function DashboardOrdersManager({
+    orders,
+    title,
+    description,
+    detailBaseHref,
+    updateStatus,
+}: {
+    orders: BackendOrder[];
+    title: string;
+    description: string;
+    detailBaseHref: string;
+    updateStatus: (formData: FormData) => Promise<void>;
+}) {
     return (
         <Card className="shadow-sm">
             <CardHeader>
-                <CardTitle>Orders</CardTitle>
-                <CardDescription>{orders.length} orders loaded from backend.</CardDescription>
+                <CardTitle>{title}</CardTitle>
+                <CardDescription>{description}</CardDescription>
             </CardHeader>
             <CardContent>
                 <Table>
@@ -59,7 +42,7 @@ export default async function DashboardOrdersPage() {
                             <TableRow key={order.orderId}>
                                 <TableCell>
                                     <Link
-                                        href={`/dashboard/orders/${order.orderId}`}
+                                        href={`${detailBaseHref}/${order.orderId}`}
                                         className="font-medium hover:underline"
                                     >
                                         {order.orderId}

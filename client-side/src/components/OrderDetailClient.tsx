@@ -3,14 +3,19 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useMemo } from 'react';
-
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { formatMoney, type CartItem } from '@/lib/cart';
 import { useCartStore } from '@/lib/cart-store';
 import type { BackendOrder } from '@/services/Order';
 
-export function OrderDetailClient({ order }: { order: BackendOrder | null }) {
+export function OrderDetailClient({
+    order,
+    backHref = '/my-account/orders',
+}: {
+    order: BackendOrder | null;
+    backHref?: string;
+}) {
     const addItems = useCartStore(state => state.addItems);
 
     const timeline = useMemo(
@@ -28,7 +33,7 @@ export function OrderDetailClient({ order }: { order: BackendOrder | null }) {
                 <div className="mx-auto w-full max-w-310 px-4 py-6 lg:px-0">
                     <Card className="p-6 shadow-sm">
                         Order not found.{' '}
-                        <Link className="font-semibold text-primary" href="/my-account/orders">
+                        <Link className="font-semibold text-primary" href={backHref}>
                             Back to orders
                         </Link>
                     </Card>
@@ -238,7 +243,7 @@ export function OrderDetailClient({ order }: { order: BackendOrder | null }) {
                                 variant="outline"
                                 className="h-11 rounded-full border-white/20 px-6 text-sm font-bold text-white hover:bg-white/10"
                             >
-                                <Link href="/my-account/orders">Back to orders</Link>
+                                <Link href={backHref}>Back to orders</Link>
                             </Button>
                         </div>
                     </Card>

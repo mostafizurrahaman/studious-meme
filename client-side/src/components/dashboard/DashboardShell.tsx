@@ -2,7 +2,16 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Settings, ShieldUser } from 'lucide-react';
+import {
+    LayoutDashboard,
+    ShoppingBag,
+    Tags,
+    ReceiptText,
+    Users as UsersIcon,
+    BadgeCheck,
+    Settings,
+    ShieldUser,
+} from 'lucide-react';
 import {
     Sidebar,
     SidebarContent,
@@ -37,9 +46,20 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
     const pathname = usePathname();
     const role = normalizeRole(user?.role) ?? 'USER';
     const roleConfig = getDashboardRoleConfig(role);
+    const iconByLabel: Record<string, typeof LayoutDashboard> = {
+        Dashboard: LayoutDashboard,
+        Admins: ShieldUser,
+        Users: UsersIcon,
+        Products: ShoppingBag,
+        Brands: BadgeCheck,
+        Categories: Tags,
+        Orders: ReceiptText,
+        Payments: ReceiptText,
+        Profile: Settings,
+    };
     const navItems = getDashboardNavigationItems(role).map(item => ({
         ...item,
-        icon: item.label === 'Dashboard' ? LayoutDashboard : item.label === 'Admins' ? ShieldUser : Settings,
+        icon: iconByLabel[item.label] ?? LayoutDashboard,
     }));
 
     return (
@@ -51,8 +71,12 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
                             M
                         </div>
                         <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-semibold text-sidebar-foreground">Malamal Dashboard</p>
-                            <p className="truncate text-xs text-sidebar-foreground/70">Storefront control center</p>
+                            <p className="truncate text-sm font-semibold text-sidebar-foreground">
+                                Malamal Dashboard
+                            </p>
+                            <p className="truncate text-xs text-sidebar-foreground/70">
+                                Storefront control center
+                            </p>
                         </div>
                     </div>
                 </SidebarHeader>
@@ -64,7 +88,12 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
                             <SidebarMenu>
                                 {navItems.map(item => (
                                     <SidebarMenuItem key={item.href}>
-                                        <SidebarMenuButton asChild isActive={pathname === item.href || pathname.startsWith(`${item.href}/`)}>
+                                        <SidebarMenuButton
+                                            asChild
+                                            isActive={
+                                                pathname === item.href || pathname.startsWith(`${item.href}/`)
+                                            }
+                                        >
                                             <Link href={item.href}>
                                                 <item.icon />
                                                 <span>{item.label}</span>
@@ -79,7 +108,18 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
 
                 <SidebarFooter>
                     <div className="px-1">
-                        <UserDropdownMenu user={user ? { name: user.name ?? 'Guest', email: user.email ?? '', image: user.image ?? '', role: role } : null} />
+                        <UserDropdownMenu
+                            user={
+                                user
+                                    ? {
+                                          name: user.name ?? 'Guest',
+                                          email: user.email ?? '',
+                                          image: user.image ?? '',
+                                          role: role,
+                                      }
+                                    : null
+                            }
+                        />
                     </div>
                 </SidebarFooter>
                 <SidebarRail />
@@ -94,9 +134,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
                     </div>
                 </header>
 
-                <div className="min-h-[calc(100vh-4rem)] bg-muted/20 px-4 py-6 md:px-6">
-                    {children}
-                </div>
+                <div className="min-h-[calc(100vh-4rem)] bg-muted/20 px-4 py-6 md:px-6">{children}</div>
             </SidebarInset>
         </SidebarProvider>
     );
