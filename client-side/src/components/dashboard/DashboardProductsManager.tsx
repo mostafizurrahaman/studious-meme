@@ -7,7 +7,7 @@ import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { DashboardInput } from '@/components/dashboard/DashboardInput';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { FileUpload } from '@/components/ui/file-upload';
 import { TableFilter } from '@/components/ui/table-filter';
@@ -88,16 +88,16 @@ export function DashboardProductsManager({ products, brandOptions, categoryOptio
                     <CardDescription>Add a new catalog item using backend CRUD.</CardDescription>
                 </CardHeader>
                 <CardContent className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                    <Input placeholder="Title" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} />
-                    <Input placeholder="Slug" value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })} />
-                    <Input placeholder="SKU" value={form.sku} onChange={e => setForm({ ...form, sku: e.target.value })} />
+                    <DashboardInput placeholder="Title" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} />
+                    <DashboardInput placeholder="Slug" value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })} />
+                    <DashboardInput placeholder="SKU" value={form.sku} onChange={e => setForm({ ...form, sku: e.target.value })} />
                     <FileUpload value={form.image} onChange={url => setForm({ ...form, image: url })} placeholder="Product image" />
-                    <Input placeholder="Price" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} />
-                    <Input placeholder="Old price" value={form.oldPrice} onChange={e => setForm({ ...form, oldPrice: e.target.value })} />
-                    <Input placeholder="Badge" value={form.badge} onChange={e => setForm({ ...form, badge: e.target.value })} />
-                    <Input placeholder="Sub-category slug" value={form.subCategorySlug} onChange={e => setForm({ ...form, subCategorySlug: e.target.value })} />
-                    <Input placeholder="Stock label" value={form.stock} onChange={e => setForm({ ...form, stock: e.target.value })} />
-                    <Input placeholder="Rating" value={form.rating} onChange={e => setForm({ ...form, rating: e.target.value })} />
+                    <DashboardInput placeholder="Price" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} />
+                    <DashboardInput placeholder="Old price" value={form.oldPrice} onChange={e => setForm({ ...form, oldPrice: e.target.value })} />
+                    <DashboardInput placeholder="Badge" value={form.badge} onChange={e => setForm({ ...form, badge: e.target.value })} />
+                    <DashboardInput placeholder="Sub-category slug" value={form.subCategorySlug} onChange={e => setForm({ ...form, subCategorySlug: e.target.value })} />
+                    <DashboardInput placeholder="Stock label" value={form.stock} onChange={e => setForm({ ...form, stock: e.target.value })} />
+                    <DashboardInput placeholder="Rating" value={form.rating} onChange={e => setForm({ ...form, rating: e.target.value })} />
                     <select className="h-10 rounded-md border border-input bg-background px-3 text-sm" value={form.brand} onChange={e => setForm({ ...form, brand: e.target.value })}>
                         <option value="">Brand</option>
                         {brandOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}
@@ -144,11 +144,11 @@ export function DashboardProductsManager({ products, brandOptions, categoryOptio
                                 const isEditing = editingSlug === product.slug;
                                 return (
                                     <TableRow key={product.sku}>
-                                        <TableCell className="font-medium">{isEditing ? <Input value={editingForm.title} onChange={e => setEditingForm({ ...editingForm, title: e.target.value })} /> : product.title}</TableCell>
+                                        <TableCell className="font-medium">{isEditing ? <DashboardInput value={editingForm.title} onChange={e => setEditingForm({ ...editingForm, title: e.target.value })} /> : product.title}</TableCell>
                                         <TableCell>{typeof product.brand === 'string' ? product.brand : product.brand.name}</TableCell>
                                         <TableCell>{product.sku}</TableCell>
                                         <TableCell><Badge variant="secondary">{product.stock}</Badge></TableCell>
-                                        <TableCell>{isEditing ? <Input value={editingForm.price} onChange={e => setEditingForm({ ...editingForm, price: e.target.value })} /> : product.price}</TableCell>
+                                        <TableCell>{isEditing ? <DashboardInput value={editingForm.price} onChange={e => setEditingForm({ ...editingForm, price: e.target.value })} /> : product.price}</TableCell>
                                         <TableCell className="text-right">
                                             <div className="flex justify-end gap-2">
                                                 {isEditing ? (

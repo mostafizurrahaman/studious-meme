@@ -53,6 +53,7 @@ function toFormData(payload: Record<string, unknown>) {
 
 export const createBrand = async (payload: BrandMutationPayload): Promise<BackendEnvelope<BackendBrand>> => {
     const accessToken = await getValidAccessTokenForServerActions();
+    
     const result = await requestBackendJson<BackendEnvelope<BackendBrand>>('/brand/brands', {
         method: 'POST',
         body: toFormData(payload),

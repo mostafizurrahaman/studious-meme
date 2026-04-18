@@ -7,22 +7,22 @@ import { MulterFile } from '../../lib/upload';
 
 // 1. createBrandIntoDB
 const createBrandIntoDB = async (payload: Partial<IBrand>, imageFile?: MulterFile) => {
-    let uploadedImage: string | undefined;
-
-    try {
-        if (imageFile) {
-            const { secure_url } = await sendImageToCloudinary(imageFile);
-            uploadedImage = secure_url;
-        }
-
-        return BrandModel.create({ ...payload, image: uploadedImage ?? payload.image });
-    } catch (error) {
-        if (uploadedImage) {
-            await deleteImageFromCloudinary(uploadedImage);
-        }
-
-        throw error;
+    if (!imageFile) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Brand image is required!');
     }
+
+    const { secure_url } = await sendImageToCloudinary(imageFile);
+
+    const brand = await BrandModel.create({
+        ...payload,
+        image: secure_url,
+    });
+
+    if (!brand) {
+        await deleteImageFromCloudinary(secure_url);
+    }
+
+    return brand;
 };
 
 // 2. getAllBrandsFromDB

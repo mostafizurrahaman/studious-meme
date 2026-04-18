@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { Pencil, ShieldPlus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { DashboardInput } from '@/components/dashboard/DashboardInput';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { createUser, deleteAdmin, updateAdmin } from '@/services/Admin';
@@ -56,28 +56,28 @@ export function DashboardAdminsManager({ admins }: DashboardAdminsManagerProps) 
                     <CardDescription>Only super admins can create admin accounts.</CardDescription>
                 </CardHeader>
                 <CardContent className="grid gap-4 md:grid-cols-2">
-                    <Input
+                    <DashboardInput
                         placeholder="Name"
                         value={form.name}
                         onChange={e => setForm({ ...form, name: e.target.value })}
                     />
-                    <Input
+                    <DashboardInput
                         placeholder="Email"
                         value={form.email}
                         onChange={e => setForm({ ...form, email: e.target.value })}
                     />
-                    <Input
+                    <DashboardInput
                         placeholder="Phone"
                         value={form.phone}
                         onChange={e => setForm({ ...form, phone: e.target.value })}
                     />
-                    <Input
+                    <DashboardInput
                         type="password"
                         placeholder="Password"
                         value={form.password}
                         onChange={e => setForm({ ...form, password: e.target.value })}
                     />
-                    <Input
+                    <DashboardInput
                         type="password"
                         placeholder="Confirm password"
                         value={form.confirmPassword}
@@ -138,7 +138,7 @@ export function DashboardAdminsManager({ admins }: DashboardAdminsManagerProps) 
                                     <TableRow key={admin._id ?? admin.email}>
                                         <TableCell className="font-medium">
                                             {isEditing ? (
-                                                <Input
+                                                <DashboardInput
                                                     value={editingForm.name}
                                                     onChange={e =>
                                                         setEditingForm({
@@ -153,7 +153,7 @@ export function DashboardAdminsManager({ admins }: DashboardAdminsManagerProps) 
                                         </TableCell>
                                         <TableCell>
                                             {isEditing ? (
-                                                <Input
+                                                <DashboardInput
                                                     value={editingForm.email}
                                                     onChange={e =>
                                                         setEditingForm({
@@ -168,7 +168,7 @@ export function DashboardAdminsManager({ admins }: DashboardAdminsManagerProps) 
                                         </TableCell>
                                         <TableCell>
                                             {isEditing ? (
-                                                <Input
+                                                <DashboardInput
                                                     value={editingForm.phone}
                                                     onChange={e =>
                                                         setEditingForm({

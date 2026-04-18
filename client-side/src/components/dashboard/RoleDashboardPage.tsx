@@ -130,7 +130,7 @@ export async function RoleDashboardPage({ role }: { role: AuthRole }) {
                         <CardDescription>{config.description}</CardDescription>
                     </CardHeader>
                     <CardContent className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                        <Button asChild className="justify-start">
+                        <Button asChild className="justify-start text-white!">
                             <Link href={`${dashboardPath}/profile`}>Update profile</Link>
                         </Button>
                         <Button asChild variant="outline" className="justify-start">
@@ -285,7 +285,7 @@ export async function RoleDashboardPage({ role }: { role: AuthRole }) {
                     <CardDescription>{config.description}</CardDescription>
                 </CardHeader>
                 <CardContent className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                    <Button asChild className="justify-start">
+                    <Button asChild className="justify-start text-white!">
                         <Link href={`${dashboardPath}/profile`}>Update profile</Link>
                     </Button>
                     {role === 'SUPER_ADMIN' ? (

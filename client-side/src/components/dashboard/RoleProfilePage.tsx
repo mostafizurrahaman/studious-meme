@@ -32,7 +32,7 @@ export async function RoleProfilePage({
                     <CardDescription>{config.description}</CardDescription>
                 </CardHeader>
                 <CardContent className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                    <Button asChild className="justify-start">
+                    <Button asChild className="justify-start text-white!">
                         <Link href={dashboardPath}>Back to dashboard</Link>
                     </Button>
                     <Button asChild variant="outline" className="justify-start">

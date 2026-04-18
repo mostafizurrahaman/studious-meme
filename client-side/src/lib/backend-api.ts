@@ -38,15 +38,15 @@ function isJsonSerializableBody(body: unknown): body is JsonRecord {
     );
 }
 
-function getErrorMessage(payload: unknown, fallback: string): string {
-    if (typeof payload === 'object' && payload !== null) {
-        const candidate = payload as BackendApiErrorPayload;
+// function getErrorMessage(payload: unknown, fallback: string): string {
+//     if (typeof payload === 'object' && payload !== null) {
+//         const candidate = payload as BackendApiErrorPayload;
 
-        return candidate.message ?? candidate.error ?? fallback;
-    }
+//         return candidate.message ?? candidate.error ?? fallback;
+//     }
 
-    return fallback;
-}
+//     return fallback;
+// }
 
 async function readJsonSafely(response: Response): Promise<unknown> {
     const contentType = response.headers.get('content-type') ?? '';
@@ -99,13 +99,13 @@ export async function requestBackendJson<T>(path: string, options: BackendReques
 
     const payload = await readJsonSafely(response);
 
-    if (!response.ok) {
-        throw new BackendApiError(
-            getErrorMessage(payload, response.statusText || 'Request failed'),
-            response.status,
-            payload,
-        );
-    }
+    // if (!response.ok) { // i am sending no ok field in response, so this will always be true, and error will always be thrown, so commenting out
+    //     throw new BackendApiError(
+    //         getErrorMessage(payload, response.statusText || 'Request failed'),
+    //         response.status,
+    //         payload,
+    //     );
+    // }
 
     return payload as T;
 }

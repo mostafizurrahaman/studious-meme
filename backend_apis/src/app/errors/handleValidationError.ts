@@ -16,7 +16,7 @@ const handleValidationError = (err: mongoose.Error.ValidationError): TGenericErr
 
     return {
         statusCode,
-        message: 'Validation Error!',
+        message: errorSources[0]?.message || 'Validation Error!',
         errorSources,
     };
 };

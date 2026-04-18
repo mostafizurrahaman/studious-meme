@@ -62,4 +62,10 @@ const deleteBrand = asyncHandler(async (req, res) => {
     });
 });
 
-export const BrandController = { createBrand, getAllBrands, getBrand, updateBrand, deleteBrand };
+export const BrandController = {
+    createBrand,
+    getAllBrands,
+    getBrand,
+    updateBrand,
+    deleteBrand,
+};

@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { DashboardInput } from '@/components/dashboard/DashboardInput';
 import { FileUpload } from '@/components/ui/file-upload';
 import {
     createHeroSection,
@@ -57,7 +57,7 @@ export function DashboardHeroManager({ heroes }: { heroes: BackendHeroSection[] 
                         placeholder="Slide image"
                     />
                     <div className="grid gap-3 md:grid-cols-3">
-                        <Input
+                        <DashboardInput
                             placeholder="Image alt"
                             value={card.imageAlt}
                             onChange={e =>
@@ -68,7 +68,7 @@ export function DashboardHeroManager({ heroes }: { heroes: BackendHeroSection[] 
                                 )
                             }
                         />
-                        <Input
+                        <DashboardInput
                             placeholder="Title"
                             value={card.title}
                             onChange={e =>
@@ -79,7 +79,7 @@ export function DashboardHeroManager({ heroes }: { heroes: BackendHeroSection[] 
                                 )
                             }
                         />
-                        <Input
+                        <DashboardInput
                             placeholder="Click URL"
                             value={card.clickUrl}
                             onChange={e =>

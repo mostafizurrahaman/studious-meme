@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { ChevronDown, Pencil, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { DashboardInput } from '@/components/dashboard/DashboardInput';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -48,6 +48,15 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
     const [editingSubCategory, setEditingSubCategory] = useState({ name: '', slug: '', isActive: true });
 
     const visibleCategories = useMemo(() => categories.slice(0, 24), [categories]);
+
+    function toSlug(value: string) {
+        return value
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-');
+    }
 
     function refreshWithToast(message: string, type: 'success' | 'error') {
         if (type === 'success') {
@@ -200,12 +209,17 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="flex flex-col gap-3 sm:flex-row">
-                    <Input
+                    <DashboardInput
                         value={newName}
                         onChange={event => setNewName(event.target.value)}
                         placeholder="Create a new category"
                     />
-                    <Button type="button" disabled={isPending} onClick={handleCreate} className="gap-2">
+                    <Button
+                        type="button"
+                        disabled={isPending}
+                        onClick={handleCreate}
+                        className="gap-2 bg-primary text-primary-foreground hover:bg-primary/70"
+                    >
                         <Plus className="size-4" />
                         Add category
                     </Button>
@@ -251,7 +265,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                                         />
                                                     </Button>
                                                     {isEditing ? (
-                                                        <Input
+                                                        <DashboardInput
                                                             value={editingName}
                                                             onChange={event =>
                                                                 setEditingName(event.target.value)
@@ -263,7 +277,9 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                                 </div>
                                             </TableCell>
                                             <TableCell>{category.slug ?? '-'}</TableCell>
-                                            <TableCell>{category.totalNews ?? 0}</TableCell>
+                                            <TableCell>
+                                                {category.subCategories?.length ?? category.totalNews ?? 0}
+                                            </TableCell>
                                             <TableCell>
                                                 <Badge variant="secondary">
                                                     {category.isActive === false ? 'Inactive' : 'Active'}
@@ -311,25 +327,30 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                                 <TableCell colSpan={5}>
                                                     <div className="space-y-4 rounded-xl border bg-muted/20 p-4">
                                                         <div className="grid gap-3 md:grid-cols-[1fr_1fr_auto]">
-                                                            <Input
+                                                            <DashboardInput
                                                                 placeholder="Sub-category name"
                                                                 value={
                                                                     newSubCategory[category.slug ?? '']
                                                                         ?.name ?? ''
                                                                 }
                                                                 onChange={event =>
-                                                                    setNewSubCategory(current => ({
-                                                                        ...current,
-                                                                        [category.slug ?? '']: {
-                                                                            ...(current[
-                                                                                category.slug ?? ''
-                                                                            ] ?? { name: '', slug: '' }),
-                                                                            name: event.target.value,
-                                                                        },
-                                                                    }))
+                                                                    setNewSubCategory(current => {
+                                                                        const name = event.target.value;
+
+                                                                        return {
+                                                                            ...current,
+                                                                            [category.slug ?? '']: {
+                                                                                ...(current[
+                                                                                    category.slug ?? ''
+                                                                                ] ?? { name: '', slug: '' }),
+                                                                                name,
+                                                                                slug: toSlug(name),
+                                                                            },
+                                                                        };
+                                                                    })
                                                                 }
                                                             />
-                                                            <Input
+                                                            <DashboardInput
                                                                 placeholder="sub-category-slug"
                                                                 value={
                                                                     newSubCategory[category.slug ?? '']
@@ -342,13 +363,14 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                                                             ...(current[
                                                                                 category.slug ?? ''
                                                                             ] ?? { name: '', slug: '' }),
-                                                                            slug: event.target.value,
+                                                                            slug: toSlug(event.target.value),
                                                                         },
                                                                     }))
                                                                 }
                                                             />
                                                             <Button
                                                                 type="button"
+                                                                className="bg-primary text-primary-foreground hover:bg-primary/70"
                                                                 disabled={isPending}
                                                                 onClick={() =>
                                                                     handleCreateSubCategory(category.slug)
@@ -360,170 +382,185 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
 
                                                         <div className="grid gap-3">
                                                             {(category.subCategories ?? []).length > 0 ? (
-                                                                category.subCategories?.map(subCategory => {
-                                                                    const subCategoryKey = `${category.slug}:${subCategory.slug}`;
-                                                                    const isEditingSubCategory =
-                                                                        editingSubCategoryKey ===
-                                                                        subCategoryKey;
+                                                                category.subCategories?.map(
+                                                                    (subCategory, index) => {
+                                                                        const subCategoryKey = `${category.slug}:${subCategory.slug}`;
+                                                                        const isEditingSubCategory =
+                                                                            editingSubCategoryKey ===
+                                                                            subCategoryKey;
 
-                                                                    return (
-                                                                        <div
-                                                                            key={subCategoryKey}
-                                                                            className="flex flex-col gap-3 rounded-lg border bg-background p-3 md:flex-row md:items-center"
-                                                                        >
-                                                                            <div className="grid flex-1 gap-3 md:grid-cols-3">
-                                                                                {isEditingSubCategory ? (
-                                                                                    <>
-                                                                                        <Input
-                                                                                            value={
-                                                                                                editingSubCategory.name
-                                                                                            }
-                                                                                            onChange={event =>
-                                                                                                setEditingSubCategory(
-                                                                                                    current => ({
-                                                                                                        ...current,
-                                                                                                        name: event
-                                                                                                            .target
-                                                                                                            .value,
-                                                                                                    }),
-                                                                                                )
-                                                                                            }
-                                                                                        />
-                                                                                        <Input
-                                                                                            value={
-                                                                                                editingSubCategory.slug
-                                                                                            }
-                                                                                            onChange={event =>
-                                                                                                setEditingSubCategory(
-                                                                                                    current => ({
-                                                                                                        ...current,
-                                                                                                        slug: event
-                                                                                                            .target
-                                                                                                            .value,
-                                                                                                    }),
-                                                                                                )
-                                                                                            }
-                                                                                        />
-                                                                                        <select
-                                                                                            value={
-                                                                                                editingSubCategory.isActive
-                                                                                                    ? 'true'
-                                                                                                    : 'false'
-                                                                                            }
-                                                                                            onChange={event =>
-                                                                                                setEditingSubCategory(
-                                                                                                    current => ({
-                                                                                                        ...current,
-                                                                                                        isActive:
-                                                                                                            event
+                                                                        return (
+                                                                            <div
+                                                                                key={subCategoryKey}
+                                                                                className="flex flex-col gap-3 rounded-lg border bg-background p-3 md:flex-row md:items-center"
+                                                                            >
+                                                                                <div className="grid flex-1 gap-3 md:grid-cols-3">
+                                                                                    {isEditingSubCategory ? (
+                                                                                        <>
+                                                                                            <DashboardInput
+                                                                                                value={
+                                                                                                    editingSubCategory.name
+                                                                                                }
+                                                                                                onChange={event =>
+                                                                                                    setEditingSubCategory(
+                                                                                                        current => ({
+                                                                                                            ...current,
+                                                                                                            name: event
                                                                                                                 .target
-                                                                                                                .value ===
-                                                                                                            'true',
-                                                                                                    }),
-                                                                                                )
-                                                                                            }
-                                                                                            className="h-9 rounded-md border border-input bg-background px-3 text-sm"
-                                                                                        >
-                                                                                            <option value="true">
-                                                                                                Active
-                                                                                            </option>
-                                                                                            <option value="false">
-                                                                                                Inactive
-                                                                                            </option>
-                                                                                        </select>
-                                                                                    </>
-                                                                                ) : (
-                                                                                    <>
-                                                                                        <div className="font-medium">
-                                                                                            {subCategory.name}
-                                                                                        </div>
-                                                                                        <div className="text-sm text-muted-foreground">
-                                                                                            {subCategory.slug}
-                                                                                        </div>
-                                                                                        <Badge variant="secondary">
-                                                                                            {subCategory.isActive ===
-                                                                                            false
-                                                                                                ? 'Inactive'
-                                                                                                : 'Active'}
-                                                                                        </Badge>
-                                                                                    </>
-                                                                                )}
-                                                                            </div>
-                                                                            <div className="flex gap-2">
-                                                                                {isEditingSubCategory ? (
-                                                                                    <>
-                                                                                        <Button
-                                                                                            size="sm"
-                                                                                            disabled={
-                                                                                                isPending
-                                                                                            }
-                                                                                            onClick={() =>
-                                                                                                handleUpdateSubCategory(
-                                                                                                    category.slug,
-                                                                                                    subCategory.slug,
-                                                                                                )
-                                                                                            }
-                                                                                        >
-                                                                                            Save
-                                                                                        </Button>
-                                                                                        <Button
-                                                                                            size="sm"
-                                                                                            variant="outline"
-                                                                                            onClick={() =>
-                                                                                                setEditingSubCategoryKey(
-                                                                                                    null,
-                                                                                                )
-                                                                                            }
-                                                                                        >
-                                                                                            Cancel
-                                                                                        </Button>
-                                                                                    </>
-                                                                                ) : (
-                                                                                    <>
-                                                                                        <Button
-                                                                                            size="sm"
-                                                                                            variant="outline"
-                                                                                            disabled={
-                                                                                                isPending
-                                                                                            }
-                                                                                            onClick={() => {
-                                                                                                setEditingSubCategoryKey(
-                                                                                                    subCategoryKey,
-                                                                                                );
-                                                                                                setEditingSubCategory(
+                                                                                                                .value,
+                                                                                                        }),
+                                                                                                    )
+                                                                                                }
+                                                                                            />
+                                                                                            <DashboardInput
+                                                                                                value={
+                                                                                                    editingSubCategory.slug
+                                                                                                }
+                                                                                                onChange={event =>
+                                                                                                    setEditingSubCategory(
+                                                                                                        current => ({
+                                                                                                            ...current,
+                                                                                                            slug: event
+                                                                                                                .target
+                                                                                                                .value,
+                                                                                                        }),
+                                                                                                    )
+                                                                                                }
+                                                                                            />
+                                                                                            <select
+                                                                                                value={
+                                                                                                    editingSubCategory.isActive
+                                                                                                        ? 'true'
+                                                                                                        : 'false'
+                                                                                                }
+                                                                                                onChange={event =>
+                                                                                                    setEditingSubCategory(
+                                                                                                        current => ({
+                                                                                                            ...current,
+                                                                                                            isActive:
+                                                                                                                event
+                                                                                                                    .target
+                                                                                                                    .value ===
+                                                                                                                'true',
+                                                                                                        }),
+                                                                                                    )
+                                                                                                }
+                                                                                                className="h-9 rounded-md border border-input bg-background px-3 text-sm w-fit"
+                                                                                            >
+                                                                                                <option value="true">
+                                                                                                    Active
+                                                                                                </option>
+                                                                                                <option value="false">
+                                                                                                    Inactive
+                                                                                                </option>
+                                                                                            </select>
+                                                                                        </>
+                                                                                    ) : (
+                                                                                        <>
+                                                                                            <div className="flex items-center gap-2 font-semibold text-primary">
+                                                                                                <span className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-xs">
+                                                                                                    {index +
+                                                                                                        1}
+                                                                                                </span>
+                                                                                                <span>
                                                                                                     {
-                                                                                                        name: subCategory.name,
-                                                                                                        slug: subCategory.slug,
-                                                                                                        isActive:
-                                                                                                            subCategory.isActive !==
-                                                                                                            false,
-                                                                                                    },
-                                                                                                );
-                                                                                            }}
-                                                                                        >
-                                                                                            <Pencil className="size-4" />
-                                                                                        </Button>
-                                                                                        <Button
-                                                                                            size="sm"
-                                                                                            variant="outline"
-                                                                                            disabled={
-                                                                                                isPending
-                                                                                            }
-                                                                                            onClick={() =>
-                                                                                                handleDeleteSubCategory(
-                                                                                                    category.slug,
-                                                                                                    subCategory.slug,
-                                                                                                )
-                                                                                            }
-                                                                                        >
-                                                                                            <Trash2 className="size-4" />
-                                                                                        </Button>
-                                                                                    </>
-                                                                                )}
+                                                                                                        subCategory.name
+                                                                                                    }
+                                                                                                </span>
+                                                                                            </div>
+                                                                                            <div className="font-medium">
+                                                                                                {
+                                                                                                    subCategory.slug
+                                                                                                }
+                                                                                            </div>
+                                                                                            <Badge
+                                                                                                variant="secondary"
+                                                                                                className="w-fit"
+                                                                                            >
+                                                                                                {subCategory.isActive ===
+                                                                                                false
+                                                                                                    ? 'Inactive'
+                                                                                                    : 'Active'}
+                                                                                            </Badge>
+                                                                                        </>
+                                                                                    )}
+                                                                                </div>
+                                                                                <div className="flex gap-2">
+                                                                                    {isEditingSubCategory ? (
+                                                                                        <>
+                                                                                            <Button
+                                                                                                size="sm"
+                                                                                                disabled={
+                                                                                                    isPending
+                                                                                                }
+                                                                                                onClick={() =>
+                                                                                                    handleUpdateSubCategory(
+                                                                                                        category.slug,
+                                                                                                        subCategory.slug,
+                                                                                                    )
+                                                                                                }
+                                                                                            >
+                                                                                                Save
+                                                                                            </Button>
+                                                                                            <Button
+                                                                                                size="sm"
+                                                                                                variant="outline"
+                                                                                                onClick={() =>
+                                                                                                    setEditingSubCategoryKey(
+                                                                                                        null,
+                                                                                                    )
+                                                                                                }
+                                                                                            >
+                                                                                                Cancel
+                                                                                            </Button>
+                                                                                        </>
+                                                                                    ) : (
+                                                                                        <>
+                                                                                            <Button
+                                                                                                size="sm"
+                                                                                                variant="outline"
+                                                                                                disabled={
+                                                                                                    isPending
+                                                                                                }
+                                                                                                onClick={() => {
+                                                                                                    setEditingSubCategoryKey(
+                                                                                                        subCategoryKey,
+                                                                                                    );
+                                                                                                    setEditingSubCategory(
+                                                                                                        {
+                                                                                                            name: subCategory.name,
+                                                                                                            slug: subCategory.slug,
+                                                                                                            isActive:
+                                                                                                                subCategory.isActive !==
+                                                                                                                false,
+                                                                                                        },
+                                                                                                    );
+                                                                                                }}
+                                                                                            >
+                                                                                                <Pencil className="size-4" />
+                                                                                            </Button>
+                                                                                            <Button
+                                                                                                size="sm"
+                                                                                                variant="outline"
+                                                                                                disabled={
+                                                                                                    isPending
+                                                                                                }
+                                                                                                onClick={() =>
+                                                                                                    handleDeleteSubCategory(
+                                                                                                        category.slug,
+                                                                                                        subCategory.slug,
+                                                                                                    )
+                                                                                                }
+                                                                                            >
+                                                                                                <Trash2 className="size-4" />
+                                                                                            </Button>
+                                                                                        </>
+                                                                                    )}
+                                                                                </div>
                                                                             </div>
-                                                                        </div>
-                                                                    );
-                                                                })
+                                                                        );
+                                                                    },
+                                                                )
                                                             ) : (
                                                                 <div className="text-sm text-muted-foreground">
                                                                     No sub-categories yet.
