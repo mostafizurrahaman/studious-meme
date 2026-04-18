@@ -72,7 +72,10 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
                 className="border-r border-sidebar-border/60 bg-linear-to-b from-sidebar via-sidebar to-sidebar-accent/15 shadow-[0_18px_60px_-22px_rgba(0,0,0,0.28)]"
             >
                 <SidebarHeader>
-                    <div className="flex items-center gap-3 rounded-2xl border border-sidebar-border/60 bg-white/5 p-3 shadow-sm backdrop-blur">
+                    <Link
+                        href="/"
+                        className="flex items-center gap-3 rounded-2xl border border-sidebar-border/60 bg-white/5 p-3 shadow-sm backdrop-blur"
+                    >
                         <div className="flex size-10 items-center justify-center rounded-2xl bg-linear-to-br from-primary to-primary/70 text-sm font-black text-primary-foreground shadow-lg shadow-primary/20">
                             M
                         </div>
@@ -84,7 +87,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
                                 Storefront control center
                             </p>
                         </div>
-                    </div>
+                    </Link>
                 </SidebarHeader>
 
                 <SidebarContent>
@@ -134,7 +137,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
                                     ? {
                                           name: user.name ?? 'Guest',
                                           email: user.email ?? '',
-                                          image: user.image ?? '',
+                                          image: user.image?.trim() || null,
                                           role: role,
                                       }
                                     : null

@@ -1,10 +1,9 @@
 'use client';
 
-import { useActionState, useEffect, useState, useTransition } from 'react';
+import { useActionState, useEffect, useState, useTransition, type ComponentProps } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
-
 import {
     resendSignupOtpAction,
     submitSignIn,
@@ -17,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { accountBenefits } from '@/lib/malamal-content';
+import { useUser } from '@/context/UserContext';
 
 const initialState: SignInState = {
     ok: false,
@@ -29,46 +29,75 @@ const initialSignUpState: SignUpState = {
     email: '',
 };
 
+function LabeledInput({ id, label, ...props }: ComponentProps<typeof Input> & { id: string; label: string }) {
+    return (
+        <div className="grid gap-2">
+            <label htmlFor={id} className="text-sm font-medium">
+                {label}
+            </label>
+            <Input id={id} {...props} aria-label={label} />
+        </div>
+    );
+}
+
 function PasswordField({
+    id,
     name,
+    label,
     placeholder,
     value,
     onToggle,
     visible,
     readOnly,
+    autoComplete,
 }: {
+    id: string;
     name: string;
+    label: string;
     placeholder: string;
     value?: string;
     onToggle: () => void;
     visible: boolean;
     readOnly?: boolean;
+    autoComplete?: string;
 }) {
     return (
-        <div className="relative">
-            <Input
-                name={name}
-                placeholder={placeholder}
-                type={visible ? 'text' : 'password'}
-                value={value}
-                readOnly={readOnly}
-                required={!readOnly}
-                className="h-11 px-4 pr-12 text-sm"
-            />
-            <button
-                type="button"
-                onClick={onToggle}
-                aria-label={visible ? 'Hide password' : 'Show password'}
-                className="absolute inset-y-0 right-3 inline-flex items-center text-foreground/50 transition hover:text-foreground"
-            >
-                {visible ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-            </button>
+        <div className="grid gap-2">
+            <label htmlFor={id} className="text-sm font-medium">
+                {label}
+            </label>
+
+            <div className="relative">
+                <Input
+                    id={id}
+                    name={name}
+                    placeholder={placeholder}
+                    type={visible ? 'text' : 'password'}
+                    value={value}
+                    readOnly={readOnly}
+                    required={!readOnly}
+                    autoComplete={autoComplete}
+                    aria-label={label}
+                    className="h-11 px-4 pr-14 text-sm"
+                />
+
+                <button
+                    type="button"
+                    onClick={onToggle}
+                    aria-label={visible ? 'Hide password' : 'Show password'}
+                    title={visible ? 'Hide password' : 'Show password'}
+                    className="absolute right-1 top-1/2 z-10 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-foreground/60 transition hover:bg-muted hover:text-foreground"
+                >
+                    {visible ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                </button>
+            </div>
         </div>
     );
 }
 
 export function MyAccountAuthForm() {
     const router = useRouter();
+    const { setIsLoading } = useUser();
     const [mode, setMode] = useState<'signin' | 'signup'>('signin');
     const [showSigninPassword, setShowSigninPassword] = useState(false);
     const [showSignupPassword, setShowSignupPassword] = useState(false);
@@ -85,12 +114,13 @@ export function MyAccountAuthForm() {
 
         if (state.ok) {
             toast.success(state.message);
+            setIsLoading(true);
             router.push('/');
             return;
         }
 
         toast.error(state.message);
-    }, [router, state]);
+    }, [router, setIsLoading, state]);
 
     useEffect(() => {
         if (!signupState.message) return;
@@ -108,12 +138,13 @@ export function MyAccountAuthForm() {
 
         if (otpState.ok) {
             toast.success(otpState.message);
+            setIsLoading(true);
             router.push('/');
             return;
         }
 
         toast.error(otpState.message);
-    }, [otpState, router]);
+    }, [otpState, router, setIsLoading]);
 
     const signupEmail = otpState.email || signupState.email || '';
     const showOtpStep = signupState.ok && signupState.step === 'otp' && !otpState.ok;
@@ -145,10 +176,22 @@ export function MyAccountAuthForm() {
                 <CardContent className="mt-5 p-0">
                     {mode === 'signin' ? (
                         <form action={formAction} className="grid gap-4">
-                            <Input name="email" type="email" placeholder="Email address" required className="h-11 px-4 text-sm" />
+                            <LabeledInput
+                                id="login-email"
+                                label="Email address"
+                                name="email"
+                                type="email"
+                                placeholder="Email address"
+                                autoComplete="email"
+                                className="h-11 px-4 text-sm"
+                                required
+                            />
                             <PasswordField
+                                id="signin-password"
                                 name="password"
+                                label="Password"
                                 placeholder="Password"
+                                autoComplete="current-password"
                                 onToggle={() => setShowSigninPassword(value => !value)}
                                 visible={showSigninPassword}
                             />
@@ -162,8 +205,26 @@ export function MyAccountAuthForm() {
                         </form>
                     ) : showOtpStep ? (
                         <form action={otpAction} className="grid gap-4">
-                            <Input name="otp-email" type="email" value={signupEmail} readOnly className="h-11 px-4 text-sm" />
-                            <Input name="otp" placeholder="6 digit OTP" required className="h-11 px-4 text-sm" />
+                            <LabeledInput
+                                id="otp-email"
+                                label="Email address"
+                                name="otp-email"
+                                type="email"
+                                value={signupEmail}
+                                readOnly
+                                className="h-11 px-4 text-sm"
+                            />
+
+                            <LabeledInput
+                                id="otp-code"
+                                label="OTP code"
+                                name="otp"
+                                placeholder="6 digit OTP"
+                                required
+                                autoComplete="one-time-code"
+                                inputMode="numeric"
+                                className="h-11 px-4 text-sm"
+                            />
                             <div className="flex flex-wrap gap-3">
                                 <Button
                                     type="submit"
@@ -193,17 +254,39 @@ export function MyAccountAuthForm() {
                         </form>
                     ) : (
                         <form action={signupAction} className="grid gap-4">
-                            <Input name="signup-name" placeholder="Full name" required className="h-11 px-4 text-sm" />
-                            <Input name="signup-email" type="email" placeholder="Email address" required className="h-11 px-4 text-sm" />
+                            <LabeledInput
+                                id="signup-name"
+                                label="Full name"
+                                name="signup-name"
+                                placeholder="Full name"
+                                required
+                                className="h-11 px-4 text-sm"
+                            />
+                            <LabeledInput
+                                id="signup-email"
+                                label="Email address"
+                                name="signup-email"
+                                type="email"
+                                placeholder="Email address"
+                                autoComplete="email"
+                                className="h-11 px-4 text-sm"
+                                required
+                            />
                             <PasswordField
+                                id="signup-password"
                                 name="signup-password"
+                                label="Password"
                                 placeholder="Password"
+                                autoComplete="new-password"
                                 onToggle={() => setShowSignupPassword(value => !value)}
                                 visible={showSignupPassword}
                             />
                             <PasswordField
+                                id="signup-confirm-password"
                                 name="signup-confirm-password"
+                                label="Confirm password"
                                 placeholder="Confirm password"
+                                autoComplete="new-password"
                                 onToggle={() => setShowSignupConfirmPassword(value => !value)}
                                 visible={showSignupConfirmPassword}
                             />

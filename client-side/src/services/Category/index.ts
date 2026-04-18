@@ -6,6 +6,7 @@ import {
     getValidAccessTokenForServerActions,
     getValidAccessTokenForServerHandlerGet,
 } from '@/lib/getValidAccessToken';
+import { slugify } from '@/lib/slug';
 import type { BackendCategory } from './mappers';
 
 type BackendEnvelope<T> = {
@@ -46,6 +47,7 @@ function toFormData(payload: Record<string, unknown>) {
 
 type CategoryMutationPayload = {
     name: string;
+    slug: string;
     image?: File | string;
     description?: string;
     accent?: string;
@@ -80,11 +82,7 @@ export const createCategory = async (payload: CategoryMutationPayload): Promise<
         method: 'POST',
         body: toFormData({
             name: payload.name.trim(),
-            slug: payload.name
-                .trim()
-                .toLowerCase()
-                .replace(/[^a-z0-9]+/g, '-')
-                .replace(/^-+|-+$/g, ''),
+            slug: slugify(payload.slug ?? payload.name),
             image: payload.image,
             description: payload.description,
             accent: payload.accent,
@@ -106,6 +104,7 @@ export const updateCategory = async (
         method: 'PATCH',
         body: toFormData({
             name: payload.name.trim(),
+            slug: slugify(payload.slug ?? payload.name),
             image: payload.image,
             description: payload.description,
             accent: payload.accent,
@@ -138,7 +137,10 @@ export const createCategorySubCategory = async (
         `/category/categories/${categorySlug}/sub-categories`,
         {
             method: 'POST',
-            body: toFormData(payload),
+            body: toFormData({
+                ...payload,
+                slug: slugify(payload.slug),
+            }),
             token: accessToken ?? undefined,
         },
     );
@@ -157,7 +159,10 @@ export const updateCategorySubCategory = async (
         `/category/categories/${categorySlug}/sub-categories/${subCategorySlug}`,
         {
             method: 'PATCH',
-            body: toFormData(payload),
+            body: toFormData({
+                ...payload,
+                slug: payload.slug ? slugify(payload.slug) : payload.slug,
+            }),
             token: accessToken ?? undefined,
         },
     );

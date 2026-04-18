@@ -1,10 +1,11 @@
 'use client';
 
+import { useActionState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 import { useUser } from '@/context/UserContext';
-import { submitSignOut } from '@/app/(withNavFooter)/my-account/actions';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { submitSignOut, type SignOutState } from '@/app/(withNavFooter)/my-account/actions';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -15,32 +16,43 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { getDashboardPathByRole, getProfilePathByRole, getRoleLabel } from '@/lib/auth/roles';
+import { UserAvatar } from '@/components/UserAvatar';
 
 type UserDropdownMenuProps = {
     compact?: boolean;
     user?: {
         name: string;
         email: string;
-        image: string;
+        image?: string | null;
         role: string;
     } | null;
 };
 
-function getInitials(name?: string | null): string {
-    if (!name) return 'U';
-
-    return name
-        .split(' ')
-        .filter(Boolean)
-        .map(part => part[0])
-        .join('')
-        .slice(0, 2)
-        .toUpperCase();
-}
-
 export function UserDropdownMenu({ compact = false, user: providedUser }: UserDropdownMenuProps) {
-    const { user: contextUser } = useUser();
-    const user = providedUser ?? contextUser;
+    const router = useRouter();
+    const { user: contextUser, setIsLoading, setUser } = useUser();
+    const [logoutState, logoutAction, logoutPending] = useActionState<SignOutState, FormData>(
+        submitSignOut,
+        { ok: false, message: '' },
+    );
+
+    useEffect(() => {
+        if (!logoutState.ok) {
+            return;
+        }
+
+        setUser(null);
+        setIsLoading(true);
+        router.push('/my-account');
+    }, [logoutState, router, setIsLoading, setUser]);
+
+    const user = contextUser
+        ? {
+              ...(providedUser ?? {}),
+              ...contextUser,
+              image: contextUser.image?.trim() || providedUser?.image || null,
+          }
+        : providedUser;
 
     if (!user) {
         return (
@@ -66,10 +78,7 @@ export function UserDropdownMenu({ compact = false, user: providedUser }: UserDr
                     variant="ghost"
                     className={compact ? 'h-10 w-10 rounded-full p-0' : 'h-auto rounded-full px-2 py-1.5'}
                 >
-                    <Avatar className="size-8">
-                        <AvatarImage src={user.image} alt={user.name} />
-                        <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
-                    </Avatar>
+                    <UserAvatar name={user.name} image={user.image} className="size-8" />
                     {compact ? null : (
                         <div className="ml-2 text-left">
                             <div className="text-sm font-semibold text-foreground">{user.name}</div>
@@ -95,12 +104,13 @@ export function UserDropdownMenu({ compact = false, user: providedUser }: UserDr
                     <Link href={profilePath}>Profile</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <form action={submitSignOut} className="px-1 py-1">
+                <form action={logoutAction} className="px-1 py-1">
                     <button
                         type="submit"
-                        className="w-full rounded-md px-2 py-1.5 text-left text-xs text-destructive hover:bg-destructive/10"
+                        disabled={logoutPending}
+                        className="w-full rounded-md px-2 py-1.5 text-left text-xs text-destructive hover:bg-destructive/10 disabled:opacity-60"
                     >
-                        Logout
+                        {logoutPending ? 'Logging out...' : 'Logout'}
                     </button>
                 </form>
             </DropdownMenuContent>

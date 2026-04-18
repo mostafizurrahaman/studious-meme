@@ -18,6 +18,7 @@ import {
     updateCategory,
     updateCategorySubCategory,
 } from '@/services/Category';
+import { slugify } from '@/lib/slug';
 
 type CategoryRow = {
     name: string;
@@ -44,14 +45,19 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
     const [newName, setNewName] = useState('');
+    const [newSlug, setNewSlug] = useState('');
     const [newDescription, setNewDescription] = useState('');
+    const [newSlugAutoSync, setNewSlugAutoSync] = useState(true);
     const [editingSlug, setEditingSlug] = useState<string | null>(null);
     const [editingName, setEditingName] = useState('');
+    const [editingCategorySlug, setEditingCategorySlug] = useState('');
     const [editingDescription, setEditingDescription] = useState('');
+    const [editingSlugAutoSync, setEditingSlugAutoSync] = useState(true);
     const [expandedSlug, setExpandedSlug] = useState<string | null>(null);
     const [newSubCategory, setNewSubCategory] = useState<
         Record<string, { name: string; slug: string; description: string }>
     >({});
+    const [newSubCategorySlugAutoSync, setNewSubCategorySlugAutoSync] = useState<Record<string, boolean>>({});
     const [editingSubCategoryKey, setEditingSubCategoryKey] = useState<string | null>(null);
     const [editingSubCategory, setEditingSubCategory] = useState({
         name: '',
@@ -59,6 +65,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
         description: '',
         isActive: true,
     });
+    const [editingSubCategorySlugAutoSync, setEditingSubCategorySlugAutoSync] = useState(true);
     const [categoryImageFile, setCategoryImageFile] = useState<File | null>(null);
     const [categoryImagePreview, setCategoryImagePreview] = useState('');
     const [editingCategoryImageFile, setEditingCategoryImageFile] = useState<File | null>(null);
@@ -75,7 +82,8 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
     const editingCategoryImageInputRef = useRef<HTMLInputElement>(null);
     const editingSubCategoryImageInputRef = useRef<HTMLInputElement>(null);
 
-    const visibleCategories = useMemo(() => categories.slice(0, 24), [categories]);
+    // const visibleCategories = useMemo(() => categories.slice(0, 24), [categories]);
+    const visibleCategories = useMemo(() => categories, [categories]);
 
     useEffect(() => {
         return () => {
@@ -88,18 +96,80 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
         };
     }, [categoryImagePreview, editingCategoryImagePreview, editingSubCategoryImagePreview, subCategoryImagePreviews]);
 
-    function toSlug(value: string) {
-        return value
-            .trim()
-            .toLowerCase()
-            .replace(/[^a-z0-9\s-]/g, '')
-            .replace(/\s+/g, '-')
-            .replace(/-+/g, '-');
-    }
-
     function sliceText(value?: string, maxLength = 44) {
         if (!value) return '-';
         return value.length > maxLength ? `${value.slice(0, maxLength).trim()}…` : value;
+    }
+
+    function handleNewCategoryNameChange(value: string) {
+        setNewName(value);
+        if (newSlugAutoSync) {
+            setNewSlug(slugify(value));
+        }
+    }
+
+    function handleNewCategorySlugChange(value: string) {
+        setNewSlugAutoSync(false);
+        setNewSlug(slugify(value));
+    }
+
+    function handleEditingCategoryNameChange(value: string) {
+        setEditingName(value);
+        if (editingSlugAutoSync) {
+            setEditingCategorySlug(slugify(value));
+        }
+    }
+
+    function handleEditingCategorySlugChange(value: string) {
+        setEditingSlugAutoSync(false);
+        setEditingCategorySlug(slugify(value));
+    }
+
+    function handleNewSubCategoryNameChange(categorySlug: string, value: string) {
+        setNewSubCategory(current => {
+            const existing = current[categorySlug] ?? { name: '', slug: '', description: '' };
+            const shouldSync = newSubCategorySlugAutoSync[categorySlug] ?? true;
+
+            return {
+                ...current,
+                [categorySlug]: {
+                    ...existing,
+                    name: value,
+                    slug: shouldSync ? slugify(value) : existing.slug,
+                },
+            };
+        });
+    }
+
+    function handleNewSubCategorySlugChange(categorySlug: string, value: string) {
+        setNewSubCategorySlugAutoSync(current => ({ ...current, [categorySlug]: false }));
+        setNewSubCategory(current => {
+            const existing = current[categorySlug] ?? { name: '', slug: '', description: '' };
+
+            return {
+                ...current,
+                [categorySlug]: {
+                    ...existing,
+                    slug: slugify(value),
+                },
+            };
+        });
+    }
+
+    function handleEditingSubCategoryNameChange(value: string) {
+        setEditingSubCategory(current => ({
+            ...current,
+            name: value,
+            slug: editingSubCategorySlugAutoSync ? slugify(value) : current.slug,
+        }));
+    }
+
+    function handleEditingSubCategorySlugChange(value: string) {
+        setEditingSubCategorySlugAutoSync(false);
+        setEditingSubCategory(current => ({
+            ...current,
+            slug: slugify(value),
+        }));
     }
 
     function handleCategoryImageSelect(file?: File) {
@@ -152,6 +222,11 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
             return;
         }
 
+        if (!newSlug.trim()) {
+            toast.error('Category slug is required.');
+            return;
+        }
+
         if (!categoryImageFile) {
             toast.error('Category image is required.');
             return;
@@ -160,6 +235,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
         startTransition(async () => {
             const result = await createCategory({
                 name: newName.trim(),
+                slug: newSlug.trim(),
                 image: categoryImageFile,
                 description: newDescription.trim(),
             });
@@ -170,9 +246,11 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
             }
 
             setNewName('');
+            setNewSlug('');
             setNewDescription('');
             setCategoryImageFile(null);
             setCategoryImagePreview('');
+            setNewSlugAutoSync(true);
             refreshWithToast(result.message ?? 'Category created successfully.', 'success');
         });
     }
@@ -196,7 +274,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
     }
 
     function handleUpdate(slug?: string) {
-        if (!slug || !editingName.trim()) {
+        if (!slug || !editingName.trim() || !editingCategorySlug.trim()) {
             toast.error('A category slug and name are required to update this item.');
             return;
         }
@@ -204,6 +282,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
         startTransition(async () => {
             const result = await updateCategory(slug, {
                 name: editingName.trim(),
+                slug: editingCategorySlug.trim(),
                 description: editingDescription.trim(),
                 image: editingCategoryImageFile ?? undefined,
             });
@@ -215,9 +294,11 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
 
             setEditingSlug(null);
             setEditingName('');
+            setEditingCategorySlug('');
             setEditingDescription('');
             setEditingCategoryImageFile(null);
             setEditingCategoryImagePreview('');
+            setEditingSlugAutoSync(true);
             refreshWithToast(result.message ?? 'Category updated successfully.', 'success');
         });
     }
@@ -252,6 +333,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                 ...current,
                 [categorySlug]: { name: '', slug: '', description: '' },
             }));
+            setNewSubCategorySlugAutoSync(current => ({ ...current, [categorySlug]: true }));
             setSubCategoryImageFiles(current => ({ ...current, [categorySlug]: null }));
             setSubCategoryImagePreviews(current => ({ ...current, [categorySlug]: '' }));
             refreshWithToast(result.message ?? 'Sub-category created successfully.', 'success');
@@ -286,6 +368,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
             setEditingSubCategoryKey(null);
             setEditingSubCategoryImageFile(null);
             setEditingSubCategoryImagePreview('');
+            setEditingSubCategorySlugAutoSync(true);
             refreshWithToast(result.message ?? 'Sub-category updated successfully.', 'success');
         });
     }
@@ -316,11 +399,16 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                         here.
                     </CardDescription>
                 </CardHeader>
-                <CardContent className="grid gap-3 lg:grid-cols-[1fr_1fr] xl:grid-cols-[1fr_1fr_1.2fr_auto]">
+                <CardContent className="grid gap-3 lg:grid-cols-[1fr_1fr_1fr] xl:grid-cols-[1fr_1fr_1fr_1.2fr_auto]">
                     <DashboardInput
                         value={newName}
-                        onChange={event => setNewName(event.target.value)}
+                        onChange={event => handleNewCategoryNameChange(event.target.value)}
                         placeholder="Create a new category"
+                    />
+                    <DashboardInput
+                        value={newSlug}
+                        onChange={event => handleNewCategorySlugChange(event.target.value)}
+                        placeholder="Category slug"
                     />
                     <DashboardInput
                         value={newDescription}
@@ -503,15 +591,29 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                                     {isEditing ? (
                                                         <DashboardInput
                                                             value={editingName}
-                                                            onChange={event => setEditingName(event.target.value)}
+                                                            onChange={event =>
+                                                                handleEditingCategoryNameChange(event.target.value)
+                                                            }
                                                         />
                                                     ) : (
                                                         category.name
                                                     )}
                                                 </div>
                                             </TableCell>
-                                            <TableCell>{category.slug ?? '-'}</TableCell>
-                                            <TableCell className="max-w-[240px] text-sm text-muted-foreground">
+                                            <TableCell>
+                                                {isEditing ? (
+                                                    <DashboardInput
+                                                        value={editingCategorySlug}
+                                                        onChange={event =>
+                                                            handleEditingCategorySlugChange(event.target.value)
+                                                        }
+                                                        placeholder="Category slug"
+                                                    />
+                                                ) : (
+                                                    category.slug ?? '-'
+                                                )}
+                                            </TableCell>
+                                            <TableCell className="max-w-60 text-sm text-muted-foreground">
                                                 {isEditing ? (
                                                     <DashboardInput
                                                         value={editingDescription}
@@ -550,14 +652,34 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                                         onClick={() => {
                                                                 setEditingSlug(category.slug ?? null);
                                                                 setEditingName(category.name);
+                                                                setEditingCategorySlug(category.slug ?? '');
                                                                 setEditingDescription(category.description ?? '');
                                                                 setEditingCategoryImageFile(null);
                                                                 setEditingCategoryImagePreview(category.image ?? '');
+                                                                setEditingSlugAutoSync(true);
                                                             }}
                                                         >
                                                             <Pencil className="size-4" />
                                                         </Button>
                                                     )}
+                                                    {isEditing ? (
+                                                        <Button
+                                                            type="button"
+                                                            size="sm"
+                                                            variant="outline"
+                                                            onClick={() => {
+                                                                setEditingSlug(null);
+                                                                setEditingName('');
+                                                                setEditingCategorySlug('');
+                                                                setEditingDescription('');
+                                                                setEditingCategoryImageFile(null);
+                                                                setEditingCategoryImagePreview('');
+                                                                setEditingSlugAutoSync(true);
+                                                            }}
+                                                        >
+                                                            Cancel
+                                                        </Button>
+                                                    ) : null}
                                                     <Button
                                                         type="button"
                                                         size="sm"
@@ -572,7 +694,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                         </TableRow>
                                         {expandedSlug === category.slug ? (
                                             <TableRow>
-                                                <TableCell colSpan={6}>
+                                                <TableCell colSpan={7}>
                                                     <div className="space-y-4 rounded-xl border bg-muted/20 p-4">
                                                         <div className="grid gap-3 md:grid-cols-[1fr_1fr_1fr_auto]">
                                                             <DashboardInput
@@ -582,24 +704,10 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                                                         ?.name ?? ''
                                                                 }
                                                                 onChange={event =>
-                                                                    setNewSubCategory(current => {
-                                                                        const name = event.target.value;
-
-                                                                        return {
-                                                                            ...current,
-                                                                            [category.slug ?? '']: {
-                                                                                ...(current[
-                                                                                    category.slug ?? ''
-                                                                                ] ?? {
-                                                                                    name: '',
-                                                                                    slug: '',
-                                                                                    description: '',
-                                                                                }),
-                                                                                name,
-                                                                                slug: toSlug(name),
-                                                                            },
-                                                                        };
-                                                                    })
+                                                                    handleNewSubCategoryNameChange(
+                                                                        category.slug ?? '',
+                                                                        event.target.value,
+                                                                    )
                                                                 }
                                                             />
                                                             <DashboardInput
@@ -609,19 +717,10 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                                                         ?.slug ?? ''
                                                                 }
                                                                 onChange={event =>
-                                                                    setNewSubCategory(current => ({
-                                                                        ...current,
-                                                                        [category.slug ?? '']: {
-                                                                            ...(current[
-                                                                                category.slug ?? ''
-                                                                             ] ?? {
-                                                                                 name: '',
-                                                                                 slug: '',
-                                                                                 description: '',
-                                                                             }),
-                                                                            slug: toSlug(event.target.value),
-                                                                        },
-                                                                    }))
+                                                                    handleNewSubCategorySlugChange(
+                                                                        category.slug ?? '',
+                                                                        event.target.value,
+                                                                    )
                                                                 }
                                                             />
                                                             <DashboardInput
@@ -740,13 +839,8 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                                                                                     editingSubCategory.name
                                                                                                 }
                                                                                                 onChange={event =>
-                                                                                                    setEditingSubCategory(
-                                                                                                        current => ({
-                                                                                                            ...current,
-                                                                                                            name: event
-                                                                                                                .target
-                                                                                                                .value,
-                                                                                                        }),
+                                                                                                    handleEditingSubCategoryNameChange(
+                                                                                                        event.target.value,
                                                                                                     )
                                                                                                 }
                                                                                             />
@@ -755,13 +849,8 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                                                                                     editingSubCategory.slug
                                                                                                 }
                                                                                                 onChange={event =>
-                                                                                                    setEditingSubCategory(
-                                                                                                        current => ({
-                                                                                                            ...current,
-                                                                                                            slug: event
-                                                                                                                .target
-                                                                                                                .value,
-                                                                                                        }),
+                                                                                                    handleEditingSubCategorySlugChange(
+                                                                                                        event.target.value,
                                                                                                     )
                                                                                                 }
                                                                                             />
@@ -933,6 +1022,9 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                                                                                         setEditingSubCategoryKey(null);
                                                                                                         setEditingSubCategoryImageFile(null);
                                                                                                         setEditingSubCategoryImagePreview('');
+                                                                                                        setEditingSubCategorySlugAutoSync(
+                                                                                                            true,
+                                                                                                        );
                                                                                                     }
                                                                                                 }
                                                                                             >
@@ -951,20 +1043,21 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                                                                                     setEditingSubCategoryKey(
                                                                                                         subCategoryKey,
                                                                                                     );
-                                                                                            setEditingSubCategory(
-                                                                                                {
-                                                                                                    name: subCategory.name,
-                                                                                                    slug: subCategory.slug,
-                                                                                                    description:
-                                                                                                        subCategory.description ?? '',
-                                                                                                    isActive:
-                                                                                                        subCategory.isActive !==
-                                                                                                        false,
-                                                                                                },
-                                                                                            );
+                                                                                            setEditingSubCategory({
+                                                                                                name: subCategory.name,
+                                                                                                slug: subCategory.slug,
+                                                                                                description:
+                                                                                                    subCategory.description ?? '',
+                                                                                                isActive:
+                                                                                                    subCategory.isActive !==
+                                                                                                    false,
+                                                                                            });
                                                                                                 setEditingSubCategoryImageFile(null);
                                                                                                 setEditingSubCategoryImagePreview(
                                                                                                     subCategory.image ?? '',
+                                                                                                );
+                                                                                                setEditingSubCategorySlugAutoSync(
+                                                                                                    true,
                                                                                                 );
                                                                                         }}
                                                                                             >

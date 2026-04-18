@@ -18,7 +18,7 @@ export default async function SuperAdminProfilePage() {
     return (
         <RoleProfilePage
             role={user.role}
-            user={{ name: user.name, email: user.email, phone: user.phone, dob: user.dob }}
+            user={{ name: user.name, email: user.email, phone: user.phone, dob: user.dob, image: user.image }}
         />
     );
 }

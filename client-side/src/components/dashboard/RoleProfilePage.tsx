@@ -1,12 +1,12 @@
 import Link from 'next/link';
 
+import { UserAvatar } from '@/components/UserAvatar';
 import { ProfileSettingsForm } from '@/components/ProfileSettingsForm';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 import { getDashboardRoleConfig } from '@/lib/dashboard-navigation';
 import { getDashboardPathByRole } from '@/lib/auth/roles';
-import { fetchProfile } from '@/services/Auth';
 import type { AuthRole } from '@/types';
 
 export async function RoleProfilePage({
@@ -14,12 +14,11 @@ export async function RoleProfilePage({
     user,
 }: {
     role: AuthRole;
-    user: { name: string; email: string; phone?: string; dob?: string };
+    user: { name: string; email: string; phone?: string; dob?: string; image?: string };
 }) {
     const config = getDashboardRoleConfig(role);
     const dashboardPath = getDashboardPathByRole(role) ?? '/dashboard';
-    const profileResult = await fetchProfile().catch(() => null);
-    const profile = profileResult?.data ?? user;
+    const profile = user;
 
     return (
         <section className="space-y-6">
@@ -31,6 +30,14 @@ export async function RoleProfilePage({
                     <CardTitle className="text-3xl">{config.title} profile</CardTitle>
                     <CardDescription>{config.description}</CardDescription>
                 </CardHeader>
+                <CardContent className="grid gap-4 sm:grid-cols-[auto_1fr] sm:items-center">
+                    <UserAvatar name={profile.name} image={profile.image} className="size-16" />
+                    <div className="space-y-1 text-sm text-muted-foreground">
+                        <div className="font-semibold text-foreground">{profile.name}</div>
+                        <div>{profile.email}</div>
+                        <div>{role}</div>
+                    </div>
+                </CardContent>
                 <CardContent className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                     <Button asChild className="justify-start text-white!">
                         <Link href={dashboardPath}>Back to dashboard</Link>
@@ -42,7 +49,14 @@ export async function RoleProfilePage({
             </Card>
 
             <ProfileSettingsForm
-                profile={{ name: profile.name, email: profile.email, phone: profile.phone, dob: profile.dob }}
+                key={`${profile.name}-${profile.email}-${profile.phone ?? ''}-${profile.dob ?? ''}-${profile.image ?? ''}`}
+                profile={{
+                    name: profile.name,
+                    email: profile.email,
+                    phone: profile.phone,
+                    dob: profile.dob,
+                    image: profile.image,
+                }}
             />
 
             <Card className="shadow-sm">

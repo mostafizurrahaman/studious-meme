@@ -4,6 +4,7 @@ import { updateTag } from 'next/cache';
 import { requestBackendJson } from '@/lib/backend-api';
 import { getValidAccessTokenForServerActions } from '@/lib/getValidAccessToken';
 import type { Brand as StorefrontBrand } from '@/lib/malamal-content';
+import { slugify } from '@/lib/slug';
 
 type BackendEnvelope<T> = {
     success?: boolean;
@@ -66,10 +67,13 @@ function toFormData(payload: Record<string, unknown>) {
 
 export const createBrand = async (payload: BrandMutationPayload): Promise<BackendEnvelope<BackendBrand>> => {
     const accessToken = await getValidAccessTokenForServerActions();
-    
+
     const result = await requestBackendJson<BackendEnvelope<BackendBrand>>('/brand/brands', {
         method: 'POST',
-        body: toFormData(payload),
+        body: toFormData({
+            ...payload,
+            slug: slugify(payload.slug),
+        }),
         token: accessToken ?? undefined,
     });
 
@@ -84,7 +88,10 @@ export const updateBrand = async (
     const accessToken = await getValidAccessTokenForServerActions();
     const result = await requestBackendJson<BackendEnvelope<BackendBrand>>(`/brand/brands/${slug}`, {
         method: 'PATCH',
-        body: toFormData(payload),
+        body: toFormData({
+            ...payload,
+            slug: payload.slug ? slugify(payload.slug) : payload.slug,
+        }),
         token: accessToken ?? undefined,
     });
 

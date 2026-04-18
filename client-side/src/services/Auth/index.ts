@@ -125,24 +125,37 @@ export const sendSignupOtpAgain = async (userEmail: string): Promise<BackendEnve
 export const updateProfilePhoto = async (data: FormData): Promise<BackendEnvelope<AuthTokens>> => {
     const accessToken = await getValidAccessTokenForServerActions();
 
-    return requestBackendJson<BackendEnvelope<AuthTokens>>('/user/update-profile-photo', {
+    const result = await requestBackendJson<BackendEnvelope<AuthTokens>>('/user/update-profile-photo', {
         method: 'PUT',
         body: data,
         token: accessToken ?? undefined,
     });
+
+    if (result?.success && result.data?.accessToken) {
+        await setAuthCookies(result.data);
+    }
+
+    return result;
 };
 
 // updateProfileData
 export const updateProfileData = async (data: FieldValues): Promise<BackendEnvelope<AuthTokens>> => {
     const accessToken = await getValidAccessTokenForServerActions();
 
-    return requestBackendJson<BackendEnvelope<AuthTokens>>('/user/update-profile-data', {
+    const result = await requestBackendJson<BackendEnvelope<AuthTokens>>('/user/update-profile-data', {
         method: 'PATCH',
         body: data as Record<string, unknown>,
         token: accessToken ?? undefined,
     });
+
+    if (result?.success && result.data?.accessToken) {
+        await setAuthCookies(result.data);
+    }
+
+    return result;
 };
 
+/*
 export const fetchProfile = async (): Promise<BackendEnvelope<AuthUser>> => {
     const accessToken = await getValidAccessTokenForServerActions();
     return requestBackendJson<BackendEnvelope<AuthUser>>('/user/profile', {
@@ -150,6 +163,7 @@ export const fetchProfile = async (): Promise<BackendEnvelope<AuthUser>> => {
         token: accessToken ?? undefined,
     });
 };
+*/
 
 // changePassword
 export const changePassword = async (data: {

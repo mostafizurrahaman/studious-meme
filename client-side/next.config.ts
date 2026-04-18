@@ -24,6 +24,14 @@ const nextConfig: NextConfig = {
             },
         ],
     },
+    experimental: {
+        serverActions: {
+            bodySizeLimit: '5mb', // Set this to 2mb, 5mb, etc.
+        },
+    },
+    // typescript: {
+    //     ignoreBuildErrors: true,
+    // },
 };
 
 export default nextConfig;

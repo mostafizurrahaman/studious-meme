@@ -1,7 +1,6 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 
 import { logOut, sendSignupOtpAgain, signInUser, signUpUser, verifySignupOtp } from '@/services/Auth';
 
@@ -38,11 +37,20 @@ export async function submitSignIn(_prevState: SignInState, formData: FormData):
     };
 }
 
-export async function submitSignOut() {
+export type SignOutState = { ok: false; message: string } | { ok: true; message: string };
+
+export async function submitSignOut(prevState: SignOutState, formData?: FormData): Promise<SignOutState> {
+    void prevState;
+    void formData;
+
     await logOut();
     revalidatePath('/my-account');
     revalidatePath('/dashboard');
-    redirect('/my-account');
+
+    return {
+        ok: true,
+        message: 'Signed out successfully.',
+    };
 }
 
 export async function submitSignUp(_prevState: SignUpState, formData: FormData): Promise<SignUpState> {

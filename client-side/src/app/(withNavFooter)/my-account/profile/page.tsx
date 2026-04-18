@@ -3,6 +3,7 @@ import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { UserAvatar } from '@/components/UserAvatar';
 import { getCurrentUser } from '@/services/Auth';
 import { ProfileSettingsForm } from '@/components/ProfileSettingsForm';
 import { buildMetadata } from '@/lib/seo';
@@ -52,7 +53,13 @@ export default async function ProfilePage({}: Props) {
 
                 <section className="mt-6 grid gap-6 lg:grid-cols-2">
                     <Card className="p-6 shadow-sm">
-                        <h2 className="text-xl font-bold text-secondary">Account Details</h2>
+                        <div className="flex items-center gap-4">
+                            <UserAvatar name={user.name} image={user.image} className="size-16" />
+                            <div>
+                                <h2 className="text-xl font-bold text-secondary">Account Details</h2>
+                                <p className="text-sm text-foreground/65">Your current profile information.</p>
+                            </div>
+                        </div>
                         <div className="mt-4 space-y-3 text-sm">
                             <div className="rounded-lg bg-muted p-3">
                                 <div className="text-xs uppercase tracking-wider text-muted-foreground">
@@ -85,11 +92,13 @@ export default async function ProfilePage({}: Props) {
 
                     <Card className="p-6 shadow-sm">
                         <ProfileSettingsForm
+                            key={`${user.name}-${user.email}-${user.phone ?? ''}-${user.dob ?? ''}-${user.image ?? ''}`}
                             profile={{
                                 name: user.name,
                                 phone: user.phone ?? '',
                                 dob: user.dob ?? '',
                                 email: user.email,
+                                image: user.image,
                             }}
                         />
                     </Card>

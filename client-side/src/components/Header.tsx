@@ -94,7 +94,8 @@ export function Header() {
                                         width={160}
                                         height={32}
                                         priority
-                                        className="h-auto w-32"
+                                        className="w-32"
+                                        style={{ height: 'auto' }}
                                     />
                                 </Link>
                                 <UserDropdownMenu compact />
@@ -187,7 +188,8 @@ export function Header() {
                             width={182}
                             height={36}
                             priority
-                            className="h-auto w-36 sm:w-45.5"
+                            className="w-36 sm:w-45.5"
+                            style={{ height: 'auto' }}
                         />
                     </Link>
 

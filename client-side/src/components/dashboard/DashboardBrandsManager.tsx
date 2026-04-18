@@ -13,20 +13,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { TableFilter } from '@/components/ui/table-filter';
 import { TablePagination } from '@/components/ui/table-pagination';
 import { createBrand, deleteBrand, type BackendBrand, updateBrand } from '@/services/Brand';
+import { slugify } from '@/lib/slug';
 const initialForm = { name: '', slug: '', image: '', description: '', isActive: true };
-
-// function EmptyCard() {
-//     return { name: '', slug: '', image: '', description: '', isActive: true };
-// }
-
-function slugify(value: string) {
-    return value
-        .trim()
-        .toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-');
-}
 
 function sliceText(value?: string, maxLength = 44) {
     if (!value) return '-';
@@ -39,11 +27,13 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
     const [form, setForm] = useState(initialForm);
     const [brandImageFile, setBrandImageFile] = useState<File | null>(null);
     const [brandImagePreview, setBrandImagePreview] = useState('');
+    const [brandSlugSynced, setBrandSlugSynced] = useState(true);
     const [isDragging, setIsDragging] = useState(false);
     const [editingSlug, setEditingSlug] = useState<string | null>(null);
     const [editingForm, setEditingForm] = useState(initialForm);
     const [editingBrandImageFile, setEditingBrandImageFile] = useState<File | null>(null);
     const [editingBrandImagePreview, setEditingBrandImagePreview] = useState('');
+    const [editingBrandSlugSynced, setEditingBrandSlugSynced] = useState(true);
     const [isEditingDragging, setIsEditingDragging] = useState(false);
     // Filter state
     const [search, setSearch] = useState('');
@@ -83,7 +73,31 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
         setForm(current => ({
             ...current,
             name,
-            slug: slugify(name),
+            slug: brandSlugSynced ? slugify(name) : current.slug,
+        }));
+    }
+
+    function handleBrandSlugChange(value: string) {
+        setBrandSlugSynced(false);
+        setForm(current => ({
+            ...current,
+            slug: slugify(value),
+        }));
+    }
+
+    function handleEditingBrandNameChange(name: string) {
+        setEditingForm(current => ({
+            ...current,
+            name,
+            slug: editingBrandSlugSynced ? slugify(name) : current.slug,
+        }));
+    }
+
+    function handleEditingBrandSlugChange(value: string) {
+        setEditingBrandSlugSynced(false);
+        setEditingForm(current => ({
+            ...current,
+            slug: slugify(value),
         }));
     }
 
@@ -134,7 +148,11 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
                         value={form.name}
                         onChange={e => handleBrandNameChange(e.target.value)}
                     />
-                    <DashboardInput placeholder="Slug" value={form.slug} readOnly />
+                    <DashboardInput
+                        placeholder="Slug"
+                        value={form.slug}
+                        onChange={e => handleBrandSlugChange(e.target.value)}
+                    />
                     <div className="space-y-2 xl:col-span-2">
                         <div
                             role="button"
@@ -223,10 +241,10 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
                                     }
 
                                     const result = await createBrand({
-                                        name: form.name,
-                                        slug: form.slug,
+                                        name: form.name.trim(),
+                                        slug: form.slug.trim(),
                                         image: brandImageFile,
-                                        description: form.description,
+                                        description: form.description.trim(),
                                         isActive: form.isActive,
                                     });
 
@@ -236,6 +254,7 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
                                     setForm(initialForm);
                                     setBrandImageFile(null);
                                     setBrandImagePreview('');
+                                    setBrandSlugSynced(true);
 
                                     refresh(result.message ?? 'Brand created successfully.', 'success');
                                 })
@@ -352,14 +371,9 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
                                         </TableCell>
                                         <TableCell className="font-medium">
                                             {isEditing ? (
-                                                <DashboardInput
+                                                    <DashboardInput
                                                     value={editingForm.name}
-                                                    onChange={e =>
-                                                        setEditingForm({
-                                                            ...editingForm,
-                                                            name: e.target.value,
-                                                        })
-                                                    }
+                                                    onChange={e => handleEditingBrandNameChange(e.target.value)}
                                                 />
                                             ) : (
                                                 brand.name
@@ -369,12 +383,7 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
                                             {isEditing ? (
                                                 <DashboardInput
                                                     value={editingForm.slug}
-                                                    onChange={e =>
-                                                        setEditingForm({
-                                                            ...editingForm,
-                                                            slug: e.target.value,
-                                                        })
-                                                    }
+                                                    onChange={e => handleEditingBrandSlugChange(e.target.value)}
                                                 />
                                             ) : (
                                                 brand.slug
@@ -429,13 +438,13 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
                                                                     const result = await updateBrand(
                                                                         brand.slug,
                                                                         {
-                                                                            name: editingForm.name,
-                                                                            slug: editingForm.slug,
+                                                                            name: editingForm.name.trim(),
+                                                                            slug: editingForm.slug.trim(),
                                                                             image:
                                                                                 editingBrandImageFile ??
                                                                                 undefined,
                                                                             description:
-                                                                                editingForm.description,
+                                                                                editingForm.description.trim(),
                                                                             isActive: editingForm.isActive,
                                                                         },
                                                                     );
@@ -448,6 +457,7 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
                                                                     setEditingSlug(null);
                                                                     setEditingBrandImageFile(null);
                                                                     setEditingBrandImagePreview('');
+                                                                    setEditingBrandSlugSynced(true);
                                                                     refresh(
                                                                         result.message ??
                                                                             'Brand updated successfully.',
@@ -465,6 +475,7 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
                                                                 setEditingSlug(null);
                                                                 setEditingBrandImageFile(null);
                                                                 setEditingBrandImagePreview('');
+                                                                setEditingBrandSlugSynced(true);
                                                             }}
                                                         >
                                                             Cancel
@@ -488,6 +499,7 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
                                                                 setEditingBrandImagePreview(
                                                                     brand.image ?? '',
                                                                 );
+                                                                setEditingBrandSlugSynced(true);
                                                             }}
                                                         >
                                                             <Pencil className="size-4" />
