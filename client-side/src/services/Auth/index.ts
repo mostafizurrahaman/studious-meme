@@ -1,12 +1,11 @@
 'use server';
 
 import { cookies } from 'next/headers';
-import { jwtDecode } from 'jwt-decode';
 import type { FieldValues } from 'react-hook-form';
-
 import { requestBackendJson } from '@/lib/backend-api';
 import { getValidAccessTokenForServerActions } from '@/lib/getValidAccessToken';
 import type { AuthUser } from '@/types';
+import { getAuthUserFromCookies } from '@/lib/auth/server';
 
 type BackendEnvelope<T> = {
     success?: boolean;
@@ -153,7 +152,10 @@ export const fetchProfile = async (): Promise<BackendEnvelope<AuthUser>> => {
 };
 
 // changePassword
-export const changePassword = async (data: { oldPassword: string; newPassword: string }): Promise<BackendEnvelope<AuthTokens>> => {
+export const changePassword = async (data: {
+    oldPassword: string;
+    newPassword: string;
+}): Promise<BackendEnvelope<AuthTokens>> => {
     const accessToken = await getValidAccessTokenForServerActions();
 
     const result = await requestBackendJson<BackendEnvelope<AuthTokens>>('/user/change-password', {
@@ -195,14 +197,19 @@ export const sendForgotPasswordOtpAgain = async (): Promise<BackendEnvelope<unkn
 };
 
 // verifyOtpForForgotPassword
-export const verifyOtpForForgotPassword = async (otp: string): Promise<BackendEnvelope<ResetPasswordToken>> => {
+export const verifyOtpForForgotPassword = async (
+    otp: string,
+): Promise<BackendEnvelope<ResetPasswordToken>> => {
     const cookieStore = await getCookieStore();
     const token = cookieStore.get('forgotPassToken')?.value;
 
-    const result = await requestBackendJson<BackendEnvelope<ResetPasswordToken>>('/user/verify-forgot-password-otp', {
-        method: 'POST',
-        body: { token, otp },
-    });
+    const result = await requestBackendJson<BackendEnvelope<ResetPasswordToken>>(
+        '/user/verify-forgot-password-otp',
+        {
+            method: 'POST',
+            body: { token, otp },
+        },
+    );
 
     if (result?.success && result.data?.resetPasswordToken) {
         cookieStore.set('resetPasswordToken', result.data.resetPasswordToken, {
@@ -234,45 +241,9 @@ export const setNewPasswordIntoDB = async (newPassword: string): Promise<Backend
     return result;
 };
 
-function toAuthUser(payload: Record<string, unknown>): AuthUser | null {
-    const id = typeof payload._id === 'string' ? payload._id : typeof payload.id === 'string' ? payload.id : null;
-    const name = typeof payload.name === 'string' ? payload.name : null;
-    const email = typeof payload.email === 'string' ? payload.email : null;
-    const image = typeof payload.image === 'string' ? payload.image : '';
-    const role = typeof payload.role === 'string' ? payload.role : null;
-    const phone = typeof payload.phone === 'string' ? payload.phone : undefined;
-    const dob = typeof payload.dob === 'string' ? payload.dob : undefined;
-
-    if (!id || !name || !email || !role) {
-        return null;
-    }
-
-    return {
-        _id: id,
-        name,
-        email,
-        image,
-        role,
-        phone,
-        dob,
-    };
-}
-
 // getCurrentUser
 export const getCurrentUser = async (): Promise<AuthUser | null> => {
-    const cookieStore = await getCookieStore();
-    const accessToken = cookieStore.get('accessToken')?.value;
-
-    if (!accessToken) {
-        return null;
-    }
-
-    try {
-        const decoded = jwtDecode<Record<string, unknown>>(accessToken);
-        return toAuthUser(decoded);
-    } catch {
-        return null;
-    }
+    return getAuthUserFromCookies();
 };
 
 // logOut

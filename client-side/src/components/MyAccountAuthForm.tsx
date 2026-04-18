@@ -81,10 +81,24 @@ export function MyAccountAuthForm() {
             <Card className="p-6 shadow-sm">
                 <CardHeader className="p-0">
                     <div className="flex gap-2">
-                        <Button type="button" variant={mode === 'signin' ? 'default' : 'outline'} onClick={() => setMode('signin')}>Login</Button>
-                        <Button type="button" variant={mode === 'signup' ? 'default' : 'outline'} onClick={() => setMode('signup')}>Sign up</Button>
+                        <Button
+                            type="button"
+                            variant={mode === 'signin' ? 'default' : 'outline'}
+                            onClick={() => setMode('signin')}
+                        >
+                            Login
+                        </Button>
+                        <Button
+                            type="button"
+                            variant={mode === 'signup' ? 'default' : 'outline'}
+                            onClick={() => setMode('signup')}
+                        >
+                            Sign up
+                        </Button>
                     </div>
-                    <h2 className="mt-4 text-2xl font-black text-secondary">{mode === 'signin' ? 'Login' : showOtpStep ? 'Verify OTP' : 'Create account'}</h2>
+                    <h2 className="mt-4 text-2xl font-black text-secondary">
+                        {mode === 'signin' ? 'Login' : showOtpStep ? 'Verify OTP' : 'Create account'}
+                    </h2>
                 </CardHeader>
                 <CardContent className="mt-5 p-0">
                     {mode === 'signin' ? (
@@ -104,7 +118,11 @@ export function MyAccountAuthForm() {
                             <Input name="otp-email" type="email" value={signupEmail} readOnly />
                             <Input name="otp" placeholder="6 digit OTP" required />
                             <div className="flex flex-wrap gap-3">
-                                <Button type="submit" disabled={otpPending} className="h-11 rounded-full px-6 text-sm font-bold shadow-sm">
+                                <Button
+                                    type="submit"
+                                    disabled={otpPending}
+                                    className="h-11 rounded-full px-6 text-sm font-bold shadow-sm"
+                                >
                                     {otpPending ? 'Verifying...' : 'Verify OTP'}
                                 </Button>
                                 <Button
@@ -131,7 +149,12 @@ export function MyAccountAuthForm() {
                             <Input name="signup-name" placeholder="Full name" required />
                             <Input name="signup-email" type="email" placeholder="Email address" required />
                             <Input name="signup-password" placeholder="Password" type="password" required />
-                            <Input name="signup-confirm-password" placeholder="Confirm password" type="password" required />
+                            <Input
+                                name="signup-confirm-password"
+                                placeholder="Confirm password"
+                                type="password"
+                                required
+                            />
                             <Button
                                 type="submit"
                                 disabled={signupPending}

@@ -4,7 +4,6 @@ import { useMemo, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
-
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -67,8 +66,10 @@ export function DashboardProductsManager({ products, brandOptions, categoryOptio
         return filteredData.slice(start, start + limit);
     }, [filteredData, page, limit]);
 
-    // Reset page when search changes
-    useMemo(() => { setPage(1); }, [search]);
+    const handleSearchChange = (value: string) => {
+        setSearch(value);
+        setPage(1);
+    };
 
     function refresh(message: string, type: 'success' | 'error') {
         if (type === 'success') {
@@ -124,7 +125,7 @@ export function DashboardProductsManager({ products, brandOptions, categoryOptio
                         <CardTitle>Products</CardTitle>
                         <CardDescription>{filteredData.length} of {products.length} items</CardDescription>
                     </div>
-                    <TableFilter value={search} onChange={setSearch} placeholder="Search products..." />
+                    <TableFilter value={search} onChange={handleSearchChange} placeholder="Search products..." />
                 </CardHeader>
                 <CardContent>
                     <Table>

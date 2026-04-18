@@ -1,0 +1,67 @@
+import Link from 'next/link';
+
+import { ProfileSettingsForm } from '@/components/ProfileSettingsForm';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
+import { getDashboardRoleConfig } from '@/lib/dashboard-navigation';
+import { getDashboardPathByRole } from '@/lib/auth/roles';
+import { fetchProfile } from '@/services/Auth';
+import type { AuthRole } from '@/types';
+
+export async function RoleProfilePage({
+    role,
+    user,
+}: {
+    role: AuthRole;
+    user: { name: string; email: string; phone?: string; dob?: string };
+}) {
+    const config = getDashboardRoleConfig(role);
+    const dashboardPath = getDashboardPathByRole(role) ?? '/dashboard';
+    const profileResult = await fetchProfile().catch(() => null);
+    const profile = profileResult?.data ?? user;
+
+    return (
+        <section className="space-y-6">
+            <Card className="shadow-sm">
+                <CardHeader>
+                    <p className="text-xs font-semibold uppercase tracking-[0.28em] text-primary">
+                        {config.eyebrow}
+                    </p>
+                    <CardTitle className="text-3xl">{config.title} profile</CardTitle>
+                    <CardDescription>{config.description}</CardDescription>
+                </CardHeader>
+                <CardContent className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                    <Button asChild className="justify-start">
+                        <Link href={dashboardPath}>Back to dashboard</Link>
+                    </Button>
+                    <Button asChild variant="outline" className="justify-start">
+                        <Link href="/shop">Continue shopping</Link>
+                    </Button>
+                </CardContent>
+            </Card>
+
+            <ProfileSettingsForm
+                profile={{ name: profile.name, email: profile.email, phone: profile.phone, dob: profile.dob }}
+            />
+
+            <Card className="shadow-sm">
+                <CardHeader>
+                    <CardTitle>Access summary</CardTitle>
+                    <CardDescription>Current authenticated dashboard user.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3 text-sm">
+                    <div>
+                        <span className="font-semibold">Name:</span> {user.name}
+                    </div>
+                    <div>
+                        <span className="font-semibold">Email:</span> {user.email}
+                    </div>
+                    <div>
+                        <span className="font-semibold">Role:</span> {role}
+                    </div>
+                </CardContent>
+            </Card>
+        </section>
+    );
+}

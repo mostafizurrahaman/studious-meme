@@ -25,10 +25,7 @@ export function TablePagination({ page, limit, total, onPageChange, onLimitChang
                 </span>
                 {onLimitChange && (
                     <div className="h-8 w-20">
-                        <Select
-                            value={String(limit)}
-                            onValueChange={value => onLimitChange(Number(value))}
-                        >
+                        <Select value={String(limit)} onValueChange={value => onLimitChange(Number(value))}>
                             <option value="10">10</option>
                             <option value="25">25</option>
                             <option value="50">50</option>

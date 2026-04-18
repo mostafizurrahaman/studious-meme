@@ -35,7 +35,13 @@ export function buildBackendApiUrl(path: string): string {
 }
 
 function isJsonSerializableBody(body: unknown): body is JsonRecord {
-    return Boolean(body) && !(body instanceof FormData) && !(body instanceof Blob) && !(body instanceof URLSearchParams) && typeof body !== 'string';
+    return (
+        Boolean(body) &&
+        !(body instanceof FormData) &&
+        !(body instanceof Blob) &&
+        !(body instanceof URLSearchParams) &&
+        typeof body !== 'string'
+    );
 }
 
 function getErrorMessage(payload: unknown, fallback: string): string {
@@ -88,16 +94,23 @@ export async function requestBackendJson<T>(path: string, options: BackendReques
           ? undefined
           : (body as BodyInit);
 
-    const response = await fetch(`${(baseUrl ?? getBackendApiBase()).replace(/\/$/, '')}${path.startsWith('/') ? path : `/${path}`}`, {
-        ...fetchOptions,
-        headers: requestHeaders,
-        body: requestBody,
-    });
+    const response = await fetch(
+        `${(baseUrl ?? getBackendApiBase()).replace(/\/$/, '')}${path.startsWith('/') ? path : `/${path}`}`,
+        {
+            ...fetchOptions,
+            headers: requestHeaders,
+            body: requestBody,
+        },
+    );
 
     const payload = await readJsonSafely(response);
 
     if (!response.ok) {
-        throw new BackendApiError(getErrorMessage(payload, response.statusText || 'Request failed'), response.status, payload);
+        throw new BackendApiError(
+            getErrorMessage(payload, response.statusText || 'Request failed'),
+            response.status,
+            payload,
+        );
     }
 
     return payload as T;

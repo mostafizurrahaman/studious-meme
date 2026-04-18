@@ -4,7 +4,6 @@ import { useMemo, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
-
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,9 +16,9 @@ import { createBrand, deleteBrand, type BackendBrand, updateBrand } from '@/serv
 
 const initialForm = { name: '', slug: '', image: '', description: '', isActive: true };
 
-function EmptyCard() {
-    return { name: '', slug: '', image: '', description: '', isActive: true };
-}
+// function EmptyCard() {
+//     return { name: '', slug: '', image: '', description: '', isActive: true };
+// }
 
 export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
     const router = useRouter();

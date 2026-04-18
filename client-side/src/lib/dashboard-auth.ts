@@ -1,9 +1,9 @@
 import { redirect } from 'next/navigation';
-import { getCurrentUser } from '@/services/Auth';
+import { getAuthUserFromCookies } from './auth/server';
 import { getDashboardPath, isRoleSegmentMatch } from '@/lib/dashboard';
 
 export async function requireDashboardUser() {
-    const user = await getCurrentUser();
+    const user = await getAuthUserFromCookies();
 
     if (!user) {
         redirect('/my-account');

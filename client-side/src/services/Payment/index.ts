@@ -1,7 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use server';
 
 import { requestBackendJson } from '@/lib/backend-api';
-import { getValidAccessTokenForServerActions, getValidAccessTokenForServerHandlerGet } from '@/lib/getValidAccessToken';
+import {
+    getValidAccessTokenForServerActions,
+    getValidAccessTokenForServerHandlerGet,
+} from '@/lib/getValidAccessToken';
 
 type BackendEnvelope<T> = {
     success?: boolean;
@@ -42,10 +46,15 @@ export const getMyPayments = async (): Promise<BackendEnvelope<unknown[]>> => {
     });
 };
 
-export const getAllPaymentsForAdmin = async (): Promise<BackendEnvelope<{ data: BackendPayment[]; meta: any; summary: any }>> => {
+export const getAllPaymentsForAdmin = async (): Promise<
+    BackendEnvelope<{ data: BackendPayment[]; meta: any; summary: any }>
+> => {
     const accessToken = await getValidAccessTokenForServerHandlerGet();
-    return requestBackendJson<BackendEnvelope<{ data: BackendPayment[]; meta: any; summary: any }>>('/payment/admin', {
-        method: 'GET',
-        token: accessToken ?? undefined,
-    });
+    return requestBackendJson<BackendEnvelope<{ data: BackendPayment[]; meta: any; summary: any }>>(
+        '/payment/admin',
+        {
+            method: 'GET',
+            token: accessToken ?? undefined,
+        },
+    );
 };

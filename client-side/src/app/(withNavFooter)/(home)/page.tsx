@@ -6,12 +6,12 @@ import { getHomeContent } from '@/services/HeroSection';
 export const metadata = homeMetadata;
 
 export default async function Page() {
-  const heroContent = await getHomeContent().catch(() => null);
+    const heroContent = await getHomeContent().catch(() => null);
 
-  return (
-    <>
-      <SeoScripts data={homeSchemas} />
-      <HomePage heroContent={heroContent?.data ?? null} />
-    </>
-  );
+    return (
+        <>
+            <SeoScripts data={homeSchemas} />
+            <HomePage heroContent={heroContent?.data ?? null} />
+        </>
+    );
 }

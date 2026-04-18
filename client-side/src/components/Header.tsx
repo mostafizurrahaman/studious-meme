@@ -10,12 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Container } from '@/components/Container';
 import { MiniCartDropdown } from '@/components/cart/MiniCartDropdown';
 import { brands, topCategories } from '@/lib/malamal-content';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { UserDropdownMenu } from '@/components/account/UserDropdownMenu';
 import { useUser } from '@/context/UserContext';
 import { getDashboardPath } from '@/lib/dashboard';
 
@@ -102,16 +97,7 @@ export function Header() {
                                         className="h-auto w-32"
                                     />
                                 </Link>
-                                <Link
-                                    href={user ? getDashboardPath(user.role) : '/my-account'}
-                                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background text-foreground"
-                                    aria-label="My account"
-                                >
-                                    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                                        <path d="M20 21a8 8 0 0 0-16 0" />
-                                        <circle cx="12" cy="8" r="4" />
-                                    </svg>
-                                </Link>
+                                <UserDropdownMenu compact />
                             </div>
                         </summary>
 
@@ -151,7 +137,9 @@ export function Header() {
                                     <div className="grid">
                                         {(
                                             [
-                                                ...(user ? ([['Dashboard', getDashboardPath(user.role)] as const]) : []),
+                                                ...(user
+                                                    ? [['Dashboard', getDashboardPath(user.role)] as const]
+                                                    : []),
                                                 ['Hardware Store', '/main-categories'],
                                                 ['Our Contacts', '/our-contacts'],
                                                 ['Delivery & Return', '/delivery-return'],
@@ -328,6 +316,7 @@ export function Header() {
                         >
                             Quotation Request
                         </Link>
+                        <UserDropdownMenu />
                     </div>
                 </div>
             </Container>
@@ -390,35 +379,7 @@ export function Header() {
                             >
                                 Terms & Condition
                             </Link>
-                            {user ? (
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <button
-                                            className={navLinkClass('/my-account')}
-                                            style={activeStyle('/my-account')}
-                                            type="button"
-                                        >
-                                            Account
-                                        </button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuItem asChild>
-                                            <Link href="/my-account">My account</Link>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem asChild>
-                                            <Link href={getDashboardPath(user.role)}>Dashboard</Link>
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            ) : (
-                                <Link
-                                    className={navLinkClass('/my-account')}
-                                    href="/my-account"
-                                    style={activeStyle('/my-account')}
-                                >
-                                    My account
-                                </Link>
-                            )}
+                            <UserDropdownMenu />
                         </div>
                     </nav>
 
@@ -475,7 +436,6 @@ export function Header() {
                     </details>
                 </Container>
             </div>
-
         </header>
     );
 }

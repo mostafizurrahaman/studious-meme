@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-
 import { DashboardAdminsManager } from '@/components/dashboard/DashboardAdminsManager';
 import { buildMetadata } from '@/lib/seo';
 import { requireDashboardRoles } from '@/lib/dashboard-auth';

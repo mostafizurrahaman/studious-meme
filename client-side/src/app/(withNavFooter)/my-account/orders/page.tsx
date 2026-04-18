@@ -8,13 +8,13 @@ export const metadata = ordersMetadata;
 export const dynamic = 'force-dynamic';
 
 export default async function OrdersPage() {
-  const ordersResult = await getMyOrders().catch(() => null);
-  const orders = Array.isArray(ordersResult?.data) ? ordersResult.data : [];
+    const ordersResult = await getMyOrders().catch(() => null);
+    const orders = Array.isArray(ordersResult?.data) ? ordersResult.data : [];
 
-  return (
-    <>
-      <SeoScripts data={ordersSchemas} />
-      <OrdersPageClient orders={orders} />
-    </>
-  );
+    return (
+        <>
+            <SeoScripts data={ordersSchemas} />
+            <OrdersPageClient orders={orders} />
+        </>
+    );
 }

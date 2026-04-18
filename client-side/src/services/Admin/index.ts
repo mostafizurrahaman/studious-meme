@@ -1,9 +1,11 @@
 'use server';
 
 import { updateTag } from 'next/cache';
-
 import { requestBackendJson } from '@/lib/backend-api';
-import { getValidAccessTokenForServerActions, getValidAccessTokenForServerHandlerGet } from '@/lib/getValidAccessToken';
+import {
+    getValidAccessTokenForServerActions,
+    getValidAccessTokenForServerHandlerGet,
+} from '@/lib/getValidAccessToken';
 import { CreateUserFormValues } from '@/utils/createAdminValidation';
 
 type BackendEnvelope<T> = {
@@ -15,9 +17,11 @@ type BackendEnvelope<T> = {
 
 const unsupported = <T>(message: string): BackendEnvelope<T> => ({ success: false, message });
 
-export const getDashboardMetaData = async (): Promise<BackendEnvelope<unknown>> => unsupported('Endpoint not supported by current backend.');
+export const getDashboardMetaData = async (): Promise<BackendEnvelope<unknown>> =>
+    unsupported('Endpoint not supported by current backend.');
 
-export const updateNewsStatus = async (): Promise<BackendEnvelope<unknown>> => unsupported('Endpoint not supported by current backend.');
+export const updateNewsStatus = async (): Promise<BackendEnvelope<unknown>> =>
+    unsupported('Endpoint not supported by current backend.');
 
 export const getAllUsers = async (): Promise<BackendEnvelope<unknown>> => {
     const accessToken = await getValidAccessTokenForServerHandlerGet();
@@ -35,7 +39,8 @@ export const getAllAdmins = async (): Promise<BackendEnvelope<unknown>> => {
     });
 };
 
-export const blockUnblockSingleUserById = async (): Promise<BackendEnvelope<unknown>> => unsupported('Endpoint not supported by current backend.');
+export const blockUnblockSingleUserById = async (): Promise<BackendEnvelope<unknown>> =>
+    unsupported('Endpoint not supported by current backend.');
 
 export const createUser = async (payload: CreateUserFormValues): Promise<BackendEnvelope<unknown>> => {
     const accessToken = await getValidAccessTokenForServerActions();

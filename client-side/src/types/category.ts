@@ -1,9 +1,9 @@
 export type TCategory = {
-  _id: string;
+    _id: string;
 
-  name: string;
-  totalNews: number;
+    name: string;
+    totalNews: number;
 
-  createdAt: Date;
-  updatedAt: Date;
+    createdAt: Date;
+    updatedAt: Date;
 };

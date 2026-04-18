@@ -4,7 +4,5 @@ import { cartMetadata } from '@/lib/seo';
 export const metadata = cartMetadata;
 
 export default function CartPage() {
-  return (
-    <CartPageClient />
-  );
+    return <CartPageClient />;
 }

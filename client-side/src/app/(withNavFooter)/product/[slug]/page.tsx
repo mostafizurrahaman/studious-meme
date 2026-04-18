@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: Props) {
     const { slug } = await params;
     const productResult = await getProductBySlug(slug).catch(() => null);
     const backendProduct = productResult?.data;
-    const product = backendProduct ? mapBackendProductToStorefrontProduct(backendProduct) : null;
+    const product = backendProduct ? await mapBackendProductToStorefrontProduct(backendProduct) : null;
 
     if (!product) {
         return {
@@ -43,16 +43,18 @@ export default async function ProductPage({ params }: Props) {
     const { slug } = await params;
     const productResult = await getProductBySlug(slug).catch(() => null);
     const backendProduct = productResult?.data;
-    const product = backendProduct ? mapBackendProductToStorefrontProduct(backendProduct) : null;
+    const product = backendProduct ? await mapBackendProductToStorefrontProduct(backendProduct) : null;
 
     if (!product) notFound();
 
     const productsResult = await getAllProducts().catch(() => null);
     const related = productsResult?.data?.length
-        ? productsResult.data
-              .filter(item => item.slug !== product.slug)
-              .slice(0, 4)
-              .map(mapBackendProductToStorefrontProduct)
+        ? await Promise.all(
+              productsResult.data
+                  .filter(item => item.slug !== product.slug)
+                  .slice(0, 4)
+                  .map(mapBackendProductToStorefrontProduct),
+          )
         : allProducts.filter(item => item.slug !== product.slug).slice(0, 4);
     const gallery = [product.image, ...related.map(item => item.image)].slice(0, 4);
 

@@ -1,12 +1,11 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 
 import { logOut, sendSignupOtpAgain, signInUser, signUpUser, verifySignupOtp } from '@/services/Auth';
 
-export type SignInState =
-    | { ok: false; message: string }
-    | { ok: true; message: string };
+export type SignInState = { ok: false; message: string } | { ok: true; message: string };
 
 export type SignUpState =
     | { ok: false; message: string; email?: string }
@@ -16,10 +15,7 @@ function readValue(formData: FormData, key: string) {
     return String(formData.get(key) ?? '').trim();
 }
 
-export async function submitSignIn(
-    _prevState: SignInState,
-    formData: FormData,
-): Promise<SignInState> {
+export async function submitSignIn(_prevState: SignInState, formData: FormData): Promise<SignInState> {
     const email = readValue(formData, 'email').toLowerCase();
     const password = readValue(formData, 'password');
 
@@ -46,12 +42,10 @@ export async function submitSignOut() {
     await logOut();
     revalidatePath('/my-account');
     revalidatePath('/dashboard');
+    redirect('/my-account');
 }
 
-export async function submitSignUp(
-    _prevState: SignUpState,
-    formData: FormData,
-): Promise<SignUpState> {
+export async function submitSignUp(_prevState: SignUpState, formData: FormData): Promise<SignUpState> {
     const name = readValue(formData, 'signup-name');
     const email = readValue(formData, 'signup-email').toLowerCase();
     const password = readValue(formData, 'signup-password');
@@ -78,10 +72,7 @@ export async function submitSignUp(
     };
 }
 
-export async function submitSignupOtp(
-    _prevState: SignUpState,
-    formData: FormData,
-): Promise<SignUpState> {
+export async function submitSignupOtp(_prevState: SignUpState, formData: FormData): Promise<SignUpState> {
     const userEmail = readValue(formData, 'otp-email').toLowerCase();
     const otp = readValue(formData, 'otp');
 

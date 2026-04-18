@@ -27,7 +27,11 @@ export default async function DashboardOrdersPage() {
         'use server';
 
         const orderId = String(formData.get('orderId') ?? '');
-        const status = String(formData.get('status') ?? '') as 'PLACED' | 'PROCESSING' | 'DELIVERED' | 'CANCELLED';
+        const status = String(formData.get('status') ?? '') as
+            | 'PLACED'
+            | 'PROCESSING'
+            | 'DELIVERED'
+            | 'CANCELLED';
 
         await updateOrderStatus(orderId, status);
     }
@@ -54,16 +58,25 @@ export default async function DashboardOrdersPage() {
                         {orders.map(order => (
                             <TableRow key={order.orderId}>
                                 <TableCell>
-                                    <Link href={`/dashboard/orders/${order.orderId}`} className="font-medium hover:underline">
+                                    <Link
+                                        href={`/dashboard/orders/${order.orderId}`}
+                                        className="font-medium hover:underline"
+                                    >
                                         {order.orderId}
                                     </Link>
-                                    <div className="text-xs text-muted-foreground">{new Date(order.createdAt).toLocaleString('en-US')}</div>
+                                    <div className="text-xs text-muted-foreground">
+                                        {new Date(order.createdAt).toLocaleString('en-US')}
+                                    </div>
                                 </TableCell>
                                 <TableCell>
                                     <div>{order.customer.name}</div>
-                                    <div className="text-xs text-muted-foreground">{order.customer.phone}</div>
+                                    <div className="text-xs text-muted-foreground">
+                                        {order.customer.phone}
+                                    </div>
                                 </TableCell>
-                                <TableCell><Badge variant="secondary">{order.status}</Badge></TableCell>
+                                <TableCell>
+                                    <Badge variant="secondary">{order.status}</Badge>
+                                </TableCell>
                                 <TableCell>
                                     <div>{order.paymentMethod}</div>
                                     <div className="text-xs text-muted-foreground">{order.paymentStatus}</div>
@@ -72,12 +85,22 @@ export default async function DashboardOrdersPage() {
                                 <TableCell className="text-right">
                                     <form action={updateStatus} className="flex justify-end gap-2">
                                         <input type="hidden" name="orderId" value={order.orderId} />
-                                        <select name="status" defaultValue={order.status} className="h-9 rounded-md border border-input bg-background px-3 text-sm">
-                                            {['PLACED', 'PROCESSING', 'DELIVERED', 'CANCELLED'].map(status => (
-                                                <option key={status} value={status}>{status}</option>
-                                            ))}
+                                        <select
+                                            name="status"
+                                            defaultValue={order.status}
+                                            className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+                                        >
+                                            {['PLACED', 'PROCESSING', 'DELIVERED', 'CANCELLED'].map(
+                                                status => (
+                                                    <option key={status} value={status}>
+                                                        {status}
+                                                    </option>
+                                                ),
+                                            )}
                                         </select>
-                                        <Button size="sm" type="submit">Update</Button>
+                                        <Button size="sm" type="submit">
+                                            Update
+                                        </Button>
                                     </form>
                                 </TableCell>
                             </TableRow>

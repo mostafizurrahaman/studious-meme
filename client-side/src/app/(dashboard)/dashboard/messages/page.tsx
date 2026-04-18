@@ -19,7 +19,15 @@ export const dynamic = 'force-dynamic';
 export default async function DashboardMessagesPage() {
     await requireDashboardRoles(['ADMIN', 'SUPER_ADMIN']);
     const contactsResult = await getAllContacts().catch(() => null);
-    const contacts = Array.isArray(contactsResult?.data) ? (contactsResult.data as Array<{ name: string; email: string; message: string; isReplied?: boolean; createdAt?: string }>) : [];
+    const contacts = Array.isArray(contactsResult?.data)
+        ? (contactsResult.data as Array<{
+              name: string;
+              email: string;
+              message: string;
+              isReplied?: boolean;
+              createdAt?: string;
+          }>)
+        : [];
 
     return (
         <Card className="shadow-sm">
@@ -44,7 +52,9 @@ export default async function DashboardMessagesPage() {
                                 <TableCell>{contact.email}</TableCell>
                                 <TableCell className="max-w-105 truncate">{contact.message}</TableCell>
                                 <TableCell>
-                                    <Badge variant="secondary">{contact.isReplied ? 'Replied' : 'Open'}</Badge>
+                                    <Badge variant="secondary">
+                                        {contact.isReplied ? 'Replied' : 'Open'}
+                                    </Badge>
                                 </TableCell>
                             </TableRow>
                         ))}

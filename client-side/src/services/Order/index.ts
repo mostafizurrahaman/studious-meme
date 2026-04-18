@@ -1,7 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use server';
 
 import { requestBackendJson } from '@/lib/backend-api';
-import { getValidAccessTokenForServerActions, getValidAccessTokenForServerHandlerGet } from '@/lib/getValidAccessToken';
+import {
+    getValidAccessTokenForServerActions,
+    getValidAccessTokenForServerHandlerGet,
+} from '@/lib/getValidAccessToken';
 
 type BackendEnvelope<T> = {
     success?: boolean;
@@ -88,7 +92,9 @@ export const getMyOrderById = async (orderId: string): Promise<BackendEnvelope<B
     });
 };
 
-export const getAllOrdersForAdmin = async (): Promise<BackendEnvelope<{ data: BackendOrder[]; meta: any }>> => {
+export const getAllOrdersForAdmin = async (): Promise<
+    BackendEnvelope<{ data: BackendOrder[]; meta: any }>
+> => {
     const accessToken = await getValidAccessTokenForServerHandlerGet();
     return requestBackendJson<BackendEnvelope<{ data: BackendOrder[]; meta: any }>>('/order/admin/orders', {
         method: 'GET',

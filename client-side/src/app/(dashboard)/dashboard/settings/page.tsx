@@ -22,16 +22,24 @@ export default async function DashboardSettingsPage() {
 
     return (
         <div className="grid gap-4">
-            <ProfileSettingsForm profile={{ name: profile.name, email: profile.email, phone: profile.phone, dob: profile.dob }} />
+            <ProfileSettingsForm
+                profile={{ name: profile.name, email: profile.email, phone: profile.phone, dob: profile.dob }}
+            />
             <Card className="shadow-sm">
                 <CardHeader>
                     <CardTitle>Session</CardTitle>
                     <CardDescription>Current authenticated dashboard user.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3 text-sm">
-                    <div><span className="font-semibold">Name:</span> {user?.name ?? 'Guest'}</div>
-                    <div><span className="font-semibold">Email:</span> {user?.email ?? 'Not signed in'}</div>
-                    <div><span className="font-semibold">Role:</span> {user?.role ?? 'Unknown'}</div>
+                    <div>
+                        <span className="font-semibold">Name:</span> {user?.name ?? 'Guest'}
+                    </div>
+                    <div>
+                        <span className="font-semibold">Email:</span> {user?.email ?? 'Not signed in'}
+                    </div>
+                    <div>
+                        <span className="font-semibold">Role:</span> {user?.role ?? 'Unknown'}
+                    </div>
                 </CardContent>
             </Card>
 
@@ -41,8 +49,14 @@ export default async function DashboardSettingsPage() {
                     <CardDescription>Client API config in use.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3 text-sm">
-                    <div><span className="font-semibold">API URL:</span> {process.env.NEXT_PUBLIC_API_URL ?? 'unset'}</div>
-                    <div><span className="font-semibold">App URL:</span> {process.env.NEXT_PUBLIC_APP_URL ?? 'unset'}</div>
+                    <div>
+                        <span className="font-semibold">API URL:</span>{' '}
+                        {process.env.NEXT_PUBLIC_API_URL ?? 'unset'}
+                    </div>
+                    <div>
+                        <span className="font-semibold">App URL:</span>{' '}
+                        {process.env.NEXT_PUBLIC_APP_URL ?? 'unset'}
+                    </div>
                 </CardContent>
             </Card>
         </div>

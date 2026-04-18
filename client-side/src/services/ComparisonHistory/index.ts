@@ -1,7 +1,10 @@
 'use server';
 
 import { requestBackendJson } from '@/lib/backend-api';
-import { getValidAccessTokenForServerActions, getValidAccessTokenForServerHandlerGet } from '@/lib/getValidAccessToken';
+import {
+    getValidAccessTokenForServerActions,
+    getValidAccessTokenForServerHandlerGet,
+} from '@/lib/getValidAccessToken';
 
 type BackendEnvelope<T> = {
     success?: boolean;

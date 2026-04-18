@@ -41,7 +41,9 @@ function resolveName(value: BackendProductRef): string {
     return value.name ?? value.slug ?? 'Unknown';
 }
 
-export async function mapBackendProductToStorefrontProduct(product: BackendProduct): Promise<StorefrontProduct> {
+export async function mapBackendProductToStorefrontProduct(
+    product: BackendProduct,
+): Promise<StorefrontProduct> {
     return {
         title: product.title,
         slug: product.slug,
@@ -63,15 +65,24 @@ export const getAllProducts = async (): Promise<BackendEnvelope<BackendProduct[]
 };
 
 export const getProductBySlug = async (slug: string): Promise<BackendEnvelope<BackendProduct>> => {
-    return requestBackendJson<BackendEnvelope<BackendProduct>>(`/product/products/${slug}`, { method: 'GET' });
+    return requestBackendJson<BackendEnvelope<BackendProduct>>(`/product/products/${slug}`, {
+        method: 'GET',
+    });
 };
 
 export const getProductsByCategorySlug = async (slug: string): Promise<BackendEnvelope<BackendProduct[]>> => {
-    return requestBackendJson<BackendEnvelope<BackendProduct[]>>(`/product/products/by-category/${slug}`, { method: 'GET' });
+    return requestBackendJson<BackendEnvelope<BackendProduct[]>>(`/product/products/by-category/${slug}`, {
+        method: 'GET',
+    });
 };
 
-export const getProductsBySubCategorySlug = async (slug: string): Promise<BackendEnvelope<BackendProduct[]>> => {
-    return requestBackendJson<BackendEnvelope<BackendProduct[]>>(`/product/products/by-sub-category/${slug}`, { method: 'GET' });
+export const getProductsBySubCategorySlug = async (
+    slug: string,
+): Promise<BackendEnvelope<BackendProduct[]>> => {
+    return requestBackendJson<BackendEnvelope<BackendProduct[]>>(
+        `/product/products/by-sub-category/${slug}`,
+        { method: 'GET' },
+    );
 };
 
 type ProductMutationPayload = {
@@ -97,7 +108,9 @@ function toFormData(payload: Record<string, unknown>) {
     return formData;
 }
 
-export const createProduct = async (payload: ProductMutationPayload): Promise<BackendEnvelope<BackendProduct>> => {
+export const createProduct = async (
+    payload: ProductMutationPayload,
+): Promise<BackendEnvelope<BackendProduct>> => {
     const accessToken = await getValidAccessTokenForServerActions();
     const result = await requestBackendJson<BackendEnvelope<BackendProduct>>('/product/products', {
         method: 'POST',

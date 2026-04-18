@@ -1,7 +1,18 @@
-export type DashboardRole = 'SUPER_ADMIN' | 'ADMIN' | 'USER';
+import type { AuthRole } from '@/types';
 
-export const getDashboardRoleSegment = (role: string) => role.toLowerCase();
+import {
+    getDashboardPathByRole,
+    getDashboardSegmentByRole,
+    isDashboardPathForRole,
+    normalizeRoleSegment,
+} from './auth/roles';
 
-export const getDashboardPath = (role: string) => `/dashboard/${getDashboardRoleSegment(role)}`;
+export type DashboardRole = AuthRole;
 
-export const isRoleSegmentMatch = (role: string, segment: string) => getDashboardRoleSegment(role) === segment;
+export const getDashboardRoleSegment = (role: string) => getDashboardSegmentByRole(role) ?? 'user';
+
+export const getDashboardPath = (role: string) => getDashboardPathByRole(role) ?? '/dashboard';
+
+export const isRoleSegmentMatch = (role: string, segment: string) =>
+    normalizeRoleSegment(segment) === getDashboardSegmentByRole(role) &&
+    isDashboardPathForRole(role, `/dashboard/${segment}`);

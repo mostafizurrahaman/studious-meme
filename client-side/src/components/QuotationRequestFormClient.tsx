@@ -3,7 +3,10 @@
 import { useActionState, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
-import { submitQuotationRequest, type QuotationRequestState } from '@/app/(withNavFooter)/quotation-request/actions';
+import {
+    submitQuotationRequest,
+    type QuotationRequestState,
+} from '@/app/(withNavFooter)/quotation-request/actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';

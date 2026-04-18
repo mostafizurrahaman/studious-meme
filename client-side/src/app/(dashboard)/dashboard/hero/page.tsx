@@ -36,22 +36,34 @@ export default async function DashboardHeroPage() {
                         <p className="mb-3 text-sm font-semibold">Slides</p>
                         <div className="space-y-3">
                             {heroSection?.slides?.map((slide, index) => (
-                                <div key={`${slide.title}-${index}`} className="rounded-xl border bg-background p-3 text-sm">
+                                <div
+                                    key={`${slide.title}-${index}`}
+                                    className="rounded-xl border bg-background p-3 text-sm"
+                                >
                                     <div className="font-medium">{slide.title}</div>
                                     <div className="text-muted-foreground">{slide.description}</div>
                                 </div>
-                            )) ?? <div className="text-sm text-muted-foreground">No slide data available.</div>}
+                            )) ?? (
+                                <div className="text-sm text-muted-foreground">No slide data available.</div>
+                            )}
                         </div>
                     </div>
                     <div>
                         <p className="mb-3 text-sm font-semibold">Features</p>
                         <div className="space-y-3">
                             {heroSection?.features?.map((card, index) => (
-                                <div key={`${card.title}-${index}`} className="rounded-xl border bg-background p-3 text-sm">
+                                <div
+                                    key={`${card.title}-${index}`}
+                                    className="rounded-xl border bg-background p-3 text-sm"
+                                >
                                     <div className="font-medium">{card.title}</div>
                                     <div className="text-muted-foreground">{card.description}</div>
                                 </div>
-                            )) ?? <div className="text-sm text-muted-foreground">No feature card data available.</div>}
+                            )) ?? (
+                                <div className="text-sm text-muted-foreground">
+                                    No feature card data available.
+                                </div>
+                            )}
                         </div>
                     </div>
                 </CardContent>
@@ -60,7 +72,9 @@ export default async function DashboardHeroPage() {
             <Card className="shadow-sm">
                 <CardHeader>
                     <CardTitle>Attached catalog data</CardTitle>
-                    <CardDescription>Brands, categories and product highlights surfaced by the backend hero endpoint.</CardDescription>
+                    <CardDescription>
+                        Brands, categories and product highlights surfaced by the backend hero endpoint.
+                    </CardDescription>
                 </CardHeader>
                 <CardContent className="grid gap-4 md:grid-cols-2 xl:grid-cols-4 text-sm">
                     {[

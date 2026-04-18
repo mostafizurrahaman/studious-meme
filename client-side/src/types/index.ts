@@ -5,6 +5,4 @@ export * from './category';
 export * from './social';
 export * from './contact';
 
-
-
 export type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;

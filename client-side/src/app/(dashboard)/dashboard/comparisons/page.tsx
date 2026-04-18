@@ -19,7 +19,13 @@ export const dynamic = 'force-dynamic';
 export default async function DashboardComparisonsPage() {
     await requireDashboardRoles(['ADMIN', 'SUPER_ADMIN']);
     const historyResult = await getAllComparisonHistory().catch(() => null);
-    const history = Array.isArray(historyResult?.data) ? (historyResult.data as Array<{ user?: { name?: string; email?: string }; products?: unknown[]; createdAt?: string }>) : [];
+    const history = Array.isArray(historyResult?.data)
+        ? (historyResult.data as Array<{
+              user?: { name?: string; email?: string };
+              products?: unknown[];
+              createdAt?: string;
+          }>)
+        : [];
 
     return (
         <Card className="shadow-sm">
@@ -39,8 +45,12 @@ export default async function DashboardComparisonsPage() {
                     <TableBody>
                         {history.slice(0, 12).map((item, index) => (
                             <TableRow key={`${item.createdAt ?? index}`}>
-                                <TableCell className="font-medium">{item.user?.name ?? item.user?.email ?? 'Anonymous'}</TableCell>
-                                <TableCell><Badge variant="secondary">{item.products?.length ?? 0}</Badge></TableCell>
+                                <TableCell className="font-medium">
+                                    {item.user?.name ?? item.user?.email ?? 'Anonymous'}
+                                </TableCell>
+                                <TableCell>
+                                    <Badge variant="secondary">{item.products?.length ?? 0}</Badge>
+                                </TableCell>
                                 <TableCell>{item.createdAt ?? '-'}</TableCell>
                             </TableRow>
                         ))}

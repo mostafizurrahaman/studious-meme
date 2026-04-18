@@ -41,7 +41,9 @@ export function CheckoutPageClient() {
 
         clear();
         toast.success(
-            result.gatewayUrl ? 'Redirecting to SSLCommerz payment gateway...' : 'Order submitted successfully.',
+            result.gatewayUrl
+                ? 'Redirecting to SSLCommerz payment gateway...'
+                : 'Order submitted successfully.',
         );
 
         if (result.gatewayUrl) {

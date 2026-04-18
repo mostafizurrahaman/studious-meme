@@ -3,18 +3,20 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useMemo } from 'react';
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { formatMoney, type CartItem } from '@/lib/cart';
+import { formatMoney } from '@/lib/cart';
 import type { BackendOrder } from '@/services/Order';
 
 export function OrderDetailAdminClient({ order }: { order: BackendOrder | null }) {
-    const timeline = useMemo(() => [
-        { key: 'PLACED', label: 'Placed' },
-        { key: 'PROCESSING', label: 'Processing' },
-        { key: 'DELIVERED', label: 'Delivered' },
-    ], []);
+    const timeline = useMemo(
+        () => [
+            { key: 'PLACED', label: 'Placed' },
+            { key: 'PROCESSING', label: 'Processing' },
+            { key: 'DELIVERED', label: 'Delivered' },
+        ],
+        [],
+    );
 
     if (!order) {
         return <div className="p-4 text-muted-foreground">Order not found</div>;
@@ -47,8 +49,13 @@ export function OrderDetailAdminClient({ order }: { order: BackendOrder | null }
                 {timeline.map((step, index) => {
                     const isActive = index <= activeIndex;
                     return (
-                        <div key={step.key} className={`rounded-xl border p-4 ${isActive ? 'border-primary/30 bg-background' : 'border-border bg-background/50'}`}>
-                            <div className={`text-sm font-semibold ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
+                        <div
+                            key={step.key}
+                            className={`rounded-xl border p-4 ${isActive ? 'border-primary/30 bg-background' : 'border-border bg-background/50'}`}
+                        >
+                            <div
+                                className={`text-sm font-semibold ${isActive ? 'text-primary' : 'text-muted-foreground'}`}
+                            >
                                 {step.label}
                             </div>
                             <div className="mt-1 text-xs text-muted-foreground">
@@ -65,11 +72,21 @@ export function OrderDetailAdminClient({ order }: { order: BackendOrder | null }
                     <CardTitle className="text-lg">Customer</CardTitle>
                 </CardHeader>
                 <CardContent className="grid gap-2 text-sm">
-                    <div><span className="font-medium">Name:</span> {order.customer.name || '-'}</div>
-                    <div><span className="font-medium">Phone:</span> {order.customer.phone || '-'}</div>
-                    <div><span className="font-medium">Email:</span> {order.customer.email || '-'}</div>
-                    <div><span className="font-medium">Address:</span> {order.customer.address || '-'}</div>
-                    <div><span className="font-medium">City:</span> {order.customer.city || '-'}</div>
+                    <div>
+                        <span className="font-medium">Name:</span> {order.customer.name || '-'}
+                    </div>
+                    <div>
+                        <span className="font-medium">Phone:</span> {order.customer.phone || '-'}
+                    </div>
+                    <div>
+                        <span className="font-medium">Email:</span> {order.customer.email || '-'}
+                    </div>
+                    <div>
+                        <span className="font-medium">Address:</span> {order.customer.address || '-'}
+                    </div>
+                    <div>
+                        <span className="font-medium">City:</span> {order.customer.city || '-'}
+                    </div>
                 </CardContent>
             </Card>
 
@@ -82,15 +99,26 @@ export function OrderDetailAdminClient({ order }: { order: BackendOrder | null }
                     {order.items.map(item => (
                         <div key={item.sku} className="flex gap-4 rounded-lg border p-3">
                             <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-muted">
-                                <Image src={item.image} alt={item.title} fill className="object-contain p-1" />
+                                <Image
+                                    src={item.image}
+                                    alt={item.title}
+                                    fill
+                                    className="object-contain p-1"
+                                />
                             </div>
                             <div className="min-w-0 flex-1">
                                 <div className="font-medium">{item.title}</div>
-                                <div className="text-sm text-muted-foreground">SKU {item.sku} · Qty {item.quantity}</div>
+                                <div className="text-sm text-muted-foreground">
+                                    SKU {item.sku} · Qty {item.quantity}
+                                </div>
                             </div>
                             <div className="text-right">
-                                <div className="font-medium">{formatMoney(item.unitPrice * item.quantity)}</div>
-                                <div className="text-sm text-muted-foreground">{formatMoney(item.unitPrice)} each</div>
+                                <div className="font-medium">
+                                    {formatMoney(item.unitPrice * item.quantity)}
+                                </div>
+                                <div className="text-sm text-muted-foreground">
+                                    {formatMoney(item.unitPrice)} each
+                                </div>
                             </div>
                         </div>
                     ))}
@@ -103,11 +131,25 @@ export function OrderDetailAdminClient({ order }: { order: BackendOrder | null }
                     <CardTitle className="text-lg">Summary</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2 text-sm">
-                    <div className="flex justify-between"><span>Subtotal</span><span>{formatMoney(order.subtotal)}</span></div>
-                    <div className="flex justify-between"><span>Discount</span><span>- {formatMoney(order.discount)}</span></div>
-                    <div className="flex justify-between"><span>Delivery</span><span>{formatMoney(order.delivery)}</span></div>
-                    <div className="flex justify-between border-t pt-2 font-bold"><span>Total</span><span>{formatMoney(order.total)}</span></div>
-                    {order.couponCode && <div className="text-muted-foreground">Coupon: {order.couponCode}</div>}
+                    <div className="flex justify-between">
+                        <span>Subtotal</span>
+                        <span>{formatMoney(order.subtotal)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                        <span>Discount</span>
+                        <span>- {formatMoney(order.discount)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                        <span>Delivery</span>
+                        <span>{formatMoney(order.delivery)}</span>
+                    </div>
+                    <div className="flex justify-between border-t pt-2 font-bold">
+                        <span>Total</span>
+                        <span>{formatMoney(order.total)}</span>
+                    </div>
+                    {order.couponCode && (
+                        <div className="text-muted-foreground">Coupon: {order.couponCode}</div>
+                    )}
                 </CardContent>
             </Card>
         </div>

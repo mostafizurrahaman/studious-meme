@@ -1,7 +1,6 @@
 'use server';
 
 import { updateTag } from 'next/cache';
-
 import { requestBackendJson } from '@/lib/backend-api';
 import { getValidAccessTokenForServerActions } from '@/lib/getValidAccessToken';
 import type { BackendBrand } from '@/services/Brand';
@@ -70,7 +69,9 @@ function toFormData(payload: Record<string, unknown>) {
     return formData;
 }
 
-export const createHeroSection = async (payload: HeroMutationPayload): Promise<BackendEnvelope<BackendHeroSection>> => {
+export const createHeroSection = async (
+    payload: HeroMutationPayload,
+): Promise<BackendEnvelope<BackendHeroSection>> => {
     const accessToken = await getValidAccessTokenForServerActions();
     const result = await requestBackendJson<BackendEnvelope<BackendHeroSection>>('/hero/heroes', {
         method: 'POST',

@@ -1,9 +1,11 @@
 'use server';
 
 import { updateTag } from 'next/cache';
-
 import { requestBackendJson } from '@/lib/backend-api';
-import { getValidAccessTokenForServerActions, getValidAccessTokenForServerHandlerGet } from '@/lib/getValidAccessToken';
+import {
+    getValidAccessTokenForServerActions,
+    getValidAccessTokenForServerHandlerGet,
+} from '@/lib/getValidAccessToken';
 import type { AddCategoryFormValues } from '@/utils/addCategoryValidation';
 import type { BackendCategory } from './mappers';
 
@@ -54,7 +56,14 @@ export const createCategory = async (payload: AddCategoryFormValues): Promise<Ba
     const accessToken = await getValidAccessTokenForServerActions();
     const result = await requestBackendJson<BackendEnvelope<unknown>>('/category/categories', {
         method: 'POST',
-        body: toFormData({ name: payload.name.trim(), slug: payload.name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') }),
+        body: toFormData({
+            name: payload.name.trim(),
+            slug: payload.name
+                .trim()
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, ''),
+        }),
         token: accessToken ?? undefined,
     });
 
@@ -62,7 +71,10 @@ export const createCategory = async (payload: AddCategoryFormValues): Promise<Ba
     return result;
 };
 
-export const updateCategory = async (id: string, payload: AddCategoryFormValues): Promise<BackendEnvelope<unknown>> => {
+export const updateCategory = async (
+    id: string,
+    payload: AddCategoryFormValues,
+): Promise<BackendEnvelope<unknown>> => {
     const accessToken = await getValidAccessTokenForServerActions();
     const result = await requestBackendJson<BackendEnvelope<unknown>>(`/category/categories/${id}`, {
         method: 'PATCH',

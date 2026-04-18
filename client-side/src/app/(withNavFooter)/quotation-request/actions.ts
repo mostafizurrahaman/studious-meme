@@ -2,9 +2,7 @@
 
 import { createContact } from '@/services/Contact';
 
-export type QuotationRequestState =
-    | { ok: false; message: string }
-    | { ok: true; message: string };
+export type QuotationRequestState = { ok: false; message: string } | { ok: true; message: string };
 
 function readValue(formData: FormData, key: string) {
     return String(formData.get(key) ?? '').trim();

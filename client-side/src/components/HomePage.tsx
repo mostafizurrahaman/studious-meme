@@ -64,7 +64,7 @@ function SectionMarquee() {
     );
 }
 
-export function HomePage({ heroContent }: HomePageProps) {
+export async function HomePage({ heroContent }: HomePageProps) {
     const heroSlides: HeroSlide[] = heroContent?.heroSection?.slides?.length
         ? heroContent.heroSection.slides.map(slide => ({
               title: slide.title,
@@ -75,7 +75,8 @@ export function HomePage({ heroContent }: HomePageProps) {
         : [
               {
                   title: 'Industrial tools for every project',
-                  description: 'Dedicated categories for workshop, construction, cleaning and packaging equipment.',
+                  description:
+                      'Dedicated categories for workshop, construction, cleaning and packaging equipment.',
                   image: 'https://malamal.com.bd/wp-content/uploads/2025/01/vacuum-packaging-sealer-machine-dz-400-pc.webp',
                   href: '/shop',
               },
@@ -87,7 +88,8 @@ export function HomePage({ heroContent }: HomePageProps) {
               },
               {
                   title: 'Garage tools and cleaning solutions',
-                  description: 'Product discovery built like the reference site with a fast browsing experience.',
+                  description:
+                      'Product discovery built like the reference site with a fast browsing experience.',
                   image: 'https://malamal.com.bd/wp-content/uploads/2024/11/garage-tools-and-equipment-pc.webp',
                   href: '/shop',
               },
@@ -103,11 +105,11 @@ export function HomePage({ heroContent }: HomePageProps) {
         : heroSlides;
 
     const featuredCatalog = heroContent?.featuredProducts?.length
-        ? heroContent.featuredProducts.map(mapBackendProductToStorefrontProduct)
+        ? await Promise.all(heroContent.featuredProducts.map(mapBackendProductToStorefrontProduct))
         : featuredProducts;
 
     const latestCatalog = heroContent?.latestProducts?.length
-        ? heroContent.latestProducts.map(mapBackendProductToStorefrontProduct)
+        ? await Promise.all(heroContent.latestProducts.map(mapBackendProductToStorefrontProduct))
         : latestProducts;
 
     const categoryCards = heroContent?.categories?.length
@@ -115,7 +117,7 @@ export function HomePage({ heroContent }: HomePageProps) {
         : categoryShowcase;
 
     const brandItems = heroContent?.brands?.length
-        ? heroContent.brands.map(mapBackendBrandToStorefrontBrand)
+        ? await Promise.all(heroContent.brands.map(mapBackendBrandToStorefrontBrand))
         : brands;
 
     return (

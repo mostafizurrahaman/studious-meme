@@ -32,5 +32,11 @@ export default async function DashboardProductsPage() {
         ? categoriesResult.data.map(category => ({ value: category.slug, label: category.name }))
         : [];
 
-    return <DashboardProductsManager products={products} brandOptions={brandOptions} categoryOptions={categoryOptions} />;
+    return (
+        <DashboardProductsManager
+            products={products}
+            brandOptions={brandOptions}
+            categoryOptions={categoryOptions}
+        />
+    );
 }

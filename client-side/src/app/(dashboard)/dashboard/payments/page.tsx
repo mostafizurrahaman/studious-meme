@@ -17,11 +17,16 @@ export const dynamic = 'force-dynamic';
 
 function getStatusVariant(status: BackendPayment['status']) {
     switch (status) {
-        case 'SUCCEEDED': return 'default';
-        case 'FAILED': return 'destructive';
-        case 'CANCELED': return 'secondary';
-        case 'PENDING': return 'outline';
-        default: return 'secondary';
+        case 'SUCCEEDED':
+            return 'default';
+        case 'FAILED':
+            return 'destructive';
+        case 'CANCELED':
+            return 'secondary';
+        case 'PENDING':
+            return 'outline';
+        default:
+            return 'secondary';
     }
 }
 
@@ -63,9 +68,7 @@ export default async function DashboardPaymentsPage() {
                                     <TableCell>{orderId}</TableCell>
                                     <TableCell>Tk. {item.amount}</TableCell>
                                     <TableCell>
-                                        <Badge variant={getStatusVariant(item.status)}>
-                                            {item.status}
-                                        </Badge>
+                                        <Badge variant={getStatusVariant(item.status)}>{item.status}</Badge>
                                     </TableCell>
                                     <TableCell>{new Date(item.createdAt).toLocaleDateString()}</TableCell>
                                 </TableRow>
