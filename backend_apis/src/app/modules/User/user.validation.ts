@@ -6,47 +6,49 @@ export const zodEnumFromObject = <T extends Record<string, string>>(obj: T) =>
 
 // 1. createUserSchema
 const createUserSchema = z.object({
-    body: z.object({
-        name: z
-            .string({ error: 'Name is required!' })
-            .trim()
-            .min(3, { message: 'Name must be at least 3 characters long!' }),
+    body: z
+        .object({
+            name: z
+                .string({ error: 'Name is required!' })
+                .trim()
+                .min(3, { message: 'Name must be at least 3 characters long!' }),
 
-        // phone: z
-        //   .string({ error: 'Phone number is required!' })
-        //   .trim()
-        //   .regex(/^[0-9+]+$/, { message: 'Invalid phone number format!' })
-        //   .min(10, { message: 'Phone number must be at least 10 digits!' }),
+            // phone: z
+            //   .string({ error: 'Phone number is required!' })
+            //   .trim()
+            //   .regex(/^[0-9+]+$/, { message: 'Invalid phone number format!' })
+            //   .min(10, { message: 'Phone number must be at least 10 digits!' }),
 
-        email: z
-            .string({ error: 'Email is required!' })
-            .trim()
-            .email({ message: 'Invalid email format!' }) // Ensure it's a valid email
-            .transform(email => email.toLowerCase()) // Convert email to lowercase
-            .refine(email => email !== '', { message: 'Email is required!' }) // Check that email is not empty
-            .refine(value => typeof value === 'string', {
-                message: 'Email must be string!', // Check that email is string
-            }),
+            email: z
+                .string({ error: 'Email is required!' })
+                .trim()
+                .email({ message: 'Invalid email format!' }) // Ensure it's a valid email
+                .transform(email => email.toLowerCase()) // Convert email to lowercase
+                .refine(email => email !== '', { message: 'Email is required!' }) // Check that email is not empty
+                .refine(value => typeof value === 'string', {
+                    message: 'Email must be string!', // Check that email is string
+                }),
 
-        password: z
-            .string({
-                error: 'Password is required',
-            })
-            .min(8, { message: 'Password must be at least 8 characters long' })
-            .max(20, { message: 'Password cannot exceed 20 characters' })
-            .regex(/[A-Z]/, {
-                message: 'Password must contain at least one uppercase letter',
-            })
-            .regex(/[a-z]/, {
-                message: 'Password must contain at least one lowercase letter',
-            })
-            .regex(/[0-9]/, {
-                message: 'Password must contain at least one number',
-            })
-            .regex(/[@$!%*?&#]/, {
-                message: 'Password must contain at least one special character',
-            }),
-    }).passthrough(),
+            password: z
+                .string({
+                    error: 'Password is required',
+                })
+                .min(8, { message: 'Password must be at least 8 characters long' })
+                .max(20, { message: 'Password cannot exceed 20 characters' })
+                .regex(/[A-Z]/, {
+                    message: 'Password must contain at least one uppercase letter',
+                })
+                .regex(/[a-z]/, {
+                    message: 'Password must contain at least one lowercase letter',
+                })
+                .regex(/[0-9]/, {
+                    message: 'Password must contain at least one number',
+                })
+                .regex(/[@$!%*?&#]/, {
+                    message: 'Password must contain at least one special character',
+                }),
+        })
+        .passthrough(),
 });
 
 // 2. sendSignupOtpAgainSchema

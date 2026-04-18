@@ -19,12 +19,18 @@ router
     );
 
 // 3. getMyComparisonHistory
-router.route('/history').get(auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN), ComparisonHistoryController.getMyComparisonHistory);
+router
+    .route('/history')
+    .get(auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN), ComparisonHistoryController.getMyComparisonHistory);
 
 // 4. getAllComparisonHistory
-router.route('/admin/history').get(auth(ROLE.ADMIN, ROLE.SUPER_ADMIN), ComparisonHistoryController.getAllComparisonHistory);
+router
+    .route('/admin/history')
+    .get(auth(ROLE.ADMIN, ROLE.SUPER_ADMIN), ComparisonHistoryController.getAllComparisonHistory);
 
 // 5. clearComparisonHistory
-router.route('/history').delete(auth(ROLE.ADMIN, ROLE.SUPER_ADMIN), ComparisonHistoryController.clearComparisonHistory);
+router
+    .route('/history')
+    .delete(auth(ROLE.ADMIN, ROLE.SUPER_ADMIN), ComparisonHistoryController.clearComparisonHistory);
 
 export const ComparisonHistoryRoutes = router;

@@ -11,5 +11,8 @@ const brandBaseSchema = z.object({
 
 export const BrandValidation = {
     brandCreateSchema: z.object({ body: brandBaseSchema }),
-    brandUpdateSchema: z.object({ params: z.object({ slug: z.string().min(1) }), body: brandBaseSchema.partial() }),
+    brandUpdateSchema: z.object({
+        params: z.object({ slug: z.string().min(1) }),
+        body: brandBaseSchema.partial(),
+    }),
 };

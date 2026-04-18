@@ -23,7 +23,16 @@ const categoryBaseSchema = z.object({
 
 export const CategoryValidation = {
     categoryCreateSchema: z.object({ body: categoryBaseSchema }),
-    categoryUpdateSchema: z.object({ params: z.object({ slug: z.string().min(1) }), body: categoryBaseSchema.partial() }),
-    categorySubCategoryCreateSchema: z.object({ params: z.object({ slug: z.string().min(1) }), body: categorySubCategorySchema }),
-    categorySubCategoryUpdateSchema: z.object({ params: z.object({ slug: z.string().min(1), subCategorySlug: z.string().min(1) }), body: categorySubCategorySchema.partial() }),
+    categoryUpdateSchema: z.object({
+        params: z.object({ slug: z.string().min(1) }),
+        body: categoryBaseSchema.partial(),
+    }),
+    categorySubCategoryCreateSchema: z.object({
+        params: z.object({ slug: z.string().min(1) }),
+        body: categorySubCategorySchema,
+    }),
+    categorySubCategoryUpdateSchema: z.object({
+        params: z.object({ slug: z.string().min(1), subCategorySlug: z.string().min(1) }),
+        body: categorySubCategorySchema.partial(),
+    }),
 };

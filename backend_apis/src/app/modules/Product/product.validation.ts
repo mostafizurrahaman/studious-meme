@@ -20,5 +20,8 @@ const productBaseSchema = z.object({
 
 export const ProductValidation = {
     productCreateSchema: z.object({ body: productBaseSchema }),
-    productUpdateSchema: z.object({ params: z.object({ slug: z.string().min(1) }), body: productBaseSchema.partial() }),
+    productUpdateSchema: z.object({
+        params: z.object({ slug: z.string().min(1) }),
+        body: productBaseSchema.partial(),
+    }),
 };

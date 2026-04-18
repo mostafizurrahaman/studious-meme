@@ -163,7 +163,8 @@ const handleSslCommerzSuccess = async (payload: Record<string, unknown>) => {
 
     const validationPayload = valId ? await validateSslPayment(valId) : payload;
 
-    const validationStatus = typeof validationPayload.status === 'string' ? validationPayload.status.toUpperCase() : '';
+    const validationStatus =
+        typeof validationPayload.status === 'string' ? validationPayload.status.toUpperCase() : '';
     const validationAmount = Number(validationPayload.amount ?? payload.amount ?? 0);
 
     if (validationStatus && !['VALID', 'VALIDATED'].includes(validationStatus)) {

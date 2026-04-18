@@ -5,7 +5,10 @@ import { PaymentService } from './payment.service';
 const getSingleParam = (value: string | string[]) => (Array.isArray(value) ? value[0] : value);
 
 const initiateSslCommerzPayment = asyncHandler(async (req, res) => {
-    const result = await PaymentService.initiateSslCommerzPayment(req.user, getSingleParam(req.params.orderId));
+    const result = await PaymentService.initiateSslCommerzPayment(
+        req.user,
+        getSingleParam(req.params.orderId),
+    );
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
@@ -24,19 +27,25 @@ const sslCommerzSuccess = asyncHandler(async (req, res) => {
 });
 
 const sslCommerzFail = asyncHandler(async (req, res) => {
-    const redirectUrl = await PaymentService.handleSslCommerzFailure({
-        ...req.query,
-        ...req.body,
-    }, 'FAILED');
+    const redirectUrl = await PaymentService.handleSslCommerzFailure(
+        {
+            ...req.query,
+            ...req.body,
+        },
+        'FAILED',
+    );
 
     res.redirect(redirectUrl);
 });
 
 const sslCommerzCancel = asyncHandler(async (req, res) => {
-    const redirectUrl = await PaymentService.handleSslCommerzFailure({
-        ...req.query,
-        ...req.body,
-    }, 'CANCELED');
+    const redirectUrl = await PaymentService.handleSslCommerzFailure(
+        {
+            ...req.query,
+            ...req.body,
+        },
+        'CANCELED',
+    );
 
     res.redirect(redirectUrl);
 });
