@@ -243,7 +243,8 @@ export const setNewPasswordIntoDB = async (newPassword: string): Promise<Backend
 
 // getCurrentUser
 export const getCurrentUser = async (): Promise<AuthUser | null> => {
-    return getAuthUserFromCookies();
+    const user = await getAuthUserFromCookies();
+    return user;
 };
 
 // logOut

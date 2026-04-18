@@ -49,7 +49,7 @@ export function UserDropdownMenu({ compact = false, user: providedUser }: UserDr
                 variant="secondary"
                 className={compact ? 'h-10 w-10 rounded-full p-0' : 'rounded-full px-4'}
             >
-                <Link href="/my-account" aria-label="My account" className='text-white!'>
+                <Link href="/my-account" aria-label="My account" className="text-white!">
                     {compact ? '👤' : 'Sign in'}
                 </Link>
             </Button>

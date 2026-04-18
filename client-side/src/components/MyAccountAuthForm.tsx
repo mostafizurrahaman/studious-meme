@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 
 import {
@@ -28,9 +29,50 @@ const initialSignUpState: SignUpState = {
     email: '',
 };
 
+function PasswordField({
+    name,
+    placeholder,
+    value,
+    onToggle,
+    visible,
+    readOnly,
+}: {
+    name: string;
+    placeholder: string;
+    value?: string;
+    onToggle: () => void;
+    visible: boolean;
+    readOnly?: boolean;
+}) {
+    return (
+        <div className="relative">
+            <Input
+                name={name}
+                placeholder={placeholder}
+                type={visible ? 'text' : 'password'}
+                value={value}
+                readOnly={readOnly}
+                required={!readOnly}
+                className="h-11 px-4 pr-12 text-sm"
+            />
+            <button
+                type="button"
+                onClick={onToggle}
+                aria-label={visible ? 'Hide password' : 'Show password'}
+                className="absolute inset-y-0 right-3 inline-flex items-center text-foreground/50 transition hover:text-foreground"
+            >
+                {visible ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+            </button>
+        </div>
+    );
+}
+
 export function MyAccountAuthForm() {
     const router = useRouter();
     const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+    const [showSigninPassword, setShowSigninPassword] = useState(false);
+    const [showSignupPassword, setShowSignupPassword] = useState(false);
+    const [showSignupConfirmPassword, setShowSignupConfirmPassword] = useState(false);
     const [isResending, startResendTransition] = useTransition();
     const [state, formAction, isPending] = useActionState(submitSignIn, initialState);
     const [signupState, signupAction, signupPending] = useActionState(submitSignUp, initialSignUpState);
@@ -43,7 +85,7 @@ export function MyAccountAuthForm() {
 
         if (state.ok) {
             toast.success(state.message);
-            router.refresh();
+            router.push('/');
             return;
         }
 
@@ -66,7 +108,7 @@ export function MyAccountAuthForm() {
 
         if (otpState.ok) {
             toast.success(otpState.message);
-            router.refresh();
+            router.push('/');
             return;
         }
 
@@ -103,8 +145,13 @@ export function MyAccountAuthForm() {
                 <CardContent className="mt-5 p-0">
                     {mode === 'signin' ? (
                         <form action={formAction} className="grid gap-4">
-                            <Input name="email" type="email" placeholder="Email address" required />
-                            <Input name="password" placeholder="Password" type="password" required />
+                            <Input name="email" type="email" placeholder="Email address" required className="h-11 px-4 text-sm" />
+                            <PasswordField
+                                name="password"
+                                placeholder="Password"
+                                onToggle={() => setShowSigninPassword(value => !value)}
+                                visible={showSigninPassword}
+                            />
                             <Button
                                 type="submit"
                                 disabled={isPending}
@@ -115,8 +162,8 @@ export function MyAccountAuthForm() {
                         </form>
                     ) : showOtpStep ? (
                         <form action={otpAction} className="grid gap-4">
-                            <Input name="otp-email" type="email" value={signupEmail} readOnly />
-                            <Input name="otp" placeholder="6 digit OTP" required />
+                            <Input name="otp-email" type="email" value={signupEmail} readOnly className="h-11 px-4 text-sm" />
+                            <Input name="otp" placeholder="6 digit OTP" required className="h-11 px-4 text-sm" />
                             <div className="flex flex-wrap gap-3">
                                 <Button
                                     type="submit"
@@ -146,14 +193,19 @@ export function MyAccountAuthForm() {
                         </form>
                     ) : (
                         <form action={signupAction} className="grid gap-4">
-                            <Input name="signup-name" placeholder="Full name" required />
-                            <Input name="signup-email" type="email" placeholder="Email address" required />
-                            <Input name="signup-password" placeholder="Password" type="password" required />
-                            <Input
+                            <Input name="signup-name" placeholder="Full name" required className="h-11 px-4 text-sm" />
+                            <Input name="signup-email" type="email" placeholder="Email address" required className="h-11 px-4 text-sm" />
+                            <PasswordField
+                                name="signup-password"
+                                placeholder="Password"
+                                onToggle={() => setShowSignupPassword(value => !value)}
+                                visible={showSignupPassword}
+                            />
+                            <PasswordField
                                 name="signup-confirm-password"
                                 placeholder="Confirm password"
-                                type="password"
-                                required
+                                onToggle={() => setShowSignupConfirmPassword(value => !value)}
+                                visible={showSignupConfirmPassword}
                             />
                             <Button
                                 type="submit"

@@ -10,7 +10,7 @@ const authTokenPayloadSchema = z
         name: z.string().optional(),
         email: z.string().email().optional(),
         phone: z.string().optional(),
-        dob: z.union([z.string(), z.date()]).optional(),
+        dob: z.union([z.string(), z.date(), z.null()]).optional(),
         image: z.string().optional(),
         role: z.string().optional(),
         exp: z.number().optional(),
