@@ -300,6 +300,13 @@ const deactivateUserAccountSchema = z.object({
         .strict(),
 });
 
+// 13. adminUpdateUserStatusSchema
+const adminUpdateUserStatusSchema = z.object({
+    body: z.object({
+        isActive: z.boolean({ error: 'isActive is required!' }),
+    }),
+});
+
 export const UserValidation = {
     createUserSchema,
     sendSignupOtpAgainSchema,
@@ -313,4 +320,5 @@ export const UserValidation = {
     resetPasswordSchema,
     getNewAccessTokenSchema,
     deactivateUserAccountSchema,
+    adminUpdateUserStatusSchema,
 };

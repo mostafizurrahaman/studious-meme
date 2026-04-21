@@ -5,6 +5,7 @@ import { updateTag } from 'next/cache';
 import { requestBackendJson } from '@/lib/backend-api';
 import { getValidAccessTokenForServerActions } from '@/lib/getValidAccessToken';
 import type { Product as StorefrontProduct } from '@/lib/malamal-content';
+import { slugify } from '@/lib/slug';
 
 type BackendEnvelope<T> = {
     success?: boolean;
@@ -21,16 +22,18 @@ export type BackendProduct = {
     slug: string;
     sku: string;
     image: string;
-    price: string;
-    oldPrice?: string;
+    price: number;
+    oldPrice?: number;
     badge?: string;
     brand: BackendProductRef;
     category: BackendProductRef;
     subCategorySlug?: string;
-    stock: string;
-    rating: string;
+    stock: number;
+    rating: number;
     isFeatured: boolean;
     isActive: boolean;
+    createdAt?: string;
+    updatedAt?: string;
 };
 
 function resolveName(value: BackendProductRef): string {
@@ -49,13 +52,13 @@ export async function mapBackendProductToStorefrontProduct(
         slug: product.slug,
         href: '/shop',
         image: product.image,
-        price: product.price,
-        oldPrice: product.oldPrice,
+        price: String(product.price),
+        oldPrice: product.oldPrice === undefined ? undefined : String(product.oldPrice),
         badge: product.badge,
         brand: resolveName(product.brand),
         sku: product.sku,
-        stock: product.stock,
-        rating: product.rating,
+        stock: product.stock > 0 ? `${product.stock} in stock` : 'Out of stock',
+        rating: String(product.rating),
         category: resolveName(product.category),
     };
 }
@@ -89,22 +92,36 @@ type ProductMutationPayload = {
     title: string;
     slug: string;
     sku: string;
-    image: string;
-    price: string;
-    oldPrice?: string;
+    image?: File | string;
+    price: number;
+    oldPrice?: number;
     badge?: string;
     brand: string;
     category: string;
     subCategorySlug?: string;
-    stock: string;
-    rating: string;
+    stock: number;
+    rating: number;
     isFeatured?: boolean;
     isActive?: boolean;
 };
 
 function toFormData(payload: Record<string, unknown>) {
     const formData = new FormData();
-    formData.set('data', JSON.stringify(payload));
+
+    const { image, ...rest } = payload as { image?: File | string; [key: string]: unknown };
+
+    formData.set(
+        'data',
+        JSON.stringify({
+            ...rest,
+            ...(typeof image === 'string' && image ? { image } : {}),
+        }),
+    );
+
+    if (image instanceof File) {
+        formData.append('image', image);
+    }
+
     return formData;
 }
 
@@ -114,7 +131,10 @@ export const createProduct = async (
     const accessToken = await getValidAccessTokenForServerActions();
     const result = await requestBackendJson<BackendEnvelope<BackendProduct>>('/product/products', {
         method: 'POST',
-        body: toFormData(payload),
+        body: toFormData({
+            ...payload,
+            slug: slugify(payload.slug),
+        }),
         token: accessToken ?? undefined,
     });
 
@@ -129,7 +149,10 @@ export const updateProduct = async (
     const accessToken = await getValidAccessTokenForServerActions();
     const result = await requestBackendJson<BackendEnvelope<BackendProduct>>(`/product/products/${slug}`, {
         method: 'PATCH',
-        body: toFormData(payload),
+        body: toFormData({
+            ...payload,
+            slug: payload.slug ? slugify(payload.slug) : payload.slug,
+        }),
         token: accessToken ?? undefined,
     });
 

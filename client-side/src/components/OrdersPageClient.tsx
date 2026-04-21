@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { formatMoney, type CartItem } from '@/lib/cart';
+import { formatDashboardDate } from '@/lib/formatDate';
 import { useCartStore } from '@/lib/cart-store';
 import type { BackendOrder } from '@/services/Order';
 
@@ -52,7 +53,9 @@ export function OrdersPageClient({
                                             {order.orderId}
                                         </Link>
                                         <div className="mt-1 text-xs uppercase tracking-[0.22em] text-foreground/45">
-                                            {new Date(order.createdAt).toLocaleString('en-US')}
+                                            <span title={formatDashboardDate(order.createdAt, { time: true })}>
+                                                {formatDashboardDate(order.createdAt)}
+                                            </span>
                                         </div>
                                     </div>
                                     <div className="rounded-full bg-muted px-4 py-2 text-sm font-semibold text-foreground/70">

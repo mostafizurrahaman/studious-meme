@@ -40,7 +40,7 @@ export const getValidAccessTokenForServerActions = async (): Promise<string | vo
             return logOut();
         }
 
-        (await cookies()).set('accessToken', accessToken);
+        (await cookies()).set('accessToken', accessToken, { path: '/' });
     }
 
     return accessToken;
@@ -52,17 +52,22 @@ let tokenExpiry: number | null = null; // for not getting new token again and ag
 export const getValidAccessTokenForServerHandlerGet = async (clientCall = false): Promise<string | null> => {
     const now = Date.now();
 
-    // ✅ Step 1: if cached token is still valid
-    if (cachedAccessToken && tokenExpiry && now < tokenExpiry) {
-        return cachedAccessToken;
-    }
-
-    // ✅ Step 2: get refreshToken from cookies
+    // ✅ Step 1: read the current cookie token
     const cookieStore = await cookies();
     const accessToken = cookieStore.get('accessToken')?.value;
 
     if (!accessToken) {
         return null; // 🚫 user not logged in
+    }
+
+    if (cachedAccessToken !== accessToken) {
+        cachedAccessToken = null;
+        tokenExpiry = null;
+    }
+
+    // ✅ Step 2: if cached token is still valid and matches cookie, reuse it
+    if (cachedAccessToken && tokenExpiry && now < tokenExpiry) {
+        return cachedAccessToken;
     }
 
     if (accessToken && (await isTokenExpired(accessToken))) {
@@ -83,13 +88,17 @@ export const getValidAccessTokenForServerHandlerGet = async (clientCall = false)
 
         // ✅ Step 5: save in cookie if clientCall = true
         if (clientCall) {
-            (await cookies()).set('accessToken', newAccessToken);
+            (await cookies()).set('accessToken', newAccessToken, { path: '/' });
         }
 
         cachedAccessToken = newAccessToken;
 
         return cachedAccessToken;
     }
+
+    const payload: { exp: number } = jwtDecode(accessToken);
+    tokenExpiry = payload.exp * 1000;
+    cachedAccessToken = accessToken;
 
     return accessToken;
 };

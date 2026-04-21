@@ -6,6 +6,7 @@ import { useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatMoney } from '@/lib/cart';
+import { formatDashboardDate } from '@/lib/formatDate';
 import type { BackendOrder } from '@/services/Order';
 
 export function OrderDetailAdminClient({
@@ -37,7 +38,12 @@ export function OrderDetailAdminClient({
                 <div>
                     <h2 className="text-2xl font-bold">{order.orderId}</h2>
                     <div className="mt-2 flex flex-wrap gap-3 text-sm text-muted-foreground">
-                        <span>{new Date(order.createdAt).toLocaleString()}</span>
+                        <span title={formatDashboardDate(order.createdAt, { time: true })}>
+                            {formatDashboardDate(order.createdAt)}
+                        </span>
+                        <span title={formatDashboardDate(order.updatedAt, { time: true })}>
+                            {formatDashboardDate(order.updatedAt)}
+                        </span>
                         <span className="font-medium">{order.status}</span>
                         <span>{order.paymentMethod}</span>
                         <span>{order.paymentStatus}</span>

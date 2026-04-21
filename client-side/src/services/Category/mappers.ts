@@ -7,6 +7,8 @@ export type BackendSubCategory = {
     description?: string;
     accent?: string;
     isActive?: boolean;
+    createdAt?: string;
+    updatedAt?: string;
 };
 
 export type BackendCategory = {
@@ -17,6 +19,8 @@ export type BackendCategory = {
     accent?: string;
     isActive?: boolean;
     subCategories?: BackendSubCategory[];
+    createdAt?: string;
+    updatedAt?: string;
 };
 
 const accentPalette = [

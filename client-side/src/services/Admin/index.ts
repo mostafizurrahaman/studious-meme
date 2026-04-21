@@ -6,7 +6,14 @@ import {
     getValidAccessTokenForServerActions,
     getValidAccessTokenForServerHandlerGet,
 } from '@/lib/getValidAccessToken';
-import { CreateUserFormValues } from '@/utils/createAdminValidation';
+
+type AdminCreatePayload = {
+    name: string;
+    email: string;
+    phone?: string;
+    password: string;
+    image?: File | string;
+};
 
 type BackendEnvelope<T> = {
     success?: boolean;
@@ -42,18 +49,51 @@ export const getAllAdmins = async (): Promise<BackendEnvelope<unknown>> => {
 export const blockUnblockSingleUserById = async (): Promise<BackendEnvelope<unknown>> =>
     unsupported('Endpoint not supported by current backend.');
 
-export const createUser = async (payload: CreateUserFormValues): Promise<BackendEnvelope<unknown>> => {
+export const updateUserStatus = async (
+    userId: string,
+    isActive: boolean,
+): Promise<BackendEnvelope<unknown>> => {
+    const accessToken = await getValidAccessTokenForServerActions();
+    const result = await requestBackendJson<BackendEnvelope<unknown>>(`/user/admin-users/${userId}/status`, {
+        method: 'PATCH',
+        body: { isActive },
+        token: accessToken ?? undefined,
+    });
+
+    updateTag('USERS');
+    return result;
+};
+
+export const deleteUserById = async (userId: string): Promise<BackendEnvelope<unknown>> => {
+    const accessToken = await getValidAccessTokenForServerActions();
+    const result = await requestBackendJson<BackendEnvelope<unknown>>(`/user/admin-users/${userId}`, {
+        method: 'DELETE',
+        token: accessToken ?? undefined,
+    });
+
+    updateTag('USERS');
+    return result;
+};
+
+export const createUser = async (payload: AdminCreatePayload): Promise<BackendEnvelope<unknown>> => {
     const accessToken = await getValidAccessTokenForServerActions();
     const formData = new FormData();
+
+    const { image, ...rest } = payload;
     formData.set(
         'data',
         JSON.stringify({
-            name: payload.name.trim(),
-            email: payload.email.trim().toLowerCase(),
-            phone: payload.phone,
-            password: payload.password,
+            name: rest.name.trim(),
+            email: rest.email.trim().toLowerCase(),
+            phone: rest.phone,
+            password: rest.password,
+            ...(typeof image === 'string' && image ? { image } : {}),
         }),
     );
+
+    if (image instanceof File) {
+        formData.append('image', image);
+    }
 
     const result = await requestBackendJson<BackendEnvelope<unknown>>('/admin/admins', {
         method: 'POST',
@@ -67,11 +107,23 @@ export const createUser = async (payload: CreateUserFormValues): Promise<Backend
 
 export const updateAdmin = async (
     userId: string,
-    payload: { name?: string; email?: string; phone?: string; isActive?: boolean },
+    payload: { name?: string; email?: string; phone?: string; isActive?: boolean; image?: File | string },
 ): Promise<BackendEnvelope<unknown>> => {
     const accessToken = await getValidAccessTokenForServerActions();
     const formData = new FormData();
-    formData.set('data', JSON.stringify(payload));
+
+    const { image, ...rest } = payload;
+    formData.set(
+        'data',
+        JSON.stringify({
+            ...rest,
+            ...(typeof image === 'string' && image ? { image } : {}),
+        }),
+    );
+
+    if (image instanceof File) {
+        formData.append('image', image);
+    }
 
     const result = await requestBackendJson<BackendEnvelope<unknown>>(`/admin/admins/${userId}`, {
         method: 'PATCH',

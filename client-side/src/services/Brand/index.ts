@@ -20,6 +20,8 @@ export type BackendBrand = {
     image?: string;
     description?: string;
     isActive: boolean;
+    createdAt?: string;
+    updatedAt?: string;
 };
 
 export async function mapBackendBrandToStorefrontBrand(brand: BackendBrand): Promise<StorefrontBrand> {

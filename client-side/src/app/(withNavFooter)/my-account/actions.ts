@@ -1,7 +1,6 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-
 import { logOut, sendSignupOtpAgain, signInUser, signUpUser, verifySignupOtp } from '@/services/Auth';
 
 export type SignInState = { ok: false; message: string } | { ok: true; message: string };

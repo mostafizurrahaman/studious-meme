@@ -51,7 +51,7 @@ const createAdminIntoDB = async (payload: IAdminCreatePayload, imageFile?: Multe
 // 2. getAllAdminsFromDB
 const getAllAdminsFromDB = async () => {
     return UserModel.find({ role: ROLE.ADMIN })
-        .select('name email phone image role isActive createdAt updatedAt')
+        .select('name email phone image isActive createdAt updatedAt')
         .sort({ createdAt: -1 })
         .lean();
 };
@@ -59,7 +59,7 @@ const getAllAdminsFromDB = async () => {
 // 3. getAdminByIdFromDB
 const getAdminByIdFromDB = async (userId: string) => {
     const admin = await UserModel.findOne({ _id: userId, role: ROLE.ADMIN })
-        .select('name email phone image role isActive createdAt updatedAt')
+        .select('name email phone image isActive createdAt updatedAt')
         .lean();
 
     if (!admin) {
@@ -92,8 +92,8 @@ const updateAdminIntoDB = async (
         const admin = await UserModel.findOneAndUpdate(
             { _id: userId, role: ROLE.ADMIN },
             { ...payload, ...(uploadedImage ? { image: uploadedImage } : {}) },
-            { new: true, runValidators: true },
-        ).select('name email phone image role isActive createdAt updatedAt');
+            { returnDocument: 'after', runValidators: true },
+        ).select('name email phone image isActive createdAt updatedAt');
 
         if (!admin) {
             if (uploadedImage) {
@@ -121,8 +121,8 @@ const deleteAdminFromDB = async (userId: string) => {
     const admin = await UserModel.findOneAndUpdate(
         { _id: userId, role: ROLE.ADMIN },
         { isDeleted: true, isActive: false },
-        { new: true },
-    ).select('name email phone image role isActive isDeleted createdAt updatedAt');
+        { returnDocument: 'after' },
+    ).select('name email phone image isActive isDeleted createdAt updatedAt');
 
     if (!admin) {
         throw new AppError(httpStatus.NOT_FOUND, 'Admin not found!');

@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { formatDashboardDate } from '@/lib/formatDate';
 import type { BackendPayment } from '@/services/Payment';
 
 function getStatusVariant(status: BackendPayment['status']) {
@@ -62,7 +63,11 @@ export function DashboardPaymentsManager({
                                     <TableCell>
                                         <Badge variant={getStatusVariant(item.status)}>{item.status}</Badge>
                                     </TableCell>
-                                    <TableCell>{new Date(item.createdAt).toLocaleDateString()}</TableCell>
+                                     <TableCell>
+                                         <span title={formatDashboardDate(item.createdAt, { time: true })}>
+                                             {formatDashboardDate(item.createdAt)}
+                                         </span>
+                                     </TableCell>
                                 </TableRow>
                             );
                         })}

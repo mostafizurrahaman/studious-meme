@@ -77,7 +77,7 @@ const updateHeroSectionIntoDB = async (
     const existing = await HeroSectionModel.findById(id);
 
     if (!existing) {
-        return null;
+        throw new AppError(httpStatus.NOT_FOUND, 'Hero section not found!');
     }
 
     const previousImages = [...existing.slides, ...existing.features].map(card => card.image).filter(Boolean);
@@ -88,12 +88,12 @@ const updateHeroSectionIntoDB = async (
         ensureHeroSectionImages(updatedPayload);
 
         const updated = await HeroSectionModel.findByIdAndUpdate(id, updatedPayload, {
-            new: true,
+            returnDocument: 'after',
             runValidators: true,
         });
 
         if (!updated) {
-            return null;
+            throw new AppError(httpStatus.NOT_FOUND, 'Hero section not found!');
         }
 
         const nextImages = [...updated.slides, ...updated.features].map(card => card.image).filter(Boolean);

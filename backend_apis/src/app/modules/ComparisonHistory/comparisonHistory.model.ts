@@ -8,9 +8,9 @@ type ComparisonProductSnapshot = {
     image: string;
     sku: string;
     slug: string;
-    stock: string;
-    rating: string;
-    oldPrice?: string;
+    stock: number;
+    rating: number;
+    oldPrice?: number;
     isFeatured: boolean;
 };
 
@@ -31,9 +31,9 @@ const comparisonProductSnapshotSchema = new Schema<ComparisonProductSnapshot>(
         image: { type: String, required: true },
         sku: { type: String, required: true },
         slug: { type: String, required: true },
-        stock: { type: String, required: true },
-        rating: { type: String, required: true },
-        oldPrice: { type: String },
+        stock: { type: Number, required: true },
+        rating: { type: Number, required: true },
+        oldPrice: { type: Number },
         isFeatured: { type: Boolean, required: true },
     },
     { _id: false },

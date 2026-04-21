@@ -14,6 +14,7 @@ import { TableFilter } from '@/components/ui/table-filter';
 import { TablePagination } from '@/components/ui/table-pagination';
 import { createBrand, deleteBrand, type BackendBrand, updateBrand } from '@/services/Brand';
 import { slugify } from '@/lib/slug';
+import { formatDashboardDate } from '@/lib/formatDate';
 import Image from 'next/image';
 const initialForm = { name: '', slug: '', image: '', description: '', isActive: true };
 
@@ -286,6 +287,8 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
                 <TableHead>Name</TableHead>
                 <TableHead>Slug</TableHead>
                 <TableHead>Description</TableHead>
+                <TableHead>Created At</TableHead>
+                <TableHead>Updated At</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -414,6 +417,16 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
                       ) : (
                         sliceText(brand.description)
                       )}
+                    </TableCell>
+                    <TableCell>
+                      <span title={formatDashboardDate(brand.createdAt, { time: true })}>
+                        {formatDashboardDate(brand.createdAt)}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <span title={formatDashboardDate(brand.updatedAt, { time: true })}>
+                        {formatDashboardDate(brand.updatedAt)}
+                      </span>
                     </TableCell>
                     <TableCell>
                       {isEditing ? (

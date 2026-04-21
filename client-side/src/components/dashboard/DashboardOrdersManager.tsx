@@ -1,9 +1,9 @@
 import Link from 'next/link';
-
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { formatDashboardDate } from '@/lib/formatDate';
 import type { BackendOrder } from '@/services/Order';
 
 export function DashboardOrdersManager({
@@ -34,6 +34,8 @@ export function DashboardOrdersManager({
                             <TableHead>Status</TableHead>
                             <TableHead>Payment</TableHead>
                             <TableHead>Total</TableHead>
+                            <TableHead>Created At</TableHead>
+                            <TableHead>Updated At</TableHead>
                             <TableHead className="text-right">Action</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -48,7 +50,9 @@ export function DashboardOrdersManager({
                                         {order.orderId}
                                     </Link>
                                     <div className="text-xs text-muted-foreground">
-                                        {new Date(order.createdAt).toLocaleString('en-US')}
+                                        <span title={formatDashboardDate(order.createdAt, { time: true })}>
+                                            {formatDashboardDate(order.createdAt)}
+                                        </span>
                                     </div>
                                 </TableCell>
                                 <TableCell>
@@ -65,6 +69,16 @@ export function DashboardOrdersManager({
                                     <div className="text-xs text-muted-foreground">{order.paymentStatus}</div>
                                 </TableCell>
                                 <TableCell>Tk. {order.total.toFixed(2)}</TableCell>
+                                <TableCell>
+                                    <span title={formatDashboardDate(order.createdAt, { time: true })}>
+                                        {formatDashboardDate(order.createdAt)}
+                                    </span>
+                                </TableCell>
+                                <TableCell>
+                                    <span title={formatDashboardDate(order.updatedAt, { time: true })}>
+                                        {formatDashboardDate(order.updatedAt)}
+                                    </span>
+                                </TableCell>
                                 <TableCell className="text-right">
                                     <form action={updateStatus} className="flex justify-end gap-2">
                                         <input type="hidden" name="orderId" value={order.orderId} />

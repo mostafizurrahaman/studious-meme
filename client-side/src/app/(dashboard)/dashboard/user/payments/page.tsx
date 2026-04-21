@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { formatDashboardDate } from '@/lib/formatDate';
 import { requireRoleSegment } from '@/lib/dashboard-auth';
 import { buildMetadata } from '@/lib/seo';
 import { getMyPayments, type BackendPayment } from '@/services/Payment';
@@ -51,8 +52,12 @@ export default async function UserPaymentsPage() {
                                     <TableCell>{orderId}</TableCell>
                                     <TableCell>Tk. {item.amount}</TableCell>
                                     <TableCell>{item.status}</TableCell>
-                                    <TableCell>{new Date(item.createdAt).toLocaleDateString()}</TableCell>
-                                </TableRow>
+                                <TableCell>
+                                    <span title={formatDashboardDate(item.createdAt, { time: true })}>
+                                        {formatDashboardDate(item.createdAt)}
+                                    </span>
+                                </TableCell>
+                            </TableRow>
                             );
                         })}
                     </TableBody>

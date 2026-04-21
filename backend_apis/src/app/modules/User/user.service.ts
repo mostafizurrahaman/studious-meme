@@ -867,6 +867,34 @@ const adminGetAllUsersFromDB = async (query: Record<string, unknown>) => {
     return { data: facetResult.data, meta };
 };
 
+const adminUpdateUserStatusIntoDB = async (userId: string, isActive: boolean) => {
+    const user = await UserModel.findOneAndUpdate(
+        { _id: userId, role: { $nin: [ROLE.ADMIN, ROLE.SUPER_ADMIN] } },
+        { isActive },
+        { returnDocument: 'after', runValidators: true },
+    ).select('name email phone image isActive isDeleted createdAt updatedAt');
+
+    if (!user) {
+        throw new AppError(httpStatus.NOT_FOUND, 'User not found!');
+    }
+
+    return null;
+};
+
+const adminDeleteUserIntoDB = async (userId: string) => {
+    const user = await UserModel.findOneAndUpdate(
+        { _id: userId, role: { $nin: [ROLE.ADMIN, ROLE.SUPER_ADMIN] } },
+        { isDeleted: true, isActive: false },
+        { returnDocument: 'after', runValidators: true },
+    ).select('name email phone image isActive isDeleted createdAt updatedAt');
+
+    if (!user) {
+        throw new AppError(httpStatus.NOT_FOUND, 'User not found!');
+    }
+
+    return null;
+};
+
 // 18. adminGetAllMetaDataFromDB (dashboard meta aggregation)
 // const adminGetAllMetaDataFromDB = async () => {
 //   const [
@@ -1226,6 +1254,8 @@ export const UserService = {
     deactivateAccountIntoDB,
     deleteSpecificUserAccountIntoDB,
     adminGetAllUsersFromDB,
+    adminUpdateUserStatusIntoDB,
+    adminDeleteUserIntoDB,
     // adminGetAllMetaDataFromDB,
     // getAllUserFromDB,
 };

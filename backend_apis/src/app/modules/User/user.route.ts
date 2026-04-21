@@ -100,6 +100,18 @@ router.route('/delete-account').delete(auth(ROLE.USER), UserController.deleteSpe
 // 16. adminGetAllUsers
 router.route('/admin-get-all').get(auth(ROLE.ADMIN, ROLE.SUPER_ADMIN), UserController.adminGetAllUsers);
 
+// 17. adminUpdateUserStatus
+router
+    .route('/admin-users/:userId/status')
+    .patch(
+        auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
+        validateRequest(UserValidation.adminUpdateUserStatusSchema),
+        UserController.adminUpdateUserStatus,
+    );
+
+// 18. adminDeleteUser
+router.route('/admin-users/:userId').delete(auth(ROLE.ADMIN, ROLE.SUPER_ADMIN), UserController.adminDeleteUser);
+
 // 17. adminGetAllMetaData
 // router
 //   .route('/meta-data')

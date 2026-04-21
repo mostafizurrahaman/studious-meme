@@ -19,18 +19,29 @@ type CreateOrderPayload = {
     paymentMethod: TPaymentMethod;
 };
 
-const parsePrice = (value: string) => {
-    const normalized = value.replace(/[^0-9.]/g, '');
-    const amount = Number(normalized);
-
-    if (!Number.isFinite(amount)) {
+const parsePrice = (value: number) => {
+    if (!Number.isFinite(value)) {
         throw new AppError(httpStatus.BAD_REQUEST, 'Invalid product price found in catalog.');
     }
 
-    return amount;
+    return value;
 };
 
 const createOrderId = () => `ORD-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
+
+const decrementProductStock = async (sku: string, quantity: number) => {
+    const updated = await ProductModel.findOneAndUpdate(
+        { sku, isActive: true, stock: { $gte: quantity } },
+        { $inc: { stock: -quantity } },
+        { returnDocument: 'after', runValidators: true },
+    ).lean();
+
+    if (!updated) {
+        throw new AppError(httpStatus.BAD_REQUEST, `Not enough stock available for SKU ${sku}.`);
+    }
+
+    return updated;
+};
 
 const createOrderIntoDB = async (user: IUser, payload: CreateOrderPayload) => {
     const skuList = payload.items.map(item => item.sku);
@@ -45,56 +56,83 @@ const createOrderIntoDB = async (user: IUser, payload: CreateOrderPayload) => {
 
     const productMap = new Map(products.map(product => [product.sku, product]));
 
-    const items: IOrderItemSnapshot[] = payload.items.map(item => {
-        const product = productMap.get(item.sku);
+    const updatedStocks: Array<{ sku: string; quantity: number }> = [];
 
-        if (!product) {
-            throw new AppError(httpStatus.BAD_REQUEST, `Product with SKU ${item.sku} is unavailable.`);
+    try {
+        const items: IOrderItemSnapshot[] = payload.items.map(item => {
+            const product = productMap.get(item.sku);
+
+            if (!product) {
+                throw new AppError(httpStatus.BAD_REQUEST, `Product with SKU ${item.sku} is unavailable.`);
+            }
+
+            if (!Number.isInteger(item.quantity) || item.quantity <= 0) {
+                throw new AppError(httpStatus.BAD_REQUEST, `Invalid quantity for SKU ${item.sku}.`);
+            }
+
+            const unitStock = Number(product.stock);
+
+            if (!Number.isFinite(unitStock) || unitStock < item.quantity) {
+                throw new AppError(httpStatus.BAD_REQUEST, `Not enough stock available for SKU ${item.sku}.`);
+            }
+
+            const unitPrice = parsePrice(product.price);
+
+            return {
+                product: product._id,
+                title: product.title,
+                slug: product.slug,
+                sku: product.sku,
+                image: product.image,
+                brand: (product.brand as unknown as { name: string }).name,
+                category: (product.category as unknown as { name: string }).name,
+                unitPrice,
+                quantity: item.quantity,
+                lineTotal: unitPrice * item.quantity,
+            };
+        });
+
+        for (const item of payload.items) {
+            await decrementProductStock(item.sku, item.quantity);
+            updatedStocks.push({ sku: item.sku, quantity: item.quantity });
         }
 
-        const unitPrice = parsePrice(product.price);
+        const subtotal = items.reduce((sum, item) => sum + item.lineTotal, 0);
+        const discount = 0;
+        const delivery = subtotal > 0 ? 250 : 0;
+        const total = Math.max(subtotal - discount + delivery, 0);
+        const paymentStatus: TPaymentStatus = payload.paymentMethod === 'SSL_COMMERZ' ? 'PENDING' : 'UNPAID';
+        const status: TOrderStatus = 'PLACED';
 
-        return {
-            product: product._id,
-            title: product.title,
-            slug: product.slug,
-            sku: product.sku,
-            image: product.image,
-            brand: (product.brand as unknown as { name: string }).name,
-            category: (product.category as unknown as { name: string }).name,
-            unitPrice,
-            quantity: item.quantity,
-            lineTotal: unitPrice * item.quantity,
-        };
-    });
+        const order = await OrderModel.create({
+            orderId: createOrderId(),
+            user: user._id,
+            items,
+            customer: {
+                ...payload.customer,
+                email: payload.customer.email || undefined,
+                note: payload.customer.note || undefined,
+            },
+            subtotal,
+            discount,
+            delivery,
+            total,
+            couponCode: payload.couponCode || undefined,
+            paymentMethod: payload.paymentMethod,
+            paymentStatus,
+            status,
+        });
 
-    const subtotal = items.reduce((sum, item) => sum + item.lineTotal, 0);
-    const discount = 0;
-    const delivery = subtotal > 0 ? 250 : 0;
-    const total = Math.max(subtotal - discount + delivery, 0);
-    const paymentStatus: TPaymentStatus = payload.paymentMethod === 'SSL_COMMERZ' ? 'PENDING' : 'UNPAID';
-    const status: TOrderStatus = 'PLACED';
+        return order;
+    } catch (error) {
+        await Promise.all(
+            updatedStocks.map(item =>
+                ProductModel.updateOne({ sku: item.sku }, { $inc: { stock: item.quantity } }),
+            ),
+        );
 
-    const order = await OrderModel.create({
-        orderId: createOrderId(),
-        user: user._id,
-        items,
-        customer: {
-            ...payload.customer,
-            email: payload.customer.email || undefined,
-            note: payload.customer.note || undefined,
-        },
-        subtotal,
-        discount,
-        delivery,
-        total,
-        couponCode: payload.couponCode || undefined,
-        paymentMethod: payload.paymentMethod,
-        paymentStatus,
-        status,
-    });
-
-    return order;
+        throw error;
+    }
 };
 
 const getMyOrdersFromDB = async (user: IUser) => {
@@ -147,7 +185,7 @@ const updateOrderStatusIntoDB = async (orderId: string, status: TOrderStatus) =>
     const order = await OrderModel.findOneAndUpdate(
         { orderId },
         { status },
-        { new: true, runValidators: true },
+        { returnDocument: 'after', runValidators: true },
     ).lean();
 
     if (!order) {
@@ -177,7 +215,7 @@ const updateOrderPaymentIntoDB = async (
     }>,
 ) => {
     const order = await OrderModel.findOneAndUpdate({ orderId }, payload, {
-        new: true,
+        returnDocument: 'after',
         runValidators: true,
     }).lean();
 

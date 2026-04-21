@@ -51,14 +51,14 @@ const updateCategoryIntoDB = async (slug: string, payload: Partial<ICategory>, i
         const updated = await CategoryModel.findOneAndUpdate(
             { slug },
             { ...payload, ...(uploadedImage ? { image: uploadedImage } : {}) },
-            { new: true, runValidators: true },
+            { returnDocument: 'after', runValidators: true },
         );
 
         if (!updated) {
             if (uploadedImage) {
                 await deleteImageFromCloudinary(uploadedImage);
             }
-            return null;
+            throw new AppError(httpStatus.NOT_FOUND, 'Category not found!');
         }
 
         if (uploadedImage && existingCategory.image && existingCategory.image !== uploadedImage) {

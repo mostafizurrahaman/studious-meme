@@ -5,6 +5,8 @@ import { UserService } from './user.service';
 import { sendResponse } from '../../utils';
 import { OTP_EXPIRY_MINUTES } from './user.constant';
 
+const getSingleParam = (value: string | string[]) => (Array.isArray(value) ? value[0] : value);
+
 // 1. createUser
 const createUser = asyncHandler(async (req, res) => {
     const result = await UserService.createUserIntoDB(req.body);
@@ -193,6 +195,28 @@ const adminGetAllUsers = asyncHandler(async (req, res) => {
     });
 });
 
+// 17. adminUpdateUserStatus
+const adminUpdateUserStatus = asyncHandler(async (req, res) => {
+    const result = await UserService.adminUpdateUserStatusIntoDB(getSingleParam(req.params.userId), req.body.isActive);
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        message: `User ${req.body.isActive ? 'unblocked' : 'blocked'} successfully!`,
+        data: result,
+    });
+});
+
+// 18. adminDeleteUser
+const adminDeleteUser = asyncHandler(async (req, res) => {
+    const result = await UserService.adminDeleteUserIntoDB(getSingleParam(req.params.userId));
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        message: 'User deleted successfully!',
+        data: result,
+    });
+});
+
 // 17. adminGetAllMetaData
 // const adminGetAllMetaData = asyncHandler(async (req, res) => {
 //   const result = await UserService.adminGetAllMetaDataFromDB();
@@ -233,6 +257,8 @@ export const UserController = {
     deactivateUserAccount,
     deleteSpecificUserAccount,
     adminGetAllUsers,
+    adminUpdateUserStatus,
+    adminDeleteUser,
     // adminGetAllMetaData,
     // getAllUser,
 };

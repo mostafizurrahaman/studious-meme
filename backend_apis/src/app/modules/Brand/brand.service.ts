@@ -40,7 +40,7 @@ const updateBrandIntoDB = async (slug: string, payload: Partial<IBrand>, imageFi
     const existingBrand = await BrandModel.findOne({ slug }).select('image');
 
     if (!existingBrand) {
-        return null;
+        throw new AppError(httpStatus.NOT_FOUND, 'Brand not found!');
     }
 
     let uploadedImage: string | undefined;
@@ -54,14 +54,14 @@ const updateBrandIntoDB = async (slug: string, payload: Partial<IBrand>, imageFi
         const updated = await BrandModel.findOneAndUpdate(
             { slug },
             { ...payload, ...(uploadedImage ? { image: uploadedImage } : {}) },
-            { new: true, runValidators: true },
+            { returnDocument: 'after', runValidators: true },
         );
 
         if (!updated) {
             if (uploadedImage) {
                 await deleteImageFromCloudinary(uploadedImage);
             }
-            return null;
+            throw new AppError(httpStatus.NOT_FOUND, 'Brand not found!');
         }
 
         if (uploadedImage && existingBrand.image && existingBrand.image !== uploadedImage) {

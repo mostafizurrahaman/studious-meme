@@ -20,7 +20,7 @@ export default async function SuperAdminUsersPage() {
 
     return (
         <DashboardUsersManager
-            users={users as Array<{ _id?: string; name?: string; email?: string; phone?: string; isActive?: boolean; createdAt?: string }>}
+            users={users as Array<{ _id?: string; name?: string; email?: string; phone?: string; image?: string; dob?: string; isActive?: boolean; createdAt?: string }>}
             title="Users"
             description="Browse customer accounts managed through the backend."
         />

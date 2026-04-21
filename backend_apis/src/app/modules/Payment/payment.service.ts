@@ -108,7 +108,7 @@ const initiateSslCommerzPayment = async (user: IUser, orderId: string): Promise<
             gatewayUrl: result.GatewayPageURL,
             sessionKey: result.sessionkey,
         },
-        { upsert: true, new: true, runValidators: true },
+        { upsert: true, returnDocument: 'after', runValidators: true },
     );
 
     await OrderService.updateOrderPaymentIntoDB(order.orderId, {

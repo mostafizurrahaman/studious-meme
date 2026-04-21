@@ -19,28 +19,73 @@ import {
   updateCategorySubCategory,
 } from '@/services/Category';
 import { slugify } from '@/lib/slug';
+import { formatDashboardDate } from '@/lib/formatDate';
 import Image from 'next/image';
 
 type CategoryRow = {
-  name: string;
-  slug?: string;
-  image?: string;
-  description?: string;
-  totalNews?: number;
-  isActive?: boolean;
-  subCategories?: Array<{
     name: string;
-    slug: string;
+    slug?: string;
     image?: string;
     description?: string;
     accent?: string;
+    totalNews?: number;
     isActive?: boolean;
-  }>;
+    createdAt?: string;
+    updatedAt?: string;
+    subCategories?: Array<{
+        name: string;
+        slug: string;
+        image?: string;
+        description?: string;
+        accent?: string;
+        isActive?: boolean;
+        createdAt?: string;
+        updatedAt?: string;
+    }>;
 };
 
 type DashboardCategoriesManagerProps = {
   categories: CategoryRow[];
 };
+
+function sliceText(value?: string, maxLength = 44) {
+  if (!value) return '-';
+  return value.length > maxLength ? `${value.slice(0, maxLength).trim()}…` : value;
+}
+
+function AccentColorField({
+  value,
+  onChange,
+  placeholder,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+}) {
+  const colorValue = /^#([0-9a-fA-F]{6})$/.test(value) ? value : '#000000';
+
+  return (
+    <div className="inline-flex h-fit w-fit max-w-full items-center gap-2 rounded-xl border border-input bg-background px-2 py-1.5">
+      <label className="relative flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-muted">
+        <span className="sr-only">Pick accent color</span>
+        <span className="absolute inset-0" style={{ backgroundColor: colorValue }} />
+        <input
+          type="color"
+          value={colorValue}
+          onChange={event => onChange(event.target.value)}
+          className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+          aria-label="Pick accent color"
+        />
+      </label>
+      <DashboardInput
+        value={value}
+        onChange={event => onChange(event.target.value)}
+        placeholder={placeholder}
+        className="h-fit w-36 border-0 bg-transparent px-0 shadow-none focus-visible:ring-0"
+      />
+    </div>
+  );
+}
 
 export function DashboardCategoriesManager({ categories }: DashboardCategoriesManagerProps) {
   const router = useRouter();
@@ -48,15 +93,17 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
   const [newName, setNewName] = useState('');
   const [newSlug, setNewSlug] = useState('');
   const [newDescription, setNewDescription] = useState('');
+  const [newAccent, setNewAccent] = useState('');
   const [newSlugAutoSync, setNewSlugAutoSync] = useState(true);
   const [editingSlug, setEditingSlug] = useState<string | null>(null);
   const [editingName, setEditingName] = useState('');
   const [editingCategorySlug, setEditingCategorySlug] = useState('');
   const [editingDescription, setEditingDescription] = useState('');
+  const [editingAccent, setEditingAccent] = useState('');
   const [editingSlugAutoSync, setEditingSlugAutoSync] = useState(true);
   const [expandedSlug, setExpandedSlug] = useState<string | null>(null);
   const [newSubCategory, setNewSubCategory] = useState<
-    Record<string, { name: string; slug: string; description: string }>
+    Record<string, { name: string; slug: string; description: string; accent: string }>
   >({});
   const [newSubCategorySlugAutoSync, setNewSubCategorySlugAutoSync] = useState<Record<string, boolean>>({});
   const [editingSubCategoryKey, setEditingSubCategoryKey] = useState<string | null>(null);
@@ -64,6 +111,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
     name: '',
     slug: '',
     description: '',
+    accent: '',
     isActive: true,
   });
   const [editingSubCategorySlugAutoSync, setEditingSubCategorySlugAutoSync] = useState(true);
@@ -102,11 +150,6 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
     subCategoryImagePreviews,
   ]);
 
-  function sliceText(value?: string, maxLength = 44) {
-    if (!value) return '-';
-    return value.length > maxLength ? `${value.slice(0, maxLength).trim()}…` : value;
-  }
-
   function handleNewCategoryNameChange(value: string) {
     setNewName(value);
     if (newSlugAutoSync) {
@@ -133,7 +176,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
 
   function handleNewSubCategoryNameChange(categorySlug: string, value: string) {
     setNewSubCategory(current => {
-      const existing = current[categorySlug] ?? { name: '', slug: '', description: '' };
+      const existing = current[categorySlug] ?? { name: '', slug: '', description: '', accent: '' };
       const shouldSync = newSubCategorySlugAutoSync[categorySlug] ?? true;
 
       return {
@@ -150,7 +193,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
   function handleNewSubCategorySlugChange(categorySlug: string, value: string) {
     setNewSubCategorySlugAutoSync(current => ({ ...current, [categorySlug]: false }));
     setNewSubCategory(current => {
-      const existing = current[categorySlug] ?? { name: '', slug: '', description: '' };
+      const existing = current[categorySlug] ?? { name: '', slug: '', description: '', accent: '' };
 
       return {
         ...current,
@@ -167,6 +210,27 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
       ...current,
       name: value,
       slug: editingSubCategorySlugAutoSync ? slugify(value) : current.slug,
+    }));
+  }
+
+  function handleNewSubCategoryAccentChange(categorySlug: string, value: string) {
+    setNewSubCategory(current => {
+      const existing = current[categorySlug] ?? { name: '', slug: '', description: '', accent: '' };
+
+      return {
+        ...current,
+        [categorySlug]: {
+          ...existing,
+          accent: value,
+        },
+      };
+    });
+  }
+
+  function handleEditingSubCategoryAccentChange(value: string) {
+    setEditingSubCategory(current => ({
+      ...current,
+      accent: value,
     }));
   }
 
@@ -244,6 +308,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
         slug: newSlug.trim(),
         image: categoryImageFile,
         description: newDescription.trim(),
+        accent: newAccent.trim() || undefined,
       });
 
       if (!result?.success) {
@@ -254,6 +319,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
       setNewName('');
       setNewSlug('');
       setNewDescription('');
+      setNewAccent('');
       setCategoryImageFile(null);
       setCategoryImagePreview('');
       setNewSlugAutoSync(true);
@@ -290,6 +356,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
         name: editingName.trim(),
         slug: editingCategorySlug.trim(),
         description: editingDescription.trim(),
+        accent: editingAccent.trim() || undefined,
         image: editingCategoryImageFile ?? undefined,
       });
 
@@ -302,6 +369,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
       setEditingName('');
       setEditingCategorySlug('');
       setEditingDescription('');
+      setEditingAccent('');
       setEditingCategoryImageFile(null);
       setEditingCategoryImagePreview('');
       setEditingSlugAutoSync(true);
@@ -326,6 +394,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
         name: payload.name.trim(),
         slug: payload.slug.trim(),
         description: payload.description.trim(),
+        accent: payload.accent.trim() || undefined,
         image: subCategoryImageFiles[categorySlug] ?? undefined,
         isActive: true,
       });
@@ -337,7 +406,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
 
       setNewSubCategory(current => ({
         ...current,
-        [categorySlug]: { name: '', slug: '', description: '' },
+        [categorySlug]: { name: '', slug: '', description: '', accent: '' },
       }));
       setNewSubCategorySlugAutoSync(current => ({ ...current, [categorySlug]: true }));
       setSubCategoryImageFiles(current => ({ ...current, [categorySlug]: null }));
@@ -362,6 +431,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
         name: editingSubCategory.name.trim(),
         slug: editingSubCategory.slug.trim(),
         description: editingSubCategory.description.trim(),
+        accent: editingSubCategory.accent.trim() || undefined,
         isActive: editingSubCategory.isActive,
         image: editingSubCategoryImageFile ?? undefined,
       });
@@ -375,6 +445,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
       setEditingSubCategoryImageFile(null);
       setEditingSubCategoryImagePreview('');
       setEditingSubCategorySlugAutoSync(true);
+      setEditingSubCategory({ name: '', slug: '', description: '', accent: '', isActive: true });
       refreshWithToast(result.message ?? 'Sub-category updated successfully.', 'success');
     });
   }
@@ -404,7 +475,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
             {categories.length} categories loaded from backend. Create, rename, or remove entries here.
           </CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-3 lg:grid-cols-[1fr_1fr_1fr] xl:grid-cols-[1fr_1fr_1fr_1.2fr_auto]">
+        <CardContent className="grid gap-3 lg:grid-cols-[1fr_1fr_1fr_1fr] xl:grid-cols-[1fr_1fr_1fr_1fr_1.2fr_auto]">
           <DashboardInput
             value={newName}
             onChange={event => handleNewCategoryNameChange(event.target.value)}
@@ -414,6 +485,11 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
             value={newSlug}
             onChange={event => handleNewCategorySlugChange(event.target.value)}
             placeholder="Category slug"
+          />
+          <AccentColorField
+            value={newAccent}
+            onChange={setNewAccent}
+            placeholder="Category accent hex"
           />
           <DashboardInput
             value={newDescription}
@@ -498,15 +574,18 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
         <CardContent className="pt-6">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>No.</TableHead>
-                <TableHead>Image</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Slug</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Items</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableRow>
+                  <TableHead>No.</TableHead>
+                  <TableHead>Image</TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Slug</TableHead>
+                  <TableHead>Accent</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead>Items</TableHead>
+                  <TableHead>Created At</TableHead>
+                  <TableHead>Updated At</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -638,6 +717,22 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                           (category.slug ?? '-')
                         )}
                       </TableCell>
+                      <TableCell className="max-w-44 text-sm text-muted-foreground">
+                        {isEditing ? (
+                          <div className="grid gap-1.5">
+                            <label className="text-[11px] font-medium text-muted-foreground">
+                              Accent
+                            </label>
+                            <AccentColorField
+                              value={editingAccent}
+                              onChange={setEditingAccent}
+                              placeholder="Category accent hex"
+                            />
+                          </div>
+                        ) : (
+                          sliceText(category.accent)
+                        )}
+                      </TableCell>
                       <TableCell className="max-w-60 text-sm text-muted-foreground">
                         {isEditing ? (
                           <div className="grid gap-1.5">
@@ -655,6 +750,16 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                         )}
                       </TableCell>
                       <TableCell>{category.subCategories?.length ?? category.totalNews ?? 0}</TableCell>
+                      <TableCell>
+                        <span title={formatDashboardDate(category.createdAt, { time: true })}>
+                          {formatDashboardDate(category.createdAt)}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <span title={formatDashboardDate(category.updatedAt, { time: true })}>
+                          {formatDashboardDate(category.updatedAt)}
+                        </span>
+                      </TableCell>
                       <TableCell>
                         <Badge variant="secondary">
                           {category.isActive === false ? 'Inactive' : 'Active'}
@@ -682,6 +787,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                 setEditingName(category.name);
                                 setEditingCategorySlug(category.slug ?? '');
                                 setEditingDescription(category.description ?? '');
+                                setEditingAccent(category.accent ?? '');
                                 setEditingCategoryImageFile(null);
                                 setEditingCategoryImagePreview(category.image ?? '');
                                 setEditingSlugAutoSync(true);
@@ -700,6 +806,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                 setEditingName('');
                                 setEditingCategorySlug('');
                                 setEditingDescription('');
+                                setEditingAccent('');
                                 setEditingCategoryImageFile(null);
                                 setEditingCategoryImagePreview('');
                                 setEditingSlugAutoSync(true);
@@ -722,9 +829,9 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                     </TableRow>
                     {expandedSlug === category.slug ? (
                       <TableRow>
-                        <TableCell colSpan={7}>
+                        <TableCell colSpan={11}>
                           <div className="space-y-4 rounded-xl border bg-muted/20 p-4">
-                            <div className="grid gap-3 md:grid-cols-[1fr_1fr_1fr_auto]">
+                            <div className="grid gap-3 md:grid-cols-[1fr_1fr_1fr_1fr_auto]">
                               <DashboardInput
                                 placeholder="Sub-category name"
                                 value={newSubCategory[category.slug ?? '']?.name ?? ''}
@@ -739,6 +846,11 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                   handleNewSubCategorySlugChange(category.slug ?? '', event.target.value)
                                 }
                               />
+                              <AccentColorField
+                                value={newSubCategory[category.slug ?? '']?.accent ?? ''}
+                                onChange={value => handleNewSubCategoryAccentChange(category.slug ?? '', value)}
+                                placeholder="Sub-category accent hex"
+                              />
                               <DashboardInput
                                 placeholder="Sub-category description"
                                 value={newSubCategory[category.slug ?? '']?.description ?? ''}
@@ -750,6 +862,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                         name: '',
                                         slug: '',
                                         description: '',
+                                        accent: '',
                                       }),
                                       description: event.target.value,
                                     },
@@ -859,7 +972,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                           )}
                                         </div>
                                       </div>
-                                      <div className="grid flex-1 gap-3 md:grid-cols-4">
+                              <div className="grid flex-1 gap-3 md:grid-cols-5">
                                         {isEditingSubCategory ? (
                                           <>
                                             <DashboardInput
@@ -875,6 +988,11 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                               onChange={event =>
                                                 handleEditingSubCategorySlugChange(event.target.value)
                                               }
+                                            />
+                                            <AccentColorField
+                                              value={editingSubCategory.accent}
+                                              onChange={handleEditingSubCategoryAccentChange}
+                                              placeholder="Accent hex"
                                             />
                                             <select
                                               value={editingSubCategory.isActive ? 'true' : 'false'}
@@ -910,6 +1028,9 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                               <span>{subCategory.name}</span>
                                             </div>
                                             <div className="font-medium">{subCategory.slug}</div>
+                                            <div className="text-sm text-muted-foreground">
+                                              Accent: {sliceText(subCategory.accent)}
+                                            </div>
                                             <div className="text-sm text-muted-foreground">
                                               {sliceText(subCategory.description)}
                                             </div>
@@ -1004,6 +1125,13 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                                 setEditingSubCategoryImageFile(null);
                                                 setEditingSubCategoryImagePreview('');
                                                 setEditingSubCategorySlugAutoSync(true);
+                                                setEditingSubCategory({
+                                                  name: '',
+                                                  slug: '',
+                                                  description: '',
+                                                  accent: '',
+                                                  isActive: true,
+                                                });
                                               }}
                                             >
                                               Cancel
@@ -1021,6 +1149,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                                   name: subCategory.name,
                                                   slug: subCategory.slug,
                                                   description: subCategory.description ?? '',
+                                                  accent: subCategory.accent ?? '',
                                                   isActive: subCategory.isActive !== false,
                                                 });
                                                 setEditingSubCategoryImageFile(null);

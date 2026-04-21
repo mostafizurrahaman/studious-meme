@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { formatDashboardDate } from '@/lib/formatDate';
 import { featuredProducts } from '@/lib/malamal-content';
 import { compareMetadata } from '@/lib/seo';
 import { getComparisonSuggestions, getMyComparisonHistory } from '@/services/ComparisonHistory';
@@ -121,9 +122,13 @@ export default async function ComparePage() {
                                     className="rounded-2xl border border-border p-4"
                                 >
                                     <div className="text-xs uppercase tracking-[0.22em] text-foreground/45">
-                                        {entry.createdAt
-                                            ? new Date(entry.createdAt).toLocaleString('en-US')
-                                            : 'Recent compare'}
+                                        {entry.createdAt ? (
+                                            <span title={formatDashboardDate(entry.createdAt, { time: true })}>
+                                                {formatDashboardDate(entry.createdAt)}
+                                            </span>
+                                        ) : (
+                                            'Recent compare'
+                                        )}
                                     </div>
                                     <div className="mt-2 flex flex-wrap gap-2 text-sm text-foreground/70">
                                         {entry.products?.map(product => (

@@ -3,14 +3,14 @@ import { z } from 'zod';
 // 1. adminCreateSchema
 const adminCreateSchema = z.object({
     body: z.object({
-        name: z.string().trim().min(3),
+        name: z.string({ error: 'Name is required!' }).trim().min(3),
         email: z
-            .string()
+            .string({ error: 'Email is required!' })
             .trim()
             .email()
             .transform(v => v.toLowerCase()),
         password: z
-            .string()
+            .string({ error: 'Password is required!' })
             .min(8)
             .max(20)
             .regex(/[A-Z]/)
@@ -24,7 +24,7 @@ const adminCreateSchema = z.object({
 
 // 2. adminUpdateSchema
 const adminUpdateSchema = z.object({
-    params: z.object({ userId: z.string().min(1) }),
+    params: z.object({ userId: z.string({ error: 'User ID is required!' }).min(1) }),
     body: z.object({
         name: z.string().trim().min(3).optional(),
         email: z

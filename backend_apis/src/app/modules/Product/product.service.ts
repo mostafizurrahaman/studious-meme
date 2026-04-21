@@ -6,6 +6,17 @@ import { IProduct } from './product.interface';
 import { CategoryModel } from '../Category/category.model';
 import { MulterFile } from '../../lib/upload';
 
+const normalizeSlug = (value: string) =>
+    value
+        .normalize('NFKD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .trim()
+        .replace(/["'’]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-+|-+$/g, '');
+
 // 1. createProductIntoDB
 const createProductIntoDB = async (payload: Partial<IProduct>, imageFile?: MulterFile) => {
     let uploadedImage: string | undefined;
@@ -16,7 +27,11 @@ const createProductIntoDB = async (payload: Partial<IProduct>, imageFile?: Multe
             uploadedImage = secure_url;
         }
 
-        return ProductModel.create({ ...payload, image: uploadedImage ?? payload.image });
+        return ProductModel.create({
+            ...payload,
+            slug: normalizeSlug(String(payload.slug ?? payload.title ?? '')),
+            image: uploadedImage ?? payload.image,
+        });
     } catch (error) {
         if (uploadedImage) {
             await deleteImageFromCloudinary(uploadedImage);
@@ -42,7 +57,7 @@ const updateProductIntoDB = async (slug: string, payload: Partial<IProduct>, ima
     const existingProduct = await ProductModel.findOne({ slug }).select('image');
 
     if (!existingProduct) {
-        return null;
+        throw new AppError(httpStatus.NOT_FOUND, 'Product not found!');
     }
 
     let uploadedImage: string | undefined;
@@ -55,15 +70,19 @@ const updateProductIntoDB = async (slug: string, payload: Partial<IProduct>, ima
 
         const updated = await ProductModel.findOneAndUpdate(
             { slug },
-            { ...payload, ...(uploadedImage ? { image: uploadedImage } : {}) },
-            { new: true, runValidators: true },
+            {
+                ...payload,
+                slug: payload.slug ? normalizeSlug(String(payload.slug)) : payload.slug,
+                ...(uploadedImage ? { image: uploadedImage } : {}),
+            },
+            { returnDocument: 'after', runValidators: true },
         );
 
         if (!updated) {
             if (uploadedImage) {
                 await deleteImageFromCloudinary(uploadedImage);
             }
-            return null;
+            throw new AppError(httpStatus.NOT_FOUND, 'Product not found!');
         }
 
         if (uploadedImage && existingProduct.image && existingProduct.image !== uploadedImage) {
@@ -81,12 +100,20 @@ const updateProductIntoDB = async (slug: string, payload: Partial<IProduct>, ima
 };
 
 // 5. deleteProductFromDB
-const deleteProductFromDB = async (slug: string) => ProductModel.findOneAndDelete({ slug });
+const deleteProductFromDB = async (slug: string) => {
+    const product = await ProductModel.findOneAndDelete({ slug });
+    if (!product) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Product not found!');
+    }
+    return product;
+};
 
 // 6. getProductsByCategorySlugFromDB
 const getProductsByCategorySlugFromDB = async (slug: string) => {
     const category = await CategoryModel.findOne({ slug, isActive: true }).lean();
-    if (!category) return [];
+    if (!category) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Category not found!');
+    }
     return ProductModel.find({ category: category._id, isActive: true })
         .populate('brand')
         .populate('category')
@@ -96,6 +123,32 @@ const getProductsByCategorySlugFromDB = async (slug: string) => {
 // 7. getProductsBySubCategorySlugFromDB
 const getProductsBySubCategorySlugFromDB = async (subCategorySlug: string) =>
     ProductModel.find({ subCategorySlug, isActive: true }).populate('brand').populate('category').lean();
+
+// // 7. getProductsBySubCategorySlugFromDB
+// const getProductsBySubCategorySlugFromDB = async (subCategorySlug: string) => {
+//     // find category that contains this subcategory
+//     const category = await CategoryModel.findOne({
+//         'subCategories.slug': subCategorySlug,
+//         isActive: true,
+//     }).lean();
+
+//     if (!category) {
+//         throw new AppError(httpStatus.NOT_FOUND, 'SubCategory not found!');
+//     }
+
+//     // find the exact subcategory object
+//     const subCategory = category.subCategories.find(sc => sc.slug === subCategorySlug && sc.isActive);
+
+//     if (!subCategory) {
+//         throw new AppError(httpStatus.NOT_FOUND, 'SubCategory not active!');
+//     }
+
+//     // now query products using slug (NOT _id)
+//     return ProductModel.find({ subCategorySlug, isActive: true })
+//         .populate('brand')
+//         .populate('category')
+//         .lean();
+// };
 
 export const ProductService = {
     createProductIntoDB,

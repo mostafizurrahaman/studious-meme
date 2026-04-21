@@ -73,7 +73,7 @@ function PasswordField({
                     name={name}
                     placeholder={placeholder}
                     type={visible ? 'text' : 'password'}
-                    value={value}
+                    {...(value !== undefined ? { value } : {})}
                     readOnly={readOnly}
                     required={!readOnly}
                     autoComplete={autoComplete}
