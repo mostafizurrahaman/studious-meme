@@ -2,10 +2,10 @@ import { z } from 'zod';
 
 // 1. heroCardSchema
 const heroCardSchema = z.object({
-    image: z.string().min(1).optional(),
-    imageAlt: z.string().min(1),
-    title: z.string().min(1),
-    clickUrl: z.string().min(1),
+    image: z.string().optional(),
+    imageAlt: z.string({ error: 'Image alt is required!' }).trim().min(1, { message: 'Image alt is required!' }),
+    title: z.string({ error: 'Title is required!' }).trim().min(1, { message: 'Title is required!' }),
+    clickUrl: z.string({ error: 'Click URL is required!' }).trim().min(1, { message: 'Click URL is required!' }),
 });
 
 // 2. HeroSectionValidation
@@ -23,6 +23,6 @@ export const HeroSectionValidation = {
             features: z.array(heroCardSchema).optional(),
             isActive: z.boolean().optional(),
         }),
-        params: z.object({ heroSectionId: z.string().min(1) }),
+        params: z.object({ heroSectionId: z.string({ error: 'Hero section ID is required!' }).trim().min(1, { message: 'Hero section ID is required!' }) }),
     }),
 };

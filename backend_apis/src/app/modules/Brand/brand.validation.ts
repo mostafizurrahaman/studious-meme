@@ -4,14 +4,16 @@ import { z } from 'zod';
 const brandBaseSchema = z.object({
     name: z
         .string({ error: 'Name is required' })
+        .trim()
         .min(3, { message: 'Name must be at least 3 characters long' })
         .max(50, { message: 'Name must be at most 50 characters long' }),
     slug: z
         .string({ error: 'Slug is required' })
+        .trim()
         .min(3, { message: 'Slug must be at least 3 characters long' })
         .max(50, { message: 'Slug must be at most 50 characters long' }),
     image: z.string().optional(),
-    description: z.string({ error: 'Description is required!' }).optional(),
+    description: z.string().optional(),
     isActive: z.boolean().optional(),
 });
 
@@ -21,6 +23,7 @@ export const BrandValidation = {
         params: z.object({
             slug: z
                 .string({ error: 'Slug is required' })
+                .trim()
                 .min(3, { message: 'Slug must be at least 3 characters long' }),
         }),
         body: brandBaseSchema.partial(),

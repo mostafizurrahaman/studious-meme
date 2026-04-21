@@ -81,10 +81,10 @@ const verifySignupOtpSchema = z.object({
 
         otp: z
             .string({
-                error: 'Password is required!',
+                error: 'OTP is required!',
             })
-            .min(6, { message: 'Password must be at least 6 characters long!' })
-            .max(6, { message: 'Password cannot exceed 6 characters!' }),
+            .min(6, { message: 'OTP must be at least 6 characters long!' })
+            .max(6, { message: 'OTP cannot exceed 6 characters!' }),
     }),
 });
 

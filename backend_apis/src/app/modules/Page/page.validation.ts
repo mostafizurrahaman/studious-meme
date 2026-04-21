@@ -14,9 +14,17 @@ const createOrUpdatePageSchema = z.object({
                     .join(', ')}.`,
             }),
 
-        title: z.string().min(3, 'Title must be at least 3 characters long'),
+        title: z
+            .string({ error: 'Title is required!' })
+            .trim()
+            .min(1, { message: 'Title is required!' })
+            .min(3, { message: 'Title must be at least 3 characters long' }),
 
-        content: z.string().min(10, 'Content must be at least 10 characters long'),
+        content: z
+            .string({ error: 'Content is required!' })
+            .trim()
+            .min(1, { message: 'Content is required!' })
+            .min(10, { message: 'Content must be at least 10 characters long' }),
     }),
 });
 

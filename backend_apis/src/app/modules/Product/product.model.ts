@@ -24,5 +24,6 @@ const productSchema = new Schema<IProduct>(
 );
 
 productSchema.index({ category: 1, subCategorySlug: 1, isFeatured: 1 }, { name: 'product_category_index' });
+productSchema.index({ isActive: 1, isFeatured: 1, createdAt: -1 }, { name: 'product_active_featured_createdAt_idx' });
 
 export const ProductModel = model<IProduct>('Product', productSchema);

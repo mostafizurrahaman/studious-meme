@@ -2,8 +2,8 @@ import { z } from 'zod';
 
 // 1. categorySubCategorySchema
 const categorySubCategorySchema = z.object({
-    name: z.string().min(1),
-    slug: z.string().min(1),
+    name: z.string({ error: 'SubCategory name is required!' }).trim().min(1, { message: 'SubCategory name is required!' }),
+    slug: z.string({ error: 'SubCategory slug is required!' }).trim().min(1, { message: 'SubCategory slug is required!' }),
     image: z.string().optional(),
     description: z.string().optional(),
     accent: z.string().optional(),
@@ -12,8 +12,8 @@ const categorySubCategorySchema = z.object({
 
 // 2. categoryBaseSchema
 const categoryBaseSchema = z.object({
-    name: z.string().min(1),
-    slug: z.string().min(1),
+    name: z.string({ error: 'Category name is required!' }).trim().min(1, { message: 'Category name is required!' }),
+    slug: z.string({ error: 'Category slug is required!' }).trim().min(1, { message: 'Category slug is required!' }),
     subCategories: z.array(categorySubCategorySchema).optional(),
     image: z.string().optional(),
     description: z.string().optional(),
@@ -24,15 +24,18 @@ const categoryBaseSchema = z.object({
 export const CategoryValidation = {
     categoryCreateSchema: z.object({ body: categoryBaseSchema }),
     categoryUpdateSchema: z.object({
-        params: z.object({ slug: z.string().min(1) }),
+        params: z.object({ slug: z.string({ error: 'Category slug is required!' }).trim().min(1, { message: 'Category slug is required!' }) }),
         body: categoryBaseSchema.partial(),
     }),
     categorySubCategoryCreateSchema: z.object({
-        params: z.object({ slug: z.string().min(1) }),
+        params: z.object({ slug: z.string({ error: 'Category slug is required!' }).trim().min(1, { message: 'Category slug is required!' }) }),
         body: categorySubCategorySchema,
     }),
     categorySubCategoryUpdateSchema: z.object({
-        params: z.object({ slug: z.string().min(1), subCategorySlug: z.string().min(1) }),
+        params: z.object({
+            slug: z.string({ error: 'Category slug is required!' }).trim().min(1, { message: 'Category slug is required!' }),
+            subCategorySlug: z.string({ error: 'SubCategory slug is required!' }).trim().min(1, { message: 'SubCategory slug is required!' }),
+        }),
         body: categorySubCategorySchema.partial(),
     }),
 };

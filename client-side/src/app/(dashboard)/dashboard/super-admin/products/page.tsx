@@ -5,6 +5,7 @@ import { buildMetadata } from '@/lib/seo';
 import { getAllProducts } from '@/services/Product';
 import { getAllBrands } from '@/services/Brand';
 import { getAllCategoriesWithTotalNewsCount } from '@/services/Category';
+import type { BackendCategory } from '@/services/Category/mappers';
 
 export const metadata: Metadata = buildMetadata({
     title: 'Products',
@@ -27,15 +28,13 @@ export default async function SuperAdminProductsPage() {
     const brandOptions = Array.isArray(brandsResult?.data)
         ? brandsResult.data.map(brand => ({ value: brand.slug, label: brand.name }))
         : [];
-    const categoryOptions = Array.isArray(categoriesResult?.data)
-        ? categoriesResult.data.map(category => ({ value: category.slug, label: category.name }))
-        : [];
+    const categories = Array.isArray(categoriesResult?.data) ? (categoriesResult.data as BackendCategory[]) : [];
 
     return (
         <DashboardProductsManager
             products={products}
             brandOptions={brandOptions}
-            categoryOptions={categoryOptions}
+            categories={categories}
         />
     );
 }

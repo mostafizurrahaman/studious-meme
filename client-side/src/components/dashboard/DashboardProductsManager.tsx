@@ -14,6 +14,7 @@ import { TablePagination } from '@/components/ui/table-pagination';
 import { createProduct, deleteProduct, type BackendProduct, updateProduct } from '@/services/Product';
 import { formatDashboardDate } from '@/lib/formatDate';
 import { slugify } from '@/lib/slug';
+import type { BackendCategory } from '@/services/Category/mappers';
 import Image from 'next/image';
 
 type Option = { value: string; label: string };
@@ -21,7 +22,7 @@ type Option = { value: string; label: string };
 type DashboardProductsManagerProps = {
   products: BackendProduct[];
   brandOptions: Option[];
-  categoryOptions: Option[];
+  categories: BackendCategory[];
 };
 
 const initialForm = {
@@ -44,7 +45,7 @@ const initialForm = {
 export function DashboardProductsManager({
   products,
   brandOptions,
-  categoryOptions,
+  categories,
 }: DashboardProductsManagerProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -59,6 +60,13 @@ export function DashboardProductsManager({
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+
+  const selectedCategory = useMemo(
+    () => categories.find(category => category.slug === form.category) ?? null,
+    [categories, form.category],
+  );
+
+  const subCategoryOptions = selectedCategory?.subCategories ?? [];
 
   useEffect(() => {
     return () => {
@@ -120,6 +128,14 @@ export function DashboardProductsManager({
       ...current,
       title: value,
       slug: slugify(value),
+    }));
+  }
+
+  function handleCategoryChange(value: string) {
+    setForm(current => ({
+      ...current,
+      category: value,
+      subCategorySlug: '',
     }));
   }
 
@@ -224,11 +240,18 @@ export function DashboardProductsManager({
             value={form.badge}
             onChange={e => setForm({ ...form, badge: e.target.value })}
           />
-          <DashboardInput
-            placeholder="Sub-category slug (optional)"
-            value={form.subCategorySlug}
-            onChange={e => setForm({ ...form, subCategorySlug: e.target.value })}
-          />
+          <select
+            className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+            value={form.category}
+            onChange={e => handleCategoryChange(e.target.value)}
+          >
+            <option value="">Category</option>
+            {categories.map(category => (
+              <option key={category.slug} value={category.slug}>
+                {category.name}
+              </option>
+            ))}
+          </select>
           <DashboardInput
             placeholder="Stock quantity"
             type="number"
@@ -259,13 +282,14 @@ export function DashboardProductsManager({
           </select>
           <select
             className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-            value={form.category}
-            onChange={e => setForm({ ...form, category: e.target.value })}
+            value={form.subCategorySlug}
+            onChange={e => setForm({ ...form, subCategorySlug: e.target.value })}
+            disabled={!form.category}
           >
-            <option value="">Category</option>
-            {categoryOptions.map(option => (
-              <option key={option.value} value={option.value}>
-                {option.label}
+            <option value="">Sub-category</option>
+            {subCategoryOptions.map(subCategory => (
+              <option key={subCategory.slug} value={subCategory.slug}>
+                {subCategory.name}
               </option>
             ))}
           </select>
@@ -325,6 +349,8 @@ export function DashboardProductsManager({
                   const result = await createProduct({
                     ...form,
                     slug: form.slug.trim(),
+                    category: form.category.trim(),
+                    subCategorySlug: form.subCategorySlug.trim() || undefined,
                     price: priceValue,
                     oldPrice: oldPriceValue,
                     stock: stockValue,

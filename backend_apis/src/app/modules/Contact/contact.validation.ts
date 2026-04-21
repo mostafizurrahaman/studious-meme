@@ -5,7 +5,7 @@ export const createContactValidation = z.object({
     body: z.object({
         name: z.string({
             error: 'Name is required',
-        }),
+        }).trim().min(1, { message: 'Name is required' }),
 
         email: z
             .string({
@@ -20,18 +20,20 @@ export const createContactValidation = z.object({
 
         phone: z.string({
             error: 'Phone is required',
-        }),
+        }).trim().min(1, { message: 'Phone is required' }),
 
         subject: z
             .string({
                 error: 'Subject is required',
             })
+            .trim()
             .min(3, { message: 'Subject must be at least 3 characters long' }),
 
         message: z
             .string({
                 error: 'Message is required',
             })
+            .trim()
             .min(20, {
                 message: 'Message must be at least 20 characters long',
             }),
