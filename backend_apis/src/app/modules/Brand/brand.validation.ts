@@ -13,7 +13,10 @@ const brandBaseSchema = z.object({
         .min(3, { message: 'Slug must be at least 3 characters long' })
         .max(50, { message: 'Slug must be at most 50 characters long' }),
     image: z.string().optional(),
-    description: z.string().optional(),
+    description: z
+        .string({ error: 'Description is required' })
+        .trim()
+        .min(1, { message: 'Description is required' }),
     isActive: z.boolean().optional(),
 });
 
@@ -26,6 +29,8 @@ export const BrandValidation = {
                 .trim()
                 .min(3, { message: 'Slug must be at least 3 characters long' }),
         }),
-        body: brandBaseSchema.partial(),
+        body: brandBaseSchema.partial().extend({
+            description: brandBaseSchema.shape.description,
+        }),
     }),
 };

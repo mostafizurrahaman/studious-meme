@@ -113,7 +113,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
                                                     'relative rounded-2xl border border-transparent px-3 py-3 text-sm font-medium transition-all',
                                                     active
                                                         ? 'bg-linear-to-r from-primary via-primary/90 to-primary/75 shadow-xl shadow-primary/25 ring-1 ring-primary/30 before:absolute before:inset-y-3 before:left-1 before:w-1 before:rounded-full before:bg-primary-foreground/90 text-white!'
-                                                        : 'border-sidebar-border/0 bg-white/0 text-sidebar-foreground/80 hover:border-sidebar-border/70 hover:bg-sidebar-accent/70 hover:text-sidebar-accent-foreground',
+                                                        : 'border-sidebar-border/0 bg-white/0 text-sidebar-foreground/80 hover:-translate-y-0.5 hover:border-sidebar-border/70 hover:bg-primary/30 hover:text-primary-foreground hover:shadow-lg hover:shadow-primary/15 hover:ring-1 hover:ring-primary/25',
                                                 )}
                                             >
                                                 <Link href={item.href}>

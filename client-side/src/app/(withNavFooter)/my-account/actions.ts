@@ -53,10 +53,10 @@ export async function submitSignOut(prevState: SignOutState, formData?: FormData
 }
 
 export async function submitSignUp(_prevState: SignUpState, formData: FormData): Promise<SignUpState> {
-    const name = readValue(formData, 'signup-name');
-    const email = readValue(formData, 'signup-email').toLowerCase();
-    const password = readValue(formData, 'signup-password');
-    const confirmPassword = readValue(formData, 'signup-confirm-password');
+    const name = readValue(formData, 'name');
+    const email = readValue(formData, 'email').toLowerCase();
+    const password = readValue(formData, 'password');
+    const confirmPassword = readValue(formData, 'confirmPassword');
 
     if (!name || !email || !password || !confirmPassword) {
         return { ok: false, message: 'All signup fields are required.', email };

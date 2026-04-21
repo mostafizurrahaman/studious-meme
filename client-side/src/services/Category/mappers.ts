@@ -12,6 +12,7 @@ export type BackendSubCategory = {
 };
 
 export type BackendCategory = {
+    _id?: string;
     name: string;
     slug: string;
     image?: string;

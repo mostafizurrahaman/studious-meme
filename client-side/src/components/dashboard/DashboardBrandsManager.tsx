@@ -5,6 +5,8 @@ import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { ImagePlus, Pencil, Plus, Trash2, UploadCloud } from 'lucide-react';
+import { Controller, useForm, useWatch } from 'react-hook-form';
+import { z } from 'zod';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,7 +18,26 @@ import { createBrand, deleteBrand, type BackendBrand, updateBrand } from '@/serv
 import { slugify } from '@/lib/slug';
 import { formatDashboardDate } from '@/lib/formatDate';
 import Image from 'next/image';
-const initialForm = { name: '', slug: '', image: '', description: '', isActive: true };
+import { dashboardFormSchemas, makeZodResolver } from '@/lib/form-validation';
+
+const brandEditSchema = z.object({
+  name: z.string({ error: 'Brand name is required!' }).trim().min(1, { message: 'Brand name is required!' }),
+  slug: z.string({ error: 'Brand slug is required!' }).trim().min(1, { message: 'Brand slug is required!' }),
+  description: z
+    .string({ error: 'Brand description is required!' })
+    .trim()
+    .min(1, { message: 'Brand description is required!' }),
+  isActive: z.boolean().default(true),
+});
+
+type BrandCreateValues = z.infer<typeof dashboardFormSchemas.brand>;
+type BrandEditValues = z.infer<typeof brandEditSchema>;
+
+function ErrorText({ message }: { message?: string }) {
+  if (!message) return null;
+
+  return <p className="text-xs text-destructive">{message}</p>;
+}
 
 function sliceText(value?: string, maxLength = 44) {
   if (!value) return '-';
@@ -26,13 +47,12 @@ function sliceText(value?: string, maxLength = 44) {
 export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [form, setForm] = useState(initialForm);
   const [brandImageFile, setBrandImageFile] = useState<File | null>(null);
   const [brandImagePreview, setBrandImagePreview] = useState('');
   const [brandSlugSynced, setBrandSlugSynced] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
   const [editingSlug, setEditingSlug] = useState<string | null>(null);
-  const [editingForm, setEditingForm] = useState(initialForm);
   const [editingBrandImageFile, setEditingBrandImageFile] = useState<File | null>(null);
   const [editingBrandImagePreview, setEditingBrandImagePreview] = useState('');
   const [editingBrandSlugSynced, setEditingBrandSlugSynced] = useState(true);
@@ -44,10 +64,40 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
   const imageInputRef = useRef<HTMLInputElement>(null);
   const editingImageInputRef = useRef<HTMLInputElement>(null);
 
+  const createForm = useForm<BrandCreateValues>({
+    resolver: makeZodResolver(dashboardFormSchemas.brand),
+    defaultValues: { name: '', slug: '', description: '', isActive: true },
+    mode: 'onTouched',
+  });
+
+  const brandName = useWatch({
+    control: createForm.control,
+    name: 'name',
+    defaultValue: '',
+  });
+
+  useEffect(() => {
+    if (brandSlugSynced && brandName.trim()) {
+      createForm.setValue('slug', slugify(brandName), {
+        shouldDirty: true,
+        shouldTouch: false,
+        shouldValidate: false,
+      });
+    }
+  }, [brandName, brandSlugSynced, createForm]);
+
   const filteredData = useMemo(() => {
     const q = search.toLowerCase();
     return brands.filter(b => b.name?.toLowerCase().includes(q) || b.slug?.toLowerCase().includes(q));
   }, [brands, search]);
+
+  const editForm = useForm<BrandEditValues>({
+    resolver: makeZodResolver(brandEditSchema),
+    defaultValues: { name: '', slug: '', description: '', isActive: true },
+    mode: 'onTouched',
+  });
+
+  const editingBrandName = useWatch({ control: editForm.control, name: 'name', defaultValue: '' });
 
   const paginatedRows = useMemo(() => {
     const start = (page - 1) * limit;
@@ -71,36 +121,13 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
     router.refresh();
   }
 
-  function handleBrandNameChange(name: string) {
-    setForm(current => ({
-      ...current,
-      name,
-      slug: brandSlugSynced ? slugify(name) : current.slug,
-    }));
-  }
-
   function handleBrandSlugChange(value: string) {
     setBrandSlugSynced(false);
-    setForm(current => ({
-      ...current,
-      slug: slugify(value),
-    }));
-  }
-
-  function handleEditingBrandNameChange(name: string) {
-    setEditingForm(current => ({
-      ...current,
-      name,
-      slug: editingBrandSlugSynced ? slugify(name) : current.slug,
-    }));
-  }
-
-  function handleEditingBrandSlugChange(value: string) {
-    setEditingBrandSlugSynced(false);
-    setEditingForm(current => ({
-      ...current,
-      slug: slugify(value),
-    }));
+    createForm.setValue('slug', slugify(value), {
+      shouldDirty: true,
+      shouldTouch: false,
+      shouldValidate: true,
+    });
   }
 
   function handleBrandImageSelect(file?: File) {
@@ -137,6 +164,16 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
     handleBrandImageSelect(event.dataTransfer.files?.[0]);
   }
 
+  useEffect(() => {
+    if (editingSlug && editingBrandSlugSynced && editingBrandName.trim()) {
+      editForm.setValue('slug', slugify(editingBrandName), {
+        shouldDirty: true,
+        shouldTouch: false,
+        shouldValidate: false,
+      });
+    }
+  }, [editingBrandName, editingBrandSlugSynced, editingSlug, editForm]);
+
   return (
     <div className="space-y-6">
       <Card className="shadow-sm">
@@ -144,23 +181,24 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
           <CardTitle>Create brand</CardTitle>
           <CardDescription>Add and manage storefront brands.</CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-          <DashboardInput
-            placeholder="Name"
-            value={form.name}
-            onChange={e => handleBrandNameChange(e.target.value)}
-          />
-          <DashboardInput
-            placeholder="Slug"
-            value={form.slug}
-            onChange={e => handleBrandSlugChange(e.target.value)}
-          />
-          <DashboardInput
-            placeholder="Description"
-            value={form.description}
-            onChange={e => setForm({ ...form, description: e.target.value })}
-          />
-          <div className="space-y-2 xl:col-span-2">
+        <CardContent className="grid items-start gap-3 md:grid-cols-2 xl:grid-cols-5">
+          <div className="grid gap-1.5">
+            <DashboardInput placeholder="Name" {...createForm.register('name')} />
+            <ErrorText message={createForm.formState.errors.name?.message} />
+          </div>
+          <div className="grid gap-1.5">
+            <DashboardInput
+              placeholder="Slug"
+              {...createForm.register('slug')}
+              onChange={e => handleBrandSlugChange(e.target.value)}
+            />
+            <ErrorText message={createForm.formState.errors.slug?.message} />
+          </div>
+          <div className="grid gap-1.5">
+            <DashboardInput placeholder="Description" {...createForm.register('description')} />
+            <ErrorText message={createForm.formState.errors.description?.message} />
+          </div>
+          <div className="space-y-2 self-start xl:col-span-2">
             <div
               role="button"
               tabIndex={0}
@@ -178,7 +216,7 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
               }}
               onDragLeave={() => setIsDragging(false)}
               onDrop={handleBrandImageDrop}
-              className={`rounded-2xl border-2 border-dashed p-4 transition ${
+              className={`self-start rounded-2xl border-2 border-dashed p-3 transition ${
                 isDragging
                   ? 'border-primary bg-primary/5'
                   : 'border-border/70 bg-background/80 hover:border-primary/40 hover:bg-muted/20'
@@ -193,17 +231,17 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
                   <p className="text-xs text-muted-foreground">
                     Drag and drop an image here or click to upload.
                   </p>
-                  <div className="mt-3 overflow-hidden rounded-xl border bg-muted">
+                  <div className="mt-2 overflow-hidden rounded-xl border bg-muted">
                     {brandImagePreview ? (
                       <Image
                         height={500}
                         width={500}
                         src={brandImagePreview}
                         alt="Brand preview"
-                        className="h-36 w-full object-cover"
+                        className="h-24 w-full object-cover"
                       />
                     ) : (
-                      <div className="flex h-36 items-center justify-center gap-2 text-sm text-muted-foreground">
+                      <div className="flex h-24 items-center justify-center gap-2 text-sm text-muted-foreground">
                         <ImagePlus className="size-4" />
                         Preview will appear here
                       </div>
@@ -223,47 +261,43 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
               }}
             />
           </div>
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={form.isActive}
-              onChange={e => setForm({ ...form, isActive: e.target.checked })}
-            />
+          <label className="flex items-center gap-2 self-start text-sm">
+            <input type="checkbox" {...createForm.register('isActive')} />
             Active
           </label>
-          <div className="xl:col-span-5">
+          <div className="self-start xl:col-span-5">
             <Button
               type="button"
               className="gap-2"
-              disabled={isPending}
-              onClick={() =>
-                startTransition(async () => {
-                  if (!brandImageFile) {
-                    toast.error('Brand image is required.');
-                    return;
-                  }
+              disabled={isCreating}
+              onClick={createForm.handleSubmit(async values => {
+                if (!brandImageFile) {
+                  toast.error('Brand image is required.');
+                  return;
+                }
 
-                  const result = await createBrand({
-                    name: form.name.trim(),
-                    slug: form.slug.trim(),
-                    image: brandImageFile,
-                    description: form.description.trim(),
-                    isActive: form.isActive,
-                  });
+                setIsCreating(true);
+                const result = await createBrand({
+                  name: values.name,
+                  slug: values.slug,
+                  image: brandImageFile,
+                  description: values.description,
+                  isActive: values.isActive,
+                });
+                setIsCreating(false);
 
-                  if (!result?.success) return refresh(result?.message ?? 'Failed to create brand.', 'error');
+                if (!result?.success) return refresh(result?.message ?? 'Failed to create brand.', 'error');
 
-                  setForm(initialForm);
-                  setBrandImageFile(null);
-                  setBrandImagePreview('');
-                  setBrandSlugSynced(true);
+                createForm.reset({ name: '', slug: '', description: '', isActive: true });
+                setBrandImageFile(null);
+                setBrandImagePreview('');
+                setBrandSlugSynced(true);
 
-                  refresh(result.message ?? 'Brand created successfully.', 'success');
-                })
-              }
+                refresh(result.message ?? 'Brand created successfully.', 'success');
+              })}
             >
               <Plus className="size-4" />
-              Create brand
+              {isCreating ? 'Creating brand...' : 'Create brand'}
             </Button>
           </div>
         </CardContent>
@@ -299,7 +333,7 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
                 return (
                   <TableRow key={brand.slug}>
                     <TableCell className="w-14 font-medium text-muted-foreground">{index + 1}</TableCell>
-                    <TableCell>
+                    <TableCell className="min-w-0">
                       {isEditing ? (
                         <>
                           <div
@@ -327,12 +361,12 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
                           >
                             <div className="flex flex-col items-center gap-2">
                               <div className="flex size-12 items-center justify-center overflow-hidden rounded-lg border bg-muted">
-                                {editingBrandImagePreview || editingForm.image ? (
+                                {editingBrandImagePreview || brand.image ? (
                                   <Image
                                     height={500}
                                     width={500}
-                                    src={editingBrandImagePreview || editingForm.image}
-                                    alt={editingForm.name || brand.name}
+                                    src={editingBrandImagePreview || brand.image || ''}
+                                    alt={editingBrandName || brand.name}
                                     className="h-full w-full object-cover"
                                   />
                                 ) : (
@@ -371,75 +405,113 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
                         </div>
                       )}
                     </TableCell>
-                    <TableCell className="font-medium">
+                    <TableCell className="min-w-0 whitespace-normal font-medium">
                       {isEditing ? (
-                        <div className="grid gap-1.5">
+                        <div className="grid min-w-0 gap-1.5">
                           <label className="text-[11px] font-medium text-muted-foreground">Brand name</label>
-                          <DashboardInput
-                            placeholder="Brand name"
-                            value={editingForm.name}
-                            onChange={e => handleEditingBrandNameChange(e.target.value)}
+                          <Controller
+                            control={editForm.control}
+                            name="name"
+                            render={({ field, fieldState }) => (
+                              <div className="grid min-w-0 gap-1.5">
+                                <DashboardInput
+                                  {...field}
+                                  value={field.value}
+                                  placeholder="Brand name"
+                                  className="max-w-full"
+                                  onChange={e => field.onChange(e.target.value)}
+                                  onBlur={field.onBlur}
+                                  aria-invalid={fieldState.invalid}
+                                />
+                                <ErrorText message={fieldState.error?.message} />
+                              </div>
+                            )}
                           />
                         </div>
                       ) : (
                         brand.name
                       )}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="min-w-0 whitespace-normal">
                       {isEditing ? (
-                        <div className="grid gap-1.5">
+                        <div className="grid min-w-0 gap-1.5">
                           <label className="text-[11px] font-medium text-muted-foreground">Brand slug</label>
-                          <DashboardInput
-                            placeholder="Brand slug"
-                            value={editingForm.slug}
-                            onChange={e => handleEditingBrandSlugChange(e.target.value)}
+                          <Controller
+                            control={editForm.control}
+                            name="slug"
+                            render={({ field, fieldState }) => (
+                              <div className="grid min-w-0 gap-1.5">
+                                <DashboardInput
+                                  {...field}
+                                  value={field.value}
+                                  placeholder="Brand slug"
+                                  className="max-w-full"
+                                  onBlur={field.onBlur}
+                                  aria-invalid={fieldState.invalid}
+                                  onChange={e => {
+                                    setEditingBrandSlugSynced(false);
+                                    field.onChange(slugify(e.target.value));
+                                  }}
+                                />
+                                <ErrorText message={fieldState.error?.message} />
+                              </div>
+                            )}
                           />
                         </div>
                       ) : (
                         brand.slug
                       )}
                     </TableCell>
-                    <TableCell className="max-w-60 text-sm text-muted-foreground">
+                    <TableCell className="min-w-0 max-w-60 whitespace-normal text-sm text-muted-foreground">
                       {isEditing ? (
-                        <div className="grid gap-1.5">
+                        <div className="grid min-w-0 gap-1.5">
                           <label className="text-[11px] font-medium text-muted-foreground">Description</label>
-                          <DashboardInput
-                            placeholder="Brand description"
-                            value={editingForm.description}
-                            onChange={e =>
-                              setEditingForm({
-                                  ...editingForm,
-                                  description: e.target.value,
-                              })
-                            }
+                          <Controller
+                            control={editForm.control}
+                            name="description"
+                            render={({ field, fieldState }) => (
+                              <div className="grid min-w-0 gap-1.5">
+                                <DashboardInput
+                                  {...field}
+                                  value={field.value ?? ''}
+                                  placeholder="Brand description"
+                                  className="max-w-full"
+                                  onChange={e => field.onChange(e.target.value)}
+                                  onBlur={field.onBlur}
+                                  aria-invalid={fieldState.invalid}
+                                />
+                                <ErrorText message={fieldState.error?.message} />
+                              </div>
+                            )}
                           />
                         </div>
                       ) : (
                         sliceText(brand.description)
                       )}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="min-w-0">
                       <span title={formatDashboardDate(brand.createdAt, { time: true })}>
                         {formatDashboardDate(brand.createdAt)}
                       </span>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="min-w-0">
                       <span title={formatDashboardDate(brand.updatedAt, { time: true })}>
                         {formatDashboardDate(brand.updatedAt)}
                       </span>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="min-w-0">
                       {isEditing ? (
                         <label className="flex items-center gap-2 text-sm">
-                          <input
-                            type="checkbox"
-                            checked={editingForm.isActive}
-                            onChange={e =>
-                              setEditingForm({
-                                ...editingForm,
-                                isActive: e.target.checked,
-                              })
-                            }
+                          <Controller
+                            control={editForm.control}
+                            name="isActive"
+                            render={({ field }) => (
+                              <input
+                                type="checkbox"
+                                checked={field.value}
+                                onChange={e => field.onChange(e.target.checked)}
+                              />
+                            )}
                           />
                           Active
                         </label>
@@ -454,14 +526,14 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
                             <Button
                               size="sm"
                               disabled={isPending}
-                              onClick={() =>
+                              onClick={editForm.handleSubmit(values =>
                                 startTransition(async () => {
                                   const result = await updateBrand(brand.slug, {
-                                    name: editingForm.name.trim(),
-                                    slug: editingForm.slug.trim(),
+                                    name: values.name.trim(),
+                                    slug: values.slug.trim(),
                                     image: editingBrandImageFile ?? undefined,
-                                    description: editingForm.description.trim(),
-                                    isActive: editingForm.isActive,
+                                    description: values.description?.trim(),
+                                    isActive: values.isActive,
                                   });
                                   if (!result?.success)
                                     return refresh(result?.message ?? 'Failed to update brand.', 'error');
@@ -469,9 +541,10 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
                                   setEditingBrandImageFile(null);
                                   setEditingBrandImagePreview('');
                                   setEditingBrandSlugSynced(true);
+                                  editForm.reset({ name: '', slug: '', description: '', isActive: true });
                                   refresh(result.message ?? 'Brand updated successfully.', 'success');
-                                })
-                              }
+                                }),
+                              )}
                             >
                               Save
                             </Button>
@@ -483,6 +556,7 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
                                 setEditingBrandImageFile(null);
                                 setEditingBrandImagePreview('');
                                 setEditingBrandSlugSynced(true);
+                                editForm.reset({ name: '', slug: '', description: '', isActive: true });
                               }}
                             >
                               Cancel
@@ -494,11 +568,13 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
                               size="sm"
                               variant="outline"
                               onClick={() => {
+                                if (editingBrandImagePreview.startsWith('blob:')) {
+                                  URL.revokeObjectURL(editingBrandImagePreview);
+                                }
                                 setEditingSlug(brand.slug);
-                                setEditingForm({
+                                editForm.reset({
                                   name: brand.name,
                                   slug: brand.slug,
-                                  image: brand.image ?? '',
                                   description: brand.description ?? '',
                                   isActive: brand.isActive,
                                 });

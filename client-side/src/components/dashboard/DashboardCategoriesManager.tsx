@@ -1,10 +1,11 @@
 'use client';
 
-import type React from 'react';
 import { Fragment, useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { ChevronDown, ImagePlus, Pencil, Plus, Trash2, UploadCloud } from 'lucide-react';
+import { useForm, useWatch } from 'react-hook-form';
+import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { DashboardInput } from '@/components/dashboard/DashboardInput';
@@ -21,27 +22,28 @@ import {
 import { slugify } from '@/lib/slug';
 import { formatDashboardDate } from '@/lib/formatDate';
 import Image from 'next/image';
+import { makeZodResolver } from '@/lib/form-validation';
 
 type CategoryRow = {
+  name: string;
+  slug?: string;
+  image?: string;
+  description?: string;
+  accent?: string;
+  totalNews?: number;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  subCategories?: Array<{
     name: string;
-    slug?: string;
+    slug: string;
     image?: string;
     description?: string;
     accent?: string;
-    totalNews?: number;
     isActive?: boolean;
     createdAt?: string;
     updatedAt?: string;
-    subCategories?: Array<{
-        name: string;
-        slug: string;
-        image?: string;
-        description?: string;
-        accent?: string;
-        isActive?: boolean;
-        createdAt?: string;
-        updatedAt?: string;
-    }>;
+  }>;
 };
 
 type DashboardCategoriesManagerProps = {
@@ -62,10 +64,10 @@ function AccentColorField({
   onChange: (value: string) => void;
   placeholder: string;
 }) {
-  const colorValue = /^#([0-9a-fA-F]{6})$/.test(value) ? value : '#000000';
+  const colorValue = /^#([0-9a-fA-F]{6})$/.test(value) ? value : '#f97316';
 
   return (
-    <div className="inline-flex h-fit w-fit max-w-full items-center gap-2 rounded-xl border border-input bg-background px-2 py-1.5">
+    <div className="flex h-fit w-full max-w-55 min-w-0 items-center gap-2 rounded-xl border border-input bg-background px-2 py-1.5">
       <label className="relative flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-muted">
         <span className="sr-only">Pick accent color</span>
         <span className="absolute inset-0" style={{ backgroundColor: colorValue }} />
@@ -81,39 +83,69 @@ function AccentColorField({
         value={value}
         onChange={event => onChange(event.target.value)}
         placeholder={placeholder}
-        className="h-fit w-36 border-0 bg-transparent px-0 shadow-none focus-visible:ring-0"
+        className="h-fit min-w-0 flex-1 border-0 bg-transparent px-0 shadow-none focus-visible:ring-0"
       />
     </div>
   );
 }
 
+const categoryEditSchema = z.object({
+  name: z
+    .string({ error: 'Category name is required!' })
+    .trim()
+    .min(1, { message: 'Category name is required!' }),
+  slug: z
+    .string({ error: 'Category slug is required!' })
+    .trim()
+    .min(1, { message: 'Category slug is required!' }),
+  description: z
+    .string({ error: 'Category description is required!' })
+    .trim()
+    .min(1, { message: 'Category description is required!' }),
+  accent: z.string().trim().optional(),
+});
+
+const subCategoryEditSchema = z.object({
+  name: z
+    .string({ error: 'Sub-category name is required!' })
+    .trim()
+    .min(1, { message: 'Sub-category name is required!' }),
+  slug: z
+    .string({ error: 'Sub-category slug is required!' })
+    .trim()
+    .min(1, { message: 'Sub-category slug is required!' }),
+  description: z
+    .string({ error: 'Sub-category description is required!' })
+    .trim()
+    .min(1, { message: 'Sub-category description is required!' }),
+  accent: z.string().trim().optional(),
+  isActive: z.boolean().default(true),
+});
+
+type CategoryEditValues = z.infer<typeof categoryEditSchema>;
+type SubCategoryEditValues = z.infer<typeof subCategoryEditSchema>;
+
+function ErrorText({ message }: { message?: string }) {
+  if (!message) return null;
+
+  return <p className="text-xs text-destructive">{message}</p>;
+}
+
 export function DashboardCategoriesManager({ categories }: DashboardCategoriesManagerProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [newName, setNewName] = useState('');
-  const [newSlug, setNewSlug] = useState('');
-  const [newDescription, setNewDescription] = useState('');
-  const [newAccent, setNewAccent] = useState('');
   const [newSlugAutoSync, setNewSlugAutoSync] = useState(true);
   const [editingSlug, setEditingSlug] = useState<string | null>(null);
-  const [editingName, setEditingName] = useState('');
-  const [editingCategorySlug, setEditingCategorySlug] = useState('');
-  const [editingDescription, setEditingDescription] = useState('');
-  const [editingAccent, setEditingAccent] = useState('');
   const [editingSlugAutoSync, setEditingSlugAutoSync] = useState(true);
   const [expandedSlug, setExpandedSlug] = useState<string | null>(null);
   const [newSubCategory, setNewSubCategory] = useState<
     Record<string, { name: string; slug: string; description: string; accent: string }>
   >({});
+  const [newSubCategoryErrors, setNewSubCategoryErrors] = useState<
+    Record<string, { name?: string; slug?: string; description?: string }>
+  >({});
   const [newSubCategorySlugAutoSync, setNewSubCategorySlugAutoSync] = useState<Record<string, boolean>>({});
   const [editingSubCategoryKey, setEditingSubCategoryKey] = useState<string | null>(null);
-  const [editingSubCategory, setEditingSubCategory] = useState({
-    name: '',
-    slug: '',
-    description: '',
-    accent: '',
-    isActive: true,
-  });
   const [editingSubCategorySlugAutoSync, setEditingSubCategorySlugAutoSync] = useState(true);
   const [categoryImageFile, setCategoryImageFile] = useState<File | null>(null);
   const [categoryImagePreview, setCategoryImagePreview] = useState('');
@@ -130,6 +162,54 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
   const categoryImageInputRef = useRef<HTMLInputElement>(null);
   const editingCategoryImageInputRef = useRef<HTMLInputElement>(null);
   const editingSubCategoryImageInputRef = useRef<HTMLInputElement>(null);
+
+  const categoryCreateForm = useForm<{ name: string; slug: string; description: string; accent: string }>({
+    resolver: makeZodResolver(
+      z.object({
+        name: z
+          .string({ error: 'Category name is required!' })
+          .trim()
+          .min(1, { message: 'Category name is required!' }),
+        slug: z
+          .string({ error: 'Category slug is required!' })
+          .trim()
+          .min(1, { message: 'Category slug is required!' }),
+        description: z
+          .string({ error: 'Category description is required!' })
+          .trim()
+          .min(1, { message: 'Category description is required!' }),
+        accent: z.string().trim().optional(),
+      }),
+    ),
+    defaultValues: { name: '', slug: '', description: '', accent: '' },
+    mode: 'onTouched',
+  });
+
+  const categoryCreateName = useWatch({
+    control: categoryCreateForm.control,
+    name: 'name',
+    defaultValue: '',
+  });
+  const categoryCreateAccent = useWatch({ control: categoryCreateForm.control, name: 'accent' }) ?? '';
+
+  const categoryEditForm = useForm<CategoryEditValues>({
+    resolver: makeZodResolver(categoryEditSchema),
+    defaultValues: { name: '', slug: '', description: '', accent: '' },
+    mode: 'onTouched',
+  });
+
+  const subCategoryEditForm = useForm<SubCategoryEditValues>({
+    resolver: makeZodResolver(subCategoryEditSchema),
+    defaultValues: { name: '', slug: '', description: '', accent: '', isActive: true },
+    mode: 'onTouched',
+  });
+
+  const categoryEditName = useWatch({ control: categoryEditForm.control, name: 'name' }) ?? '';
+  const categoryEditAccent = useWatch({ control: categoryEditForm.control, name: 'accent' }) ?? '';
+  const subCategoryEditName = useWatch({ control: subCategoryEditForm.control, name: 'name' }) ?? '';
+  const subCategoryEditAccent = useWatch({ control: subCategoryEditForm.control, name: 'accent' }) ?? '';
+  const subCategoryEditIsActive =
+    useWatch({ control: subCategoryEditForm.control, name: 'isActive' }) ?? true;
 
   // const visibleCategories = useMemo(() => categories.slice(0, 24), [categories]);
   const visibleCategories = useMemo(() => categories, [categories]);
@@ -150,28 +230,57 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
     subCategoryImagePreviews,
   ]);
 
+  useEffect(() => {
+    if (editingSlugAutoSync) {
+      categoryEditForm.setValue('slug', slugify(categoryEditName), { shouldValidate: true });
+    }
+  }, [categoryEditForm, categoryEditName, editingSlugAutoSync]);
+
+  useEffect(() => {
+    if (editingSubCategorySlugAutoSync) {
+      subCategoryEditForm.setValue('slug', slugify(subCategoryEditName), { shouldValidate: true });
+    }
+  }, [editingSubCategorySlugAutoSync, subCategoryEditForm, subCategoryEditName]);
+
+  useEffect(() => {
+    if (newSlugAutoSync && categoryCreateName.trim()) {
+      categoryCreateForm.setValue('slug', slugify(categoryCreateName), {
+        shouldDirty: true,
+        shouldTouch: false,
+        shouldValidate: false,
+      });
+    }
+  }, [categoryCreateForm, categoryCreateName, newSlugAutoSync]);
+
   function handleNewCategoryNameChange(value: string) {
-    setNewName(value);
+    categoryCreateForm.setValue('name', value, { shouldValidate: true });
     if (newSlugAutoSync) {
-      setNewSlug(slugify(value));
+      categoryCreateForm.setValue('slug', slugify(value), {
+        shouldDirty: true,
+        shouldTouch: false,
+        shouldValidate: false,
+      });
+      if (!value.trim()) {
+        categoryCreateForm.clearErrors('slug');
+      }
     }
   }
 
   function handleNewCategorySlugChange(value: string) {
     setNewSlugAutoSync(false);
-    setNewSlug(slugify(value));
+    categoryCreateForm.setValue('slug', slugify(value), { shouldValidate: true });
   }
 
   function handleEditingCategoryNameChange(value: string) {
-    setEditingName(value);
     if (editingSlugAutoSync) {
-      setEditingCategorySlug(slugify(value));
+      categoryEditForm.setValue('slug', slugify(value), { shouldValidate: true });
     }
+    categoryEditForm.setValue('name', value, { shouldValidate: true });
   }
 
   function handleEditingCategorySlugChange(value: string) {
     setEditingSlugAutoSync(false);
-    setEditingCategorySlug(slugify(value));
+    categoryEditForm.setValue('slug', slugify(value), { shouldValidate: true });
   }
 
   function handleNewSubCategoryNameChange(categorySlug: string, value: string) {
@@ -188,6 +297,10 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
         },
       };
     });
+    setNewSubCategoryErrors(current => ({
+      ...current,
+      [categorySlug]: { ...current[categorySlug], name: '' },
+    }));
   }
 
   function handleNewSubCategorySlugChange(categorySlug: string, value: string) {
@@ -203,14 +316,17 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
         },
       };
     });
+    setNewSubCategoryErrors(current => ({
+      ...current,
+      [categorySlug]: { ...current[categorySlug], slug: '' },
+    }));
   }
 
   function handleEditingSubCategoryNameChange(value: string) {
-    setEditingSubCategory(current => ({
-      ...current,
-      name: value,
-      slug: editingSubCategorySlugAutoSync ? slugify(value) : current.slug,
-    }));
+    subCategoryEditForm.setValue('name', value, { shouldValidate: true });
+    if (editingSubCategorySlugAutoSync) {
+      subCategoryEditForm.setValue('slug', slugify(value), { shouldValidate: true });
+    }
   }
 
   function handleNewSubCategoryAccentChange(categorySlug: string, value: string) {
@@ -227,19 +343,9 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
     });
   }
 
-  function handleEditingSubCategoryAccentChange(value: string) {
-    setEditingSubCategory(current => ({
-      ...current,
-      accent: value,
-    }));
-  }
-
   function handleEditingSubCategorySlugChange(value: string) {
     setEditingSubCategorySlugAutoSync(false);
-    setEditingSubCategory(current => ({
-      ...current,
-      slug: slugify(value),
-    }));
+    subCategoryEditForm.setValue('slug', slugify(value), { shouldValidate: true });
   }
 
   function handleCategoryImageSelect(file?: File) {
@@ -287,44 +393,33 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
   }
 
   function handleCreate() {
-    if (!newName.trim()) {
-      toast.error('Category name is required.');
-      return;
-    }
-
-    if (!newSlug.trim()) {
-      toast.error('Category slug is required.');
-      return;
-    }
-
     if (!categoryImageFile) {
       toast.error('Category image is required.');
       return;
     }
 
-    startTransition(async () => {
-      const result = await createCategory({
-        name: newName.trim(),
-        slug: newSlug.trim(),
-        image: categoryImageFile,
-        description: newDescription.trim(),
-        accent: newAccent.trim() || undefined,
+    categoryCreateForm.handleSubmit(async values => {
+      startTransition(async () => {
+        const result = await createCategory({
+          name: values.name.trim(),
+          slug: values.slug.trim(),
+          image: categoryImageFile,
+          description: values.description?.trim() ?? '',
+          accent: values.accent?.trim() || undefined,
+        });
+
+        if (!result?.success) {
+          refreshWithToast(result?.message ?? 'Failed to create category.', 'error');
+          return;
+        }
+
+        categoryCreateForm.reset({ name: '', slug: '', description: '', accent: '' });
+        setCategoryImageFile(null);
+        setCategoryImagePreview('');
+        setNewSlugAutoSync(true);
+        refreshWithToast(result.message ?? 'Category created successfully.', 'success');
       });
-
-      if (!result?.success) {
-        refreshWithToast(result?.message ?? 'Failed to create category.', 'error');
-        return;
-      }
-
-      setNewName('');
-      setNewSlug('');
-      setNewDescription('');
-      setNewAccent('');
-      setCategoryImageFile(null);
-      setCategoryImagePreview('');
-      setNewSlugAutoSync(true);
-      refreshWithToast(result.message ?? 'Category created successfully.', 'success');
-    });
+    })();
   }
 
   function handleDelete(slug?: string) {
@@ -345,36 +440,52 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
     });
   }
 
+  function startEditingCategory(category: CategoryRow) {
+    setEditingSlug(category.slug ?? null);
+    categoryEditForm.reset({
+      name: category.name,
+      slug: category.slug ?? '',
+      description: category.description ?? '',
+      accent: category.accent ?? '',
+    });
+    setEditingCategoryImageFile(null);
+    setEditingCategoryImagePreview(category.image ?? '');
+    setEditingSlugAutoSync(true);
+  }
+
+  function stopEditingCategory() {
+    setEditingSlug(null);
+    categoryEditForm.reset({ name: '', slug: '', description: '', accent: '' });
+    setEditingCategoryImageFile(null);
+    setEditingCategoryImagePreview('');
+    setEditingSlugAutoSync(true);
+  }
+
   function handleUpdate(slug?: string) {
-    if (!slug || !editingName.trim() || !editingCategorySlug.trim()) {
-      toast.error('A category slug and name are required to update this item.');
+    if (!slug) {
+      toast.error('A category slug is required to update this item.');
       return;
     }
 
-    startTransition(async () => {
-      const result = await updateCategory(slug, {
-        name: editingName.trim(),
-        slug: editingCategorySlug.trim(),
-        description: editingDescription.trim(),
-        accent: editingAccent.trim() || undefined,
-        image: editingCategoryImageFile ?? undefined,
+    categoryEditForm.handleSubmit(async values => {
+      startTransition(async () => {
+        const result = await updateCategory(slug, {
+          name: values.name.trim(),
+          slug: values.slug.trim(),
+          description: values.description?.trim() ?? '',
+          accent: values.accent?.trim() || undefined,
+          image: editingCategoryImageFile ?? undefined,
+        });
+
+        if (!result?.success) {
+          refreshWithToast(result?.message ?? 'Failed to update category.', 'error');
+          return;
+        }
+
+        stopEditingCategory();
+        refreshWithToast(result.message ?? 'Category updated successfully.', 'success');
       });
-
-      if (!result?.success) {
-        refreshWithToast(result?.message ?? 'Failed to update category.', 'error');
-        return;
-      }
-
-      setEditingSlug(null);
-      setEditingName('');
-      setEditingCategorySlug('');
-      setEditingDescription('');
-      setEditingAccent('');
-      setEditingCategoryImageFile(null);
-      setEditingCategoryImagePreview('');
-      setEditingSlugAutoSync(true);
-      refreshWithToast(result.message ?? 'Category updated successfully.', 'success');
-    });
+    })();
   }
 
   function handleCreateSubCategory(categorySlug?: string) {
@@ -384,10 +495,32 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
     }
 
     const payload = newSubCategory[categorySlug];
-    if (!payload?.name?.trim() || !payload?.slug?.trim()) {
-      toast.error('Sub-category name and slug are required.');
+    const nextErrors: { name?: string; slug?: string; description?: string } = {};
+
+    if (!payload?.name?.trim()) {
+      nextErrors.name = 'Sub-category name is required!';
+    }
+
+    if (!payload?.slug?.trim()) {
+      nextErrors.slug = 'Sub-category slug is required!';
+    }
+
+    if (!payload?.description?.trim()) {
+      nextErrors.description = 'Sub-category description is required!';
+    }
+
+    if (Object.keys(nextErrors).length > 0) {
+      setNewSubCategoryErrors(current => ({
+        ...current,
+        [categorySlug]: { ...current[categorySlug], ...nextErrors },
+      }));
       return;
     }
+
+    setNewSubCategoryErrors(current => ({
+      ...current,
+      [categorySlug]: { name: '', slug: '', description: '' },
+    }));
 
     startTransition(async () => {
       const result = await createCategorySubCategory(categorySlug, {
@@ -408,6 +541,10 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
         ...current,
         [categorySlug]: { name: '', slug: '', description: '', accent: '' },
       }));
+      setNewSubCategoryErrors(current => ({
+        ...current,
+        [categorySlug]: { name: '', slug: '', description: '' },
+      }));
       setNewSubCategorySlugAutoSync(current => ({ ...current, [categorySlug]: true }));
       setSubCategoryImageFiles(current => ({ ...current, [categorySlug]: null }));
       setSubCategoryImagePreviews(current => ({ ...current, [categorySlug]: '' }));
@@ -415,39 +552,57 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
     });
   }
 
+  function startEditingSubCategory(
+    categorySlug: string,
+    subCategory: NonNullable<CategoryRow['subCategories']>[number],
+  ) {
+    setEditingSubCategoryKey(`${categorySlug}:${subCategory.slug}`);
+    subCategoryEditForm.reset({
+      name: subCategory.name,
+      slug: subCategory.slug,
+      description: subCategory.description ?? '',
+      accent: subCategory.accent ?? '',
+      isActive: subCategory.isActive ?? true,
+    });
+    setEditingSubCategoryImageFile(null);
+    setEditingSubCategoryImagePreview(subCategory.image ?? '');
+    setEditingSubCategorySlugAutoSync(true);
+  }
+
+  function stopEditingSubCategory() {
+    setEditingSubCategoryKey(null);
+    subCategoryEditForm.reset({ name: '', slug: '', description: '', accent: '', isActive: true });
+    setEditingSubCategoryImageFile(null);
+    setEditingSubCategoryImagePreview('');
+    setEditingSubCategorySlugAutoSync(true);
+  }
+
   function handleUpdateSubCategory(categorySlug?: string, subCategorySlug?: string) {
-    if (
-      !categorySlug ||
-      !subCategorySlug ||
-      !editingSubCategory.name.trim() ||
-      !editingSubCategory.slug.trim()
-    ) {
+    if (!categorySlug || !subCategorySlug) {
       toast.error('Sub-category details are incomplete.');
       return;
     }
 
-    startTransition(async () => {
-      const result = await updateCategorySubCategory(categorySlug, subCategorySlug, {
-        name: editingSubCategory.name.trim(),
-        slug: editingSubCategory.slug.trim(),
-        description: editingSubCategory.description.trim(),
-        accent: editingSubCategory.accent.trim() || undefined,
-        isActive: editingSubCategory.isActive,
-        image: editingSubCategoryImageFile ?? undefined,
+    subCategoryEditForm.handleSubmit(async values => {
+      startTransition(async () => {
+        const result = await updateCategorySubCategory(categorySlug, subCategorySlug, {
+          name: values.name.trim(),
+          slug: values.slug.trim(),
+          description: values.description?.trim() ?? '',
+          accent: values.accent?.trim() || undefined,
+          isActive: values.isActive,
+          image: editingSubCategoryImageFile ?? undefined,
+        });
+
+        if (!result?.success) {
+          refreshWithToast(result?.message ?? 'Failed to update sub-category.', 'error');
+          return;
+        }
+
+        stopEditingSubCategory();
+        refreshWithToast(result.message ?? 'Sub-category updated successfully.', 'success');
       });
-
-      if (!result?.success) {
-        refreshWithToast(result?.message ?? 'Failed to update sub-category.', 'error');
-        return;
-      }
-
-      setEditingSubCategoryKey(null);
-      setEditingSubCategoryImageFile(null);
-      setEditingSubCategoryImagePreview('');
-      setEditingSubCategorySlugAutoSync(true);
-      setEditingSubCategory({ name: '', slug: '', description: '', accent: '', isActive: true });
-      refreshWithToast(result.message ?? 'Sub-category updated successfully.', 'success');
-    });
+    })();
   }
 
   function handleDeleteSubCategory(categorySlug?: string, subCategorySlug?: string) {
@@ -475,27 +630,39 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
             {categories.length} categories loaded from backend. Create, rename, or remove entries here.
           </CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-3 lg:grid-cols-[1fr_1fr_1fr_1fr] xl:grid-cols-[1fr_1fr_1fr_1fr_1.2fr_auto]">
-          <DashboardInput
-            value={newName}
-            onChange={event => handleNewCategoryNameChange(event.target.value)}
-            placeholder="Create a new category"
-          />
-          <DashboardInput
-            value={newSlug}
-            onChange={event => handleNewCategorySlugChange(event.target.value)}
-            placeholder="Category slug"
-          />
-          <AccentColorField
-            value={newAccent}
-            onChange={setNewAccent}
-            placeholder="Category accent hex"
-          />
-          <DashboardInput
-            value={newDescription}
-            onChange={event => setNewDescription(event.target.value)}
-            placeholder="Category description"
-          />
+        <CardContent className="grid items-start gap-3 lg:grid-cols-[1fr_1fr_1fr_1fr] xl:grid-cols-[minmax(0,1.1fr)_minmax(0,1.1fr)_minmax(0,0.95fr)_minmax(0,1.1fr)_minmax(280px,1fr)_auto]">
+          <div className="grid gap-1.5">
+            <DashboardInput
+              placeholder="Create category"
+              {...categoryCreateForm.register('name', {
+                onChange: event => handleNewCategoryNameChange(event.target.value),
+              })}
+            />
+            <ErrorText message={categoryCreateForm.formState.errors.name?.message} />
+          </div>
+          <div className="grid gap-1.5">
+            <DashboardInput
+              placeholder="Category slug"
+              {...categoryCreateForm.register('slug', {
+                onChange: event => handleNewCategorySlugChange(event.target.value),
+              })}
+            />
+            <ErrorText message={categoryCreateForm.formState.errors.slug?.message} />
+          </div>
+          <div className="grid gap-1.5">
+            <AccentColorField
+              value={categoryCreateAccent}
+              onChange={value => categoryCreateForm.setValue('accent', value, { shouldValidate: true })}
+              placeholder="Category accent hex"
+            />
+          </div>
+          <div className="grid gap-1.5">
+            <DashboardInput
+              {...categoryCreateForm.register('description')}
+              placeholder="Category description"
+            />
+            <ErrorText message={categoryCreateForm.formState.errors.description?.message} />
+          </div>
           <div
             role="button"
             tabIndex={0}
@@ -516,7 +683,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
               setCategoryDragging(false);
               handleCategoryImageSelect(event.dataTransfer.files?.[0]);
             }}
-            className={`rounded-2xl border-2 border-dashed p-4 transition ${
+            className={`self-start rounded-2xl border-2 border-dashed p-3 transition ${
               categoryDragging
                 ? 'border-primary bg-primary/5'
                 : 'border-border/70 bg-background/80 hover:border-primary/40'
@@ -529,17 +696,17 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
               <div className="min-w-0 flex-1">
                 <div className="text-sm font-semibold text-foreground">Category image</div>
                 <p className="text-xs text-muted-foreground">Drag and drop or click to add.</p>
-                <div className="mt-3 overflow-hidden rounded-xl border bg-muted">
+                <div className="mt-2 overflow-hidden rounded-xl border bg-muted">
                   {categoryImagePreview ? (
                     <Image
                       height={500}
                       width={500}
                       src={categoryImagePreview}
                       alt="Category preview"
-                      className="h-32 w-full object-cover"
+                      className="h-24 w-full object-cover"
                     />
                   ) : (
-                    <div className="flex h-32 items-center justify-center gap-2 text-sm text-muted-foreground">
+                    <div className="flex h-24 items-center justify-center gap-2 text-sm text-muted-foreground">
                       <ImagePlus className="size-4" />
                       Preview will appear here
                     </div>
@@ -562,7 +729,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
             type="button"
             disabled={isPending}
             onClick={handleCreate}
-            className="gap-2 bg-primary text-primary-foreground hover:bg-primary/70"
+            className="justify-self-start gap-2 bg-primary text-primary-foreground hover:bg-primary/70 xl:mt-6"
           >
             <Plus className="size-4" />
             Add category
@@ -574,18 +741,18 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
         <CardContent className="pt-6">
           <Table>
             <TableHeader>
-                <TableRow>
-                  <TableHead>No.</TableHead>
-                  <TableHead>Image</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Slug</TableHead>
-                  <TableHead>Accent</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Items</TableHead>
-                  <TableHead>Created At</TableHead>
-                  <TableHead>Updated At</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+              <TableRow>
+                <TableHead>No.</TableHead>
+                <TableHead>Image</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Slug</TableHead>
+                <TableHead>Accent</TableHead>
+                <TableHead>Description</TableHead>
+                <TableHead>Items</TableHead>
+                <TableHead>Created At</TableHead>
+                <TableHead>Updated At</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -686,15 +853,18 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                             />
                           </Button>
                           {isEditing ? (
-                            <div className="grid gap-1.5">
+                            <div className="grid min-w-0 gap-1.5 font-normal">
                               <label className="text-[11px] font-medium text-muted-foreground">
                                 Category name
                               </label>
                               <DashboardInput
                                 placeholder="Category name"
-                                value={editingName}
-                                onChange={event => handleEditingCategoryNameChange(event.target.value)}
+                                className="max-w-full"
+                                {...categoryEditForm.register('name', {
+                                  onChange: event => handleEditingCategoryNameChange(event.target.value),
+                                })}
                               />
+                              <ErrorText message={categoryEditForm.formState.errors.name?.message} />
                             </div>
                           ) : (
                             category.name
@@ -702,30 +872,33 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                         </div>
                       </TableCell>
                       <TableCell>
-                        {isEditing ? (
-                          <div className="grid gap-1.5">
-                            <label className="text-[11px] font-medium text-muted-foreground">
-                              Category slug
-                            </label>
-                            <DashboardInput
-                              placeholder="Category slug"
-                              value={editingCategorySlug}
-                              onChange={event => handleEditingCategorySlugChange(event.target.value)}
-                            />
+                          {isEditing ? (
+                            <div className="grid min-w-0 gap-1.5">
+                              <label className="text-[11px] font-medium text-muted-foreground">
+                                Category slug
+                              </label>
+                              <DashboardInput
+                                placeholder="Category slug"
+                                className="max-w-full"
+                                {...categoryEditForm.register('slug', {
+                                  onChange: event => handleEditingCategorySlugChange(event.target.value),
+                                })}
+                              />
+                            <ErrorText message={categoryEditForm.formState.errors.slug?.message} />
                           </div>
                         ) : (
                           (category.slug ?? '-')
                         )}
                       </TableCell>
-                      <TableCell className="max-w-44 text-sm text-muted-foreground">
+                      <TableCell className="min-w-0 max-w-44 text-sm text-muted-foreground">
                         {isEditing ? (
                           <div className="grid gap-1.5">
-                            <label className="text-[11px] font-medium text-muted-foreground">
-                              Accent
-                            </label>
+                            <label className="text-[11px] font-medium text-muted-foreground">Accent</label>
                             <AccentColorField
-                              value={editingAccent}
-                              onChange={setEditingAccent}
+                              value={categoryEditAccent}
+                              onChange={value =>
+                                categoryEditForm.setValue('accent', value, { shouldValidate: true })
+                              }
                               placeholder="Category accent hex"
                             />
                           </div>
@@ -733,7 +906,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                           sliceText(category.accent)
                         )}
                       </TableCell>
-                      <TableCell className="max-w-60 text-sm text-muted-foreground">
+                      <TableCell className="min-w-0 max-w-60 text-sm text-muted-foreground">
                         {isEditing ? (
                           <div className="grid gap-1.5">
                             <label className="text-[11px] font-medium text-muted-foreground">
@@ -741,9 +914,9 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                             </label>
                             <DashboardInput
                               placeholder="Category description"
-                              value={editingDescription}
-                              onChange={event => setEditingDescription(event.target.value)}
+                              {...categoryEditForm.register('description')}
                             />
+                            <ErrorText message={categoryEditForm.formState.errors.description?.message} />
                           </div>
                         ) : (
                           sliceText(category.description)
@@ -782,36 +955,13 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                               size="sm"
                               variant="outline"
                               disabled={isPending}
-                              onClick={() => {
-                                setEditingSlug(category.slug ?? null);
-                                setEditingName(category.name);
-                                setEditingCategorySlug(category.slug ?? '');
-                                setEditingDescription(category.description ?? '');
-                                setEditingAccent(category.accent ?? '');
-                                setEditingCategoryImageFile(null);
-                                setEditingCategoryImagePreview(category.image ?? '');
-                                setEditingSlugAutoSync(true);
-                              }}
+                              onClick={() => startEditingCategory(category)}
                             >
                               <Pencil className="size-4" />
                             </Button>
                           )}
                           {isEditing ? (
-                            <Button
-                              type="button"
-                              size="sm"
-                              variant="outline"
-                              onClick={() => {
-                                setEditingSlug(null);
-                                setEditingName('');
-                                setEditingCategorySlug('');
-                                setEditingDescription('');
-                                setEditingAccent('');
-                                setEditingCategoryImageFile(null);
-                                setEditingCategoryImagePreview('');
-                                setEditingSlugAutoSync(true);
-                              }}
-                            >
+                            <Button type="button" size="sm" variant="outline" onClick={stopEditingCategory}>
                               Cancel
                             </Button>
                           ) : null}
@@ -831,47 +981,67 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                       <TableRow>
                         <TableCell colSpan={11}>
                           <div className="space-y-4 rounded-xl border bg-muted/20 p-4">
-                            <div className="grid gap-3 md:grid-cols-[1fr_1fr_1fr_1fr_auto]">
-                              <DashboardInput
-                                placeholder="Sub-category name"
-                                value={newSubCategory[category.slug ?? '']?.name ?? ''}
-                                onChange={event =>
-                                  handleNewSubCategoryNameChange(category.slug ?? '', event.target.value)
-                                }
-                              />
-                              <DashboardInput
-                                placeholder="sub-category-slug"
-                                value={newSubCategory[category.slug ?? '']?.slug ?? ''}
-                                onChange={event =>
-                                  handleNewSubCategorySlugChange(category.slug ?? '', event.target.value)
-                                }
-                              />
-                              <AccentColorField
-                                value={newSubCategory[category.slug ?? '']?.accent ?? ''}
-                                onChange={value => handleNewSubCategoryAccentChange(category.slug ?? '', value)}
-                                placeholder="Sub-category accent hex"
-                              />
-                              <DashboardInput
-                                placeholder="Sub-category description"
-                                value={newSubCategory[category.slug ?? '']?.description ?? ''}
-                                onChange={event =>
-                                  setNewSubCategory(current => ({
-                                    ...current,
-                                    [category.slug ?? '']: {
-                                      ...(current[category.slug ?? ''] ?? {
-                                        name: '',
-                                        slug: '',
+                            <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto]">
+                              <div className="grid gap-1.5">
+                                <DashboardInput
+                                  placeholder="Sub-category name"
+                                  value={newSubCategory[category.slug ?? '']?.name ?? ''}
+                                  onChange={event =>
+                                    handleNewSubCategoryNameChange(category.slug ?? '', event.target.value)
+                                  }
+                                />
+                                <ErrorText message={newSubCategoryErrors[category.slug ?? '']?.name} />
+                              </div>
+                              <div className="grid gap-1.5">
+                                <DashboardInput
+                                  placeholder="sub-category-slug"
+                                  value={newSubCategory[category.slug ?? '']?.slug ?? ''}
+                                  onChange={event =>
+                                    handleNewSubCategorySlugChange(category.slug ?? '', event.target.value)
+                                  }
+                                />
+                                <ErrorText message={newSubCategoryErrors[category.slug ?? '']?.slug} />
+                              </div>
+                              <div className="grid gap-1.5">
+                                <AccentColorField
+                                  value={newSubCategory[category.slug ?? '']?.accent ?? ''}
+                                  onChange={value =>
+                                    handleNewSubCategoryAccentChange(category.slug ?? '', value)
+                                  }
+                                  placeholder="Sub-category accent hex"
+                                />
+                              </div>
+                              <div className="grid gap-1.5">
+                                <DashboardInput
+                                  placeholder="Sub-category description"
+                                  value={newSubCategory[category.slug ?? '']?.description ?? ''}
+                                  onChange={event => {
+                                    setNewSubCategory(current => ({
+                                      ...current,
+                                      [category.slug ?? '']: {
+                                        ...(current[category.slug ?? ''] ?? {
+                                          name: '',
+                                          slug: '',
+                                          description: '',
+                                          accent: '',
+                                        }),
+                                        description: event.target.value,
+                                      },
+                                    }));
+                                    setNewSubCategoryErrors(current => ({
+                                      ...current,
+                                      [category.slug ?? '']: {
+                                        ...current[category.slug ?? ''],
                                         description: '',
-                                        accent: '',
-                                      }),
-                                      description: event.target.value,
-                                    },
-                                  }))
-                                }
-                              />
+                                      },
+                                    }));
+                                  }}
+                                />
+                                <ErrorText message={newSubCategoryErrors[category.slug ?? '']?.description} />
+                              </div>
                               <Button
                                 type="button"
-                                className="bg-primary text-primary-foreground hover:bg-primary/70"
+                                className="bg-primary text-primary-foreground hover:bg-primary/70 md:self-start"
                                 disabled={isPending}
                                 onClick={() => handleCreateSubCategory(category.slug)}
                               >
@@ -972,52 +1142,67 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                           )}
                                         </div>
                                       </div>
-                              <div className="grid flex-1 gap-3 md:grid-cols-5">
+                                      <div className="grid flex-1 gap-3 md:grid-cols-5">
                                         {isEditingSubCategory ? (
                                           <>
-                                            <DashboardInput
-                                              placeholder="Name"
-                                              value={editingSubCategory.name}
-                                              onChange={event =>
-                                                handleEditingSubCategoryNameChange(event.target.value)
-                                              }
-                                            />
-                                            <DashboardInput
-                                              placeholder="Slug"
-                                              value={editingSubCategory.slug}
-                                              onChange={event =>
-                                                handleEditingSubCategorySlugChange(event.target.value)
-                                              }
-                                            />
+                                            <div className="grid gap-1.5">
+                                              <DashboardInput
+                                                placeholder="Name"
+                                                {...subCategoryEditForm.register('name', {
+                                                  onChange: event =>
+                                                    handleEditingSubCategoryNameChange(event.target.value),
+                                                })}
+                                              />
+                                              <ErrorText
+                                                message={subCategoryEditForm.formState.errors.name?.message}
+                                              />
+                                            </div>
+                                            <div className="grid gap-1.5">
+                                              <DashboardInput
+                                                placeholder="Slug"
+                                                {...subCategoryEditForm.register('slug', {
+                                                  onChange: event =>
+                                                    handleEditingSubCategorySlugChange(event.target.value),
+                                                })}
+                                              />
+                                              <ErrorText
+                                                message={subCategoryEditForm.formState.errors.slug?.message}
+                                              />
+                                            </div>
                                             <AccentColorField
-                                              value={editingSubCategory.accent}
-                                              onChange={handleEditingSubCategoryAccentChange}
+                                              value={subCategoryEditAccent}
+                                              onChange={value =>
+                                                subCategoryEditForm.setValue('accent', value, {
+                                                  shouldValidate: true,
+                                                })
+                                              }
                                               placeholder="Accent hex"
                                             />
                                             <select
-                                              value={editingSubCategory.isActive ? 'true' : 'false'}
+                                              value={subCategoryEditIsActive ? 'true' : 'false'}
                                               onChange={event =>
-                                                setEditingSubCategory(current => ({
-                                                  ...current,
-                                                  isActive: event.target.value === 'true',
-                                                }))
+                                                subCategoryEditForm.setValue(
+                                                  'isActive',
+                                                  event.target.value === 'true',
+                                                  { shouldValidate: true },
+                                                )
                                               }
-                                              className="h-9 rounded-md border border-input bg-background px-3 text-sm w-fit"
+                                              className="h-9 w-fit rounded-md border border-input bg-background px-3 text-sm"
                                             >
                                               <option value="true">Active</option>
                                               <option value="false">Inactive</option>
                                             </select>
-                                            <DashboardInput
-                                              placeholder="Description"
-                                              value={editingSubCategory.description}
-                                              onChange={event =>
-                                                setEditingSubCategory(current => ({
-                                                  ...current,
-                                                  description: event.target.value,
-                                                }))
-                                              }
-                                              className="md:col-span-4"
-                                            />
+                                            <div className="grid gap-1.5 md:col-span-4">
+                                              <DashboardInput
+                                                placeholder="Description"
+                                                {...subCategoryEditForm.register('description')}
+                                              />
+                                              <ErrorText
+                                                message={
+                                                  subCategoryEditForm.formState.errors.description?.message
+                                                }
+                                              />
+                                            </div>
                                           </>
                                         ) : (
                                           <>
@@ -1120,19 +1305,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                             <Button
                                               size="sm"
                                               variant="outline"
-                                              onClick={() => {
-                                                setEditingSubCategoryKey(null);
-                                                setEditingSubCategoryImageFile(null);
-                                                setEditingSubCategoryImagePreview('');
-                                                setEditingSubCategorySlugAutoSync(true);
-                                                setEditingSubCategory({
-                                                  name: '',
-                                                  slug: '',
-                                                  description: '',
-                                                  accent: '',
-                                                  isActive: true,
-                                                });
-                                              }}
+                                              onClick={stopEditingSubCategory}
                                             >
                                               Cancel
                                             </Button>
@@ -1143,19 +1316,9 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                               size="sm"
                                               variant="outline"
                                               disabled={isPending}
-                                              onClick={() => {
-                                                setEditingSubCategoryKey(subCategoryKey);
-                                                setEditingSubCategory({
-                                                  name: subCategory.name,
-                                                  slug: subCategory.slug,
-                                                  description: subCategory.description ?? '',
-                                                  accent: subCategory.accent ?? '',
-                                                  isActive: subCategory.isActive !== false,
-                                                });
-                                                setEditingSubCategoryImageFile(null);
-                                                setEditingSubCategoryImagePreview(subCategory.image ?? '');
-                                                setEditingSubCategorySlugAutoSync(true);
-                                              }}
+                                              onClick={() =>
+                                                startEditingSubCategory(category.slug ?? '', subCategory)
+                                              }
                                             >
                                               <Pencil className="size-4" />
                                             </Button>

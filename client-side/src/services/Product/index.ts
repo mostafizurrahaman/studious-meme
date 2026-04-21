@@ -14,7 +14,7 @@ type BackendEnvelope<T> = {
     error?: string;
 };
 
-type BackendProductRef = { name?: string; slug?: string } | string;
+type BackendProductRef = { _id?: string; name?: string; slug?: string } | string;
 
 export type BackendProduct = {
     _id?: string;

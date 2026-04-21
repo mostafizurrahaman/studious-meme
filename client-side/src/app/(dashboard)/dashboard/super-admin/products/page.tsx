@@ -26,7 +26,7 @@ export default async function SuperAdminProductsPage() {
 
     const products = productsResult?.data ?? [];
     const brandOptions = Array.isArray(brandsResult?.data)
-        ? brandsResult.data.map(brand => ({ value: brand.slug, label: brand.name }))
+        ? brandsResult.data.flatMap(brand => (brand._id ? [{ value: brand._id, label: brand.name }] : []))
         : [];
     const categories = Array.isArray(categoriesResult?.data) ? (categoriesResult.data as BackendCategory[]) : [];
 

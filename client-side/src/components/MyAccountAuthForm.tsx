@@ -1,33 +1,29 @@
 'use client';
 
-import { useActionState, useEffect, useState, useTransition, type ComponentProps } from 'react';
+import { useState, type ComponentProps } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
+import { useForm } from 'react-hook-form';
+import { type z } from 'zod';
 import {
     resendSignupOtpAction,
     submitSignIn,
     submitSignUp,
     submitSignupOtp,
-    type SignInState,
-    type SignUpState,
 } from '@/app/(withNavFooter)/my-account/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { accountBenefits } from '@/lib/malamal-content';
 import { useUser } from '@/context/UserContext';
+import { authFormSchemas, makeZodResolver } from '@/lib/form-validation';
 
-const initialState: SignInState = {
-    ok: false,
-    message: '',
-};
+const initialState = { ok: false, message: '' } as const;
 
-const initialSignUpState: SignUpState = {
-    ok: false,
-    message: '',
-    email: '',
-};
+type SignInValues = z.infer<typeof authFormSchemas.signIn>;
+type SignUpValues = z.infer<typeof authFormSchemas.signUp>;
+type OtpValues = z.infer<typeof authFormSchemas.otp>;
 
 function LabeledInput({ id, label, ...props }: ComponentProps<typeof Input> & { id: string; label: string }) {
     return (
@@ -42,23 +38,18 @@ function LabeledInput({ id, label, ...props }: ComponentProps<typeof Input> & { 
 
 function PasswordField({
     id,
-    name,
     label,
     placeholder,
-    value,
     onToggle,
     visible,
-    readOnly,
     autoComplete,
-}: {
+    ...props
+}: ComponentProps<typeof Input> & {
     id: string;
-    name: string;
     label: string;
     placeholder: string;
-    value?: string;
     onToggle: () => void;
     visible: boolean;
-    readOnly?: boolean;
     autoComplete?: string;
 }) {
     return (
@@ -70,15 +61,12 @@ function PasswordField({
             <div className="relative">
                 <Input
                     id={id}
-                    name={name}
                     placeholder={placeholder}
                     type={visible ? 'text' : 'password'}
-                    {...(value !== undefined ? { value } : {})}
-                    readOnly={readOnly}
-                    required={!readOnly}
-                    autoComplete={autoComplete}
                     aria-label={label}
                     className="h-11 px-4 pr-14 text-sm"
+                    autoComplete={autoComplete}
+                    {...props}
                 />
 
                 <button
@@ -95,6 +83,12 @@ function PasswordField({
     );
 }
 
+function ErrorText({ message }: { message?: string }) {
+    if (!message) return null;
+
+    return <p className="text-xs text-destructive">{message}</p>;
+}
+
 export function MyAccountAuthForm() {
     const router = useRouter();
     const { setIsLoading } = useUser();
@@ -102,52 +96,38 @@ export function MyAccountAuthForm() {
     const [showSigninPassword, setShowSigninPassword] = useState(false);
     const [showSignupPassword, setShowSignupPassword] = useState(false);
     const [showSignupConfirmPassword, setShowSignupConfirmPassword] = useState(false);
-    const [isResending, startResendTransition] = useTransition();
-    const [state, formAction, isPending] = useActionState(submitSignIn, initialState);
-    const [signupState, signupAction, signupPending] = useActionState(submitSignUp, initialSignUpState);
-    const [otpState, otpAction, otpPending] = useActionState(submitSignupOtp, initialSignUpState);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isResending, setIsResending] = useState(false);
+    const [signupEmail, setSignupEmail] = useState('');
+    const [showOtpStep, setShowOtpStep] = useState(false);
 
-    useEffect(() => {
-        if (!state.message) {
-            return;
-        }
+    const signInForm = useForm<SignInValues>({
+        resolver: makeZodResolver(authFormSchemas.signIn),
+        defaultValues: { email: '', password: '' },
+        mode: 'onTouched',
+    });
 
-        if (state.ok) {
-            toast.success(state.message);
-            setIsLoading(true);
-            router.push('/');
-            return;
-        }
+    const signUpForm = useForm<SignUpValues>({
+        resolver: makeZodResolver(authFormSchemas.signUp),
+        defaultValues: { name: '', email: '', password: '', confirmPassword: '' },
+        mode: 'onTouched',
+    });
 
-        toast.error(state.message);
-    }, [router, setIsLoading, state]);
+    const otpForm = useForm<OtpValues>({
+        resolver: makeZodResolver(authFormSchemas.otp),
+        defaultValues: { otp: '' },
+        mode: 'onTouched',
+    });
 
-    useEffect(() => {
-        if (!signupState.message) return;
+    function toFormData(values: Record<string, string>) {
+        const formData = new FormData();
 
-        if (signupState.ok) {
-            toast.success(signupState.message);
-            return;
-        }
+        Object.entries(values).forEach(([key, value]) => {
+            formData.set(key, value);
+        });
 
-        toast.error(signupState.message);
-    }, [signupState]);
-
-    useEffect(() => {
-        if (!otpState.message) return;
-
-        if (otpState.ok) {
-            toast.success(otpState.message);
-            setIsLoading(true);
-            router.push('/');
-            return;
-        }
-
-        toast.error(otpState.message);
-    }, [otpState, router, setIsLoading]);
-
-    const signupEmail = otpState.email || signupState.email || '';
-    const showOtpStep = signupState.ok && signupState.step === 'otp' && !otpState.ok;
+        return formData;
+    }
 
     return (
         <section className="mt-6 grid gap-6 lg:grid-cols-[1fr_0.9fr]">
@@ -175,36 +155,73 @@ export function MyAccountAuthForm() {
                 </CardHeader>
                 <CardContent className="mt-5 p-0">
                     {mode === 'signin' ? (
-                        <form action={formAction} className="grid gap-4">
+                        <form
+                            className="grid gap-4"
+                            onSubmit={signInForm.handleSubmit(async values => {
+                                setIsSubmitting(true);
+                                const result = await submitSignIn(initialState, toFormData(values));
+                                setIsSubmitting(false);
+
+                                if (!result.ok) {
+                                    toast.error(result.message);
+                                    return;
+                                }
+
+                                toast.success(result.message);
+                                setIsLoading(true);
+                                router.push('/');
+                            })}
+                        >
                             <LabeledInput
                                 id="login-email"
                                 label="Email address"
-                                name="email"
+                                {...signInForm.register('email')}
                                 type="email"
                                 placeholder="Email address"
                                 autoComplete="email"
                                 className="h-11 px-4 text-sm"
-                                required
                             />
+                            <ErrorText message={signInForm.formState.errors.email?.message} />
                             <PasswordField
                                 id="signin-password"
-                                name="password"
                                 label="Password"
                                 placeholder="Password"
                                 autoComplete="current-password"
                                 onToggle={() => setShowSigninPassword(value => !value)}
                                 visible={showSigninPassword}
+                                value={undefined}
+                                {...signInForm.register('password')}
                             />
+                            <ErrorText message={signInForm.formState.errors.password?.message} />
                             <Button
                                 type="submit"
-                                disabled={isPending}
+                                disabled={isSubmitting}
                                 className="h-11 w-fit rounded-full px-6 text-sm font-bold shadow-sm"
                             >
-                                {isPending ? 'Signing in...' : 'Sign in'}
+                                {isSubmitting ? 'Signing in...' : 'Sign in'}
                             </Button>
                         </form>
                     ) : showOtpStep ? (
-                        <form action={otpAction} className="grid gap-4">
+                        <form
+                            className="grid gap-4"
+                            onSubmit={otpForm.handleSubmit(async values => {
+                                setIsSubmitting(true);
+                                const result = await submitSignupOtp(initialState, toFormData({
+                                    'otp-email': signupEmail,
+                                    otp: values.otp,
+                                }));
+                                setIsSubmitting(false);
+
+                                if (!result.ok) {
+                                    toast.error(result.message);
+                                    return;
+                                }
+
+                                toast.success(result.message);
+                                setIsLoading(true);
+                                router.push('/');
+                            })}
+                        >
                             <LabeledInput
                                 id="otp-email"
                                 label="Email address"
@@ -218,34 +235,36 @@ export function MyAccountAuthForm() {
                             <LabeledInput
                                 id="otp-code"
                                 label="OTP code"
-                                name="otp"
+                                {...otpForm.register('otp')}
                                 placeholder="6 digit OTP"
-                                required
                                 autoComplete="one-time-code"
                                 inputMode="numeric"
                                 className="h-11 px-4 text-sm"
                             />
+                            <ErrorText message={otpForm.formState.errors.otp?.message} />
                             <div className="flex flex-wrap gap-3">
                                 <Button
                                     type="submit"
-                                    disabled={otpPending}
+                                    disabled={isSubmitting}
                                     className="h-11 rounded-full px-6 text-sm font-bold shadow-sm"
                                 >
-                                    {otpPending ? 'Verifying...' : 'Verify OTP'}
+                                    {isSubmitting ? 'Verifying...' : 'Verify OTP'}
                                 </Button>
                                 <Button
                                     type="button"
                                     variant="outline"
                                     disabled={isResending || !signupEmail}
                                     onClick={() => {
-                                        startResendTransition(async () => {
+                                        setIsResending(true);
+                                        void (async () => {
                                             const result = await resendSignupOtpAction(signupEmail);
+                                            setIsResending(false);
                                             if (!result?.success) {
                                                 toast.error(result?.message ?? 'Failed to resend OTP.');
                                                 return;
                                             }
                                             toast.success(result.message ?? 'OTP sent again successfully.');
-                                        });
+                                        })();
                                     }}
                                 >
                                     {isResending ? 'Sending...' : 'Resend OTP'}
@@ -253,49 +272,69 @@ export function MyAccountAuthForm() {
                             </div>
                         </form>
                     ) : (
-                        <form action={signupAction} className="grid gap-4">
+                        <form
+                            className="grid gap-4"
+                            onSubmit={signUpForm.handleSubmit(async values => {
+                                setIsSubmitting(true);
+                                const result = await submitSignUp(initialState, toFormData(values));
+                                setIsSubmitting(false);
+
+                                if (!result.ok) {
+                                    toast.error(result.message);
+                                    return;
+                                }
+
+                                toast.success(result.message);
+                                setSignupEmail(result.email);
+                                setShowOtpStep(true);
+                            })}
+                        >
                             <LabeledInput
                                 id="signup-name"
                                 label="Full name"
-                                name="signup-name"
+                                {...signUpForm.register('name')}
                                 placeholder="Full name"
-                                required
                                 className="h-11 px-4 text-sm"
                             />
+                            <ErrorText message={signUpForm.formState.errors.name?.message} />
                             <LabeledInput
                                 id="signup-email"
                                 label="Email address"
-                                name="signup-email"
+                                {...signUpForm.register('email')}
                                 type="email"
                                 placeholder="Email address"
                                 autoComplete="email"
                                 className="h-11 px-4 text-sm"
-                                required
                             />
+                            <ErrorText message={signUpForm.formState.errors.email?.message} />
                             <PasswordField
                                 id="signup-password"
-                                name="signup-password"
                                 label="Password"
                                 placeholder="Password"
                                 autoComplete="new-password"
                                 onToggle={() => setShowSignupPassword(value => !value)}
                                 visible={showSignupPassword}
+                                value={undefined}
+                                {...signUpForm.register('password')}
                             />
+                            <ErrorText message={signUpForm.formState.errors.password?.message} />
                             <PasswordField
                                 id="signup-confirm-password"
-                                name="signup-confirm-password"
                                 label="Confirm password"
                                 placeholder="Confirm password"
                                 autoComplete="new-password"
                                 onToggle={() => setShowSignupConfirmPassword(value => !value)}
                                 visible={showSignupConfirmPassword}
+                                value={undefined}
+                                {...signUpForm.register('confirmPassword')}
                             />
+                            <ErrorText message={signUpForm.formState.errors.confirmPassword?.message} />
                             <Button
                                 type="submit"
-                                disabled={signupPending}
+                                disabled={isSubmitting}
                                 className="h-11 w-fit rounded-full px-6 text-sm font-bold shadow-sm"
                             >
-                                {signupPending ? 'Creating account...' : 'Create account'}
+                                {isSubmitting ? 'Creating account...' : 'Create account'}
                             </Button>
                         </form>
                     )}
