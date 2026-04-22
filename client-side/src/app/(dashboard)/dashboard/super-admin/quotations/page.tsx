@@ -25,11 +25,11 @@ export default async function SuperAdminQuotationsPage({ searchParams }: Props) 
   const searchTerm = query.searchTerm?.trim() ?? '';
   const result = await getAllContacts(page, limit, searchTerm).catch(() => null);
   const contacts = result?.data ?? [];
-  const meta = result?.meta ?? {
-    page: Number(page) || 1,
-    limit: Number(limit) || 50,
-    total: contacts.length,
-    totalPages: Math.ceil(contacts.length / (Number(limit) || 50)) || 1,
+  const meta = {
+    page: result?.meta?.page ?? (Number(page) || 1),
+    limit: result?.meta?.limit ?? (Number(limit) || 50),
+    total: result?.meta?.total ?? contacts.length,
+    totalPages: result?.meta?.totalPages ?? (Math.ceil(contacts.length / (Number(limit) || 50)) || 1),
   };
 
   return <DashboardQuotationRequestsManager contacts={contacts} meta={meta} searchTerm={searchTerm} />;
