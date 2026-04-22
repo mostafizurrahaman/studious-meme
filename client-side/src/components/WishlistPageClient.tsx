@@ -3,7 +3,7 @@
 import { ProductCard } from '@/components/ProductCard';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import type { Product } from '@/lib/malamal-content';
+import type { Product } from '@/lib/storefront-types';
 import { useWishlistStore } from '@/lib/wishlist-store';
 
 type Props = {
@@ -19,9 +19,7 @@ export function WishlistPageClient({ suggestions }: Props) {
     return (
         <>
             <Card className="p-6 shadow-sm sm:p-8">
-                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">
-                    Saved items
-                </p>
+                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">Saved items</p>
                 <h1 className="mt-4 text-3xl font-black text-secondary sm:text-4xl">Wishlist</h1>
                 <p className="mt-3 max-w-3xl text-sm leading-7 text-foreground/65 sm:text-base">
                     {hydrated && items.length > 0

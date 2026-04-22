@@ -1,4 +1,4 @@
-import type { Product } from '@/lib/malamal-content';
+import type { Product } from '@/lib/storefront-types';
 
 export type CartItem = {
     sku: string;

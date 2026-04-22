@@ -1,4 +1,4 @@
-import type { Category as StorefrontCategory, CategoryPageEntry } from '@/lib/malamal-content';
+import type { CategoryPageEntry, StorefrontCategory } from '@/lib/storefront-types';
 
 export type BackendSubCategory = {
     name: string;

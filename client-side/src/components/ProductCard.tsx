@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { AddToCartButton } from '@/components/cart/AddToCartButton';
-import type { Product } from '@/lib/malamal-content';
+import type { Product } from '@/lib/storefront-types';
 
 type Props = {
     product: Product;

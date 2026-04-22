@@ -6,7 +6,7 @@ import type { CartItem } from '@/lib/cart';
 import { toCartItem } from '@/lib/cart';
 import { coupons, isCouponActive } from '@/lib/coupons';
 import type { Coupon } from '@/lib/coupons';
-import type { Product } from '@/lib/malamal-content';
+import type { Product } from '@/lib/storefront-types';
 
 type CheckoutForm = {
     name: string;

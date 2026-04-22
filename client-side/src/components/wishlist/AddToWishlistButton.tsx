@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import type { Product } from '@/lib/malamal-content';
+import type { Product } from '@/lib/storefront-types';
 import { useWishlistStore } from '@/lib/wishlist-store';
 
 type Props = {

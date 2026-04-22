@@ -1,6 +1,6 @@
 import { ManagedPageContent } from '@/components/ManagedPageContent';
 import { SeoScripts } from '@/components/SeoScripts';
-import { policySections } from '@/lib/malamal-content';
+import { policySections } from '@/lib/static-site-content';
 import { termsAndConditionMetadata, termsAndConditionSchemas } from '@/lib/seo';
 import { getPageByType } from '@/services/Page';
 

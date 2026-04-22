@@ -1,7 +1,6 @@
 import { Card, CardHeader } from '@/components/ui/card';
 import { SeoScripts } from '@/components/SeoScripts';
 import { ShopPageClient } from '@/components/ShopPageClient';
-import { featuredProducts, latestProducts, topCategories } from '@/lib/malamal-content';
 import { buildShopSchemas, shopMetadata } from '@/lib/seo';
 import { getAllCategoriesWithTotalNewsCount } from '@/services/Category';
 import { mapBackendCategoryToStorefrontCategory, type BackendCategory } from '@/services/Category/mappers';
@@ -43,10 +42,10 @@ export default async function ShopPage({ searchParams }: Props) {
 
   const products = productsResult?.data?.length
     ? await Promise.all(productsResult.data.map(mapBackendProductToStorefrontProduct))
-    : [...featuredProducts, ...latestProducts];
+    : [];
   const backendCategories = Array.isArray(categoriesResult?.data)
     ? categoriesResult.data.map(item => mapBackendCategoryToStorefrontCategory(item as BackendCategory))
-    : topCategories;
+    : [];
   const meta = {
     total: productsResult?.meta?.total ?? products.length,
     limit: productsResult?.meta?.limit ?? limit,

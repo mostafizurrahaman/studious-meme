@@ -1,7 +1,6 @@
 import { SeoScripts } from '@/components/SeoScripts';
 import { QuotationRequestFormClient } from '@/components/QuotationRequestFormClient';
 import { Card, CardHeader } from '@/components/ui/card';
-import { brands } from '@/lib/malamal-content';
 import { quotationRequestMetadata, quotationRequestSchemas } from '@/lib/seo';
 import { getAllBrands } from '@/services/Brand';
 
@@ -9,9 +8,7 @@ export const metadata = quotationRequestMetadata;
 
 export default async function QuotationRequestPage() {
   const brandsResult = await getAllBrands().catch(() => null);
-  const brandNames = brandsResult?.data?.length
-    ? brandsResult.data.map(brand => brand.name)
-    : brands.map(brand => brand.name);
+  const brandNames = brandsResult?.data?.length ? brandsResult.data.map(brand => brand.name) : [];
 
   return (
     <>

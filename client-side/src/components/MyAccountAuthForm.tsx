@@ -15,7 +15,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { accountBenefits } from '@/lib/malamal-content';
+import { accountBenefits } from '@/lib/static-site-content';
 import { useUser } from '@/context/UserContext';
 import { authFormSchemas, makeZodResolver } from '@/lib/form-validation';
 
@@ -206,10 +206,13 @@ export function MyAccountAuthForm() {
                             className="grid gap-4"
                             onSubmit={otpForm.handleSubmit(async values => {
                                 setIsSubmitting(true);
-                                const result = await submitSignupOtp(initialState, toFormData({
-                                    'otp-email': signupEmail,
-                                    otp: values.otp,
-                                }));
+                                const result = await submitSignupOtp(
+                                    initialState,
+                                    toFormData({
+                                        'otp-email': signupEmail,
+                                        otp: values.otp,
+                                    }),
+                                );
                                 setIsSubmitting(false);
 
                                 if (!result.ok) {

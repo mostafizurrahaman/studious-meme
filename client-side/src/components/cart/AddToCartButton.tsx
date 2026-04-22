@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { useCartStore } from '@/lib/cart-store';
-import type { Product } from '@/lib/malamal-content';
+import type { Product } from '@/lib/storefront-types';
 
 export function AddToCartButton({ product }: { product: Product }) {
     const addProduct = useCartStore(state => state.addProduct);

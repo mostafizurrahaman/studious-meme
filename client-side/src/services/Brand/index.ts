@@ -3,7 +3,7 @@
 import { updateTag } from 'next/cache';
 import { requestBackendJson } from '@/lib/backend-api';
 import { getValidAccessTokenForServerActions } from '@/lib/getValidAccessToken';
-import type { Brand as StorefrontBrand } from '@/lib/malamal-content';
+import type { Brand as StorefrontBrand } from '@/lib/storefront-types';
 import { slugify } from '@/lib/slug';
 
 type BackendEnvelope<T> = {
@@ -27,7 +27,8 @@ export type BackendBrand = {
 export async function mapBackendBrandToStorefrontBrand(brand: BackendBrand): Promise<StorefrontBrand> {
     return {
         name: brand.name,
-        href: '/shop-by-brands',
+        slug: brand.slug,
+        href: `/shop?b=${brand.slug}`,
         image: brand.image ?? '/placeholder-brand.svg',
     };
 }

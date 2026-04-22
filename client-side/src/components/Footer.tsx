@@ -1,9 +1,15 @@
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
 import { Container } from '@/components/Container';
-import { brands, contactChannels, topCategories } from '@/lib/malamal-content';
+import { contactChannels } from '@/lib/static-site-content';
+import type { Brand, Category } from '@/lib/storefront-types';
 
-export function Footer() {
+type Props = {
+    categories: Category[];
+    brands: Brand[];
+};
+
+export function Footer({ categories, brands }: Props) {
     return (
         <footer className="mt-auto border-t border-border bg-secondary text-secondary-foreground">
             <Container>
@@ -71,7 +77,7 @@ export function Footer() {
                     <div>
                         <h3 className="text-sm font-bold tracking-wide">Categories</h3>
                         <div className="mt-4 grid gap-2 text-sm text-secondary-foreground/90">
-                            {topCategories.slice(0, 4).map(category => (
+                            {categories.slice(0, 4).map(category => (
                                 <Link
                                     key={category.name}
                                     className="hover:text-secondary-foreground"

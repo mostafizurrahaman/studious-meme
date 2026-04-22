@@ -4,9 +4,13 @@ import Image from 'next/image';
 import { useState } from 'react';
 import Link from 'next/link';
 import { Card } from '@/components/ui/card';
-import { topCategories } from '@/lib/malamal-content';
+import type { Category } from '@/lib/storefront-types';
 
-export function FloatingCategoryRail() {
+type Props = {
+    categories: Category[];
+};
+
+export function FloatingCategoryRail({ categories }: Props) {
     const [open, setOpen] = useState(false);
 
     return (
@@ -34,7 +38,7 @@ export function FloatingCategoryRail() {
                         </span>
                     </div>
 
-                    {topCategories.map(category => (
+                    {categories.map(category => (
                         <Link
                             key={category.name}
                             href={category.href}

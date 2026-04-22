@@ -9,12 +9,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Container } from '@/components/Container';
 import { MiniCartDropdown } from '@/components/cart/MiniCartDropdown';
-import { brands, topCategories } from '@/lib/malamal-content';
 import { UserDropdownMenu } from '@/components/account/UserDropdownMenu';
 import { useUser } from '@/context/UserContext';
 import { getDashboardPath } from '@/lib/dashboard';
+import type { Brand, Category } from '@/lib/storefront-types';
 
-export function Header() {
+type Props = {
+    categories: Category[];
+    brands: Brand[];
+};
+
+export function Header({ categories, brands }: Props) {
     const { user } = useUser();
     const pathname = usePathname();
     const categoriesRef = useRef<HTMLDetailsElement>(null);
@@ -123,7 +128,7 @@ export function Header() {
                             <div className="max-h-[70vh] overflow-y-auto">
                                 {mobileDrawerTab === 'categories' ? (
                                     <div className="grid">
-                                        {topCategories.map(category => (
+                                        {categories.map(category => (
                                             <Link
                                                 key={category.name}
                                                 href={category.href}
@@ -164,9 +169,9 @@ export function Header() {
 
                     <div className="pb-3">
                         <div className="flex overflow-hidden rounded-full border border-border bg-background shadow-sm">
-                                <Input
-                                    className="h-11 w-full rounded-none border-0 bg-background px-4 text-sm text-foreground placeholder:text-foreground/60 shadow-none focus-visible:ring-0"
-                                    placeholder="Search…"
+                            <Input
+                                className="h-11 w-full rounded-none border-0 bg-background px-4 text-sm text-foreground placeholder:text-foreground/60 shadow-none focus-visible:ring-0"
+                                placeholder="Search…"
                                 aria-label="Search"
                             />
                             <Button
@@ -206,7 +211,7 @@ export function Header() {
                                             Top categories
                                         </div>
                                         <div className="mt-4 grid gap-2">
-                                            {topCategories.map(category => (
+                                            {categories.map(category => (
                                                 <Link
                                                     key={category.name}
                                                     href={category.href}
@@ -271,9 +276,9 @@ export function Header() {
                     {/* search input */}
                     <div className="hidden flex-1 items-center lg:flex">
                         <div className="flex w-full overflow-hidden rounded-full border border-border bg-background shadow-sm">
-                                <Input
-                                    className="h-11 w-full rounded-none border-0 bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground/60 shadow-none focus-visible:ring-0"
-                                    placeholder="Search…"
+                            <Input
+                                className="h-11 w-full rounded-none border-0 bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground/60 shadow-none focus-visible:ring-0"
+                                placeholder="Search…"
                                 aria-label="Search"
                             />
                             <Button
@@ -283,7 +288,6 @@ export function Header() {
                             >
                                 Search
                             </Button>
-                           
                         </div>
                     </div>
 
@@ -422,7 +426,7 @@ export function Header() {
                                     Categories
                                 </div>
                                 <div className="mt-3 grid gap-2">
-                                    {topCategories.map(category => (
+                                    {categories.map(category => (
                                         <Link
                                             key={category.name}
                                             href={category.href}

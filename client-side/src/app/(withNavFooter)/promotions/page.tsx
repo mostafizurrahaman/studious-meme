@@ -1,7 +1,6 @@
 import { ProductCard } from '@/components/ProductCard';
 import { SeoScripts } from '@/components/SeoScripts';
 import { Card, CardContent } from '@/components/ui/card';
-import { offerProducts } from '@/lib/malamal-content';
 import { buildPromotionsSchemas, promotionsMetadata } from '@/lib/seo';
 import { getAllProducts, mapBackendProductToStorefrontProduct } from '@/services/Product';
 
@@ -24,7 +23,7 @@ export default async function PromotionsPage({ searchParams }: Props) {
   const productsResult = await getAllProducts({ page, limit, tag: 'sale' }).catch(() => null);
   const products = productsResult?.data?.length
     ? await Promise.all(productsResult.data.map(mapBackendProductToStorefrontProduct))
-    : offerProducts;
+    : [];
   const totalPages = productsResult?.meta?.totalPages ?? 1;
 
   return (

@@ -4,7 +4,6 @@ import { Suspense } from 'react';
 import { CategoryPageClient } from '@/components/CategoryPageClient';
 import { SeoScripts } from '@/components/SeoScripts';
 import { Card } from '@/components/ui/card';
-import { categoryPages, findCategoryBySlug, getProductsByCategory } from '@/lib/malamal-content';
 import { buildCategoryMetadata, buildCategorySchemas } from '@/lib/seo';
 import { getAllBrands } from '@/services/Brand';
 import { getCategoryBySlug } from '@/services/Category';
@@ -22,10 +21,6 @@ type Props = {
   }>;
 };
 
-export function generateStaticParams() {
-  return categoryPages.map(category => ({ slug: category.slug }));
-}
-
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: Props) {
@@ -33,7 +28,7 @@ export async function generateMetadata({ params }: Props) {
   const backendCategory = await getCategoryBySlug(slug).catch(() => null);
   const category = backendCategory?.data
     ? mapBackendCategoryToCategoryPageEntry(backendCategory.data)
-    : findCategoryBySlug(slug);
+    : null;
 
   if (!category) {
     return {
@@ -55,7 +50,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   const backendCategory = await getCategoryBySlug(slug).catch(() => null);
   const category = backendCategory?.data
     ? mapBackendCategoryToCategoryPageEntry(backendCategory.data)
-    : findCategoryBySlug(slug);
+    : null;
 
   if (!category) {
     notFound();
@@ -74,7 +69,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   ]);
   const products = productsResult?.data?.length
     ? await Promise.all(productsResult.data.map(mapBackendProductToStorefrontProduct))
-    : getProductsByCategory(title);
+    : [];
   const meta = {
     total: productsResult?.meta?.total ?? products.length,
     limit: productsResult?.meta?.limit ?? limit,

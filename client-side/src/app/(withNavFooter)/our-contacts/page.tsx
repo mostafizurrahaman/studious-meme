@@ -1,8 +1,7 @@
 import { SeoScripts } from '@/components/SeoScripts';
 import { Card } from '@/components/ui/card';
-import { contactChannels } from '@/lib/malamal-content';
+import { contactChannels } from '@/lib/static-site-content';
 import { ourContactsMetadata, ourContactsSchemas } from '@/lib/seo';
-
 export const metadata = ourContactsMetadata;
 
 export default function OurContactsPage() {
