@@ -4,7 +4,7 @@ import { ShopPageClient } from '@/components/ShopPageClient';
 import { buildShopSchemas, shopMetadata } from '@/lib/seo';
 import { getActiveCategories } from '@/services/Category';
 import { mapBackendCategoryToStorefrontCategory, type BackendCategory } from '@/services/Category/mappers';
-import { getAllProducts, mapBackendProductToStorefrontProduct } from '@/services/Product';
+import { getAllActiveProducts, mapBackendProductToStorefrontProduct } from '@/services/Product';
 
 export const metadata = shopMetadata;
 export const revalidate = 300;
@@ -28,7 +28,7 @@ export default async function ShopPage({ searchParams }: Props) {
   const page = Math.max(Number(query.page ?? '1') || 1, 1);
   const limit = Math.max(Number(query.limit ?? String(DEFAULT_SHOP_LIMIT)) || DEFAULT_SHOP_LIMIT, 1);
   const [productsResult, categoriesResult] = await Promise.all([
-    getAllProducts({
+    getAllActiveProducts({
       page,
       limit,
       c: query.c,

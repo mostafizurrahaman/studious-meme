@@ -194,6 +194,7 @@ export function buildCategoryMetadata(category: {
   title?: string;
   slug: string;
   description: string;
+  image?: string;
 }) {
   const title = category.name ?? category.title ?? 'Category';
 
@@ -201,6 +202,7 @@ export function buildCategoryMetadata(category: {
     title,
     description: category.description,
     path: `/category/${category.slug}`,
+    image: category.image,
   });
 }
 

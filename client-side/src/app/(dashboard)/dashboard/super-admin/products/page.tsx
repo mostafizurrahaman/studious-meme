@@ -34,7 +34,7 @@ export default async function SuperAdminProductsPage({ searchParams }: Props) {
   const searchTerm = query.searchTerm?.trim() ?? '';
 
   const [productsResult, brandsResult, categoriesResult] = await Promise.all([
-    getAllProducts({ page, limit, searchTerm }).catch(() => null),
+    getAllProducts({ page, limit, searchTerm, includeInactive: true }).catch(() => null),
     getAllBrands().catch(() => null),
     getAllCategories().catch(() => null),
   ]);

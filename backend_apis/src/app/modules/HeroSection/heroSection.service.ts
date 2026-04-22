@@ -24,17 +24,27 @@ const ensureHeroSectionImages = (payload: Partial<IHeroSection>) => {
 
 // 2. getHomeContentFromDB
 const getHomeContentFromDB = async () => {
+    const [activeBrandIds, activeCategoryIds] = await Promise.all([
+        BrandModel.find({ isActive: true }).distinct('_id'),
+        CategoryModel.find({ isActive: true }).distinct('_id'),
+    ]);
+    const activeProductFilter = {
+        isActive: true,
+        brand: { $in: activeBrandIds },
+        category: { $in: activeCategoryIds },
+    };
+
     const [heroSection, brands, categories, featuredProducts, latestProducts] = await Promise.all([
         HeroSectionModel.findOne({ isActive: true }).lean(),
         BrandModel.find({ isActive: true }).sort({ name: 1 }).lean(),
         CategoryModel.find({ isActive: true }).sort({ name: 1 }).lean(),
-        ProductModel.find({ isActive: true, isFeatured: true })
+        ProductModel.find({ ...activeProductFilter, isFeatured: true })
             .populate('brand')
             .populate('category')
             .sort({ createdAt: -1 })
             .limit(12)
             .lean(),
-        ProductModel.find({ isActive: true })
+        ProductModel.find(activeProductFilter)
             .populate('brand')
             .populate('category')
             .sort({ createdAt: -1 })

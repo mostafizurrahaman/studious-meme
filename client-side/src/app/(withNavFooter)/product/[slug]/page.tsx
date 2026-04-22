@@ -9,7 +9,7 @@ import { AddToCartButton } from '@/components/cart/AddToCartButton';
 import { AddToWishlistButton } from '@/components/wishlist/AddToWishlistButton';
 import { SeoScripts } from '@/components/SeoScripts';
 import { buildProductMetadata, buildProductSchemas } from '@/lib/seo';
-import { getActiveProductBySlug, getAllActiveProducts, getAllProducts, mapBackendProductToStorefrontProduct } from '@/services/Product';
+import { getActiveProductBySlug, getAllActiveProducts, getAllActiveProductsAcrossPages, mapBackendProductToStorefrontProduct } from '@/services/Product';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -19,7 +19,7 @@ export const revalidate = 300;
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
-  const productsResult = await getAllActiveProducts({ limit: 10000 }).catch(() => null);
+  const productsResult = await getAllActiveProductsAcrossPages({ limit: 10000 }).catch(() => null);
 
   return Array.isArray(productsResult?.data)
     ? productsResult.data
@@ -53,7 +53,7 @@ export default async function ProductPage({ params }: Props) {
 
   if (!product) notFound();
 
-  const productsResult = await getAllProducts({
+  const productsResult = await getAllActiveProducts({
     limit: 4,
     category: product.category,
     excludeSlug: product.slug,

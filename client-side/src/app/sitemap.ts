@@ -1,5 +1,5 @@
 import { siteConfig } from '@/lib/seo';
-import { getAllActiveProducts, mapBackendProductToStorefrontProduct } from '@/services/Product';
+import { getAllActiveProductsAcrossPages, mapBackendProductToStorefrontProduct } from '@/services/Product';
 import { getActiveCategories } from '@/services/Category';
 import { mapBackendCategoryToStorefrontCategory, type BackendCategory } from '@/services/Category/mappers';
 import type { MetadataRoute } from 'next';
@@ -15,6 +15,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const toAbsoluteUrl = (path: string) => new URL(path, baseUrl).toString();
   const now = new Date();
+  const toLastModified = (value?: string) => (value ? new Date(value) : now);
 
   const staticRoutes: MetadataRoute.Sitemap = [
     {
@@ -87,7 +88,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const [categoriesResult, productsResult] = await Promise.all([
     getActiveCategories().catch(() => null),
-    getAllActiveProducts({ limit: 10000 }).catch(() => null),
+    getAllActiveProductsAcrossPages({ limit: 10000 }).catch(() => null),
   ]);
 
   const categoryRoutes: MetadataRoute.Sitemap = Array.isArray(categoriesResult?.data)
@@ -95,7 +96,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         const category = mapBackendCategoryToStorefrontCategory(item as BackendCategory);
         return {
           url: toAbsoluteUrl(`/category/${category.slug}`),
-          lastModified: now,
+          lastModified: toLastModified(item.updatedAt ?? item.createdAt),
           changeFrequency: 'weekly' as const,
           priority: 0.7,
         };
@@ -107,7 +108,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         const product = await mapBackendProductToStorefrontProduct(item);
         return {
           url: toAbsoluteUrl(`/product/${product.slug}`),
-          lastModified: now,
+          lastModified: toLastModified(item.updatedAt ?? item.createdAt),
           changeFrequency: 'weekly' as const,
           priority: 0.8,
         };

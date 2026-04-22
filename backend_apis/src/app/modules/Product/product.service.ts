@@ -55,6 +55,7 @@ const pickSort = (value: unknown): ProductSort => {
 const buildProductFilters = async (query: Record<string, unknown>) => {
     const filter: Record<string, unknown> = {};
     const and: Record<string, unknown>[] = [];
+    const includeInactive = query.includeInactive === 'true';
     const searchTerm = getString(query.searchTerm);
     const categorySlug = getString(query.category || query.c);
     const subCategorySlug = getString(query.subCategorySlug || query.subCategory);
@@ -64,7 +65,7 @@ const buildProductFilters = async (query: Record<string, unknown>) => {
     const brandValues = csv(query.brand || query.b);
     const excludeSlug = getString(query.excludeSlug);
 
-    filter.isActive = query.includeInactive === 'true' ? undefined : true;
+    filter.isActive = includeInactive ? undefined : true;
     if (filter.isActive === undefined) delete filter.isActive;
 
     if (searchTerm) {
@@ -77,6 +78,7 @@ const buildProductFilters = async (query: Record<string, unknown>) => {
 
     if (categorySlug) {
         const category = await CategoryModel.findOne({
+            ...(includeInactive ? {} : { isActive: true }),
             $or: [
                 { slug: categorySlug },
                 { name: { $regex: `^${escapeRegExp(categorySlug)}$`, $options: 'i' } },
@@ -97,6 +99,7 @@ const buildProductFilters = async (query: Record<string, unknown>) => {
 
     if (brandValues.length > 0) {
         const brands = await BrandModel.find({
+            ...(includeInactive ? {} : { isActive: true }),
             $or: [
                 { slug: { $in: brandValues } },
                 { name: { $in: brandValues } },
@@ -145,9 +148,40 @@ const buildProductFilters = async (query: Record<string, unknown>) => {
         const pattern =
             tag === 'industrial' ? /tool|machine|industrial|welding|cutting/i : /home|fan|cleaning|cooler/i;
         if (!filter.category) {
-            const categories = await CategoryModel.find({ name: pattern }).select('_id').lean();
+            const categories = await CategoryModel.find({
+                ...(includeInactive ? {} : { isActive: true }),
+                name: pattern,
+            })
+                .select('_id')
+                .lean();
             filter.category = { $in: categories.map(category => category._id) };
         }
+    }
+
+    if (!includeInactive) {
+        const referenceFilters: Promise<unknown>[] = [];
+
+        if (!('category' in filter)) {
+            referenceFilters.push(
+                CategoryModel.find({ isActive: true })
+                    .distinct('_id')
+                    .then(categoryIds => {
+                        filter.category = { $in: categoryIds };
+                    }),
+            );
+        }
+
+        if (!('brand' in filter)) {
+            referenceFilters.push(
+                BrandModel.find({ isActive: true })
+                    .distinct('_id')
+                    .then(brandIds => {
+                        filter.brand = { $in: brandIds };
+                    }),
+            );
+        }
+
+        await Promise.all(referenceFilters);
     }
 
     if (and.length > 0) {
@@ -228,8 +262,13 @@ const getProductBySlugFromDB = async (slug: string) => {
 
 // 5. getActiveProductBySlugFromDB
 const getActiveProductBySlugFromDB = async (slug: string) => {
-    const doc = await ProductModel.findOne({ slug, isActive: true }).populate('brand').populate('category').lean();
-    if (!doc) throw new AppError(httpStatus.NOT_FOUND, 'Product not found!');
+    const doc = await ProductModel.findOne({ slug, isActive: true })
+        .populate({ path: 'brand', match: { isActive: true } })
+        .populate({ path: 'category', match: { isActive: true } })
+        .lean();
+
+    if (!doc || !doc.brand || !doc.category) throw new AppError(httpStatus.NOT_FOUND, 'Product not found!');
+
     return doc;
 };
 
@@ -302,7 +341,23 @@ const getProductsByCategorySlugFromDB = async (slug: string, query: Record<strin
 const getProductsBySubCategorySlugFromDB = async (
     subCategorySlug: string,
     query: Record<string, unknown> = {},
-) => getAllProductsFromDB({ ...query, subCategorySlug });
+) => {
+    const category = await CategoryModel.findOne({
+        isActive: true,
+        subCategories: {
+            $elemMatch: {
+                slug: subCategorySlug,
+                isActive: { $ne: false },
+            },
+        },
+    }).lean();
+
+    if (!category) {
+        throw new AppError(httpStatus.NOT_FOUND, 'SubCategory not found!');
+    }
+
+    return getAllProductsFromDB({ ...query, subCategorySlug });
+};
 
 // // 7. getProductsBySubCategorySlugFromDB
 // const getProductsBySubCategorySlugFromDB = async (subCategorySlug: string) => {

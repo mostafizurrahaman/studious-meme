@@ -2,7 +2,7 @@ import { ProductCard } from '@/components/ProductCard';
 import { SeoScripts } from '@/components/SeoScripts';
 import { Card, CardContent } from '@/components/ui/card';
 import { buildPromotionsSchemas, promotionsMetadata } from '@/lib/seo';
-import { getAllProducts, mapBackendProductToStorefrontProduct } from '@/services/Product';
+import { getAllActiveProducts, mapBackendProductToStorefrontProduct } from '@/services/Product';
 
 export const metadata = promotionsMetadata;
 export const revalidate = 300;
@@ -20,7 +20,7 @@ export default async function PromotionsPage({ searchParams }: Props) {
     Number(query.limit ?? String(DEFAULT_PROMOTIONS_LIMIT)) || DEFAULT_PROMOTIONS_LIMIT,
     1,
   );
-  const productsResult = await getAllProducts({ page, limit, tag: 'sale' }).catch(() => null);
+  const productsResult = await getAllActiveProducts({ page, limit, tag: 'sale' }).catch(() => null);
   const products = productsResult?.data?.length
     ? await Promise.all(productsResult.data.map(mapBackendProductToStorefrontProduct))
     : [];

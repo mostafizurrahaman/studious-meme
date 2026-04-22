@@ -213,7 +213,7 @@ export async function RoleDashboardPage({ role }: { role: AuthRole }) {
   ] = await Promise.all([
     getAllCategories().catch(() => null),
     getAllBrands().catch(() => null),
-    getAllProducts().catch(() => null),
+    getAllProducts({ includeInactive: true }).catch(() => null),
     getAllUsers().catch(() => null),
     getAllOrdersForAdmin().catch(() => null),
     getAllPaymentsForAdmin().catch(() => null),

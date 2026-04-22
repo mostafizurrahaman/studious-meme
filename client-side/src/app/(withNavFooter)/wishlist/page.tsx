@@ -1,13 +1,13 @@
 import { SeoScripts } from '@/components/SeoScripts';
 import { WishlistPageClient } from '@/components/WishlistPageClient';
 import { wishlistMetadata, wishlistSchemas } from '@/lib/seo';
-import { getAllProducts, mapBackendProductToStorefrontProduct } from '@/services/Product';
+import { getAllActiveProducts, mapBackendProductToStorefrontProduct } from '@/services/Product';
 
 export const metadata = wishlistMetadata;
 export const dynamic = 'force-dynamic';
 
 export default async function WishlistPage() {
-  const productsResult = await getAllProducts({ limit: 12 }).catch(() => null);
+  const productsResult = await getAllActiveProducts({ limit: 12 }).catch(() => null);
   const products = productsResult?.data?.length
     ? await Promise.all(productsResult.data.map(mapBackendProductToStorefrontProduct))
     : [];
