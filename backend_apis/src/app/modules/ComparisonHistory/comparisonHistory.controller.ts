@@ -37,13 +37,14 @@ const getMyComparisonHistory = asyncHandler(async (req, res) => {
 });
 
 // 4. getAllComparisonHistory
-const getAllComparisonHistory = asyncHandler(async (_req, res) => {
-    const result = await ComparisonHistoryService.getAllComparisonHistoryFromDB();
+const getAllComparisonHistory = asyncHandler(async (req, res) => {
+    const result = await ComparisonHistoryService.getAllComparisonHistoryFromDB(req.query);
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
         message: 'Comparison history fetched successfully!',
-        data: result,
+        data: result.data,
+        meta: result.meta,
     });
 });
 

@@ -12,6 +12,7 @@ type BackendEnvelope<T> = {
     message?: string;
     data?: T;
     error?: string;
+    meta?: { page: number; limit: number; total: number; totalPages: number };
 };
 
 export type WishlistHistoryRecord = {
@@ -79,10 +80,27 @@ export const getMyWishlist = async (): Promise<BackendEnvelope<WishlistHistoryRe
     });
 };
 
-export const getAllWishlist = async (): Promise<BackendEnvelope<WishlistHistoryRecord[]>> => {
+type HistoryListParams = {
+    page?: number;
+    limit?: number;
+};
+
+const buildHistoryQuery = (params: HistoryListParams = {}) => {
+    const searchParams = new URLSearchParams();
+
+    if (params.page) searchParams.set('page', String(params.page));
+    if (params.limit) searchParams.set('limit', String(params.limit));
+
+    const query = searchParams.toString();
+    return query ? `?${query}` : '';
+};
+
+export const getAllWishlist = async (
+    params: HistoryListParams = {},
+): Promise<BackendEnvelope<WishlistHistoryRecord[]>> => {
     const accessToken = await getValidAccessTokenForServerHandlerGet();
 
-    return requestBackendJson<BackendEnvelope<WishlistHistoryRecord[]>>('/wishlist-history/admin', {
+    return requestBackendJson<BackendEnvelope<WishlistHistoryRecord[]>>(`/wishlist-history/admin${buildHistoryQuery(params)}`, {
         method: 'GET',
         token: accessToken ?? undefined,
         next: { tags: ['WISHLIST'] },

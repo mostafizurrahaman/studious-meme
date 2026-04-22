@@ -26,7 +26,36 @@ const createBrandIntoDB = async (payload: Partial<IBrand>, imageFile?: MulterFil
 };
 
 // 2. getAllBrandsFromDB
-const getAllBrandsFromDB = async () => BrandModel.find({}).sort({ createdAt: -1 }).lean();
+const getAllBrandsFromDB = async (query: Record<string, unknown>) => {
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || 50;
+    const skip = (page - 1) * limit;
+    const searchTerm = typeof query.searchTerm === 'string' ? query.searchTerm.trim() : '';
+    const filter: Record<string, unknown> = {};
+
+    if (searchTerm) {
+        filter.$or = [
+            { name: { $regex: searchTerm, $options: 'i' } },
+            { slug: { $regex: searchTerm, $options: 'i' } },
+            { description: { $regex: searchTerm, $options: 'i' } },
+        ];
+    }
+
+    const [data, total] = await Promise.all([
+        BrandModel.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+        BrandModel.countDocuments(filter),
+    ]);
+
+    return {
+        data,
+        meta: {
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit) || 1,
+        },
+    };
+};
 
 // 3. getActiveBrandsFromDB
 const getActiveBrandsFromDB = async () => BrandModel.find({ isActive: true }).sort({ createdAt: -1 }).lean();

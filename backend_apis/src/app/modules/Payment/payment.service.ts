@@ -234,7 +234,7 @@ const getMyPaymentsFromDB = async (user: IUser) => {
 
 const getAllPaymentsForAdminFromDB = async (query: Record<string, unknown>) => {
     const page = Number(query.page) || 1;
-    const limit = Number(query.limit) || 20;
+    const limit = Number(query.limit) || 50;
     const skip = (page - 1) * limit;
 
     const [data, total, summary] = await Promise.all([

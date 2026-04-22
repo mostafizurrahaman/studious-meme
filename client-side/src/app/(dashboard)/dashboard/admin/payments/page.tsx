@@ -13,16 +13,37 @@ export const metadata: Metadata = buildMetadata({
 
 export const dynamic = 'force-dynamic';
 
-export default async function AdminPaymentsPage() {
+type Props = {
+    searchParams: Promise<{ page?: string; limit?: string }>;
+};
+
+const parsePositiveInteger = (value: string | undefined, fallback: number) => {
+    const parsed = Number(value);
+
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
+};
+
+export default async function AdminPaymentsPage({ searchParams }: Props) {
     await requireDashboardRoles(['ADMIN', 'SUPER_ADMIN']);
-    const paymentsResult = await getAllPaymentsForAdmin().catch(() => null);
-    const payments = Array.isArray(paymentsResult?.data?.data) ? paymentsResult.data.data : [];
+    const query = await searchParams;
+    const page = parsePositiveInteger(query.page, 1);
+    const limit = parsePositiveInteger(query.limit, 50);
+    const paymentsResult = await getAllPaymentsForAdmin({ page, limit }).catch(() => null);
+    const payments = Array.isArray(paymentsResult?.data) ? paymentsResult.data : [];
+    const paginationMeta = {
+        page: paymentsResult?.meta?.page ?? page,
+        limit: paymentsResult?.meta?.limit ?? limit,
+        total: paymentsResult?.meta?.total ?? payments.length,
+        totalPages: paymentsResult?.meta?.totalPages ?? (Math.ceil(payments.length / limit) || 1),
+    };
 
     return (
         <DashboardPaymentsManager
             payments={payments}
             title="Payments"
             description="Browse through all the payments received via SSLCommerz."
+            listBaseHref="/dashboard/admin/payments"
+            paginationMeta={paginationMeta}
         />
     );
 }

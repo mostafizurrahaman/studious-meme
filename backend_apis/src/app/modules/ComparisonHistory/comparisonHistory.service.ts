@@ -94,11 +94,30 @@ const getMyComparisonHistoryFromDB = async (user: IUser) => {
 };
 
 // 3. getAllComparisonHistoryFromDB
-const getAllComparisonHistoryFromDB = async () => {
-    return ComparisonHistoryModel.find({})
-        .populate('user', 'name email phone image role isActive')
-        .sort({ createdAt: -1 })
-        .lean();
+const getAllComparisonHistoryFromDB = async (query: Record<string, unknown>) => {
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || 50;
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await Promise.all([
+        ComparisonHistoryModel.find({})
+            .populate('user', 'name email phone image role isActive')
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+            .lean(),
+        ComparisonHistoryModel.countDocuments(),
+    ]);
+
+    return {
+        data,
+        meta: {
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit) || 1,
+        },
+    };
 };
 
 // 4. clearComparisonHistoryFromDB

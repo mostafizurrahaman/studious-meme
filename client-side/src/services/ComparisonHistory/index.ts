@@ -12,6 +12,7 @@ type BackendEnvelope<T> = {
     message?: string;
     data?: T;
     error?: string;
+    meta?: { page: number; limit: number; total: number; totalPages: number };
 };
 
 export type ComparisonPayload = {
@@ -49,10 +50,27 @@ export const getMyComparisonHistory = async (): Promise<BackendEnvelope<unknown[
     });
 };
 
-export const getAllComparisonHistory = async (): Promise<BackendEnvelope<unknown[]>> => {
+type HistoryListParams = {
+    page?: number;
+    limit?: number;
+};
+
+const buildHistoryQuery = (params: HistoryListParams = {}) => {
+    const searchParams = new URLSearchParams();
+
+    if (params.page) searchParams.set('page', String(params.page));
+    if (params.limit) searchParams.set('limit', String(params.limit));
+
+    const query = searchParams.toString();
+    return query ? `?${query}` : '';
+};
+
+export const getAllComparisonHistory = async (
+    params: HistoryListParams = {},
+): Promise<BackendEnvelope<unknown[]>> => {
     const accessToken = await getValidAccessTokenForServerHandlerGet();
 
-    return requestBackendJson<BackendEnvelope<unknown[]>>('/comparison-history/admin/history', {
+    return requestBackendJson<BackendEnvelope<unknown[]>>(`/comparison-history/admin/history${buildHistoryQuery(params)}`, {
         method: 'GET',
         token: accessToken ?? undefined,
         next: { tags: ['COMPARISON_HISTORY'] },

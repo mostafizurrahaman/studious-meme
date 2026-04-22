@@ -11,6 +11,7 @@ type BackendEnvelope<T> = {
     message?: string;
     data?: T;
     error?: string;
+    meta?: { page: number; limit: number; total: number; totalPages: number };
 };
 
 export type BackendBrand = {
@@ -33,8 +34,22 @@ export async function mapBackendBrandToStorefrontBrand(brand: BackendBrand): Pro
     };
 }
 
-export const getAllBrands = async (): Promise<BackendEnvelope<BackendBrand[]>> => {
-    return requestBackendJson<BackendEnvelope<BackendBrand[]>>('/brand/brands', {
+type GetAllBrandsParams = {
+    page?: number;
+    limit?: number;
+    searchTerm?: string;
+};
+
+export const getAllBrands = async (params: GetAllBrandsParams = {}): Promise<BackendEnvelope<BackendBrand[]>> => {
+    const searchParams = new URLSearchParams();
+
+    if (params.page) searchParams.set('page', String(params.page));
+    if (params.limit) searchParams.set('limit', String(params.limit));
+    if (params.searchTerm?.trim()) searchParams.set('searchTerm', params.searchTerm.trim());
+
+    const query = searchParams.toString();
+
+    return requestBackendJson<BackendEnvelope<BackendBrand[]>>(`/brand/brands${query ? `?${query}` : ''}`, {
         method: 'GET',
         next: { tags: ['BRANDS'] },
     });

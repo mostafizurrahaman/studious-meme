@@ -224,6 +224,8 @@ import {
   ChevronDown,
   Crown,
   FileText,
+  GitCompareArrows,
+  Heart,
   LayoutDashboard,
   ShoppingBag,
   Sparkles,
@@ -288,6 +290,8 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
     Orders: ReceiptText,
     Payments: ReceiptText,
     Quotations: ReceiptText,
+    Wishlist: Heart,
+    Compare: GitCompareArrows,
     Profile: Settings,
   };
   const navItems = getDashboardNavigationItems(role).map(item => ({
@@ -314,7 +318,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
     },
     {
       label: 'Sales',
-      items: navItems.filter(item => ['Orders', 'Payments', 'Quotations'].includes(item.label)),
+      items: navItems.filter(item => ['Orders', 'Payments', 'Quotations', 'Wishlist', 'Compare'].includes(item.label)),
     },
     {
       label: 'Account',

@@ -59,12 +59,32 @@ const getMyWishlistFromDB = async (user: IUser) =>
         .sort({ updatedAt: -1 })
         .lean();
 
-const getAllWishlistFromDB = async () =>
-    WishlistHistoryModel.find({})
-        .populate('user', 'name email phone image role isActive')
-        .populate('product')
-        .sort({ updatedAt: -1 })
-        .lean();
+const getAllWishlistFromDB = async (query: Record<string, unknown>) => {
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || 50;
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await Promise.all([
+        WishlistHistoryModel.find({})
+            .populate('user', 'name email phone image role isActive')
+            .populate('product')
+            .sort({ updatedAt: -1 })
+            .skip(skip)
+            .limit(limit)
+            .lean(),
+        WishlistHistoryModel.countDocuments(),
+    ]);
+
+    return {
+        data,
+        meta: {
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit) || 1,
+        },
+    };
+};
 
 export const WishlistHistoryService = {
     addWishlistItemIntoDB,

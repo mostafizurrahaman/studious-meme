@@ -2,7 +2,7 @@
 
 import type React from 'react';
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { ImagePlus, Pencil, Plus, Trash2, UploadCloud } from 'lucide-react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
@@ -44,8 +44,18 @@ function sliceText(value?: string, maxLength = 44) {
   return value.length > maxLength ? `${value.slice(0, maxLength).trim()}…` : value;
 }
 
-export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
+export function DashboardBrandsManager({
+  brands,
+  paginationMeta,
+  searchTerm,
+}: {
+  brands: BackendBrand[];
+  paginationMeta: { page: number; limit: number; total: number; totalPages: number };
+  searchTerm: string;
+}) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [brandImageFile, setBrandImageFile] = useState<File | null>(null);
   const [brandImagePreview, setBrandImagePreview] = useState('');
@@ -57,10 +67,6 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
   const [editingBrandImagePreview, setEditingBrandImagePreview] = useState('');
   const [editingBrandSlugSynced, setEditingBrandSlugSynced] = useState(true);
   const [isEditingDragging, setIsEditingDragging] = useState(false);
-  // Filter state
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const editingImageInputRef = useRef<HTMLInputElement>(null);
 
@@ -86,11 +92,6 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
     }
   }, [brandName, brandSlugSynced, createForm]);
 
-  const filteredData = useMemo(() => {
-    const q = search.toLowerCase();
-    return brands.filter(b => b.name?.toLowerCase().includes(q) || b.slug?.toLowerCase().includes(q));
-  }, [brands, search]);
-
   const editForm = useForm<BrandEditValues>({
     resolver: makeZodResolver(brandEditSchema),
     defaultValues: { name: '', slug: '', description: '', isActive: true },
@@ -98,11 +99,6 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
   });
 
   const editingBrandName = useWatch({ control: editForm.control, name: 'name', defaultValue: '' });
-
-  const paginatedRows = useMemo(() => {
-    const start = (page - 1) * limit;
-    return filteredData.slice(start, start + limit);
-  }, [filteredData, page, limit]);
 
   useEffect(() => {
     return () => {
@@ -119,6 +115,24 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
       toast.error(message);
     }
     router.refresh();
+  }
+
+  function updateQuery(updates: { page?: number; limit?: number; searchTerm?: string }) {
+    const params = new URLSearchParams(searchParams.toString());
+    const nextPage = updates.page ?? paginationMeta.page;
+    const nextLimit = updates.limit ?? paginationMeta.limit;
+    const nextSearch = updates.searchTerm ?? params.get('searchTerm') ?? '';
+
+    params.set('page', String(nextPage));
+    params.set('limit', String(nextLimit));
+
+    if (nextSearch.trim()) {
+      params.set('searchTerm', nextSearch.trim());
+    } else {
+      params.delete('searchTerm');
+    }
+
+    router.push(`${pathname}?${params.toString()}`);
   }
 
   function handleBrandSlugChange(value: string) {
@@ -307,10 +321,14 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
           <div>
             <CardTitle>Brands</CardTitle>
             <CardDescription>
-              {filteredData.length} of {brands.length}
+              Showing {brands.length} of {paginationMeta.total}
             </CardDescription>
           </div>
-          <TableFilter value={search} onChange={setSearch} placeholder="Search brands..." />
+          <TableFilter
+            value={searchTerm}
+            onChange={value => updateQuery({ page: 1, searchTerm: value })}
+            placeholder="Search brands..."
+          />
         </CardHeader>
         <CardContent>
           <Table>
@@ -328,11 +346,13 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paginatedRows.map((brand, index) => {
+              {brands.map((brand, index) => {
                 const isEditing = editingSlug === brand.slug;
                 return (
                   <TableRow key={brand.slug}>
-                    <TableCell className="w-14 font-medium text-muted-foreground">{index + 1}</TableCell>
+                    <TableCell className="w-14 font-medium text-muted-foreground">
+                      {(paginationMeta.page - 1) * paginationMeta.limit + index + 1}
+                    </TableCell>
                     <TableCell className="min-w-0">
                       {isEditing ? (
                         <>
@@ -609,17 +629,14 @@ export function DashboardBrandsManager({ brands }: { brands: BackendBrand[] }) {
               })}
             </TableBody>
           </Table>
-          {filteredData.length > limit && (
+          {paginationMeta.total > 0 && (
             <div className="mt-4 border-t pt-4">
               <TablePagination
-                page={page}
-                limit={limit}
-                total={filteredData.length}
-                onPageChange={setPage}
-                onLimitChange={l => {
-                  setLimit(l);
-                  setPage(1);
-                }}
+                page={paginationMeta.page}
+                limit={paginationMeta.limit}
+                total={paginationMeta.total}
+                onPageChange={page => updateQuery({ page })}
+                onLimitChange={limit => updateQuery({ page: 1, limit })}
               />
             </div>
           )}

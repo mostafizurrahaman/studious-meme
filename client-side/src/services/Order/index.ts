@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use server';
 
 import { requestBackendJson } from '@/lib/backend-api';
@@ -92,14 +91,34 @@ export const getMyOrderById = async (orderId: string): Promise<BackendEnvelope<B
     });
 };
 
-export const getAllOrdersForAdmin = async (): Promise<
-    BackendEnvelope<{ data: BackendOrder[]; meta: any }>
-> => {
+type AdminListParams = {
+    page?: number;
+    limit?: number;
+    status?: string;
+};
+
+const buildAdminListQuery = (params: AdminListParams = {}) => {
+    const searchParams = new URLSearchParams();
+
+    if (params.page) searchParams.set('page', String(params.page));
+    if (params.limit) searchParams.set('limit', String(params.limit));
+    if (params.status?.trim()) searchParams.set('status', params.status.trim());
+
+    const query = searchParams.toString();
+    return query ? `?${query}` : '';
+};
+
+export const getAllOrdersForAdmin = async (
+    params: AdminListParams = {},
+): Promise<BackendEnvelope<BackendOrder[]>> => {
     const accessToken = await getValidAccessTokenForServerHandlerGet();
-    return requestBackendJson<BackendEnvelope<{ data: BackendOrder[]; meta: any }>>('/order/admin/orders', {
-        method: 'GET',
-        token: accessToken ?? undefined,
-    });
+    return requestBackendJson<BackendEnvelope<BackendOrder[]>>(
+        `/order/admin/orders${buildAdminListQuery(params)}`,
+        {
+            method: 'GET',
+            token: accessToken ?? undefined,
+        },
+    );
 };
 
 export const getOrderById = async (orderId: string): Promise<BackendEnvelope<BackendOrder>> => {

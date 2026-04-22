@@ -27,7 +27,7 @@ export default async function SuperAdminUsersPage({ searchParams }: Props) {
     await requireDashboardRoles(['SUPER_ADMIN']);
     const query = await searchParams;
     const page = parsePositiveInteger(query.page, 1);
-    const limit = parsePositiveInteger(query.limit, 25);
+    const limit = parsePositiveInteger(query.limit, 50);
     const searchTerm = query.searchTerm?.trim() ?? '';
     const usersResult = await getAllUsers({ page, limit, searchTerm }).catch(() => null);
     const users = Array.isArray(usersResult?.data) ? (usersResult.data as Array<unknown>) : [];

@@ -37,13 +37,14 @@ const getMyWishlist = asyncHandler(async (req, res) => {
     });
 });
 
-const getAllWishlist = asyncHandler(async (_req, res) => {
-    const result = await WishlistHistoryService.getAllWishlistFromDB();
+const getAllWishlist = asyncHandler(async (req, res) => {
+    const result = await WishlistHistoryService.getAllWishlistFromDB(req.query);
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
         message: 'Wishlist records fetched successfully!',
-        data: result,
+        data: result.data,
+        meta: result.meta,
     });
 });
 

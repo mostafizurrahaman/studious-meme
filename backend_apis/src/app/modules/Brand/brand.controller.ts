@@ -15,13 +15,14 @@ const createBrand = asyncHandler(async (req, res) => {
 });
 
 // 2. getAllBrands
-const getAllBrands = asyncHandler(async (_req, res) => {
-    const result = await BrandService.getAllBrandsFromDB();
+const getAllBrands = asyncHandler(async (req, res) => {
+    const result = await BrandService.getAllBrandsFromDB(req.query);
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
         message: 'Brands fetched successfully!',
-        data: result,
+        data: result.data,
+        meta: result.meta,
     });
 });
 

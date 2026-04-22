@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use server';
 
 import { requestBackendJson } from '@/lib/backend-api';
@@ -12,6 +11,8 @@ type BackendEnvelope<T> = {
     message?: string;
     data?: T;
     error?: string;
+    meta?: { page: number; limit: number; total: number; totalPages: number };
+    summary?: { total?: number; totalAmount?: number };
 };
 
 export type BackendPayment = {
@@ -46,15 +47,24 @@ export const getMyPayments = async (): Promise<BackendEnvelope<unknown[]>> => {
     });
 };
 
-export const getAllPaymentsForAdmin = async (): Promise<
-    BackendEnvelope<{ data: BackendPayment[]; meta: any; summary: any }>
-> => {
+type AdminPaymentParams = {
+    page?: number;
+    limit?: number;
+};
+
+export const getAllPaymentsForAdmin = async (
+    params: AdminPaymentParams = {},
+): Promise<BackendEnvelope<BackendPayment[]>> => {
     const accessToken = await getValidAccessTokenForServerHandlerGet();
-    return requestBackendJson<BackendEnvelope<{ data: BackendPayment[]; meta: any; summary: any }>>(
-        '/payment/admin',
-        {
-            method: 'GET',
-            token: accessToken ?? undefined,
-        },
-    );
+    const searchParams = new URLSearchParams();
+
+    if (params.page) searchParams.set('page', String(params.page));
+    if (params.limit) searchParams.set('limit', String(params.limit));
+
+    const query = searchParams.toString();
+
+    return requestBackendJson<BackendEnvelope<BackendPayment[]>>(`/payment/admin${query ? `?${query}` : ''}`, {
+        method: 'GET',
+        token: accessToken ?? undefined,
+    });
 };

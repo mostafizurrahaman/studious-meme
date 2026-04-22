@@ -16,13 +16,35 @@ export const metadata: Metadata = buildMetadata({
 
 export const dynamic = 'force-dynamic';
 
-export default async function SuperAdminWishlistPage() {
+type Props = {
+  searchParams: Promise<{ page?: string; limit?: string }>;
+};
+
+const parsePositiveInteger = (value: string | undefined, fallback: number) => {
+  const parsed = Number(value);
+
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
+};
+
+export default async function SuperAdminWishlistPage({ searchParams }: Props) {
   await requireDashboardRoles(['SUPER_ADMIN']);
-  const result = await getAllWishlist().catch(() => null);
+  const query = await searchParams;
+  const page = parsePositiveInteger(query.page, 1);
+  const limit = parsePositiveInteger(query.limit, 50);
+  const result = await getAllWishlist({ page, limit }).catch(() => null);
+  const records = Array.isArray(result?.data) ? (result.data as DashboardWishlistRecord[]) : [];
+  const paginationMeta = {
+    page: result?.meta?.page ?? page,
+    limit: result?.meta?.limit ?? limit,
+    total: result?.meta?.total ?? records.length,
+    totalPages: result?.meta?.totalPages ?? (Math.ceil(records.length / limit) || 1),
+  };
 
   return (
     <DashboardWishlistManager
-      records={Array.isArray(result?.data) ? (result.data as DashboardWishlistRecord[]) : []}
+      records={records}
+      paginationMeta={paginationMeta}
+      listBaseHref="/dashboard/super-admin/wishlist"
     />
   );
 }

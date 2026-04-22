@@ -1,5 +1,7 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatDashboardDate } from '@/lib/formatDate';
@@ -36,7 +38,52 @@ export type DashboardComparisonRecord = {
     createdAt?: string;
 };
 
-export function DashboardWishlistManager({ records }: { records: DashboardWishlistRecord[] }) {
+type PaginationMeta = { page: number; limit: number; total: number; totalPages: number };
+
+function HistoryPagination({ meta, baseHref }: { meta: PaginationMeta; baseHref: string }) {
+    const pageHref = (page: number, limit = meta.limit) => `${baseHref}?page=${page}&limit=${limit}`;
+
+    if (meta.total <= 0) return null;
+
+    return (
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-4 border-t pt-4">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span>
+                    Page {meta.page} of {meta.totalPages}
+                </span>
+                {[25, 50, 100].map(limit => (
+                    <Link
+                        key={limit}
+                        href={pageHref(1, limit)}
+                        className={`rounded-md border px-2 py-1 text-xs ${
+                            meta.limit === limit ? 'bg-primary text-primary-foreground' : ''
+                        }`}
+                    >
+                        {limit}
+                    </Link>
+                ))}
+            </div>
+            <div className="flex gap-2">
+                <Button asChild variant="outline" size="sm" disabled={meta.page <= 1}>
+                    <Link href={pageHref(Math.max(1, meta.page - 1))}>Prev</Link>
+                </Button>
+                <Button asChild variant="outline" size="sm" disabled={meta.page >= meta.totalPages}>
+                    <Link href={pageHref(Math.min(meta.totalPages, meta.page + 1))}>Next</Link>
+                </Button>
+            </div>
+        </div>
+    );
+}
+
+export function DashboardWishlistManager({
+    records,
+    paginationMeta,
+    listBaseHref,
+}: {
+    records: DashboardWishlistRecord[];
+    paginationMeta: PaginationMeta;
+    listBaseHref: string;
+}) {
     return (
         <Card className="shadow-sm">
             <CardHeader>
@@ -44,6 +91,9 @@ export function DashboardWishlistManager({ records }: { records: DashboardWishli
                 <CardDescription>Products currently saved by users in backend wishlist records.</CardDescription>
             </CardHeader>
             <CardContent>
+                <div className="mb-4 text-sm text-muted-foreground">
+                    Showing {records.length} of {paginationMeta.total} wishlist records
+                </div>
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -94,12 +144,21 @@ export function DashboardWishlistManager({ records }: { records: DashboardWishli
                         })}
                     </TableBody>
                 </Table>
+                <HistoryPagination meta={paginationMeta} baseHref={listBaseHref} />
             </CardContent>
         </Card>
     );
 }
 
-export function DashboardComparisonManager({ records }: { records: DashboardComparisonRecord[] }) {
+export function DashboardComparisonManager({
+    records,
+    paginationMeta,
+    listBaseHref,
+}: {
+    records: DashboardComparisonRecord[];
+    paginationMeta: PaginationMeta;
+    listBaseHref: string;
+}) {
     return (
         <Card className="shadow-sm">
             <CardHeader>
@@ -107,6 +166,9 @@ export function DashboardComparisonManager({ records }: { records: DashboardComp
                 <CardDescription>Backend-saved product comparison sessions from users.</CardDescription>
             </CardHeader>
             <CardContent>
+                <div className="mb-4 text-sm text-muted-foreground">
+                    Showing {records.length} of {paginationMeta.total} comparison records
+                </div>
                 <div className="grid gap-4">
                     {records.length === 0 ? (
                         <div className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
@@ -137,6 +199,7 @@ export function DashboardComparisonManager({ records }: { records: DashboardComp
                         </div>
                     ))}
                 </div>
+                <HistoryPagination meta={paginationMeta} baseHref={listBaseHref} />
             </CardContent>
         </Card>
     );

@@ -16,13 +16,35 @@ export const metadata: Metadata = buildMetadata({
 
 export const dynamic = 'force-dynamic';
 
-export default async function AdminComparePage() {
+type Props = {
+  searchParams: Promise<{ page?: string; limit?: string }>;
+};
+
+const parsePositiveInteger = (value: string | undefined, fallback: number) => {
+  const parsed = Number(value);
+
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
+};
+
+export default async function AdminComparePage({ searchParams }: Props) {
   await requireDashboardRoles(['ADMIN', 'SUPER_ADMIN']);
-  const result = await getAllComparisonHistory().catch(() => null);
+  const query = await searchParams;
+  const page = parsePositiveInteger(query.page, 1);
+  const limit = parsePositiveInteger(query.limit, 50);
+  const result = await getAllComparisonHistory({ page, limit }).catch(() => null);
+  const records = Array.isArray(result?.data) ? (result.data as DashboardComparisonRecord[]) : [];
+  const paginationMeta = {
+    page: result?.meta?.page ?? page,
+    limit: result?.meta?.limit ?? limit,
+    total: result?.meta?.total ?? records.length,
+    totalPages: result?.meta?.totalPages ?? (Math.ceil(records.length / limit) || 1),
+  };
 
   return (
     <DashboardComparisonManager
-      records={Array.isArray(result?.data) ? (result.data as DashboardComparisonRecord[]) : []}
+      records={records}
+      paginationMeta={paginationMeta}
+      listBaseHref="/dashboard/admin/compare"
     />
   );
 }
