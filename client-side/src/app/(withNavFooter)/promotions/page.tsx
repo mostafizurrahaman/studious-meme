@@ -5,7 +5,7 @@ import { buildPromotionsSchemas, promotionsMetadata } from '@/lib/seo';
 import { getAllProducts, mapBackendProductToStorefrontProduct } from '@/services/Product';
 
 export const metadata = promotionsMetadata;
-export const dynamic = 'force-dynamic';
+export const revalidate = 300;
 
 type Props = {
   searchParams: Promise<{ page?: string; limit?: string }>;

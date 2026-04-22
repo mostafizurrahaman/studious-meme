@@ -6,7 +6,7 @@ import { buildShopByBrandsSchemas, shopByBrandsMetadata } from '@/lib/seo';
 import { getAllBrands, mapBackendBrandToStorefrontBrand } from '@/services/Brand';
 
 export const metadata = shopByBrandsMetadata;
-export const dynamic = 'force-dynamic';
+export const revalidate = 300;
 
 export default async function ShopByBrandsPage() {
   const brandsResult = await getAllBrands().catch(() => null);

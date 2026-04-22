@@ -46,15 +46,24 @@ export const getHomeContent = async (): Promise<
             featuredProducts: BackendProduct[];
             latestProducts: BackendProduct[];
         }>
-    >('/hero/home', { method: 'GET' });
+    >('/hero/home', {
+        method: 'GET',
+        next: { tags: ['HERO', 'PRODUCTS', 'BRANDS', 'CATEGORIES'] },
+    });
 };
 
 export const getAllHeroSections = async (): Promise<BackendEnvelope<BackendHeroSection[]>> => {
-    return requestBackendJson<BackendEnvelope<BackendHeroSection[]>>('/hero/heroes', { method: 'GET' });
+    return requestBackendJson<BackendEnvelope<BackendHeroSection[]>>('/hero/heroes', {
+        method: 'GET',
+        next: { tags: ['HERO'] },
+    });
 };
 
 export const getHeroSectionById = async (id: string): Promise<BackendEnvelope<BackendHeroSection>> => {
-    return requestBackendJson<BackendEnvelope<BackendHeroSection>>(`/hero/heroes/${id}`, { method: 'GET' });
+    return requestBackendJson<BackendEnvelope<BackendHeroSection>>(`/hero/heroes/${id}`, {
+        method: 'GET',
+        next: { tags: ['HERO'] },
+    });
 };
 
 type HeroMutationPayload = {

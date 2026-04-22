@@ -120,13 +120,14 @@ export const getAllProducts = async (
 
     return requestBackendJson<BackendEnvelope<BackendProduct[]>>(
         `/product/products${query ? `?${query}` : ''}`,
-        { method: 'GET' },
+        { method: 'GET', next: { tags: ['PRODUCTS'] } },
     );
 };
 
 export const getProductBySlug = async (slug: string): Promise<BackendEnvelope<BackendProduct>> => {
     return requestBackendJson<BackendEnvelope<BackendProduct>>(`/product/products/${slug}`, {
         method: 'GET',
+        next: { tags: ['PRODUCTS'] },
     });
 };
 
@@ -148,6 +149,7 @@ export const getProductsByCategorySlug = async (
         `/product/products/by-category/${slug}${query ? `?${query}` : ''}`,
         {
             method: 'GET',
+            next: { tags: ['PRODUCTS', 'CATEGORIES'] },
         },
     );
 };
@@ -170,6 +172,7 @@ export const getProductsBySubCategorySlug = async (
         `/product/products/by-sub-category/${slug}${query ? `?${query}` : ''}`,
         {
             method: 'GET',
+            next: { tags: ['PRODUCTS', 'CATEGORIES'] },
         },
     );
 };

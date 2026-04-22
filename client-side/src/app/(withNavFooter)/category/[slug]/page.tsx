@@ -6,8 +6,8 @@ import { SeoScripts } from '@/components/SeoScripts';
 import { Card } from '@/components/ui/card';
 import { buildCategoryMetadata, buildCategorySchemas } from '@/lib/seo';
 import { getAllBrands } from '@/services/Brand';
-import { getCategoryBySlug } from '@/services/Category';
-import { mapBackendCategoryToCategoryPageEntry } from '@/services/Category/mappers';
+import { getAllCategories, getCategoryBySlug } from '@/services/Category';
+import { mapBackendCategoryToCategoryPageEntry, type BackendCategory } from '@/services/Category/mappers';
 import { getProductsByCategorySlug, mapBackendProductToStorefrontProduct } from '@/services/Product';
 
 type Props = {
@@ -21,14 +21,24 @@ type Props = {
   }>;
 };
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300;
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  const categoriesResult = await getAllCategories().catch(() => null);
+
+  return Array.isArray(categoriesResult?.data)
+    ? categoriesResult.data
+        .map(item => (item as BackendCategory).slug)
+        .filter((slug): slug is string => Boolean(slug))
+        .map(slug => ({ slug }))
+    : [];
+}
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const backendCategory = await getCategoryBySlug(slug).catch(() => null);
-  const category = backendCategory?.data
-    ? mapBackendCategoryToCategoryPageEntry(backendCategory.data)
-    : null;
+  const category = backendCategory?.data ? mapBackendCategoryToCategoryPageEntry(backendCategory.data) : null;
 
   if (!category) {
     return {
@@ -48,9 +58,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   const page = Math.max(Number(query.page ?? '1') || 1, 1);
   const limit = Math.max(Number(query.limit ?? String(DEFAULT_CATEGORY_LIMIT)) || DEFAULT_CATEGORY_LIMIT, 1);
   const backendCategory = await getCategoryBySlug(slug).catch(() => null);
-  const category = backendCategory?.data
-    ? mapBackendCategoryToCategoryPageEntry(backendCategory.data)
-    : null;
+  const category = backendCategory?.data ? mapBackendCategoryToCategoryPageEntry(backendCategory.data) : null;
 
   if (!category) {
     notFound();

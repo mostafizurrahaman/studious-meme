@@ -15,7 +15,19 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300;
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  const productsResult = await getAllProducts({ limit: 100 }).catch(() => null);
+
+  return Array.isArray(productsResult?.data)
+    ? productsResult.data
+        .map(product => product.slug)
+        .filter((slug): slug is string => Boolean(slug))
+        .map(slug => ({ slug }))
+    : [];
+}
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;

@@ -2,12 +2,12 @@ import { Card, CardHeader } from '@/components/ui/card';
 import { SeoScripts } from '@/components/SeoScripts';
 import { ShopPageClient } from '@/components/ShopPageClient';
 import { buildShopSchemas, shopMetadata } from '@/lib/seo';
-import { getAllCategoriesWithTotalNewsCount } from '@/services/Category';
+import { getAllCategories } from '@/services/Category';
 import { mapBackendCategoryToStorefrontCategory, type BackendCategory } from '@/services/Category/mappers';
 import { getAllProducts, mapBackendProductToStorefrontProduct } from '@/services/Product';
 
 export const metadata = shopMetadata;
-export const dynamic = 'force-dynamic';
+export const revalidate = 300;
 
 type Props = {
   searchParams: Promise<{
@@ -37,7 +37,7 @@ export default async function ShopPage({ searchParams }: Props) {
       price: query.price,
       sort: query.sort,
     }).catch(() => null),
-    getAllCategoriesWithTotalNewsCount().catch(() => null),
+    getAllCategories().catch(() => null),
   ]);
 
   const products = productsResult?.data?.length

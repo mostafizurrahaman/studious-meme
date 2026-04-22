@@ -1,3 +1,5 @@
+import { CATALOG_REVALIDATE_SECONDS } from '@/lib/isr';
+
 export type JsonRecord = Record<string, unknown>;
 
 export interface BackendApiErrorPayload {
@@ -67,6 +69,7 @@ export interface BackendRequestOptions extends Omit<RequestInit, 'body' | 'heade
     headers?: HeadersInit;
     token?: string | null;
     baseUrl?: string;
+    next?: NextFetchRequestConfig;
 }
 
 export async function requestBackendJson<T>(path: string, options: BackendRequestOptions = {}): Promise<T> {
@@ -88,10 +91,22 @@ export async function requestBackendJson<T>(path: string, options: BackendReques
           ? undefined
           : (body as BodyInit);
 
+    const method = String(fetchOptions.method ?? 'GET').toUpperCase();
+    const nextOptions =
+        !token && method === 'GET' && !fetchOptions.cache
+            ? {
+                  next: {
+                      revalidate: fetchOptions.next?.revalidate ?? CATALOG_REVALIDATE_SECONDS,
+                      tags: fetchOptions.next?.tags,
+                  },
+              }
+            : {};
+
     const response = await fetch(
         `${(baseUrl ?? getBackendApiBase()).replace(/\/$/, '')}${path.startsWith('/') ? path : `/${path}`}`,
         {
             ...fetchOptions,
+            ...nextOptions,
             headers: requestHeaders,
             body: requestBody,
         },

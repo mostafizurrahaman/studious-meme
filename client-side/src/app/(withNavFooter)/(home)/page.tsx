@@ -7,6 +7,7 @@ import { getHomeContent } from '@/services/HeroSection';
 import { mapBackendProductToStorefrontProduct } from '@/services/Product';
 
 export const metadata = homeMetadata;
+export const revalidate = 300;
 
 export default async function Page() {
     const heroContent = await getHomeContent().catch(() => null);

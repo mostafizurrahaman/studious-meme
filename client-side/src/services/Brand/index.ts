@@ -34,11 +34,17 @@ export async function mapBackendBrandToStorefrontBrand(brand: BackendBrand): Pro
 }
 
 export const getAllBrands = async (): Promise<BackendEnvelope<BackendBrand[]>> => {
-    return requestBackendJson<BackendEnvelope<BackendBrand[]>>('/brand/brands', { method: 'GET' });
+    return requestBackendJson<BackendEnvelope<BackendBrand[]>>('/brand/brands', {
+        method: 'GET',
+        next: { tags: ['BRANDS'] },
+    });
 };
 
 export const getBrandBySlug = async (slug: string): Promise<BackendEnvelope<BackendBrand>> => {
-    return requestBackendJson<BackendEnvelope<BackendBrand>>(`/brand/brands/${slug}`, { method: 'GET' });
+    return requestBackendJson<BackendEnvelope<BackendBrand>>(`/brand/brands/${slug}`, {
+        method: 'GET',
+        next: { tags: ['BRANDS'] },
+    });
 };
 
 type BrandMutationPayload = {

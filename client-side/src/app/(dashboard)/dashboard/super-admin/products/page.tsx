@@ -4,7 +4,7 @@ import { requireDashboardRoles } from '@/lib/dashboard-auth';
 import { buildMetadata } from '@/lib/seo';
 import { getAllProducts } from '@/services/Product';
 import { getAllBrands } from '@/services/Brand';
-import { getAllCategoriesWithTotalNewsCount } from '@/services/Category';
+import { getAllCategories } from '@/services/Category';
 import type { BackendCategory } from '@/services/Category/mappers';
 
 type Props = {
@@ -36,7 +36,7 @@ export default async function SuperAdminProductsPage({ searchParams }: Props) {
   const [productsResult, brandsResult, categoriesResult] = await Promise.all([
     getAllProducts({ page, limit, searchTerm }).catch(() => null),
     getAllBrands().catch(() => null),
-    getAllCategoriesWithTotalNewsCount().catch(() => null),
+    getAllCategories().catch(() => null),
   ]);
 
   const products = productsResult?.data ?? [];
