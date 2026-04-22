@@ -1,5 +1,4 @@
 import { NextResponse, type NextRequest } from 'next/server';
-
 import { getAuthUserFromRequest } from '@/lib/auth/session';
 import { getDashboardPathByRole, isAllowedDashboardPath } from '@/lib/auth/roles';
 
