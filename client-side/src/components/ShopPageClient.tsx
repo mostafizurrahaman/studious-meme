@@ -3,7 +3,6 @@
 import { type Route } from 'next';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-
 import { ProductCard } from '@/components/ProductCard';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -15,8 +14,8 @@ type Props = {
   meta: {
     total: number;
     limit: number;
-    currentPage: number;
-    totalPages: number;
+    page: number;
+    totalPage: number;
   };
 };
 
@@ -35,8 +34,8 @@ export function ShopPageClient({ products, categories, meta }: Props) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const filters = getActiveFilters(searchParams);
-  const totalPages = Math.max(meta.totalPages, 1);
-  const page = Math.min(meta.currentPage, totalPages);
+  const totalPage = Math.max(meta.totalPage, 1);
+  const page = Math.min(meta.page, totalPage);
 
   function updateFilter(key: string, value: string) {
     const params = new URLSearchParams(searchParams.toString());
@@ -144,8 +143,7 @@ export function ShopPageClient({ products, categories, meta }: Props) {
         <Card className="p-4 shadow-sm">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="text-sm text-foreground/65">
-              Showing {products.length} of {meta.total} products across{' '}
-              {categories.length} categories
+              Showing {products.length} of {meta.total} products across {categories.length} categories
             </div>
             <div className="flex flex-wrap gap-2 text-xs font-semibold">
               {[
@@ -183,7 +181,7 @@ export function ShopPageClient({ products, categories, meta }: Props) {
 
         <Card className="flex flex-wrap items-center justify-between gap-3 p-4 text-sm shadow-sm">
           <span className="text-foreground/60">
-            Page {page} of {totalPages}
+            Page {page} of {totalPage}
           </span>
           <div className="flex items-center gap-2">
             <Button
@@ -204,7 +202,7 @@ export function ShopPageClient({ products, categories, meta }: Props) {
             <Button
               type="button"
               variant="outline"
-              disabled={page >= totalPages}
+              disabled={page >= totalPage}
               onClick={() => updatePage(page + 1)}
               className="h-9 rounded-full border-border px-4 text-xs font-semibold"
             >

@@ -2,14 +2,14 @@ import ContactModel from './contact.model';
 import { IContact } from './contact.interface';
 import { AppError } from '../../utils';
 import httpStatus from 'http-status';
-import { IMeta } from '../../types';
+import { TMeta } from '../../utils/sendResponse';
 
 const DEFAULT_CONTACT_LIMIT = 50;
 
 // 1. adminGetAllContactsFromDB
 const adminGetAllContactsFromDB = async (
     query: Record<string, unknown>,
-): Promise<{ data: IContact[]; meta: IMeta }> => {
+): Promise<{ data: IContact[]; meta: TMeta }> => {
     const { page, limit, searchTerm } = query;
 
     const pageNumber = Number(page) || 1;
@@ -35,7 +35,7 @@ const adminGetAllContactsFromDB = async (
         ContactModel.countDocuments(filters),
     ]);
 
-    const meta: IMeta = {
+    const meta: TMeta = {
         page: pageNumber,
         limit: limitNumber,
         total,

@@ -11,48 +11,48 @@ export const metadata = shopMetadata;
 export const dynamic = 'force-dynamic';
 
 type Props = {
-    searchParams: Promise<{
-        c?: string;
-        stock?: string;
-        tag?: string;
-        price?: string;
-        page?: string;
-        limit?: string;
-        sort?: string;
-    }>;
+  searchParams: Promise<{
+    c?: string;
+    stock?: string;
+    tag?: string;
+    price?: string;
+    page?: string;
+    limit?: string;
+    sort?: string;
+  }>;
 };
 
 const DEFAULT_SHOP_LIMIT = 24;
 
 export default async function ShopPage({ searchParams }: Props) {
-    const query = await searchParams;
-    const page = Math.max(Number(query.page ?? '1') || 1, 1);
-    const limit = Math.max(Number(query.limit ?? String(DEFAULT_SHOP_LIMIT)) || DEFAULT_SHOP_LIMIT, 1);
-    const [productsResult, categoriesResult] = await Promise.all([
-        getAllProducts({
-            page,
-            limit,
-            c: query.c,
-            stock: query.stock,
-            tag: query.tag,
-            price: query.price,
-            sort: query.sort,
-        }).catch(() => null),
-        getAllCategoriesWithTotalNewsCount().catch(() => null),
-    ]);
+  const query = await searchParams;
+  const page = Math.max(Number(query.page ?? '1') || 1, 1);
+  const limit = Math.max(Number(query.limit ?? String(DEFAULT_SHOP_LIMIT)) || DEFAULT_SHOP_LIMIT, 1);
+  const [productsResult, categoriesResult] = await Promise.all([
+    getAllProducts({
+      page,
+      limit,
+      c: query.c,
+      stock: query.stock,
+      tag: query.tag,
+      price: query.price,
+      sort: query.sort,
+    }).catch(() => null),
+    getAllCategoriesWithTotalNewsCount().catch(() => null),
+  ]);
 
   const products = productsResult?.data?.length
     ? await Promise.all(productsResult.data.map(mapBackendProductToStorefrontProduct))
     : [...featuredProducts, ...latestProducts];
-    const backendCategories = Array.isArray(categoriesResult?.data)
-        ? categoriesResult.data.map(item => mapBackendCategoryToStorefrontCategory(item as BackendCategory))
-        : topCategories;
-    const meta = {
-        total: productsResult?.meta?.total ?? products.length,
-        limit: productsResult?.meta?.limit ?? limit,
-        currentPage: productsResult?.meta?.currentPage ?? productsResult?.meta?.page ?? page,
-        totalPages: productsResult?.meta?.totalPages ?? productsResult?.meta?.totalPage ?? 1,
-    };
+  const backendCategories = Array.isArray(categoriesResult?.data)
+    ? categoriesResult.data.map(item => mapBackendCategoryToStorefrontCategory(item as BackendCategory))
+    : topCategories;
+  const meta = {
+    total: productsResult?.meta?.total ?? products.length,
+    limit: productsResult?.meta?.limit ?? limit,
+    page: productsResult?.meta?.page ?? page,
+    totalPage: productsResult?.meta?.totalPage ?? productsResult?.meta?.totalPage ?? 1,
+  };
 
   return (
     <>
@@ -91,9 +91,9 @@ export default async function ShopPage({ searchParams }: Props) {
             </CardHeader>
           </Card>
 
-                    <ShopPageClient products={products} categories={backendCategories} meta={meta} />
-                </div>
-            </main>
+          <ShopPageClient products={products} categories={backendCategories} meta={meta} />
+        </div>
+      </main>
     </>
   );
 }

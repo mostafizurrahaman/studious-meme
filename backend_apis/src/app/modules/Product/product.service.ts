@@ -130,10 +130,7 @@ const buildProductFilters = async (query: Record<string, unknown>) => {
 
     if (stock === 'sale' || tag === 'sale') {
         and.push({
-            $or: [
-                { oldPrice: { $exists: true, $ne: null } },
-                { badge: { $regex: 'sale|%', $options: 'i' } },
-            ],
+            $or: [{ oldPrice: { $exists: true, $ne: null } }, { badge: { $regex: 'sale|%', $options: 'i' } }],
         });
     }
 
@@ -144,7 +141,8 @@ const buildProductFilters = async (query: Record<string, unknown>) => {
     }
 
     if (tag === 'industrial' || tag === 'home') {
-        const pattern = tag === 'industrial' ? /tool|machine|industrial|welding|cutting/i : /home|fan|cleaning|cooler/i;
+        const pattern =
+            tag === 'industrial' ? /tool|machine|industrial|welding|cutting/i : /home|fan|cleaning|cooler/i;
         if (!filter.category) {
             const categories = await CategoryModel.find({ name: pattern }).select('_id').lean();
             filter.category = { $in: categories.map(category => category._id) };
@@ -208,8 +206,6 @@ const getAllProductsFromDB = async (query: Record<string, unknown>) => {
             limit,
             total,
             totalPage: Math.ceil(total / limit) || 1,
-            totalPages: Math.ceil(total / limit) || 1,
-            currentPage: page,
         },
     };
 };
