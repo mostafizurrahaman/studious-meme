@@ -7,19 +7,18 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { ProductCard } from '@/components/ProductCard';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { parseMoney } from '@/lib/cart';
 import type { Category, Product } from '@/lib/malamal-content';
 
 type Props = {
   products: Product[];
   categories: Category[];
+  meta: {
+    total: number;
+    limit: number;
+    currentPage: number;
+    totalPages: number;
+  };
 };
-
-const pageSize = 24;
-
-function getProductCategorySlug(product: Product, categories: Category[]) {
-  return categories.find(category => category.name === product.category)?.slug ?? '';
-}
 
 function getActiveFilters(searchParams: URLSearchParams) {
   return {
@@ -31,47 +30,13 @@ function getActiveFilters(searchParams: URLSearchParams) {
   };
 }
 
-function productMatches(
-  product: Product,
-  categories: Category[],
-  filters: ReturnType<typeof getActiveFilters>,
-) {
-  const price = parseMoney(product.price);
-  const badge = product.badge?.toLowerCase() ?? '';
-  const inStock = product.stock.toLowerCase().includes('in stock') || product.stock.match(/^[1-9]/);
-  const categorySlug = getProductCategorySlug(product, categories);
-
-  if (filters.category && filters.category !== categorySlug) return false;
-  if (filters.stock === 'in-stock' && !inStock) return false;
-  if (filters.stock === 'featured' && !product.isFeatured && !badge.includes('featured')) return false;
-  if (filters.stock === 'sale' && !product.oldPrice && !badge.includes('sale') && !badge.includes('%')) {
-    return false;
-  }
-  if (filters.price === 'under-10000' && price >= 10000) return false;
-  if (filters.price === '10000-50000' && (price < 10000 || price >= 50000)) return false;
-  if (filters.price === '50000-plus' && price < 50000) return false;
-  if (filters.tag === 'sale' && !product.oldPrice && !badge.includes('sale') && !badge.includes('%')) {
-    return false;
-  }
-  if (filters.tag === 'featured' && !product.isFeatured && !badge.includes('featured')) return false;
-  if (filters.tag === 'latest' && badge.includes('old')) return false;
-  if (filters.tag === 'industrial' && !/tool|machine|industrial|welding|cutting/i.test(product.category)) {
-    return false;
-  }
-  if (filters.tag === 'home' && !/home|fan|cleaning|cooler/i.test(product.category)) return false;
-
-  return true;
-}
-
-export function ShopPageClient({ products, categories }: Props) {
+export function ShopPageClient({ products, categories, meta }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const filters = getActiveFilters(searchParams);
-  const filteredProducts = products.filter(product => productMatches(product, categories, filters));
-  const totalPages = Math.max(Math.ceil(filteredProducts.length / pageSize), 1);
-  const page = Math.min(filters.page, totalPages);
-  const visibleProducts = filteredProducts.slice((page - 1) * pageSize, page * pageSize);
+  const totalPages = Math.max(meta.totalPages, 1);
+  const page = Math.min(meta.currentPage, totalPages);
 
   function updateFilter(key: string, value: string) {
     const params = new URLSearchParams(searchParams.toString());
@@ -179,7 +144,7 @@ export function ShopPageClient({ products, categories }: Props) {
         <Card className="p-4 shadow-sm">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="text-sm text-foreground/65">
-              Showing {visibleProducts.length} of {filteredProducts.length} products across{' '}
+              Showing {products.length} of {meta.total} products across{' '}
               {categories.length} categories
             </div>
             <div className="flex flex-wrap gap-2 text-xs font-semibold">
@@ -205,12 +170,12 @@ export function ShopPageClient({ products, categories }: Props) {
         </Card>
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-          {visibleProducts.map(product => (
+          {products.map(product => (
             <ProductCard key={product.sku} product={product} />
           ))}
         </div>
 
-        {visibleProducts.length === 0 ? (
+        {products.length === 0 ? (
           <Card className="p-6 text-center text-sm text-foreground/60 shadow-sm">
             No products match the selected filters.
           </Card>

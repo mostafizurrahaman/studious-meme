@@ -8,24 +8,21 @@ import { getAllProducts, mapBackendProductToStorefrontProduct } from '@/services
 export const metadata = promotionsMetadata;
 export const dynamic = 'force-dynamic';
 
-export default async function PromotionsPage() {
-    const productsResult = await getAllProducts({ limit: 1000 }).catch(() => null);
-    const promotionalBackendProducts =
-        productsResult?.data?.filter(product => {
-            const badge = product.badge?.toLowerCase() ?? '';
-            return Boolean(
-                product.oldPrice ||
-                    product.isFeatured ||
-                    badge.includes('sale') ||
-                    badge.includes('offer') ||
-                    badge.includes('promo') ||
-                    badge.includes('discount') ||
-                    badge.includes('%'),
-            );
-        }) ?? [];
-    const products = promotionalBackendProducts.length
-        ? await Promise.all(promotionalBackendProducts.map(mapBackendProductToStorefrontProduct))
+type Props = {
+    searchParams: Promise<{ page?: string; limit?: string }>;
+};
+
+const DEFAULT_PROMOTIONS_LIMIT = 24;
+
+export default async function PromotionsPage({ searchParams }: Props) {
+    const query = await searchParams;
+    const page = Math.max(Number(query.page ?? '1') || 1, 1);
+    const limit = Math.max(Number(query.limit ?? String(DEFAULT_PROMOTIONS_LIMIT)) || DEFAULT_PROMOTIONS_LIMIT, 1);
+    const productsResult = await getAllProducts({ page, limit, tag: 'sale' }).catch(() => null);
+    const products = productsResult?.data?.length
+        ? await Promise.all(productsResult.data.map(mapBackendProductToStorefrontProduct))
         : offerProducts;
+    const totalPages = productsResult?.meta?.totalPages ?? productsResult?.meta?.totalPage ?? 1;
 
     return (
         <>
@@ -66,6 +63,31 @@ export default async function PromotionsPage() {
                                 ))}
                             </div>
                         </CardContent>
+                    </Card>
+
+                    <Card className="mt-6 flex flex-wrap items-center justify-between gap-3 p-4 text-sm shadow-sm">
+                        <span className="text-foreground/60">
+                            Page {productsResult?.meta?.currentPage ?? productsResult?.meta?.page ?? page} of{' '}
+                            {totalPages}
+                        </span>
+                        <div className="flex gap-2">
+                            {page > 1 ? (
+                                <a
+                                    href={`/promotions?page=${page - 1}`}
+                                    className="rounded-full border border-border px-4 py-2 text-xs font-semibold text-foreground/70"
+                                >
+                                    Prev
+                                </a>
+                            ) : null}
+                            {page < totalPages ? (
+                                <a
+                                    href={`/promotions?page=${page + 1}`}
+                                    className="rounded-full border border-border px-4 py-2 text-xs font-semibold text-foreground/70"
+                                >
+                                    Next
+                                </a>
+                            ) : null}
+                        </div>
                     </Card>
                 </div>
             </main>

@@ -65,12 +65,13 @@ const deleteProduct = asyncHandler(async (req, res) => {
 
 // 6. getProductsByCategorySlug
 const getProductsByCategorySlug = asyncHandler(async (req, res) => {
-    const result = await ProductService.getProductsByCategorySlugFromDB(getParam(req.params.slug));
+    const result = await ProductService.getProductsByCategorySlugFromDB(getParam(req.params.slug), req.query);
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
         message: 'Products fetched successfully!',
-        data: result,
+        data: result.data,
+        meta: result.meta,
     });
 });
 

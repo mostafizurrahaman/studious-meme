@@ -48,7 +48,10 @@ export default async function ProductPage({ params }: Props) {
 
     if (!product) notFound();
 
-    const productsResult = await getAllProducts({ limit: 1000 }).catch(() => null);
+    const productsResult = await getAllProducts({
+        limit: 5,
+        category: product.category,
+    }).catch(() => null);
     const related = productsResult?.data?.length
         ? await Promise.all(
               productsResult.data

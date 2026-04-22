@@ -12,7 +12,14 @@ type BackendEnvelope<T> = {
     message?: string;
     data?: T;
     error?: string;
-    meta?: { page: number; limit: number; total: number; totalPage: number };
+    meta?: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPage: number;
+        totalPages?: number;
+        currentPage?: number;
+    };
 };
 
 type BackendProductRef = { _id?: string; name?: string; slug?: string } | string;
@@ -70,6 +77,18 @@ type GetAllProductsParams = {
     page?: number;
     limit?: number;
     searchTerm?: string;
+    c?: string;
+    category?: string;
+    stock?: string;
+    s?: string;
+    tag?: string;
+    price?: string;
+    p?: string;
+    brand?: string;
+    b?: string;
+    sort?: string;
+    subCategorySlug?: string;
+    subCategory?: string;
 };
 
 export const getAllProducts = async (
@@ -80,6 +99,18 @@ export const getAllProducts = async (
     if (params.page) searchParams.set('page', String(params.page));
     if (params.limit) searchParams.set('limit', String(params.limit));
     if (params.searchTerm?.trim()) searchParams.set('searchTerm', params.searchTerm.trim());
+    if (params.c?.trim()) searchParams.set('c', params.c.trim());
+    if (params.category?.trim()) searchParams.set('category', params.category.trim());
+    if (params.stock?.trim()) searchParams.set('stock', params.stock.trim());
+    if (params.s?.trim()) searchParams.set('s', params.s.trim());
+    if (params.tag?.trim()) searchParams.set('tag', params.tag.trim());
+    if (params.price?.trim()) searchParams.set('price', params.price.trim());
+    if (params.p?.trim()) searchParams.set('p', params.p.trim());
+    if (params.brand?.trim()) searchParams.set('brand', params.brand.trim());
+    if (params.b?.trim()) searchParams.set('b', params.b.trim());
+    if (params.sort?.trim()) searchParams.set('sort', params.sort.trim());
+    if (params.subCategorySlug?.trim()) searchParams.set('subCategorySlug', params.subCategorySlug.trim());
+    if (params.subCategory?.trim()) searchParams.set('subCategory', params.subCategory.trim());
 
     const query = searchParams.toString();
 
@@ -95,10 +126,26 @@ export const getProductBySlug = async (slug: string): Promise<BackendEnvelope<Ba
     });
 };
 
-export const getProductsByCategorySlug = async (slug: string): Promise<BackendEnvelope<BackendProduct[]>> => {
-    return requestBackendJson<BackendEnvelope<BackendProduct[]>>(`/product/products/by-category/${slug}`, {
-        method: 'GET',
+export const getProductsByCategorySlug = async (
+    slug: string,
+    params: Omit<GetAllProductsParams, 'c' | 'category'> = {},
+): Promise<BackendEnvelope<BackendProduct[]>> => {
+    const searchParams = new URLSearchParams();
+
+    Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && String(value).trim()) {
+            searchParams.set(key, String(value).trim());
+        }
     });
+
+    const query = searchParams.toString();
+
+    return requestBackendJson<BackendEnvelope<BackendProduct[]>>(
+        `/product/products/by-category/${slug}${query ? `?${query}` : ''}`,
+        {
+            method: 'GET',
+        },
+    );
 };
 
 export const getProductsBySubCategorySlug = async (

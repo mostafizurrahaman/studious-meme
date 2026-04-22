@@ -5,6 +5,9 @@ import { ProductModel } from './product.model';
 import { IProduct } from './product.interface';
 import { CategoryModel } from '../Category/category.model';
 import { MulterFile } from '../../lib/upload';
+import { BrandModel } from '../Brand/brand.model';
+
+type ProductSort = Record<string, 1 | -1>;
 
 const DEFAULT_PRODUCTS_LIMIT = 50;
 
@@ -26,6 +29,134 @@ const parsePositiveInteger = (value: unknown, fallback: number) => {
 };
 
 const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const getString = (value: unknown) => (typeof value === 'string' ? value.trim() : '');
+
+const csv = (value: unknown) =>
+    getString(value)
+        .split(',')
+        .map(item => item.trim())
+        .filter(Boolean);
+
+const pickSort = (value: unknown): ProductSort => {
+    switch (getString(value)) {
+        case 'price-asc':
+            return { price: 1, createdAt: -1 };
+        case 'price-desc':
+            return { price: -1, createdAt: -1 };
+        case 'oldest':
+            return { createdAt: 1 };
+        case 'latest':
+        default:
+            return { createdAt: -1 };
+    }
+};
+
+const buildProductFilters = async (query: Record<string, unknown>) => {
+    const filter: Record<string, unknown> = {};
+    const and: Record<string, unknown>[] = [];
+    const searchTerm = getString(query.searchTerm);
+    const categorySlug = getString(query.category || query.c);
+    const subCategorySlug = getString(query.subCategorySlug || query.subCategory);
+    const stock = getString(query.stock || query.s);
+    const tag = getString(query.tag);
+    const price = getString(query.price || query.p);
+    const brandValues = csv(query.brand || query.b);
+
+    filter.isActive = query.includeInactive === 'true' ? undefined : true;
+    if (filter.isActive === undefined) delete filter.isActive;
+
+    if (searchTerm) {
+        and.push({
+            $or: ['title', 'sku', 'slug', 'badge'].map(field => ({
+                [field]: { $regex: escapeRegExp(searchTerm), $options: 'i' },
+            })),
+        });
+    }
+
+    if (categorySlug) {
+        const category = await CategoryModel.findOne({
+            $or: [
+                { slug: categorySlug },
+                { name: { $regex: `^${escapeRegExp(categorySlug)}$`, $options: 'i' } },
+            ],
+        })
+            .select('_id')
+            .lean();
+        if (!category) {
+            filter.category = null;
+        } else {
+            filter.category = category._id;
+        }
+    }
+
+    if (subCategorySlug) {
+        filter.subCategorySlug = subCategorySlug;
+    }
+
+    if (brandValues.length > 0) {
+        const brands = await BrandModel.find({
+            $or: [
+                { slug: { $in: brandValues } },
+                { name: { $in: brandValues } },
+                ...brandValues.map(value => ({
+                    name: { $regex: `^${escapeRegExp(value)}$`, $options: 'i' },
+                })),
+            ],
+        })
+            .select('_id')
+            .lean();
+
+        filter.brand = brands.length ? { $in: brands.map(brand => brand._id) } : null;
+    }
+
+    if (stock === 'in-stock') {
+        filter.stock = { $gt: 0 };
+    }
+
+    if (price === 'under-10000') {
+        filter.price = { $lt: 10000 };
+    } else if (price === '10000-50000') {
+        filter.price = { $gte: 10000, $lt: 50000 };
+    } else if (price === '50000-plus') {
+        filter.price = { $gte: 50000 };
+    }
+
+    if (stock === 'featured' || tag === 'featured') {
+        and.push({
+            $or: [{ isFeatured: true }, { badge: { $regex: 'featured', $options: 'i' } }],
+        });
+    }
+
+    if (stock === 'sale' || tag === 'sale') {
+        and.push({
+            $or: [
+                { oldPrice: { $exists: true, $ne: null } },
+                { badge: { $regex: 'sale|%', $options: 'i' } },
+            ],
+        });
+    }
+
+    if (tag === 'latest') {
+        and.push({
+            $or: [{ badge: { $exists: false } }, { badge: { $not: /old/i } }],
+        });
+    }
+
+    if (tag === 'industrial' || tag === 'home') {
+        const pattern = tag === 'industrial' ? /tool|machine|industrial|welding|cutting/i : /home|fan|cleaning|cooler/i;
+        if (!filter.category) {
+            const categories = await CategoryModel.find({ name: pattern }).select('_id').lean();
+            filter.category = { $in: categories.map(category => category._id) };
+        }
+    }
+
+    if (and.length > 0) {
+        filter.$and = and;
+    }
+
+    return filter;
+};
 
 // 1. createProductIntoDB
 const createProductIntoDB = async (payload: Partial<IProduct>, imageFile?: MulterFile) => {
@@ -56,21 +187,14 @@ const getAllProductsFromDB = async (query: Record<string, unknown>) => {
     const page = parsePositiveInteger(query.page, 1);
     const limit = parsePositiveInteger(query.limit, DEFAULT_PRODUCTS_LIMIT);
     const skip = (page - 1) * limit;
-    const searchTerm = typeof query.searchTerm === 'string' ? query.searchTerm.trim() : '';
-
-    const filter = searchTerm
-        ? {
-              $or: ['title', 'sku', 'slug'].map(field => ({
-                  [field]: { $regex: escapeRegExp(searchTerm), $options: 'i' },
-              })),
-          }
-        : {};
+    const filter = await buildProductFilters(query);
+    const sort = pickSort(query.sort);
 
     const [data, total] = await Promise.all([
         ProductModel.find(filter)
             .populate('brand')
             .populate('category')
-            .sort({ createdAt: -1 })
+            .sort(sort)
             .skip(skip)
             .limit(limit)
             .lean(),
@@ -84,6 +208,8 @@ const getAllProductsFromDB = async (query: Record<string, unknown>) => {
             limit,
             total,
             totalPage: Math.ceil(total / limit) || 1,
+            totalPages: Math.ceil(total / limit) || 1,
+            currentPage: page,
         },
     };
 };
@@ -152,15 +278,12 @@ const deleteProductFromDB = async (slug: string) => {
 };
 
 // 6. getProductsByCategorySlugFromDB
-const getProductsByCategorySlugFromDB = async (slug: string) => {
+const getProductsByCategorySlugFromDB = async (slug: string, query: Record<string, unknown> = {}) => {
     const category = await CategoryModel.findOne({ slug, isActive: true }).lean();
     if (!category) {
         throw new AppError(httpStatus.NOT_FOUND, 'Category not found!');
     }
-    return ProductModel.find({ category: category._id, isActive: true })
-        .populate('brand')
-        .populate('category')
-        .lean();
+    return getAllProductsFromDB({ ...query, c: slug });
 };
 
 // 7. getProductsBySubCategorySlugFromDB
