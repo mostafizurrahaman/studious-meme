@@ -34,13 +34,17 @@ export default async function ShopByBrandsPage() {
               <Link key={brand.name} href={brand.href} className="group">
                 <Card className="h-full p-6 text-center shadow-sm transition group-hover:-translate-y-0.5 group-hover:shadow-md">
                   <div className="mx-auto flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl border border-border bg-muted">
-                    <Image
-                      src={brand.image}
-                      alt={brand.name}
-                      width={96}
-                      height={96}
-                      className="h-full w-full rounded-2xl bg-background object-contain p-2"
-                    />
+                    {brand.image ? (
+                      <Image
+                        src={brand.image}
+                        alt={brand.name}
+                        width={96}
+                        height={96}
+                        className="h-full w-full rounded-2xl bg-background object-contain p-2"
+                      />
+                    ) : (
+                      <span className="px-3 text-sm font-black text-secondary">{brand.name}</span>
+                    )}
                   </div>
                   <div className="mt-4 text-xl font-black text-secondary">{brand.name}</div>
                   <div className="mt-2 text-sm text-foreground/55">View brand products</div>

@@ -21,7 +21,7 @@ export type StorefrontCategory = {
     name: string;
     slug: string;
     href: `/category/${string}`;
-    image: string;
+    image?: string;
     description: string;
     accent: string;
 };
@@ -30,8 +30,9 @@ export type Category = StorefrontCategory;
 
 export type StorefrontBrand = {
     name: string;
-    href: '/shop-by-brands';
-    image: string;
+    slug: string;
+    href: `/shop?b=${string}`;
+    image?: string;
 };
 
 export type Brand = StorefrontBrand;

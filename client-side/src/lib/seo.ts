@@ -92,7 +92,7 @@ export const mainCategoriesMetadata = buildMetadata({
 export const shopByBrandsMetadata = buildMetadata({
   title: 'Shop By Brands - Trusted Hardware Brands',
   description:
-    'Browse trusted hardware brands available on Malamal including INGCO, Total, Sanford and more.',
+    'Browse trusted hardware brands available on Malamal from the live storefront brand directory.',
   path: '/shop-by-brands',
 });
 
@@ -369,7 +369,7 @@ export function buildHomeSchemas(input?: {
     ...categories.slice(0, 8).map(category => ({
       name: category.name,
       url: category.href,
-      image: absoluteUrl(category.image),
+      image: category.image ? absoluteUrl(category.image) : undefined,
     })),
     ...products.slice(0, 10).map(product => ({
       name: product.title,
@@ -446,7 +446,7 @@ export function buildShopSchemas(products: Product[], categories: Category[]) {
       categories.slice(0, 20).map(category => ({
         name: category.name,
         url: category.href,
-        image: absoluteUrl(category.image),
+        image: category.image ? absoluteUrl(category.image) : undefined,
       })),
     ),
   ];
@@ -522,7 +522,7 @@ export function buildMainCategoriesSchemas(categories: Category[]) {
       items.map(category => ({
         name: category.name,
         url: category.href,
-        image: absoluteUrl(category.image),
+        image: category.image ? absoluteUrl(category.image) : undefined,
       })),
     ),
   ];

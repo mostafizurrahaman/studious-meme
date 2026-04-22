@@ -25,6 +25,12 @@ export default async function PromotionsPage({ searchParams }: Props) {
     ? await Promise.all(productsResult.data.map(mapBackendProductToStorefrontProduct))
     : [];
   const totalPages = productsResult?.meta?.totalPages ?? 1;
+  const promotionStats = [
+    [String(productsResult?.meta?.total ?? products.length), 'Promotion products'],
+    [String(products.length), 'Shown on this page'],
+    [String(productsResult?.meta?.page ?? page), 'Current page'],
+    [String(totalPages), 'Total pages'],
+  ];
 
   return (
     <>
@@ -42,15 +48,10 @@ export default async function PromotionsPage({ searchParams }: Props) {
           </Card>
 
           <section className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {[
-              ['Seasonal sale', 'Limited-time hardware bundles and discounts.'],
-              ['Bulk quotes', 'Best for projects, workshops and procurement.'],
-              ['Featured deals', 'Curated top selling industrial items.'],
-              ['New arrivals', 'Fresh stock from trusted brands.'],
-            ].map(([title, text]) => (
-              <Card key={title} className="p-5 shadow-sm">
-                <div className="text-lg font-extrabold text-secondary">{title}</div>
-                <p className="mt-2 text-sm leading-7 text-foreground/65">{text}</p>
+            {promotionStats.map(([value, label]) => (
+              <Card key={label} className="p-5 shadow-sm">
+                <div className="text-2xl font-extrabold text-secondary">{value}</div>
+                <p className="mt-2 text-sm leading-7 text-foreground/65">{label}</p>
               </Card>
             ))}
           </section>
@@ -63,6 +64,11 @@ export default async function PromotionsPage({ searchParams }: Props) {
                   <ProductCard key={product.sku} product={product} />
                 ))}
               </div>
+              {products.length === 0 ? (
+                <div className="mt-6 rounded-2xl border border-dashed border-border p-6 text-center text-sm text-foreground/60">
+                  No promotion products are currently available from the backend.
+                </div>
+              ) : null}
             </CardContent>
           </Card>
 

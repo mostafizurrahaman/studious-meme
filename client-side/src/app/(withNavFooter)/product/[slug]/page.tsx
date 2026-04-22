@@ -49,7 +49,7 @@ export default async function ProductPage({ params }: Props) {
   const related = productsResult?.data?.length
     ? await Promise.all(productsResult.data.map(mapBackendProductToStorefrontProduct))
     : [];
-  const gallery = [product.image, ...related.map(item => item.image)].slice(0, 4);
+  const gallery = [product.image];
 
   return (
     <>
@@ -114,16 +114,14 @@ export default async function ProductPage({ params }: Props) {
               </h1>
 
               <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-foreground/60">
-                {[`Brand: ${product.brand}`, `SKU: ${product.sku}`, product.stock, 'Free consultation'].map(
-                  item => (
+                {[`Brand: ${product.brand}`, `SKU: ${product.sku}`, product.stock].map(item => (
                     <span
                       key={item}
                       className="rounded-full bg-muted px-3 py-1 font-semibold text-foreground/70"
                     >
                       {item}
                     </span>
-                  ),
-                )}
+                ))}
               </div>
 
               <div className="mt-5 flex items-center gap-2 text-sm text-foreground/60">
@@ -140,15 +138,7 @@ export default async function ProductPage({ params }: Props) {
                     <div className="pb-1 text-lg text-foreground/40 line-through">{product.oldPrice}</div>
                   ) : null}
                 </div>
-                <div className="mt-2 text-sm text-foreground/55">
-                  Price includes standard store margin and catalog discount.
-                </div>
               </Card>
-
-              <p className="mt-5 text-[13px] leading-7 text-foreground/65">
-                Built for workshop buyers and procurement teams, this product detail view keeps the same
-                buying rhythm used across the storefront.
-              </p>
 
               <Card className="mt-5 grid gap-3 border-0 bg-secondary p-4 text-sm text-secondary-foreground sm:grid-cols-2">
                 <div className="rounded-2xl bg-white/10 px-4 py-3">Immediate order support</div>
@@ -190,12 +180,7 @@ export default async function ProductPage({ params }: Props) {
                 <div>
                   <h2 className="text-xl font-black text-secondary">Description</h2>
                   <p className="mt-3 text-sm leading-7 text-foreground/65">
-                    {product.title} is displayed here with store-ready details, product benefits and a clean
-                    purchase path for buyers.
-                  </p>
-                  <p className="mt-3 text-sm leading-7 text-foreground/65">
-                    The layout is designed to feel familiar to Malamal shoppers, with the main focus on
-                    product image, price, stock and action buttons.
+                    No backend product description is available for this item yet.
                   </p>
                 </div>
                 <div>
@@ -205,8 +190,6 @@ export default async function ProductPage({ params }: Props) {
                       ['Brand', product.brand],
                       ['SKU', product.sku],
                       ['Availability', product.stock],
-                      ['Condition', 'Brand new'],
-                      ['Warranty', 'As per manufacturer policy'],
                     ].map(([label, value]) => (
                       <div
                         key={label}
@@ -219,12 +202,6 @@ export default async function ProductPage({ params }: Props) {
                   </div>
                 </div>
               </div>
-              <Card className="mt-6 bg-muted p-5 text-sm leading-7 text-foreground/65">
-                <p>
-                  This product page mirrors a shop-first layout with the gallery, price block, description,
-                  and specification table arranged for quick buyer decisions.
-                </p>
-              </Card>
             </Card>
 
             <Card className="border-0 bg-secondary p-6 text-secondary-foreground shadow-sm">

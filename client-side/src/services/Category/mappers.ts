@@ -33,20 +33,6 @@ const accentPalette = [
     'from-[#3d5a48] to-[#80a27c]',
 ] as const;
 
-const categoryImageBySlug: Record<string, string> = {
-    'air-cooler-fans': '/category-air-cooler.svg',
-    'cleaning-maintenance': '/category-cleaning.svg',
-    'construction-machinery': '/category-construction.svg',
-    electrical: '/category-electrical.svg',
-    'electrical-tools': '/category-electrical.svg',
-    'power-tools': '/category-power-tools.svg',
-    'welding-cutting': '/category-welding.svg',
-    'commercial-packaging': '/category-packaging.svg',
-    'commercial-packaging-equipment': '/category-packaging.svg',
-    'material-handling': '/category-handling.svg',
-    'material-handling-equipment': '/category-handling.svg',
-};
-
 function getAccent(slug: string, accent?: string): string {
     if (accent?.trim()) {
         return accent;
@@ -61,7 +47,7 @@ export function mapBackendCategoryToStorefrontCategory(category: BackendCategory
         name: category.name,
         slug: category.slug,
         href: `/category/${category.slug}`,
-        image: category.image ?? categoryImageBySlug[category.slug] ?? '/globe.svg',
+        image: category.image,
         description: category.description ?? `${category.name} catalog and related hardware listings.`,
         accent: getAccent(category.slug, category.accent),
     };

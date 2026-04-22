@@ -52,6 +52,12 @@ export default async function ShopPage({ searchParams }: Props) {
     page: productsResult?.meta?.page ?? page,
     totalPages: productsResult?.meta?.totalPages ?? 1,
   };
+  const stats = [
+    [String(meta.total), 'Products'],
+    [String(backendCategories.length), 'Categories'],
+    [String(meta.page), 'Current page'],
+    [String(meta.totalPages), 'Total pages'],
+  ];
 
   return (
     <>
@@ -72,12 +78,7 @@ export default async function ShopPage({ searchParams }: Props) {
                   </p>
                 </div>
                 <div className="grid grid-cols-2 gap-3 text-center sm:grid-cols-4">
-                  {[
-                    ['1200+', 'Products'],
-                    ['30+', 'Brands'],
-                    ['24h', 'Support'],
-                    ['B2B', 'Quotation'],
-                  ].map(([value, label]) => (
+                  {stats.map(([value, label]) => (
                     <div key={label} className="rounded-2xl bg-white/10 px-4 py-3">
                       <div className="text-lg font-extrabold">{value}</div>
                       <div className="text-[11px] uppercase tracking-[0.24em] text-secondary-foreground/65">

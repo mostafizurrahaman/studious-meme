@@ -26,6 +26,8 @@ export function HomeHeroCarousel({ slides, features }: HomeHeroCarouselProps) {
     const featureCards = features?.length ? features : slides;
 
     useEffect(() => {
+        if (slides.length <= 1) return;
+
         const timer = window.setInterval(() => {
             setHeroIndex(prev => (prev + 1) % slides.length);
         }, 5000);
@@ -34,6 +36,19 @@ export function HomeHeroCarousel({ slides, features }: HomeHeroCarouselProps) {
     }, [slides.length]);
 
     const heroSlide = slides[heroIndex] ?? slides[0];
+    if (!heroSlide) {
+        return (
+            <Card className="flex min-h-80 items-center justify-center p-8 text-center shadow-sm">
+                <div>
+                    <div className="text-xl font-black text-secondary">No active homepage banners</div>
+                    <p className="mt-2 text-sm text-foreground/60">
+                        Publish homepage hero content from the dashboard to fill this section.
+                    </p>
+                </div>
+            </Card>
+        );
+    }
+
     const topFeature = featureCards[1] ?? featureCards[0] ?? heroSlide;
     const bottomFeatures = [featureCards[0], featureCards[2]].filter(Boolean) as HeroSlide[];
 
@@ -49,38 +64,44 @@ export function HomeHeroCarousel({ slides, features }: HomeHeroCarouselProps) {
                         className="object-cover object-[center_top] transition duration-500 ease-out"
                     />
 
-                    <Button
-                        type="button"
-                        onClick={() => setHeroIndex(prev => (prev - 1 + slides.length) % slides.length)}
-                        aria-label="Previous banner"
-                        variant="secondary"
-                        size="icon"
-                        className="absolute left-3 top-1/2 z-20 h-10 w-10 -translate-y-1/2 rounded-full bg-transparent text-foreground shadow-md backdrop-blur-sm transition hover:bg-background"
-                    >
-                        <ArrowLeft className="h-4 w-4" />
-                    </Button>
-                    <Button
-                        type="button"
-                        onClick={() => setHeroIndex(prev => (prev + 1) % slides.length)}
-                        aria-label="Next banner"
-                        variant="secondary"
-                        size="icon"
-                        className="absolute right-3 top-1/2 z-20 h-10 w-10 -translate-y-1/2 rounded-full bg-transparent text-foreground shadow-md backdrop-blur-sm transition hover:bg-background"
-                    >
-                        <ArrowRight className="h-4 w-4" />
-                    </Button>
-
-                    <div className="absolute bottom-3 left-1/2 z-20 flex -translate-x-1/2 gap-2 rounded-full bg-background/90 px-3 py-2 shadow-sm backdrop-blur-sm">
-                        {slides.map((slide, index) => (
-                            <button
-                                key={`${slide.title}-${index}`}
+                    {slides.length > 1 ? (
+                        <>
+                            <Button
                                 type="button"
-                                onClick={() => setHeroIndex(index)}
-                                aria-label={`Go to banner ${index + 1}`}
-                                className={`h-2.5 rounded-full transition-all ${index === heroIndex ? 'w-7 bg-primary' : 'w-2.5 bg-border'}`}
-                            />
-                        ))}
-                    </div>
+                                onClick={() => setHeroIndex(prev => (prev - 1 + slides.length) % slides.length)}
+                                aria-label="Previous banner"
+                                variant="secondary"
+                                size="icon"
+                                className="absolute left-3 top-1/2 z-20 h-10 w-10 -translate-y-1/2 rounded-full bg-transparent text-foreground shadow-md backdrop-blur-sm transition hover:bg-background"
+                            >
+                                <ArrowLeft className="h-4 w-4" />
+                            </Button>
+                            <Button
+                                type="button"
+                                onClick={() => setHeroIndex(prev => (prev + 1) % slides.length)}
+                                aria-label="Next banner"
+                                variant="secondary"
+                                size="icon"
+                                className="absolute right-3 top-1/2 z-20 h-10 w-10 -translate-y-1/2 rounded-full bg-transparent text-foreground shadow-md backdrop-blur-sm transition hover:bg-background"
+                            >
+                                <ArrowRight className="h-4 w-4" />
+                            </Button>
+                        </>
+                    ) : null}
+
+                    {slides.length > 1 ? (
+                        <div className="absolute bottom-3 left-1/2 z-20 flex -translate-x-1/2 gap-2 rounded-full bg-background/90 px-3 py-2 shadow-sm backdrop-blur-sm">
+                            {slides.map((slide, index) => (
+                                <button
+                                    key={`${slide.title}-${index}`}
+                                    type="button"
+                                    onClick={() => setHeroIndex(index)}
+                                    aria-label={`Go to banner ${index + 1}`}
+                                    className={`h-2.5 rounded-full transition-all ${index === heroIndex ? 'w-7 bg-primary' : 'w-2.5 bg-border'}`}
+                                />
+                            ))}
+                        </div>
+                    ) : null}
                 </div>
 
                 <div className="hidden gap-4 lg:grid lg:grid-cols-1">

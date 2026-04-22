@@ -45,13 +45,17 @@ export function FloatingCategoryRail({ categories }: Props) {
                             className="flex items-center gap-2 rounded-md px-0.5 py-1.5 hover:bg-muted"
                         >
                             <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border border-border bg-background">
-                                <Image
-                                    src={category.image}
-                                    alt={category.name}
-                                    width={12}
-                                    height={12}
-                                    className="h-3 w-3 object-contain opacity-80"
-                                />
+                                {category.image ? (
+                                    <Image
+                                        src={category.image}
+                                        alt={category.name}
+                                        width={12}
+                                        height={12}
+                                        className="h-3 w-3 object-contain opacity-80"
+                                    />
+                                ) : (
+                                    <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                                )}
                             </span>
                             <span
                                 className={`text-sm text-foreground/85 whitespace-nowrap transition ${

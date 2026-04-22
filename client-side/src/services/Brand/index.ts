@@ -29,7 +29,7 @@ export async function mapBackendBrandToStorefrontBrand(brand: BackendBrand): Pro
         name: brand.name,
         slug: brand.slug,
         href: `/shop?b=${brand.slug}`,
-        image: brand.image ?? '/placeholder-brand.svg',
+        image: brand.image,
     };
 }
 
