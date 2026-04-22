@@ -15,13 +15,14 @@ const createProduct = asyncHandler(async (req, res) => {
 });
 
 // 2. getAllProducts
-const getAllProducts = asyncHandler(async (_req, res) => {
-    const result = await ProductService.getAllProductsFromDB();
+const getAllProducts = asyncHandler(async (req, res) => {
+    const result = await ProductService.getAllProductsFromDB(req.query);
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
         message: 'Products fetched successfully!',
-        data: result,
+        data: result.data,
+        meta: result.meta,
     });
 });
 

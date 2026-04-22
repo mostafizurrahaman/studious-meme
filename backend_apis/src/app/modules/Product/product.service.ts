@@ -6,6 +6,8 @@ import { IProduct } from './product.interface';
 import { CategoryModel } from '../Category/category.model';
 import { MulterFile } from '../../lib/upload';
 
+const DEFAULT_PRODUCTS_LIMIT = 50;
+
 const normalizeSlug = (value: string) =>
     value
         .normalize('NFKD')
@@ -16,6 +18,14 @@ const normalizeSlug = (value: string) =>
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/-+/g, '-')
         .replace(/^-+|-+$/g, '');
+
+const parsePositiveInteger = (value: unknown, fallback: number) => {
+    const parsed = Number(value);
+
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
+};
+
+const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 // 1. createProductIntoDB
 const createProductIntoDB = async (payload: Partial<IProduct>, imageFile?: MulterFile) => {
@@ -42,8 +52,41 @@ const createProductIntoDB = async (payload: Partial<IProduct>, imageFile?: Multe
 };
 
 // 2. getAllProductsFromDB
-const getAllProductsFromDB = async () =>
-    ProductModel.find({}).populate('brand').populate('category').sort({ createdAt: -1 }).lean();
+const getAllProductsFromDB = async (query: Record<string, unknown>) => {
+    const page = parsePositiveInteger(query.page, 1);
+    const limit = parsePositiveInteger(query.limit, DEFAULT_PRODUCTS_LIMIT);
+    const skip = (page - 1) * limit;
+    const searchTerm = typeof query.searchTerm === 'string' ? query.searchTerm.trim() : '';
+
+    const filter = searchTerm
+        ? {
+              $or: ['title', 'sku', 'slug'].map(field => ({
+                  [field]: { $regex: escapeRegExp(searchTerm), $options: 'i' },
+              })),
+          }
+        : {};
+
+    const [data, total] = await Promise.all([
+        ProductModel.find(filter)
+            .populate('brand')
+            .populate('category')
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+            .lean(),
+        ProductModel.countDocuments(filter),
+    ]);
+
+    return {
+        data,
+        meta: {
+            page,
+            limit,
+            total,
+            totalPage: Math.ceil(total / limit) || 1,
+        },
+    };
+};
 
 // 3. getProductBySlugFromDB
 const getProductBySlugFromDB = async (slug: string) => {

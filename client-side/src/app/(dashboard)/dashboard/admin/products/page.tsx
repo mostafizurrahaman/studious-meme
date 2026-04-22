@@ -7,6 +7,10 @@ import { getAllBrands } from '@/services/Brand';
 import { getAllCategoriesWithTotalNewsCount } from '@/services/Category';
 import type { BackendCategory } from '@/services/Category/mappers';
 
+type Props = {
+    searchParams: Promise<{ page?: string; limit?: string; searchTerm?: string }>;
+};
+
 export const metadata: Metadata = buildMetadata({
     title: 'Products',
     description: 'Manage product catalog entries and inventory status.',
@@ -16,15 +20,32 @@ export const metadata: Metadata = buildMetadata({
 
 export const dynamic = 'force-dynamic';
 
-export default async function AdminProductsPage() {
+const parsePositiveInteger = (value: string | undefined, fallback: number) => {
+    const parsed = Number(value);
+
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
+};
+
+export default async function AdminProductsPage({ searchParams }: Props) {
     await requireDashboardRoles(['ADMIN', 'SUPER_ADMIN']);
+    const query = await searchParams;
+    const page = parsePositiveInteger(query.page, 1);
+    const limit = parsePositiveInteger(query.limit, 50);
+    const searchTerm = query.searchTerm?.trim() ?? '';
+
     const [productsResult, brandsResult, categoriesResult] = await Promise.all([
-        getAllProducts().catch(() => null),
+        getAllProducts({ page, limit, searchTerm }).catch(() => null),
         getAllBrands().catch(() => null),
         getAllCategoriesWithTotalNewsCount().catch(() => null),
     ]);
 
     const products = productsResult?.data ?? [];
+    const paginationMeta = productsResult?.meta ?? {
+        page,
+        limit,
+        total: products.length,
+        totalPage: Math.ceil(products.length / limit) || 1,
+    };
     const brandOptions = Array.isArray(brandsResult?.data)
         ? brandsResult.data.flatMap(brand => (brand._id ? [{ value: brand._id, label: brand.name }] : []))
         : [];
@@ -33,6 +54,8 @@ export default async function AdminProductsPage() {
     return (
         <DashboardProductsManager
             products={products}
+            paginationMeta={paginationMeta}
+            searchTerm={searchTerm}
             brandOptions={brandOptions}
             categories={categories}
         />

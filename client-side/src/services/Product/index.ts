@@ -12,6 +12,7 @@ type BackendEnvelope<T> = {
     message?: string;
     data?: T;
     error?: string;
+    meta?: { page: number; limit: number; total: number; totalPage: number };
 };
 
 type BackendProductRef = { _id?: string; name?: string; slug?: string } | string;
@@ -63,8 +64,27 @@ export async function mapBackendProductToStorefrontProduct(
     };
 }
 
-export const getAllProducts = async (): Promise<BackendEnvelope<BackendProduct[]>> => {
-    return requestBackendJson<BackendEnvelope<BackendProduct[]>>('/product/products', { method: 'GET' });
+type GetAllProductsParams = {
+    page?: number;
+    limit?: number;
+    searchTerm?: string;
+};
+
+export const getAllProducts = async (
+    params: GetAllProductsParams = {},
+): Promise<BackendEnvelope<BackendProduct[]>> => {
+    const searchParams = new URLSearchParams();
+
+    if (params.page) searchParams.set('page', String(params.page));
+    if (params.limit) searchParams.set('limit', String(params.limit));
+    if (params.searchTerm?.trim()) searchParams.set('searchTerm', params.searchTerm.trim());
+
+    const query = searchParams.toString();
+
+    return requestBackendJson<BackendEnvelope<BackendProduct[]>>(
+        `/product/products${query ? `?${query}` : ''}`,
+        { method: 'GET' },
+    );
 };
 
 export const getProductBySlug = async (slug: string): Promise<BackendEnvelope<BackendProduct>> => {

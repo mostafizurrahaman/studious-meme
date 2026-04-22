@@ -1,7 +1,7 @@
 'use client';
 
-import { Fragment, useEffect, useMemo, useRef, useState, useTransition } from 'react';
-import { useRouter } from 'next/navigation';
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { ImagePlus, Pencil, Plus, Trash2, UploadCloud } from 'lucide-react';
 import { useForm, useWatch } from 'react-hook-form';
@@ -24,38 +24,62 @@ type Option = { value: string; label: string };
 
 type DashboardProductsManagerProps = {
   products: BackendProduct[];
+  paginationMeta: { page: number; limit: number; total: number; totalPage: number };
+  searchTerm?: string;
   brandOptions: Option[];
   categories: BackendCategory[];
 };
 
 const productEditSchema = z.object({
   title: z.string({ error: 'Title is required!' }).trim().min(1, { message: 'Title is required!' }),
+
   slug: z.string({ error: 'Slug is required!' }).trim().min(1, { message: 'Slug is required!' }),
+
   sku: z.string({ error: 'SKU is required!' }).trim().min(1, { message: 'SKU is required!' }),
+
   price: z.string({ error: 'Price is required!' }).trim().min(1, { message: 'Price is required!' }),
+
   oldPrice: z.string().trim().optional(),
+
   badge: z.string().trim().optional(),
+
   brand: z.string({ error: 'Brand is required!' }).trim().min(1, { message: 'Brand is required!' }),
+
   category: z.string({ error: 'Category is required!' }).trim().min(1, { message: 'Category is required!' }),
+
   subCategorySlug: z.string().trim().optional(),
+
   stock: z.string({ error: 'Stock is required!' }).trim().min(1, { message: 'Stock is required!' }),
+
   rating: z.string({ error: 'Rating is required!' }).trim().min(1, { message: 'Rating is required!' }),
+
   isFeatured: z.boolean().default(false),
   isActive: z.boolean().default(true),
 });
 
 const productCreateSchema = z.object({
   title: z.string({ error: 'Title is required!' }).trim().min(1, { message: 'Title is required!' }),
+
   slug: z.string({ error: 'Slug is required!' }).trim().min(1, { message: 'Slug is required!' }),
+
   sku: z.string({ error: 'SKU is required!' }).trim().min(1, { message: 'SKU is required!' }),
+
   price: z.string({ error: 'Price is required!' }).trim().min(1, { message: 'Price is required!' }),
+
   oldPrice: z.string().trim().optional(),
+
   badge: z.string().trim().optional(),
+
   brand: z.string({ error: 'Brand is required!' }).trim().min(1, { message: 'Brand is required!' }),
+
   category: z.string({ error: 'Category is required!' }).trim().min(1, { message: 'Category is required!' }),
+
   subCategorySlug: z.string().trim().optional(),
+
   stock: z.string({ error: 'Stock is required!' }).trim().min(1, { message: 'Stock is required!' }),
+
   rating: z.string({ error: 'Rating is required!' }).trim().min(1, { message: 'Rating is required!' }),
+
   isFeatured: z.boolean().default(false),
   isActive: z.boolean().default(true),
 });
@@ -71,10 +95,14 @@ function ErrorText({ message }: { message?: string }) {
 
 export function DashboardProductsManager({
   products,
+  paginationMeta,
+  searchTerm = '',
   brandOptions,
   categories,
 }: DashboardProductsManagerProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [productImageFile, setProductImageFile] = useState<File | null>(null);
   const [productImagePreview, setProductImagePreview] = useState('');
@@ -87,9 +115,7 @@ export function DashboardProductsManager({
   const productImageInputRef = useRef<HTMLInputElement>(null);
   const editingProductImageInputRef = useRef<HTMLInputElement>(null);
   // Filter state
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
+  const [search, setSearch] = useState(searchTerm);
 
   const productCreateForm = useForm<ProductCreateValues>({
     resolver: makeZodResolver(productCreateSchema),
@@ -193,26 +219,34 @@ export function DashboardProductsManager({
     };
   }, [editingProductImagePreview, productImagePreview]);
 
-  // Filtered and paginated data
-  const filteredData = useMemo(() => {
-    const q = search.toLowerCase();
-    const filtered = products.filter(
-      p =>
-        p.title?.toLowerCase().includes(q) ||
-        p.sku?.toLowerCase().includes(q) ||
-        p.slug?.toLowerCase().includes(q),
-    );
-    return filtered;
-  }, [products, search]);
+  useEffect(() => {
+    setSearch(searchTerm);
+  }, [searchTerm]);
 
-  const paginatedRows = useMemo(() => {
-    const start = (page - 1) * limit;
-    return filteredData.slice(start, start + limit);
-  }, [filteredData, page, limit]);
+  const updateProductQuery = useCallback(
+    (updates: { page?: number; limit?: number; searchTerm?: string }) => {
+      const nextParams = new URLSearchParams(searchParams.toString());
+      const nextPage = updates.page ?? paginationMeta.page;
+      const nextLimit = updates.limit ?? paginationMeta.limit;
+      const nextSearchTerm = updates.searchTerm ?? search;
+
+      nextParams.set('page', String(nextPage));
+      nextParams.set('limit', String(nextLimit));
+
+      if (nextSearchTerm.trim()) {
+        nextParams.set('searchTerm', nextSearchTerm.trim());
+      } else {
+        nextParams.delete('searchTerm');
+      }
+
+      router.push(`${pathname}?${nextParams.toString()}`);
+    },
+    [paginationMeta.limit, paginationMeta.page, pathname, router, search, searchParams],
+  );
 
   const handleSearchChange = (value: string) => {
     setSearch(value);
-    setPage(1);
+    updateProductQuery({ page: 1, searchTerm: value });
   };
 
   function refresh(message: string, type: 'success' | 'error') {
@@ -558,10 +592,15 @@ export function DashboardProductsManager({
           <div>
             <CardTitle>Products</CardTitle>
             <CardDescription>
-              {filteredData.length} of {products.length} items
+              Showing {products.length} of {paginationMeta.total} items
             </CardDescription>
           </div>
-          <TableFilter value={search} onChange={handleSearchChange} placeholder="Search products..." />
+          <TableFilter
+            key={searchTerm}
+            value={search}
+            onChange={handleSearchChange}
+            placeholder="Search products..."
+          />
         </CardHeader>
         <CardContent>
           <Table>
@@ -571,6 +610,8 @@ export function DashboardProductsManager({
                 <TableHead>Brand</TableHead>
                 <TableHead>SKU</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Stock</TableHead>
+                <TableHead>Featured</TableHead>
                 <TableHead>Price</TableHead>
                 <TableHead>Created At</TableHead>
                 <TableHead>Updated At</TableHead>
@@ -578,46 +619,38 @@ export function DashboardProductsManager({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paginatedRows.map(product => {
+              {products.map(product => {
                 const isEditing = editingSlug === product.slug;
                 return (
                   <Fragment key={product.sku}>
                     <TableRow>
                       <TableCell className="min-w-0 whitespace-normal font-medium">
-                        {isEditing ? (
-                          <div className="grid gap-1.5">
-                            <DashboardInput
-                              {...productEditForm.register('title', {
-                                onChange: e => handleEditingTitleChange(e.target.value),
-                              })}
-                            />
-                            <ErrorText message={productEditForm.formState.errors.title?.message} />
-                          </div>
-                        ) : (
-                          <div className="grid min-w-0 gap-0.5">
-                            <span className="truncate">{product.title}</span>
-                            <span className="truncate text-xs font-normal text-muted-foreground">
-                              Slug: {product.slug}
-                            </span>
-                          </div>
-                        )}
+                        <div className="grid min-w-0 gap-0.5">
+                          <span className="truncate">{product.title}</span>
+                          <span className="truncate text-xs font-normal text-muted-foreground">
+                            Slug: {product.slug}
+                          </span>
+                        </div>
                       </TableCell>
                       <TableCell className="min-w-0">
                         {typeof product.brand === 'string' ? product.brand : product.brand.name}
                       </TableCell>
                       <TableCell>{product.sku}</TableCell>
                       <TableCell className="min-w-0">
+                        <Badge variant={product.isActive ? 'default' : 'secondary'}>
+                          {product.isActive ? 'Active' : 'Inactive'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="min-w-0">
                         <Badge variant="secondary">{product.stock}</Badge>
                       </TableCell>
                       <TableCell className="min-w-0">
-                        {isEditing ? (
-                          <div className="grid gap-1.5">
-                            <DashboardInput {...productEditForm.register('price')} />
-                            <ErrorText message={productEditForm.formState.errors.price?.message} />
-                          </div>
-                        ) : (
-                          product.price
-                        )}
+                        <Badge variant={product.isFeatured ? 'default' : 'secondary'}>
+                          {product.isFeatured ? 'Featured' : 'No'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="min-w-0">
+                        {product.price}
                       </TableCell>
                       <TableCell className="min-w-0">
                         <span title={formatDashboardDate(product.createdAt, { time: true })}>
@@ -703,7 +736,7 @@ export function DashboardProductsManager({
                     </TableRow>
                     {isEditing ? (
                       <TableRow key={`${product.sku}-edit`}>
-                        <TableCell colSpan={8} className="bg-muted/20">
+                        <TableCell colSpan={10} className="bg-muted/20">
                           <div className="grid gap-6 rounded-xl border bg-background p-4 xl:grid-cols-[minmax(0,1fr)_340px]">
                             <div className="grid gap-3 md:grid-cols-2">
                               <div className="grid gap-1.5 md:col-span-2">
@@ -917,16 +950,15 @@ export function DashboardProductsManager({
               })}
             </TableBody>
           </Table>
-          {filteredData.length > limit && (
+          {paginationMeta.total > 0 && (
             <div className="mt-4 border-t pt-4">
               <TablePagination
-                page={page}
-                limit={limit}
-                total={filteredData.length}
-                onPageChange={setPage}
+                page={paginationMeta.page}
+                limit={paginationMeta.limit}
+                total={paginationMeta.total}
+                onPageChange={nextPage => updateProductQuery({ page: nextPage })}
                 onLimitChange={l => {
-                  setLimit(l);
-                  setPage(1);
+                  updateProductQuery({ page: 1, limit: l });
                 }}
               />
             </div>
