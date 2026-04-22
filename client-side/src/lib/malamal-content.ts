@@ -11,6 +11,8 @@ export type Product = {
   stock: string;
   rating: string;
   category: string;
+  isFeatured?: boolean;
+  createdAt?: string;
 };
 
 export type Category = {

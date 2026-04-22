@@ -1,9 +1,10 @@
 import Image from 'next/image';
+import { SeoScripts } from '@/components/SeoScripts';
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatDashboardDate } from '@/lib/formatDate';
 import { featuredProducts } from '@/lib/malamal-content';
-import { compareMetadata } from '@/lib/seo';
+import { compareMetadata, compareSchemas } from '@/lib/seo';
 import { getComparisonSuggestions, getMyComparisonHistory } from '@/services/ComparisonHistory';
 import { mapBackendProductToStorefrontProduct, type BackendProduct } from '@/services/Product';
 
@@ -35,7 +36,9 @@ export default async function ComparePage() {
         : [];
 
     return (
-        <main className="flex-1 bg-background pb-16">
+        <>
+            <SeoScripts data={compareSchemas} />
+            <main className="flex-1 bg-background pb-16">
             <div className="mx-auto w-full max-w-350 px-4 py-6 lg:px-6">
                 <Card className="p-6 shadow-sm sm:p-8">
                     <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">
@@ -150,6 +153,7 @@ export default async function ComparePage() {
                     </div>
                 </Card>
             </div>
-        </main>
+            </main>
+        </>
     );
 }

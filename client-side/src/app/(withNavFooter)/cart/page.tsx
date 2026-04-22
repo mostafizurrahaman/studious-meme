@@ -1,8 +1,14 @@
 import { CartPageClient } from '@/components/CartPageClient';
-import { cartMetadata } from '@/lib/seo';
+import { SeoScripts } from '@/components/SeoScripts';
+import { cartMetadata, cartSchemas } from '@/lib/seo';
 
 export const metadata = cartMetadata;
 
 export default function CartPage() {
-    return <CartPageClient />;
+    return (
+        <>
+            <SeoScripts data={cartSchemas} />
+            <CartPageClient />
+        </>
+    );
 }

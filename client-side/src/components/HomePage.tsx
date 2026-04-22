@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { getCategoryAccentClassName, getCategoryAccentStyle } from '@/lib/category-accent';
 import {
     brands,
     categoryShowcase,
@@ -204,7 +205,8 @@ export async function HomePage({ heroContent }: HomePageProps) {
                             <Link
                                 key={card.slug}
                                 href={card.href}
-                                className={`ui-card group flex h-full cursor-pointer flex-col bg-linear-to-br ${card.accent} p-6 text-white shadow-sm`}
+                                className={`ui-card group flex h-full cursor-pointer flex-col p-6 text-white shadow-sm ${getCategoryAccentClassName(card.accent)}`}
+                                style={getCategoryAccentStyle(card.accent)}
                             >
                                 <Badge
                                     variant="secondary"

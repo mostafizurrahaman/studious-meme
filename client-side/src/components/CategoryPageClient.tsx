@@ -6,6 +6,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ProductCard } from '@/components/ProductCard';
+import { getCategoryAccentClassName, getCategoryAccentStyle } from '@/lib/category-accent';
 import { parseMoney } from '@/lib/cart';
 import type { CategoryPageEntry, Product } from '@/lib/malamal-content';
 
@@ -222,7 +223,10 @@ export function CategoryPageClient({ category, products }: Props) {
 
   return (
     <>
-      <section className={`rounded-3xl bg-linear-to-r ${category.accent} p-6 text-white shadow-sm sm:p-8`}>
+      <section
+        className={`rounded-3xl p-6 text-white shadow-sm sm:p-8 ${getCategoryAccentClassName(category.accent)}`}
+        style={getCategoryAccentStyle(category.accent)}
+      >
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-white/65">
           Category page
         </p>

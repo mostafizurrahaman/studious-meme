@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Card } from '@/components/ui/card';
 import { brands } from '@/lib/malamal-content';
 import { SeoScripts } from '@/components/SeoScripts';
-import { shopByBrandsMetadata, shopByBrandsSchemas } from '@/lib/seo';
+import { buildShopByBrandsSchemas, shopByBrandsMetadata } from '@/lib/seo';
 import { getAllBrands, mapBackendBrandToStorefrontBrand } from '@/services/Brand';
 
 export const metadata = shopByBrandsMetadata;
@@ -17,7 +17,7 @@ export default async function ShopByBrandsPage() {
 
     return (
         <>
-            <SeoScripts data={shopByBrandsSchemas} />
+            <SeoScripts data={buildShopByBrandsSchemas(brandItems)} />
             <main className="flex-1 bg-background pb-16">
                 <div className="mx-auto w-full max-w-350 px-4 py-6 lg:px-6">
                     <Card className="border-0 bg-secondary p-6 text-secondary-foreground shadow-sm sm:p-8">

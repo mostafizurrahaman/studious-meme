@@ -1,6 +1,7 @@
 import { CheckoutPageClient } from '@/components/CheckoutPageClient';
+import { SeoScripts } from '@/components/SeoScripts';
 import { Card } from '@/components/ui/card';
-import { checkoutMetadata } from '@/lib/seo';
+import { checkoutMetadata, checkoutSchemas } from '@/lib/seo';
 
 export const metadata = checkoutMetadata;
 
@@ -14,6 +15,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
 
     return (
         <>
+            <SeoScripts data={checkoutSchemas} />
             {paymentState ? (
                 <main className="bg-background px-4 pt-6">
                     <div className="mx-auto max-w-310">

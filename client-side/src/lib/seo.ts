@@ -9,6 +9,7 @@ import {
     offerProducts,
     topCategories,
 } from '@/lib/malamal-content';
+import type { Brand, Category, Product } from '@/lib/malamal-content';
 
 export const siteConfig = {
     name: 'Malamal.com.bd',
@@ -428,6 +429,42 @@ export const homeSchemas = [
     ),
 ];
 
+export function buildHomeSchemas(input?: {
+    categories?: Category[];
+    products?: Product[];
+    brands?: Brand[];
+}) {
+    const categories = input?.categories?.length ? input.categories : topCategories;
+    const products = input?.products?.length ? input.products : [...featuredProducts, ...latestProducts];
+    const brandItems = input?.brands?.length ? input.brands : brands;
+
+    return [
+        buildBreadcrumbSchema([{ name: 'Home', url: '/' }]),
+        buildCollectionSchema(
+            'Malamal Home',
+            'Browse top categories, trusted brands and featured store sections.',
+            '/',
+            [
+                ...categories.slice(0, 8).map(category => ({
+                    name: category.name,
+                    url: category.href,
+                    image: absoluteUrl(category.image),
+                })),
+                ...products.slice(0, 10).map(product => ({
+                    name: product.title,
+                    url: `/product/${product.slug}`,
+                    image: product.image,
+                })),
+                ...brandItems.slice(0, 8).map(brand => ({
+                    name: brand.name,
+                    url: brand.href,
+                    image: brand.image,
+                })),
+            ],
+        ),
+    ];
+}
+
 export const shopSchemas = [
     buildBreadcrumbSchema([
         { name: 'Home', url: '/' },
@@ -468,16 +505,62 @@ export const shopSchemas = [
     ),
 ];
 
+export function buildShopSchemas(products: Product[], categories: Category[]) {
+    return [
+        buildBreadcrumbSchema([
+            { name: 'Home', url: '/' },
+            { name: 'Shop', url: '/shop' },
+        ]),
+        buildFaqSchema(
+            'Shop FAQ',
+            'Frequently asked questions about browsing products and placing orders.',
+            '/shop',
+            [
+                {
+                    question: 'How do I find the right product?',
+                    answer: 'Use the category rail, product cards and the shop grid to browse by department, brand and catalog item.',
+                },
+                {
+                    question: 'Can I request bulk pricing?',
+                    answer: 'Yes. Use the quotation request page for project orders, wholesale quantities and brand-specific pricing.',
+                },
+            ],
+        ),
+        buildCollectionSchema(
+            'Shop Catalog',
+            'Browse products from the hardware catalog.',
+            '/shop',
+            products.slice(0, 50).map(product => ({
+                name: product.title,
+                url: `/product/${product.slug}`,
+                image: product.image,
+            })),
+        ),
+        buildCollectionSchema(
+            'Shop Categories',
+            'Browse the storefront category structure.',
+            '/main-categories',
+            categories.slice(0, 20).map(category => ({
+                name: category.name,
+                url: category.href,
+                image: absoluteUrl(category.image),
+            })),
+        ),
+    ];
+}
+
 export function buildCategorySchemas(category: {
     name?: string;
     title?: string;
     slug: string;
     description: string;
-}) {
+}, inputProducts?: Product[]) {
     const title = category.name ?? category.title ?? 'Category';
-    const products = [...featuredProducts, ...latestProducts, ...offerProducts].filter(
-        product => product.category === title,
-    );
+    const products = inputProducts?.length
+        ? inputProducts
+        : [...featuredProducts, ...latestProducts, ...offerProducts].filter(
+              product => product.category === title,
+          );
 
     return [
         buildBreadcrumbSchema([
@@ -538,6 +621,27 @@ export const mainCategoriesSchemas = [
     ),
 ];
 
+export function buildMainCategoriesSchemas(categories: Category[]) {
+    const items = categories.length ? categories : topCategories;
+
+    return [
+        buildBreadcrumbSchema([
+            { name: 'Home', url: '/' },
+            { name: 'Main Categories', url: '/main-categories' },
+        ]),
+        buildCollectionSchema(
+            'All Categories',
+            'Explore the storefront category structure.',
+            '/main-categories',
+            items.map(category => ({
+                name: category.name,
+                url: category.href,
+                image: absoluteUrl(category.image),
+            })),
+        ),
+    ];
+}
+
 export const shopByBrandsSchemas = [
     buildBreadcrumbSchema([
         { name: 'Home', url: '/' },
@@ -555,6 +659,27 @@ export const shopByBrandsSchemas = [
     ),
 ];
 
+export function buildShopByBrandsSchemas(brandItems: Brand[]) {
+    const items = brandItems.length ? brandItems : brands;
+
+    return [
+        buildBreadcrumbSchema([
+            { name: 'Home', url: '/' },
+            { name: 'Shop by Brands', url: '/shop-by-brands' },
+        ]),
+        buildCollectionSchema(
+            'Shop By Brands',
+            'Browse the trusted brands used across the storefront.',
+            '/shop-by-brands',
+            items.map(brand => ({
+                name: brand.name,
+                url: brand.href,
+                image: brand.image,
+            })),
+        ),
+    ];
+}
+
 export const promotionsSchemas = [
     buildBreadcrumbSchema([
         { name: 'Home', url: '/' },
@@ -570,6 +695,56 @@ export const promotionsSchemas = [
             image: product.image,
         })),
     ),
+];
+
+export function buildPromotionsSchemas(products: Product[]) {
+    const items = products.length ? products : offerProducts;
+
+    return [
+        buildBreadcrumbSchema([
+            { name: 'Home', url: '/' },
+            { name: 'Promotions', url: '/promotions' },
+        ]),
+        buildCollectionSchema(
+            'Promotions',
+            'View the current promotional offers and campaign products.',
+            '/promotions',
+            items.slice(0, 50).map(product => ({
+                name: product.title,
+                url: `/product/${product.slug}`,
+                image: product.image,
+            })),
+        ),
+    ];
+}
+
+export const cartSchemas = [
+    buildBreadcrumbSchema([
+        { name: 'Home', url: '/' },
+        { name: 'Cart', url: '/cart' },
+    ]),
+];
+
+export const checkoutSchemas = [
+    buildBreadcrumbSchema([
+        { name: 'Home', url: '/' },
+        { name: 'Cart', url: '/cart' },
+        { name: 'Checkout', url: '/checkout' },
+    ]),
+];
+
+export const wishlistSchemas = [
+    buildBreadcrumbSchema([
+        { name: 'Home', url: '/' },
+        { name: 'Wishlist', url: '/wishlist' },
+    ]),
+];
+
+export const compareSchemas = [
+    buildBreadcrumbSchema([
+        { name: 'Home', url: '/' },
+        { name: 'Compare', url: '/compare' },
+    ]),
 ];
 
 export const ourContactsSchemas = [

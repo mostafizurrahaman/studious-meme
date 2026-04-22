@@ -14,8 +14,8 @@ type Props = {
 export function ProductCard({ product }: Props) {
     return (
         <Card className="group overflow-hidden border-border transition hover:-translate-y-0.5 hover:shadow-md">
-            <Link href={`/product/${product.slug}`} className="block">
-                <div className="relative aspect-square bg-muted p-2">
+            <div className="relative aspect-square bg-muted p-2">
+                <Link href={`/product/${product.slug}`} className="absolute inset-0 block">
                     <Image
                         src={product.image}
                         alt={product.title}
@@ -28,18 +28,23 @@ export function ProductCard({ product }: Props) {
                             {product.badge}
                         </Badge>
                     ) : null}
-                    <div className="absolute right-2 top-2 flex flex-col gap-1.5 opacity-0 transition duration-300 group-hover:opacity-100">
-                        {['Compare', 'Quick view', 'Wishlist'].map(label => (
-                            <span
-                                key={label}
-                                className="rounded-full border border-border bg-background px-2 py-0.5 text-[10px] font-semibold text-foreground/70 shadow-sm"
-                            >
-                                {label}
-                            </span>
-                        ))}
-                    </div>
+                </Link>
+                <div className="absolute right-2 top-2 z-10 flex flex-col gap-1.5 opacity-0 transition duration-300 group-hover:opacity-100">
+                    {[
+                        ['Compare', '/compare'],
+                        ['Quick view', `/product/${product.slug}`],
+                        ['Wishlist', '/wishlist'],
+                    ].map(([label, href]) => (
+                        <Link
+                            key={label}
+                            href={href}
+                            className="rounded-full border border-border bg-background px-2 py-0.5 text-[10px] font-semibold text-foreground/70 shadow-sm transition hover:border-primary/30 hover:text-primary"
+                        >
+                            {label}
+                        </Link>
+                    ))}
                 </div>
-            </Link>
+            </div>
             <CardContent className="space-y-1.5 p-2.5 pt-2.5 sm:space-y-2 sm:p-4 sm:pt-4">
                 <Link href={`/product/${product.slug}`} className="block">
                     <h3 className="line-clamp-2 min-h-[2.4rem] text-[11px] font-semibold leading-5 text-foreground transition hover:text-primary sm:min-h-[3.1rem] sm:text-[13px]">

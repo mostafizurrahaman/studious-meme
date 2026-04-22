@@ -61,6 +61,8 @@ export async function mapBackendProductToStorefrontProduct(
         stock: product.stock > 0 ? `${product.stock} in stock` : 'Out of stock',
         rating: String(product.rating),
         category: resolveName(product.category),
+        isFeatured: product.isFeatured,
+        createdAt: product.createdAt,
     };
 }
 

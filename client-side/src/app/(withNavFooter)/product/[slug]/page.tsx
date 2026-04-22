@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ProductCard } from '@/components/ProductCard';
 import { AddToCartButton } from '@/components/cart/AddToCartButton';
+import { AddToWishlistButton } from '@/components/wishlist/AddToWishlistButton';
 import { allProducts } from '@/lib/malamal-content';
 import { SeoScripts } from '@/components/SeoScripts';
 import { buildProductMetadata, buildProductSchemas } from '@/lib/seo';
@@ -47,7 +48,7 @@ export default async function ProductPage({ params }: Props) {
 
     if (!product) notFound();
 
-    const productsResult = await getAllProducts().catch(() => null);
+    const productsResult = await getAllProducts({ limit: 1000 }).catch(() => null);
     const related = productsResult?.data?.length
         ? await Promise.all(
               productsResult.data
@@ -173,13 +174,7 @@ export default async function ProductPage({ params }: Props) {
 
                             <div className="mt-6 grid gap-3 sm:grid-cols-2">
                                 <AddToCartButton product={product} />
-                                <Button
-                                    type="button"
-                                    variant="secondary"
-                                    className="h-12 rounded-full px-6 text-sm font-bold shadow-sm"
-                                >
-                                    Add to wishlist
-                                </Button>
+                                <AddToWishlistButton product={product} />
                             </div>
 
                             <Card className="mt-6 grid gap-3 border-0 bg-secondary p-4 text-sm text-secondary-foreground sm:grid-cols-3">

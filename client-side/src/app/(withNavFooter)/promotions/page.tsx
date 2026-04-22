@@ -2,14 +2,34 @@ import { ProductCard } from '@/components/ProductCard';
 import { SeoScripts } from '@/components/SeoScripts';
 import { Card, CardContent } from '@/components/ui/card';
 import { offerProducts } from '@/lib/malamal-content';
-import { promotionsMetadata, promotionsSchemas } from '@/lib/seo';
+import { buildPromotionsSchemas, promotionsMetadata } from '@/lib/seo';
+import { getAllProducts, mapBackendProductToStorefrontProduct } from '@/services/Product';
 
 export const metadata = promotionsMetadata;
+export const dynamic = 'force-dynamic';
 
-export default function PromotionsPage() {
+export default async function PromotionsPage() {
+    const productsResult = await getAllProducts({ limit: 1000 }).catch(() => null);
+    const promotionalBackendProducts =
+        productsResult?.data?.filter(product => {
+            const badge = product.badge?.toLowerCase() ?? '';
+            return Boolean(
+                product.oldPrice ||
+                    product.isFeatured ||
+                    badge.includes('sale') ||
+                    badge.includes('offer') ||
+                    badge.includes('promo') ||
+                    badge.includes('discount') ||
+                    badge.includes('%'),
+            );
+        }) ?? [];
+    const products = promotionalBackendProducts.length
+        ? await Promise.all(promotionalBackendProducts.map(mapBackendProductToStorefrontProduct))
+        : offerProducts;
+
     return (
         <>
-            <SeoScripts data={promotionsSchemas} />
+            <SeoScripts data={buildPromotionsSchemas(products)} />
             <main className="flex-1 bg-background pb-16">
                 <div className="mx-auto w-full max-w-350 px-4 py-6 lg:px-6">
                     <Card className="border-0 bg-linear-to-r from-primary to-secondary p-6 text-white shadow-sm sm:p-8">
@@ -41,7 +61,7 @@ export default function PromotionsPage() {
                         <CardContent className="p-0">
                             <h2 className="text-xl font-black text-secondary">The Best Offers</h2>
                             <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-                                {offerProducts.map(product => (
+                                {products.map(product => (
                                     <ProductCard key={product.sku} product={product} />
                                 ))}
                             </div>

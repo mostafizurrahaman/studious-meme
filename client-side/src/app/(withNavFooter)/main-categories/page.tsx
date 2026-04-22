@@ -2,15 +2,32 @@ import Link from 'next/link';
 
 import { SeoScripts } from '@/components/SeoScripts';
 import { Card } from '@/components/ui/card';
+import { getCategoryAccentClassName, getCategoryAccentStyle } from '@/lib/category-accent';
 import { categoryShowcase, topCategories } from '@/lib/malamal-content';
-import { mainCategoriesMetadata, mainCategoriesSchemas } from '@/lib/seo';
+import { buildMainCategoriesSchemas, mainCategoriesMetadata } from '@/lib/seo';
+import { getAllCategoriesWithTotalNewsCount } from '@/services/Category';
+import { mapBackendCategoryToStorefrontCategory, type BackendCategory } from '@/services/Category/mappers';
 
 export const metadata = mainCategoriesMetadata;
+export const dynamic = 'force-dynamic';
 
-export default function MainCategoriesPage() {
+export default async function MainCategoriesPage() {
+    const categoriesResult = await getAllCategoriesWithTotalNewsCount().catch(() => null);
+    const backendCategories = Array.isArray(categoriesResult?.data)
+        ? categoriesResult.data.map(item => mapBackendCategoryToStorefrontCategory(item as BackendCategory))
+        : topCategories;
+    const spotlightCards = Array.isArray(categoriesResult?.data)
+        ? backendCategories.slice(0, 6).map(category => ({
+              title: category.name,
+              description: category.description,
+              href: category.href,
+              accent: category.accent,
+          }))
+        : categoryShowcase;
+
     return (
         <>
-            <SeoScripts data={mainCategoriesSchemas} />
+            <SeoScripts data={buildMainCategoriesSchemas(backendCategories)} />
             <main className="flex-1 bg-background pb-16">
                 <div className="mx-auto w-full max-w-350 px-4 py-6 lg:px-6">
                     <Card className="p-6 shadow-sm sm:p-8">
@@ -27,7 +44,7 @@ export default function MainCategoriesPage() {
                     </Card>
 
                     <section className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                        {topCategories.map(category => (
+                        {backendCategories.map(category => (
                             <Link key={category.name} href={category.href} className="group">
                                 <Card className="h-full p-5 shadow-sm transition group-hover:-translate-y-0.5 group-hover:shadow-md">
                                     <div className="text-lg font-extrabold text-secondary">
@@ -42,11 +59,12 @@ export default function MainCategoriesPage() {
                     </section>
 
                     <section className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                        {categoryShowcase.map(card => (
+                        {spotlightCards.map(card => (
                             <Link
                                 key={card.title}
                                 href={card.href}
-                                className={`rounded-3xl bg-linear-to-br ${card.accent} p-6 text-white shadow-sm`}
+                                className={`rounded-3xl p-6 text-white shadow-sm ${getCategoryAccentClassName(card.accent)}`}
+                                style={getCategoryAccentStyle(card.accent)}
                             >
                                 <div className="text-xs font-semibold uppercase tracking-[0.3em] text-white/65">
                                     Spotlight
