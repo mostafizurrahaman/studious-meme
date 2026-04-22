@@ -3,7 +3,7 @@ import { DashboardProductsManager } from '@/components/dashboard/DashboardProduc
 import { requireDashboardRoles } from '@/lib/dashboard-auth';
 import { buildMetadata } from '@/lib/seo';
 import { getAllProducts } from '@/services/Product';
-import { getAllBrands } from '@/services/Brand';
+import { getAllBrandsAcrossPages } from '@/services/Brand';
 import { getAllCategories } from '@/services/Category';
 import type { BackendCategory } from '@/services/Category/mappers';
 
@@ -35,7 +35,7 @@ export default async function SuperAdminProductsPage({ searchParams }: Props) {
 
   const [productsResult, brandsResult, categoriesResult] = await Promise.all([
     getAllProducts({ page, limit, searchTerm, includeInactive: true }).catch(() => null),
-    getAllBrands().catch(() => null),
+    getAllBrandsAcrossPages({ limit: 100 }).catch(() => null),
     getAllCategories().catch(() => null),
   ]);
 

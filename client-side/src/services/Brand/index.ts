@@ -55,6 +55,43 @@ export const getAllBrands = async (params: GetAllBrandsParams = {}): Promise<Bac
     });
 };
 
+export const getAllBrandsAcrossPages = async (
+    params: Omit<GetAllBrandsParams, 'page'> = {},
+): Promise<BackendEnvelope<BackendBrand[]>> => {
+    const firstPage = await getAllBrands({ ...params, page: 1 });
+    const brands = [...(firstPage.data ?? [])];
+    const totalPages = firstPage.meta?.totalPages ?? 1;
+    const limit = firstPage.meta?.limit ?? params.limit ?? brands.length;
+
+    if (totalPages <= 1) {
+        return firstPage;
+    }
+
+    const remainingResults = await Promise.all(
+        Array.from({ length: totalPages - 1 }, (_, index) =>
+            getAllBrands({ ...params, page: index + 2, ...(limit ? { limit } : {}) }),
+        ),
+    );
+
+    remainingResults.forEach(result => {
+        if (Array.isArray(result.data)) {
+            brands.push(...result.data);
+        }
+    });
+
+    return {
+        ...firstPage,
+        data: brands,
+        meta: {
+            ...firstPage.meta,
+            page: 1,
+            limit,
+            total: firstPage.meta?.total ?? brands.length,
+            totalPages,
+        },
+    };
+};
+
 export const getActiveBrands = async (): Promise<BackendEnvelope<BackendBrand[]>> => {
     return requestBackendJson<BackendEnvelope<BackendBrand[]>>('/brand/brands/active', {
         method: 'GET',

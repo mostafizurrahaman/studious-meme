@@ -26,6 +26,9 @@ function countItems(
 ): number {
   if (!result) return 0;
 
+  if (typeof result.meta?.total === 'number') return result.meta.total;
+  if (typeof result.summary?.total === 'number') return result.summary.total;
+
   const payload = result.data;
 
   if (Array.isArray(payload)) return payload.length;
@@ -36,10 +39,6 @@ function countItems(
     if (typeof nested.meta?.total === 'number') return nested.meta.total;
     if (Array.isArray(nested.data)) return nested.data.length;
   }
-
-  if (typeof result.meta?.total === 'number') return result.meta.total;
-  if (typeof result.summary?.total === 'number') return result.summary.total;
-
   return 0;
 }
 
