@@ -25,10 +25,13 @@ type MetadataInput = {
   title: string;
   description: string;
   path: string;
+  image?: string;
   noindex?: boolean;
 };
 
-export function buildMetadata({ title, description, path, noindex = false }: MetadataInput): Metadata {
+export function buildMetadata({ title, description, path, image, noindex = false }: MetadataInput): Metadata {
+  const images = image ? [{ url: absoluteUrl(image) }] : undefined;
+
   return {
     title,
     description,
@@ -42,11 +45,13 @@ export function buildMetadata({ title, description, path, noindex = false }: Met
       url: absoluteUrl(path),
       siteName: siteConfig.name,
       type: 'website',
+      images,
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
+      images: image ? [absoluteUrl(image)] : undefined,
     },
   };
 }
@@ -205,11 +210,13 @@ export function buildProductMetadata(product: {
   sku: string;
   slug: string;
   price: string;
+  image: string;
 }) {
   return buildMetadata({
     title: product.title,
     description: `Buy ${product.title} from ${product.brand} on ${siteConfig.name}. SKU ${product.sku} with catalog pricing and quotation support.`,
     path: `/product/${product.slug}`,
+    image: product.image,
   });
 }
 
@@ -672,14 +679,26 @@ export function buildProductSchemas(product: {
   stock: string;
   rating: string;
   category: string;
+  categorySlug?: string;
 }) {
   const url = absoluteUrl(`/product/${product.slug}`);
   const currentPrice = parseMoney(product.price);
-  const oldPrice = product.oldPrice ? parseMoney(product.oldPrice) : null;
-  const ratingValue = Number.parseFloat(product.rating);
-  const categoryUrl = product.category?.trim()
-    ? absoluteUrl(`/shop?c=${encodeURIComponent(product.category)}`)
+  const categoryUrl = product.categorySlug?.trim()
+    ? absoluteUrl(`/category/${product.categorySlug}`)
     : absoluteUrl('/shop');
+  const offer =
+    Number.isFinite(currentPrice) && currentPrice > 0
+      ? {
+          '@type': 'Offer',
+          url,
+          priceCurrency: 'BDT',
+          price: currentPrice,
+          availability: product.stock.toLowerCase().includes('in stock')
+            ? 'https://schema.org/InStock'
+            : 'https://schema.org/OutOfStock',
+          itemCondition: 'https://schema.org/NewCondition',
+        }
+      : undefined;
 
   return [
     {
@@ -716,51 +735,14 @@ export function buildProductSchemas(product: {
       '@context': 'https://schema.org',
       '@type': 'Product',
       name: product.title,
-      image: [product.image],
+      image: [absoluteUrl(product.image)],
       sku: product.sku,
       brand: {
         '@type': 'Brand',
         name: product.brand,
       },
       description: `${product.title} available from ${product.brand} on ${siteConfig.name}.`,
-      aggregateRating: Number.isFinite(ratingValue)
-        ? {
-            '@type': 'AggregateRating',
-            ratingValue,
-            reviewCount: Math.max(5, Math.round(ratingValue * 20)),
-          }
-        : undefined,
-      offers: oldPrice
-        ? [
-            {
-              '@type': 'Offer',
-              url,
-              priceCurrency: 'BDT',
-              price: currentPrice,
-              availability: product.stock.toLowerCase().includes('in stock')
-                ? 'https://schema.org/InStock'
-                : 'https://schema.org/OutOfStock',
-              itemCondition: 'https://schema.org/NewCondition',
-            },
-            {
-              '@type': 'Offer',
-              url,
-              priceCurrency: 'BDT',
-              price: oldPrice,
-              itemCondition: 'https://schema.org/NewCondition',
-              priceValidUntil: '2027-12-31',
-            },
-          ]
-        : {
-            '@type': 'Offer',
-            url,
-            priceCurrency: 'BDT',
-            price: currentPrice,
-            availability: product.stock.toLowerCase().includes('in stock')
-              ? 'https://schema.org/InStock'
-              : 'https://schema.org/OutOfStock',
-            itemCondition: 'https://schema.org/NewCondition',
-          },
+      offers: offer,
     },
   ];
 }

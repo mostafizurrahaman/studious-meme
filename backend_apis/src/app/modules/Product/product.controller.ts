@@ -26,7 +26,19 @@ const getAllProducts = asyncHandler(async (req, res) => {
     });
 });
 
-// 3. getProduct
+// 3. getAllActiveProducts
+const getAllActiveProducts = asyncHandler(async (req, res) => {
+    const result = await ProductService.getAllActiveProductsFromDB(req.query);
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        message: 'Active products fetched successfully!',
+        data: result.data,
+        meta: result.meta,
+    });
+});
+
+// 4. getProduct
 const getProduct = asyncHandler(async (req, res) => {
     const result = await ProductService.getProductBySlugFromDB(getParam(req.params.slug));
 
@@ -104,6 +116,7 @@ const getProductsBySubCategorySlug = asyncHandler(async (req, res) => {
 export const ProductController = {
     createProduct,
     getAllProducts,
+    getAllActiveProducts,
     getProduct,
     getActiveProduct,
     updateProduct,

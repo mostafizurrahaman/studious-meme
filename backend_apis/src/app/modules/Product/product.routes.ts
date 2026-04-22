@@ -18,7 +18,8 @@ router
     )
     .get(ProductController.getAllProducts);
 
-// 2. public active product detail
+// 2. public active product list/detail
+router.route('/products/active').get(ProductController.getAllActiveProducts);
 router.route('/products/active/:slug').get(ProductController.getActiveProduct);
 
 // 2. getProduct, updateProduct, deleteProduct

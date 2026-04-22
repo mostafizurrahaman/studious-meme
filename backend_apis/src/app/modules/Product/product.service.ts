@@ -9,8 +9,7 @@ import { BrandModel } from '../Brand/brand.model';
 
 type ProductSort = Record<string, 1 | -1>;
 
-const DEFAULT_PRODUCTS_LIMIT = 50;
-const MAX_PRODUCTS_LIMIT = 100;
+const DEFAULT_PRODUCTS_LIMIT = 100;
 
 const normalizeSlug = (value: string) =>
     value
@@ -189,8 +188,7 @@ const createProductIntoDB = async (payload: Partial<IProduct>, imageFile?: Multe
 // 2. getAllProductsFromDB
 const getAllProductsFromDB = async (query: Record<string, unknown>) => {
     const page = parsePositiveInteger(query.page, 1);
-    const requestedLimit = parsePositiveInteger(query.limit, DEFAULT_PRODUCTS_LIMIT);
-    const limit = Math.min(requestedLimit, MAX_PRODUCTS_LIMIT);
+    const limit = parsePositiveInteger(query.limit, DEFAULT_PRODUCTS_LIMIT);
     const skip = (page - 1) * limit;
     const filter = await buildProductFilters(query);
     const sort = pickSort(query.sort);
@@ -217,14 +215,18 @@ const getAllProductsFromDB = async (query: Record<string, unknown>) => {
     };
 };
 
-// 3. getProductBySlugFromDB
+// 3. getAllActiveProductsFromDB
+const getAllActiveProductsFromDB = async (query: Record<string, unknown>) =>
+    getAllProductsFromDB({ ...query, includeInactive: undefined });
+
+// 4. getProductBySlugFromDB
 const getProductBySlugFromDB = async (slug: string) => {
     const doc = await ProductModel.findOne({ slug }).populate('brand').populate('category').lean();
     if (!doc) throw new AppError(httpStatus.NOT_FOUND, 'Product not found!');
     return doc;
 };
 
-// 4. getActiveProductBySlugFromDB
+// 5. getActiveProductBySlugFromDB
 const getActiveProductBySlugFromDB = async (slug: string) => {
     const doc = await ProductModel.findOne({ slug, isActive: true }).populate('brand').populate('category').lean();
     if (!doc) throw new AppError(httpStatus.NOT_FOUND, 'Product not found!');
@@ -331,6 +333,7 @@ const getProductsBySubCategorySlugFromDB = async (
 export const ProductService = {
     createProductIntoDB,
     getAllProductsFromDB,
+    getAllActiveProductsFromDB,
     getProductBySlugFromDB,
     getActiveProductBySlugFromDB,
     updateProductIntoDB,

@@ -11,6 +11,7 @@ export type StorefrontProduct = {
     stock: string;
     rating: string;
     category: string;
+    categorySlug?: string;
     isFeatured?: boolean;
     createdAt?: string;
 };

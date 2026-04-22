@@ -1,5 +1,5 @@
 import { siteConfig } from '@/lib/seo';
-import { getAllProducts, mapBackendProductToStorefrontProduct } from '@/services/Product';
+import { getAllActiveProducts, mapBackendProductToStorefrontProduct } from '@/services/Product';
 import { getActiveCategories } from '@/services/Category';
 import { mapBackendCategoryToStorefrontCategory, type BackendCategory } from '@/services/Category/mappers';
 import type { MetadataRoute } from 'next';
@@ -87,7 +87,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const [categoriesResult, productsResult] = await Promise.all([
     getActiveCategories().catch(() => null),
-    getAllProducts({ limit: 10000 }).catch(() => null),
+    getAllActiveProducts({ limit: 10000 }).catch(() => null),
   ]);
 
   const categoryRoutes: MetadataRoute.Sitemap = Array.isArray(categoriesResult?.data)

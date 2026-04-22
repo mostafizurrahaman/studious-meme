@@ -50,6 +50,14 @@ function resolveName(value: BackendProductRef): string {
     return value.name ?? value.slug ?? 'Unknown';
 }
 
+function resolveSlug(value: BackendProductRef): string | undefined {
+    if (typeof value === 'string') {
+        return undefined;
+    }
+
+    return value.slug;
+}
+
 export async function mapBackendProductToStorefrontProduct(
     product: BackendProduct,
 ): Promise<StorefrontProduct> {
@@ -66,6 +74,7 @@ export async function mapBackendProductToStorefrontProduct(
         stock: product.stock > 0 ? `${product.stock} in stock` : 'Out of stock',
         rating: String(product.rating),
         category: resolveName(product.category),
+        categorySlug: resolveSlug(product.category),
         isFeatured: product.isFeatured,
         createdAt: product.createdAt,
     };
@@ -122,6 +131,73 @@ export const getAllProducts = async (
         `/product/products${query ? `?${query}` : ''}`,
         { method: 'GET', next: { tags: ['PRODUCTS'] } },
     );
+};
+
+export const getAllActiveProducts = async (params: Omit<GetAllProductsParams, 'includeInactive'> = {}) => {
+    const fetchActiveProductsPage = async (pageParams: Omit<GetAllProductsParams, 'includeInactive'>) => {
+        const searchParams = new URLSearchParams();
+
+        if (pageParams.page) searchParams.set('page', String(pageParams.page));
+        if (pageParams.limit) searchParams.set('limit', String(pageParams.limit));
+        if (pageParams.searchTerm?.trim()) searchParams.set('searchTerm', pageParams.searchTerm.trim());
+        if (pageParams.c?.trim()) searchParams.set('c', pageParams.c.trim());
+        if (pageParams.category?.trim()) searchParams.set('category', pageParams.category.trim());
+        if (pageParams.stock?.trim()) searchParams.set('stock', pageParams.stock.trim());
+        if (pageParams.s?.trim()) searchParams.set('s', pageParams.s.trim());
+        if (pageParams.tag?.trim()) searchParams.set('tag', pageParams.tag.trim());
+        if (pageParams.price?.trim()) searchParams.set('price', pageParams.price.trim());
+        if (pageParams.p?.trim()) searchParams.set('p', pageParams.p.trim());
+        if (pageParams.brand?.trim()) searchParams.set('brand', pageParams.brand.trim());
+        if (pageParams.b?.trim()) searchParams.set('b', pageParams.b.trim());
+        if (pageParams.sort?.trim()) searchParams.set('sort', pageParams.sort.trim());
+        if (pageParams.subCategorySlug?.trim()) {
+            searchParams.set('subCategorySlug', pageParams.subCategorySlug.trim());
+        }
+        if (pageParams.subCategory?.trim()) searchParams.set('subCategory', pageParams.subCategory.trim());
+        if (pageParams.excludeSlug?.trim()) searchParams.set('excludeSlug', pageParams.excludeSlug.trim());
+
+        const query = searchParams.toString();
+
+        return requestBackendJson<BackendEnvelope<BackendProduct[]>>(
+            `/product/products/active${query ? `?${query}` : ''}`,
+            { method: 'GET', next: { tags: ['PRODUCTS'] } },
+        );
+    };
+
+    const firstPage = await fetchActiveProductsPage({ ...params, page: params.page ?? 1 });
+    const products = [...(firstPage.data ?? [])];
+    const totalPages = firstPage.meta?.totalPages ?? 1;
+    const limit = firstPage.meta?.limit ?? params.limit;
+
+    if (totalPages <= 1) {
+        return {
+            ...firstPage,
+            data: products,
+        };
+    }
+
+    const remainingPages = Array.from({ length: totalPages - 1 }, (_, index) => index + 2);
+    const remainingResults = await Promise.all(
+        remainingPages.map(page => fetchActiveProductsPage({ ...params, page, ...(limit ? { limit } : {}) })),
+    );
+
+    remainingResults.forEach(result => {
+        if (Array.isArray(result.data)) {
+            products.push(...result.data);
+        }
+    });
+
+    return {
+        ...firstPage,
+        data: products,
+        meta: {
+            ...firstPage.meta,
+            page: 1,
+            limit,
+            total: firstPage.meta?.total ?? products.length,
+            totalPages,
+        },
+    };
 };
 
 export const getProductBySlug = async (slug: string): Promise<BackendEnvelope<BackendProduct>> => {
