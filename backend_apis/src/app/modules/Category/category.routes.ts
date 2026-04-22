@@ -18,6 +18,10 @@ router
     )
     .get(CategoryController.getAllCategories);
 
+// 2. public active categories
+router.route('/categories/active').get(CategoryController.getActiveCategories);
+router.route('/categories/active/:slug').get(CategoryController.getActiveCategory);
+
 // 2. getCategory, updateCategory, deleteCategory
 router
     .route('/categories/:slug')

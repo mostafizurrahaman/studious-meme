@@ -37,7 +37,18 @@ const getProduct = asyncHandler(async (req, res) => {
     });
 });
 
-// 4. updateProduct
+// 4. getActiveProduct
+const getActiveProduct = asyncHandler(async (req, res) => {
+    const result = await ProductService.getActiveProductBySlugFromDB(getParam(req.params.slug));
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        message: 'Active product fetched successfully!',
+        data: result,
+    });
+});
+
+// 5. updateProduct
 const updateProduct = asyncHandler(async (req, res) => {
     const result = await ProductService.updateProductIntoDB(getParam(req.params.slug), req.body, req.file);
 
@@ -94,6 +105,7 @@ export const ProductController = {
     createProduct,
     getAllProducts,
     getProduct,
+    getActiveProduct,
     updateProduct,
     deleteProduct,
     getProductsByCategorySlug,

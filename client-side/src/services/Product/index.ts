@@ -134,12 +134,10 @@ export const getProductBySlug = async (slug: string): Promise<BackendEnvelope<Ba
 export const getActiveProductBySlug = async (
     slug: string,
 ): Promise<BackendEnvelope<BackendProduct | null>> => {
-    const result = await getProductBySlug(slug);
-
-    return {
-        ...result,
-        data: result.data?.isActive === false ? null : (result.data ?? null),
-    };
+    return requestBackendJson<BackendEnvelope<BackendProduct | null>>(`/product/products/active/${slug}`, {
+        method: 'GET',
+        next: { tags: ['PRODUCTS'] },
+    });
 };
 
 export const getProductsByCategorySlug = async (

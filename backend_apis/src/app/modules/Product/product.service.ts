@@ -224,6 +224,13 @@ const getProductBySlugFromDB = async (slug: string) => {
     return doc;
 };
 
+// 4. getActiveProductBySlugFromDB
+const getActiveProductBySlugFromDB = async (slug: string) => {
+    const doc = await ProductModel.findOne({ slug, isActive: true }).populate('brand').populate('category').lean();
+    if (!doc) throw new AppError(httpStatus.NOT_FOUND, 'Product not found!');
+    return doc;
+};
+
 // 4. updateProductIntoDB
 const updateProductIntoDB = async (slug: string, payload: Partial<IProduct>, imageFile?: MulterFile) => {
     const existingProduct = await ProductModel.findOne({ slug }).select('image');
@@ -325,6 +332,7 @@ export const ProductService = {
     createProductIntoDB,
     getAllProductsFromDB,
     getProductBySlugFromDB,
+    getActiveProductBySlugFromDB,
     updateProductIntoDB,
     deleteProductFromDB,
     getProductsByCategorySlugFromDB,

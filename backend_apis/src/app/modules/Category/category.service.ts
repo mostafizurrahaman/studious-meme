@@ -25,11 +25,34 @@ const createCategoryIntoDB = async (payload: Partial<ICategory>, imageFile?: Mul
 // 2. getAllCategoriesFromDB
 const getAllCategoriesFromDB = async () => CategoryModel.find({}).sort({ createdAt: -1 }).lean();
 
+// 3. getActiveCategoriesFromDB
+const getActiveCategoriesFromDB = async () =>
+    CategoryModel.find({ isActive: true })
+        .sort({ createdAt: -1 })
+        .lean()
+        .then(categories =>
+            categories.map(category => ({
+                ...category,
+                subCategories: category.subCategories?.filter(item => item.isActive !== false) ?? [],
+            })),
+        );
+
 // 3. getCategoryBySlugFromDB
 const getCategoryBySlugFromDB = async (slug: string) => {
     const doc = await CategoryModel.findOne({ slug }).lean();
     if (!doc) throw new AppError(httpStatus.NOT_FOUND, 'Category not found!');
     return doc;
+};
+
+// 4. getActiveCategoryBySlugFromDB
+const getActiveCategoryBySlugFromDB = async (slug: string) => {
+    const doc = await CategoryModel.findOne({ slug, isActive: true }).lean();
+    if (!doc) throw new AppError(httpStatus.NOT_FOUND, 'Category not found!');
+
+    return {
+        ...doc,
+        subCategories: doc.subCategories?.filter(item => item.isActive !== false) ?? [],
+    };
 };
 
 // 4. updateCategoryIntoDB
@@ -158,7 +181,9 @@ const deleteCategorySubCategoryFromDB = async (categorySlug: string, subCategory
 export const CategoryService = {
     createCategoryIntoDB,
     getAllCategoriesFromDB,
+    getActiveCategoriesFromDB,
     getCategoryBySlugFromDB,
+    getActiveCategoryBySlugFromDB,
     updateCategoryIntoDB,
     deleteCategoryFromDB,
     createCategorySubCategoryIntoDB,

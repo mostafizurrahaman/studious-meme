@@ -25,13 +25,35 @@ const getAllBrands = asyncHandler(async (_req, res) => {
     });
 });
 
-// 3. getBrand
+// 3. getActiveBrands
+const getActiveBrands = asyncHandler(async (_req, res) => {
+    const result = await BrandService.getActiveBrandsFromDB();
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        message: 'Active brands fetched successfully!',
+        data: result,
+    });
+});
+
+// 4. getBrand
 const getBrand = asyncHandler(async (req, res) => {
     const result = await BrandService.getBrandBySlugFromDB(getParam(req.params.slug));
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
         message: 'Brand fetched successfully!',
+        data: result,
+    });
+});
+
+// 5. getActiveBrand
+const getActiveBrand = asyncHandler(async (req, res) => {
+    const result = await BrandService.getActiveBrandBySlugFromDB(getParam(req.params.slug));
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        message: 'Active brand fetched successfully!',
         data: result,
     });
 });
@@ -65,7 +87,9 @@ const deleteBrand = asyncHandler(async (req, res) => {
 export const BrandController = {
     createBrand,
     getAllBrands,
+    getActiveBrands,
     getBrand,
+    getActiveBrand,
     updateBrand,
     deleteBrand,
 };

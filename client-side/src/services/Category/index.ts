@@ -59,13 +59,10 @@ export const getAllCategories = async (): Promise<BackendEnvelope<unknown>> => {
 };
 
 export const getActiveCategories = async (): Promise<BackendEnvelope<BackendCategory[]>> => {
-  const result = await getAllCategories();
-  const categories = Array.isArray(result.data) ? (result.data as BackendCategory[]) : [];
-
-  return {
-    ...result,
-    data: categories.filter(category => category.isActive !== false),
-  };
+  return requestBackendJson<BackendEnvelope<BackendCategory[]>>('/category/categories/active', {
+    method: 'GET',
+    next: { tags: ['CATEGORIES'] },
+  });
 };
 
 export const getAllCategoriesNameAndId = async (): Promise<BackendEnvelope<unknown>> => {
@@ -85,12 +82,10 @@ export const getCategoryBySlug = async (slug: string): Promise<BackendEnvelope<B
 export const getActiveCategoryBySlug = async (
   slug: string,
 ): Promise<BackendEnvelope<BackendCategory | null>> => {
-  const result = await getCategoryBySlug(slug);
-
-  return {
-    ...result,
-    data: result.data?.isActive === false ? null : (result.data ?? null),
-  };
+  return requestBackendJson<BackendEnvelope<BackendCategory | null>>(`/category/categories/active/${slug}`, {
+    method: 'GET',
+    next: { tags: ['CATEGORIES'] },
+  });
 };
 
 export const createCategory = async (payload: CategoryMutationPayload): Promise<BackendEnvelope<unknown>> => {

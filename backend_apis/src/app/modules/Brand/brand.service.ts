@@ -28,9 +28,19 @@ const createBrandIntoDB = async (payload: Partial<IBrand>, imageFile?: MulterFil
 // 2. getAllBrandsFromDB
 const getAllBrandsFromDB = async () => BrandModel.find({}).sort({ createdAt: -1 }).lean();
 
+// 3. getActiveBrandsFromDB
+const getActiveBrandsFromDB = async () => BrandModel.find({ isActive: true }).sort({ createdAt: -1 }).lean();
+
 // 3. getBrandBySlugFromDB
 const getBrandBySlugFromDB = async (slug: string) => {
     const doc = await BrandModel.findOne({ slug }).lean();
+    if (!doc) throw new AppError(httpStatus.NOT_FOUND, 'Brand not found!');
+    return doc;
+};
+
+// 4. getActiveBrandBySlugFromDB
+const getActiveBrandBySlugFromDB = async (slug: string) => {
+    const doc = await BrandModel.findOne({ slug, isActive: true }).lean();
     if (!doc) throw new AppError(httpStatus.NOT_FOUND, 'Brand not found!');
     return doc;
 };
@@ -84,7 +94,9 @@ const deleteBrandFromDB = async (slug: string) => BrandModel.findOneAndDelete({ 
 export const BrandService = {
     createBrandIntoDB,
     getAllBrandsFromDB,
+    getActiveBrandsFromDB,
     getBrandBySlugFromDB,
+    getActiveBrandBySlugFromDB,
     updateBrandIntoDB,
     deleteBrandFromDB,
 };

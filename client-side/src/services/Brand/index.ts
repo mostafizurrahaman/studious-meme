@@ -41,16 +41,23 @@ export const getAllBrands = async (): Promise<BackendEnvelope<BackendBrand[]>> =
 };
 
 export const getActiveBrands = async (): Promise<BackendEnvelope<BackendBrand[]>> => {
-    const result = await getAllBrands();
-
-    return {
-        ...result,
-        data: Array.isArray(result.data) ? result.data.filter(brand => brand.isActive !== false) : [],
-    };
+    return requestBackendJson<BackendEnvelope<BackendBrand[]>>('/brand/brands/active', {
+        method: 'GET',
+        next: { tags: ['BRANDS'] },
+    });
 };
 
 export const getBrandBySlug = async (slug: string): Promise<BackendEnvelope<BackendBrand>> => {
     return requestBackendJson<BackendEnvelope<BackendBrand>>(`/brand/brands/${slug}`, {
+        method: 'GET',
+        next: { tags: ['BRANDS'] },
+    });
+};
+
+export const getActiveBrandBySlug = async (
+    slug: string,
+): Promise<BackendEnvelope<BackendBrand | null>> => {
+    return requestBackendJson<BackendEnvelope<BackendBrand | null>>(`/brand/brands/active/${slug}`, {
         method: 'GET',
         next: { tags: ['BRANDS'] },
     });

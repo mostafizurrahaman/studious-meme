@@ -18,6 +18,10 @@ router
     )
     .get(BrandController.getAllBrands);
 
+// 2. public active brands
+router.route('/brands/active').get(BrandController.getActiveBrands);
+router.route('/brands/active/:slug').get(BrandController.getActiveBrand);
+
 // 2. getBrand, updateBrand, deleteBrand
 router
     .route('/brands/:slug')

@@ -25,13 +25,35 @@ const getAllCategories = asyncHandler(async (_req, res) => {
     });
 });
 
-// 3. getCategory
+// 3. getActiveCategories
+const getActiveCategories = asyncHandler(async (_req, res) => {
+    const result = await CategoryService.getActiveCategoriesFromDB();
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        message: 'Active categories fetched successfully!',
+        data: result,
+    });
+});
+
+// 4. getCategory
 const getCategory = asyncHandler(async (req, res) => {
     const result = await CategoryService.getCategoryBySlugFromDB(getParam(req.params.slug));
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
         message: 'Category fetched successfully!',
+        data: result,
+    });
+});
+
+// 5. getActiveCategory
+const getActiveCategory = asyncHandler(async (req, res) => {
+    const result = await CategoryService.getActiveCategoryBySlugFromDB(getParam(req.params.slug));
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        message: 'Active category fetched successfully!',
         data: result,
     });
 });
@@ -114,7 +136,9 @@ const deleteCategorySubCategory = asyncHandler(async (req, res) => {
 export const CategoryController = {
     createCategory,
     getAllCategories,
+    getActiveCategories,
     getCategory,
+    getActiveCategory,
     updateCategory,
     deleteCategory,
     createCategorySubCategory,
