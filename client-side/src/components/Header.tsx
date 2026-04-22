@@ -164,15 +164,15 @@ export function Header() {
 
                     <div className="pb-3">
                         <div className="flex overflow-hidden rounded-full border border-border bg-background shadow-sm">
-                            <Input
-                                className="h-11 w-full rounded-none border-0 bg-background px-4 text-sm text-foreground placeholder:text-foreground/45 shadow-none focus-visible:ring-0"
-                                placeholder="Search for products"
+                                <Input
+                                    className="h-11 w-full rounded-none border-0 bg-background px-4 text-sm text-foreground placeholder:text-foreground/60 shadow-none focus-visible:ring-0"
+                                    placeholder="Search…"
                                 aria-label="Search"
                             />
                             <Button
                                 type="button"
                                 variant="secondary"
-                                className="h-11 rounded-none bg-primary px-4 text-sm font-semibold text-white hover:bg-primary/80"
+                                className="h-11 rounded-none bg-primary px-3 text-sm font-semibold text-white hover:bg-primary/80"
                             >
                                 <span className="text-lg leading-none">⌕</span>
                             </Button>
@@ -271,18 +271,19 @@ export function Header() {
                     {/* search input */}
                     <div className="hidden flex-1 items-center lg:flex">
                         <div className="flex w-full overflow-hidden rounded-full border border-border bg-background shadow-sm">
-                            <Input
-                                className="h-11 w-full rounded-none border-0 bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground shadow-none focus-visible:ring-0"
-                                placeholder="Search for products"
+                                <Input
+                                    className="h-11 w-full rounded-none border-0 bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground/60 shadow-none focus-visible:ring-0"
+                                    placeholder="Search…"
                                 aria-label="Search"
                             />
                             <Button
                                 type="button"
                                 variant="secondary"
-                                className="h-11 rounded-none px-6 text-sm font-semibold"
+                                className="h-11 rounded-none px-2 text-sm font-semibold"
                             >
                                 Search
                             </Button>
+                           
                         </div>
                     </div>
 
