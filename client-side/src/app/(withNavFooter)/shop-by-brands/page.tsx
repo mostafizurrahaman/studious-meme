@@ -3,13 +3,13 @@ import Link from 'next/link';
 import { Card } from '@/components/ui/card';
 import { SeoScripts } from '@/components/SeoScripts';
 import { buildShopByBrandsSchemas, shopByBrandsMetadata } from '@/lib/seo';
-import { getAllBrands, mapBackendBrandToStorefrontBrand } from '@/services/Brand';
+import { getActiveBrands, mapBackendBrandToStorefrontBrand } from '@/services/Brand';
 
 export const metadata = shopByBrandsMetadata;
 export const revalidate = 300;
 
 export default async function ShopByBrandsPage() {
-  const brandsResult = await getAllBrands().catch(() => null);
+  const brandsResult = await getActiveBrands().catch(() => null);
   const brandItems = brandsResult?.data?.length
     ? await Promise.all(brandsResult.data.map(mapBackendBrandToStorefrontBrand))
     : [];

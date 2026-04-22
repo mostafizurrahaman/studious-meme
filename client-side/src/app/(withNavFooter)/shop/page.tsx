@@ -2,7 +2,7 @@ import { Card, CardHeader } from '@/components/ui/card';
 import { SeoScripts } from '@/components/SeoScripts';
 import { ShopPageClient } from '@/components/ShopPageClient';
 import { buildShopSchemas, shopMetadata } from '@/lib/seo';
-import { getAllCategories } from '@/services/Category';
+import { getActiveCategories } from '@/services/Category';
 import { mapBackendCategoryToStorefrontCategory, type BackendCategory } from '@/services/Category/mappers';
 import { getAllProducts, mapBackendProductToStorefrontProduct } from '@/services/Product';
 
@@ -37,7 +37,7 @@ export default async function ShopPage({ searchParams }: Props) {
       price: query.price,
       sort: query.sort,
     }).catch(() => null),
-    getAllCategories().catch(() => null),
+    getActiveCategories().catch(() => null),
   ]);
 
   const products = productsResult?.data?.length

@@ -9,7 +9,7 @@ import { AddToCartButton } from '@/components/cart/AddToCartButton';
 import { AddToWishlistButton } from '@/components/wishlist/AddToWishlistButton';
 import { SeoScripts } from '@/components/SeoScripts';
 import { buildProductMetadata, buildProductSchemas } from '@/lib/seo';
-import { getAllProducts, getProductBySlug, mapBackendProductToStorefrontProduct } from '@/services/Product';
+import { getActiveProductBySlug, getAllProducts, mapBackendProductToStorefrontProduct } from '@/services/Product';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -31,7 +31,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
-  const productResult = await getProductBySlug(slug).catch(() => null);
+  const productResult = await getActiveProductBySlug(slug).catch(() => null);
   const backendProduct = productResult?.data;
   const product = backendProduct ? await mapBackendProductToStorefrontProduct(backendProduct) : null;
 
@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function ProductPage({ params }: Props) {
   const { slug } = await params;
-  const productResult = await getProductBySlug(slug).catch(() => null);
+  const productResult = await getActiveProductBySlug(slug).catch(() => null);
   const backendProduct = productResult?.data;
   const product = backendProduct ? await mapBackendProductToStorefrontProduct(backendProduct) : null;
 

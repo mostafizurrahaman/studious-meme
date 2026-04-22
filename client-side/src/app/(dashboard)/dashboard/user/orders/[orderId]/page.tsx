@@ -6,7 +6,7 @@ import { getMyOrderById } from '@/services/Order';
 export const metadata = buildMetadata({
     title: 'Order Detail',
     description: 'View the details of a saved order.',
-    path: '/dashboard/user/orders/placeholder',
+    path: '/dashboard/user/orders',
     noindex: true,
 });
 export const dynamic = 'force-dynamic';

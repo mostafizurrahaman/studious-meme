@@ -2,12 +2,12 @@ import { SeoScripts } from '@/components/SeoScripts';
 import { QuotationRequestFormClient } from '@/components/QuotationRequestFormClient';
 import { Card, CardHeader } from '@/components/ui/card';
 import { quotationRequestMetadata, quotationRequestSchemas } from '@/lib/seo';
-import { getAllBrands } from '@/services/Brand';
+import { getActiveBrands } from '@/services/Brand';
 
 export const metadata = quotationRequestMetadata;
 
 export default async function QuotationRequestPage() {
-  const brandsResult = await getAllBrands().catch(() => null);
+  const brandsResult = await getActiveBrands().catch(() => null);
   const brandNames = brandsResult?.data?.length ? brandsResult.data.map(brand => brand.name) : [];
 
   return (

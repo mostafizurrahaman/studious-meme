@@ -2,16 +2,16 @@ import { FloatingCategoryRail } from '@/components/FloatingCategoryRail';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
 import { MobileToolbar } from '@/components/MobileToolbar';
-import { getAllBrands, mapBackendBrandToStorefrontBrand } from '@/services/Brand';
-import { getAllCategories } from '@/services/Category';
+import { getActiveBrands, mapBackendBrandToStorefrontBrand } from '@/services/Brand';
+import { getActiveCategories } from '@/services/Category';
 import { mapBackendCategoryToStorefrontCategory, type BackendCategory } from '@/services/Category/mappers';
 
 export const revalidate = 300;
 
 const MainLayout = async ({ children }: { children: React.ReactNode }) => {
   const [categoriesResult, brandsResult] = await Promise.all([
-    getAllCategories().catch(() => null),
-    getAllBrands().catch(() => null),
+    getActiveCategories().catch(() => null),
+    getActiveBrands().catch(() => null),
   ]);
 
   const categories = Array.isArray(categoriesResult?.data)

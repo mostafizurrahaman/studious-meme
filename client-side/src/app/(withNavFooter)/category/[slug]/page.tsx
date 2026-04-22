@@ -5,8 +5,8 @@ import { CategoryPageClient } from '@/components/CategoryPageClient';
 import { SeoScripts } from '@/components/SeoScripts';
 import { Card } from '@/components/ui/card';
 import { buildCategoryMetadata, buildCategorySchemas } from '@/lib/seo';
-import { getAllBrands } from '@/services/Brand';
-import { getAllCategories, getCategoryBySlug } from '@/services/Category';
+import { getActiveBrands } from '@/services/Brand';
+import { getActiveCategories, getActiveCategoryBySlug } from '@/services/Category';
 import { mapBackendCategoryToCategoryPageEntry, type BackendCategory } from '@/services/Category/mappers';
 import { getProductsByCategorySlug, mapBackendProductToStorefrontProduct } from '@/services/Product';
 
@@ -25,7 +25,7 @@ export const revalidate = 300;
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
-  const categoriesResult = await getAllCategories().catch(() => null);
+  const categoriesResult = await getActiveCategories().catch(() => null);
 
   return Array.isArray(categoriesResult?.data)
     ? categoriesResult.data
@@ -37,7 +37,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
-  const backendCategory = await getCategoryBySlug(slug).catch(() => null);
+  const backendCategory = await getActiveCategoryBySlug(slug).catch(() => null);
   const category = backendCategory?.data ? mapBackendCategoryToCategoryPageEntry(backendCategory.data) : null;
 
   if (!category) {
@@ -57,7 +57,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   const query = await searchParams;
   const page = Math.max(Number(query.page ?? '1') || 1, 1);
   const limit = Math.max(Number(query.limit ?? String(DEFAULT_CATEGORY_LIMIT)) || DEFAULT_CATEGORY_LIMIT, 1);
-  const backendCategory = await getCategoryBySlug(slug).catch(() => null);
+  const backendCategory = await getActiveCategoryBySlug(slug).catch(() => null);
   const category = backendCategory?.data ? mapBackendCategoryToCategoryPageEntry(backendCategory.data) : null;
 
   if (!category) {
@@ -73,7 +73,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
       s: query.s,
       p: query.p,
     }).catch(() => null),
-    getAllBrands().catch(() => null),
+    getActiveBrands().catch(() => null),
   ]);
   const products = productsResult?.data?.length
     ? await Promise.all(productsResult.data.map(mapBackendProductToStorefrontProduct))

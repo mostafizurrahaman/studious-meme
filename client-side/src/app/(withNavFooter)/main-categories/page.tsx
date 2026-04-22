@@ -4,14 +4,14 @@ import { SeoScripts } from '@/components/SeoScripts';
 import { Card } from '@/components/ui/card';
 import { getCategoryAccentClassName, getCategoryAccentStyle } from '@/lib/category-accent';
 import { buildMainCategoriesSchemas, mainCategoriesMetadata } from '@/lib/seo';
-import { getAllCategories } from '@/services/Category';
+import { getActiveCategories } from '@/services/Category';
 import { mapBackendCategoryToStorefrontCategory, type BackendCategory } from '@/services/Category/mappers';
 
 export const metadata = mainCategoriesMetadata;
 export const revalidate = 300;
 
 export default async function MainCategoriesPage() {
-  const categoriesResult = await getAllCategories().catch(() => null);
+  const categoriesResult = await getActiveCategories().catch(() => null);
   const backendCategories = Array.isArray(categoriesResult?.data)
     ? categoriesResult.data.map(item => mapBackendCategoryToStorefrontCategory(item as BackendCategory))
     : [];

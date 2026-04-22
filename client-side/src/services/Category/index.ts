@@ -58,7 +58,15 @@ export const getAllCategories = async (): Promise<BackendEnvelope<unknown>> => {
   });
 };
 
-export const getAllCategoriesWithTotalNewsCount = getAllCategories;
+export const getActiveCategories = async (): Promise<BackendEnvelope<BackendCategory[]>> => {
+  const result = await getAllCategories();
+  const categories = Array.isArray(result.data) ? (result.data as BackendCategory[]) : [];
+
+  return {
+    ...result,
+    data: categories.filter(category => category.isActive !== false),
+  };
+};
 
 export const getAllCategoriesNameAndId = async (): Promise<BackendEnvelope<unknown>> => {
   return requestBackendJson<BackendEnvelope<unknown>>('/category/categories', {
@@ -72,6 +80,17 @@ export const getCategoryBySlug = async (slug: string): Promise<BackendEnvelope<B
     method: 'GET',
     next: { tags: ['CATEGORIES'] },
   });
+};
+
+export const getActiveCategoryBySlug = async (
+  slug: string,
+): Promise<BackendEnvelope<BackendCategory | null>> => {
+  const result = await getCategoryBySlug(slug);
+
+  return {
+    ...result,
+    data: result.data?.isActive === false ? null : (result.data ?? null),
+  };
 };
 
 export const createCategory = async (payload: CategoryMutationPayload): Promise<BackendEnvelope<unknown>> => {
