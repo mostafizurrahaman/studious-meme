@@ -4,6 +4,8 @@ import { AppError } from '../../utils';
 import httpStatus from 'http-status';
 import { IMeta } from '../../types';
 
+const DEFAULT_CONTACT_LIMIT = 50;
+
 // 1. adminGetAllContactsFromDB
 const adminGetAllContactsFromDB = async (
     query: Record<string, unknown>,
@@ -11,7 +13,7 @@ const adminGetAllContactsFromDB = async (
     const { page, limit, searchTerm } = query;
 
     const pageNumber = Number(page) || 1;
-    const limitNumber = Number(limit) || 10;
+    const limitNumber = Number(limit) || DEFAULT_CONTACT_LIMIT;
     const skip = (pageNumber - 1) * limitNumber;
 
     const filters: Record<string, unknown> = {};

@@ -21,12 +21,12 @@ const quotationRequestSchema = z.object({
     products: z
         .string()
         .trim()
-        .min(3, { message: 'Please list the products or specifications you need.' }),
+        .min(1, { message: 'Please list the products or specifications you need.' }),
     brand: z.string().trim().optional(),
     message: z
         .string()
         .trim()
-        .min(20, { message: 'Please add project details with at least 20 characters.' }),
+        .min(20, { message: 'Please add project details or delivery requirements (minimum 20 characters).' }),
 });
 
 function readValue(formData: FormData, key: string) {

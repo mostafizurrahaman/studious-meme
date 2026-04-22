@@ -21,15 +21,15 @@ export default async function AdminQuotationsPage({ searchParams }: Props) {
     await requireDashboardRoles(['ADMIN', 'SUPER_ADMIN']);
     const query = await searchParams;
     const page = query.page ?? '1';
-    const limit = query.limit ?? '20';
+    const limit = query.limit ?? '50';
     const searchTerm = query.searchTerm?.trim() ?? '';
     const result = await getAllContacts(page, limit, searchTerm).catch(() => null);
     const contacts = result?.data ?? [];
     const meta = result?.meta ?? {
         page: Number(page) || 1,
-        limit: Number(limit) || 20,
+        limit: Number(limit) || 50,
         total: contacts.length,
-        totalPage: Math.ceil(contacts.length / (Number(limit) || 20)) || 1,
+        totalPage: Math.ceil(contacts.length / (Number(limit) || 50)) || 1,
     };
 
     return <DashboardQuotationRequestsManager contacts={contacts} meta={meta} searchTerm={searchTerm} />;

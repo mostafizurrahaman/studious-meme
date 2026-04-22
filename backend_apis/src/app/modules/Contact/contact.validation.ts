@@ -35,14 +35,14 @@ export const createContactValidation = z.object({
         products: z
             .string({ error: 'Interested products are required.' })
             .trim()
-            .min(3, { message: 'Please add at least one product or specification.' }),
+            .min(1, { message: 'Please add at least one product or specification.' }),
 
         brand: optionalTrimmedString,
 
         message: z
             .string({ error: 'Project details are required.' })
             .trim()
-            .min(20, { message: 'Project details must be at least 20 characters long.' }),
+            .min(20, { message: 'Please add project details or delivery requirements (minimum 20 characters).' }),
     }),
 });
 

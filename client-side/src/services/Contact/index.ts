@@ -40,7 +40,7 @@ export const createContact = async (contactData: FieldValues): Promise<BackendEn
 
 export const getAllContacts = async (
     page: string = '1',
-    limit: string = '20',
+    limit: string = '50',
     searchTerm: string = '',
 ): Promise<BackendEnvelope<BackendContact[]>> => {
     const accessToken = await getValidAccessTokenForServerHandlerGet();
