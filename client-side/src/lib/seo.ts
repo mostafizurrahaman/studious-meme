@@ -111,24 +111,28 @@ export const cartMetadata = buildMetadata({
   title: 'Shopping Cart - Review Your Order',
   description: 'Review selected products in your shopping cart before checkout.',
   path: '/cart',
+  noindex: true,
 });
 
 export const checkoutMetadata = buildMetadata({
   title: 'Checkout - Complete Your Order',
   description: 'Complete your order and submit delivery details.',
   path: '/checkout',
+  noindex: true,
 });
 
 export const wishlistMetadata = buildMetadata({
   title: 'Wishlist - Saved Products',
   description: 'Review saved products and shortlist items for later purchase.',
   path: '/wishlist',
+  noindex: true,
 });
 
 export const compareMetadata = buildMetadata({
   title: 'Compare Products - Side by Side',
   description: 'Compare product details side by side to make the best choice.',
   path: '/compare',
+  noindex: true,
 });
 
 export const quotationRequestMetadata = buildMetadata({
@@ -175,18 +179,21 @@ export const myAccountMetadata = buildMetadata({
   title: 'My Account - User Dashboard',
   description: 'Manage your account, orders, addresses and preferences.',
   path: '/my-account',
+  noindex: true,
 });
 
 export const ordersMetadata = buildMetadata({
   title: 'My Orders - Order History',
   description: 'View all your orders, order details, status and delivery information.',
   path: '/my-account/orders',
+  noindex: true,
 });
 
 export const orderDetailMetadata = buildMetadata({
   title: 'Order Details',
   description: 'View your order details, items, status and delivery information.',
   path: '/my-account/orders',
+  noindex: true,
 });
 
 export function buildCategoryMetadata(category: {
