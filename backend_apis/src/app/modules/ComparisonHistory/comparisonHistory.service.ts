@@ -3,9 +3,26 @@ import httpStatus from 'http-status';
 import { ComparisonHistoryModel } from './comparisonHistory.model';
 import { ProductModel } from '../Product/product.model';
 import { IUser } from '../User/user.interface';
+import { BrandModel } from '../Brand/brand.model';
+import { CategoryModel } from '../Category/category.model';
 
 const getComparisonSuggestionsFromDB = async () => {
-    return ProductModel.find({ isActive: true, isFeatured: true }).sort({ createdAt: -1 }).limit(3).lean();
+    const [activeBrandIds, activeCategoryIds] = await Promise.all([
+        BrandModel.find({ isActive: true }).distinct('_id'),
+        CategoryModel.find({ isActive: true }).distinct('_id'),
+    ]);
+
+    return ProductModel.find({
+        isActive: true,
+        isFeatured: true,
+        brand: { $in: activeBrandIds },
+        category: { $in: activeCategoryIds },
+    })
+        .populate('brand')
+        .populate('category')
+        .sort({ createdAt: -1 })
+        .limit(3)
+        .lean();
 };
 
 // 1. compareProductsFromDB
@@ -17,11 +34,11 @@ const compareProductsFromDB = async (user: IUser, IDs: string[]) => {
     }
 
     const selectedProducts = await ProductModel.find({ _id: { $in: uniqueIDs }, isActive: true })
-        .populate('brand')
-        .populate('category')
+        .populate({ path: 'brand', match: { isActive: true } })
+        .populate({ path: 'category', match: { isActive: true } })
         .lean();
 
-    if (selectedProducts.length !== uniqueIDs.length) {
+    if (selectedProducts.length !== uniqueIDs.length || selectedProducts.some(product => !product.brand || !product.category)) {
         throw new AppError(httpStatus.NOT_FOUND, 'One or more products were not found or are inactive!');
     }
 

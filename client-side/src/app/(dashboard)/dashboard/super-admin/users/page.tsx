@@ -4,6 +4,10 @@ import { requireDashboardRoles } from '@/lib/dashboard-auth';
 import { buildMetadata } from '@/lib/seo';
 import { getAllUsers } from '@/services/Admin';
 
+type Props = {
+    searchParams: Promise<{ page?: string; limit?: string; searchTerm?: string }>;
+};
+
 export const metadata: Metadata = buildMetadata({
     title: 'Users',
     description: 'Manage customer accounts.',
@@ -13,16 +17,34 @@ export const metadata: Metadata = buildMetadata({
 
 export const dynamic = 'force-dynamic';
 
-export default async function SuperAdminUsersPage() {
+const parsePositiveInteger = (value: string | undefined, fallback: number) => {
+    const parsed = Number(value);
+
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
+};
+
+export default async function SuperAdminUsersPage({ searchParams }: Props) {
     await requireDashboardRoles(['SUPER_ADMIN']);
-    const usersResult = await getAllUsers().catch(() => null);
+    const query = await searchParams;
+    const page = parsePositiveInteger(query.page, 1);
+    const limit = parsePositiveInteger(query.limit, 25);
+    const searchTerm = query.searchTerm?.trim() ?? '';
+    const usersResult = await getAllUsers({ page, limit, searchTerm }).catch(() => null);
     const users = Array.isArray(usersResult?.data) ? (usersResult.data as Array<unknown>) : [];
+    const paginationMeta = {
+        page: usersResult?.meta?.page ?? page,
+        limit: usersResult?.meta?.limit ?? limit,
+        total: usersResult?.meta?.total ?? users.length,
+        totalPages: usersResult?.meta?.totalPages ?? (Math.ceil(users.length / limit) || 1),
+    };
 
     return (
         <DashboardUsersManager
             users={users as Array<{ _id?: string; name?: string; email?: string; phone?: string; image?: string; dob?: string; isActive?: boolean; createdAt?: string }>}
             title="Users"
             description="Browse customer accounts managed through the backend."
+            paginationMeta={paginationMeta}
+            searchTerm={searchTerm}
         />
     );
 }

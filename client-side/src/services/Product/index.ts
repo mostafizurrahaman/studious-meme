@@ -62,6 +62,7 @@ export async function mapBackendProductToStorefrontProduct(
   product: BackendProduct,
 ): Promise<StorefrontProduct> {
   return {
+    id: product._id,
     title: product.title,
     slug: product.slug,
     href: '/shop',

@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { CompareSaveButton } from '@/components/CompareSaveButton';
 import { SeoScripts } from '@/components/SeoScripts';
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -10,18 +11,34 @@ import { mapBackendProductToStorefrontProduct, type BackendProduct } from '@/ser
 export const metadata = compareMetadata;
 export const dynamic = 'force-dynamic';
 
-export default async function ComparePage() {
+type Props = {
+  searchParams: Promise<{ ids?: string }>;
+};
+
+export default async function ComparePage({ searchParams }: Props) {
+  const query = await searchParams;
+  const queryIds = query.ids?.split(',').map(id => id.trim()).filter(Boolean) ?? [];
   const [suggestionsResult, historyResult] = await Promise.all([
     getComparisonSuggestions().catch(() => null),
     getMyComparisonHistory().catch(() => null),
   ]);
 
-  const backendProducts = suggestionsResult?.data?.length
+  const rawSuggestions = Array.isArray(suggestionsResult?.data)
+    ? (suggestionsResult.data as BackendProduct[])
+    : [];
+  const selectedSuggestions = queryIds.length > 0
+    ? [
+        ...rawSuggestions.filter(product => product._id && queryIds.includes(product._id)),
+        ...rawSuggestions.filter(product => !product._id || !queryIds.includes(product._id)),
+      ]
+    : rawSuggestions;
+  const backendProducts = selectedSuggestions.length
     ? await Promise.all(
-        suggestionsResult.data.map(item => mapBackendProductToStorefrontProduct(item as BackendProduct)),
+        selectedSuggestions.map(item => mapBackendProductToStorefrontProduct(item as BackendProduct)),
       )
     : [];
   const products = backendProducts.slice(0, 3);
+  const productIds = products.map(product => product.id).filter((id): id is string => Boolean(id));
   const history = Array.isArray(historyResult?.data)
     ? (
         historyResult.data as Array<{
@@ -43,6 +60,7 @@ export default async function ComparePage() {
             <p className="mt-3 max-w-3xl text-sm leading-7 text-foreground/65 sm:text-base">
               Compare table showing product details side by side from the store catalog.
             </p>
+            <CompareSaveButton productIds={productIds} />
           </Card>
 
           <Card className="mt-6 overflow-hidden shadow-sm">

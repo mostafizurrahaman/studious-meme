@@ -10,6 +10,7 @@ import { BrandRoutes } from '../modules/Brand/brand.routes';
 import { CategoryRoutes } from '../modules/Category/category.routes';
 import { ProductRoutes } from '../modules/Product/product.routes';
 import { OrderRoutes } from '../modules/Order/order.routes';
+import { WishlistHistoryRoutes } from '../modules/WishlistHistory/wishlistHistory.routes';
 
 const router = Router();
 
@@ -33,6 +34,10 @@ const moduleRoutes = [
     {
         path: '/comparison-history',
         route: ComparisonHistoryRoutes,
+    },
+    {
+        path: '/wishlist-history',
+        route: WishlistHistoryRoutes,
     },
     {
         path: '/contact',

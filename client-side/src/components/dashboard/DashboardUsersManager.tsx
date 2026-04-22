@@ -1,7 +1,7 @@
 "use client";
 
-import { useRouter } from 'next/navigation';
-import { useTransition } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useCallback, useTransition } from 'react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import Image from 'next/image';
 import { formatDashboardDate } from '@/lib/formatDate';
 import { deleteUserById, updateUserStatus } from '@/services/Admin';
+import { TableFilter } from '@/components/ui/table-filter';
+import { TablePagination } from '@/components/ui/table-pagination';
 
 type DashboardUserRecord = {
     _id?: string;
@@ -27,13 +29,39 @@ export function DashboardUsersManager({
     users,
     title,
     description,
+    paginationMeta,
+    searchTerm,
 }: {
     users: DashboardUserRecord[];
     title: string;
     description: string;
+    paginationMeta: { page: number; limit: number; total: number; totalPages: number };
+    searchTerm: string;
 }) {
     const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
     const [isPending, startTransition] = useTransition();
+    const updateQuery = useCallback(
+        (updates: { page?: number; limit?: number; searchTerm?: string }) => {
+            const params = new URLSearchParams(searchParams.toString());
+            const nextPage = updates.page ?? paginationMeta.page;
+            const nextLimit = updates.limit ?? paginationMeta.limit;
+            const nextSearch = updates.searchTerm ?? params.get('searchTerm') ?? '';
+
+            params.set('page', String(nextPage));
+            params.set('limit', String(nextLimit));
+
+            if (nextSearch.trim()) {
+                params.set('searchTerm', nextSearch.trim());
+            } else {
+                params.delete('searchTerm');
+            }
+
+            router.push(`${pathname}?${params.toString()}`);
+        },
+        [paginationMeta.limit, paginationMeta.page, pathname, router, searchParams],
+    );
 
     function refresh(message: string, type: 'success' | 'error') {
         if (type === 'success') {
@@ -51,7 +79,17 @@ export function DashboardUsersManager({
                 <CardTitle>{title}</CardTitle>
                 <CardDescription>{description}</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                    <TableFilter
+                        value={searchTerm}
+                        onChange={value => updateQuery({ page: 1, searchTerm: value })}
+                        placeholder="Search users..."
+                    />
+                    <div className="text-sm text-muted-foreground">
+                        Showing {users.length} of {paginationMeta.total} users
+                    </div>
+                </div>
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -74,7 +112,7 @@ export function DashboardUsersManager({
                                 </TableCell>
                             </TableRow>
                         ) : null}
-                        {users.slice(0, 20).map(user => (
+                        {users.map(user => (
                             <TableRow key={user._id ?? `${user.email}-${user.name}`}>
                                 <TableCell>
                                     <div className="flex size-12 items-center justify-center overflow-hidden rounded-xl border bg-muted">
@@ -169,6 +207,15 @@ export function DashboardUsersManager({
                         ))}
                     </TableBody>
                 </Table>
+                {paginationMeta.total > 0 ? (
+                    <TablePagination
+                        page={paginationMeta.page}
+                        limit={paginationMeta.limit}
+                        total={paginationMeta.total}
+                        onPageChange={page => updateQuery({ page })}
+                        onLimitChange={limit => updateQuery({ page: 1, limit })}
+                    />
+                ) : null}
             </CardContent>
         </Card>
     );

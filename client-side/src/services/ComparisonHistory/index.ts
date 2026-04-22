@@ -1,5 +1,6 @@
 'use server';
 
+import { updateTag } from 'next/cache';
 import { requestBackendJson } from '@/lib/backend-api';
 import {
     getValidAccessTokenForServerActions,
@@ -24,11 +25,18 @@ export const getComparisonSuggestions = async (): Promise<BackendEnvelope<unknow
 export const compareProducts = async (payload: ComparisonPayload): Promise<BackendEnvelope<unknown>> => {
     const accessToken = await getValidAccessTokenForServerActions();
 
-    return requestBackendJson<BackendEnvelope<unknown>>('/comparison-history/compare', {
+    if (!accessToken) {
+        return { success: false, message: 'Sign in to save comparison history.' };
+    }
+
+    const result = await requestBackendJson<BackendEnvelope<unknown>>('/comparison-history/compare', {
         method: 'POST',
         body: payload,
-        token: accessToken ?? undefined,
+        token: accessToken,
     });
+
+    updateTag('COMPARISON_HISTORY');
+    return result;
 };
 
 export const getMyComparisonHistory = async (): Promise<BackendEnvelope<unknown[]>> => {
@@ -37,6 +45,7 @@ export const getMyComparisonHistory = async (): Promise<BackendEnvelope<unknown[
     return requestBackendJson<BackendEnvelope<unknown[]>>('/comparison-history/history', {
         method: 'GET',
         token: accessToken ?? undefined,
+        next: { tags: ['COMPARISON_HISTORY'] },
     });
 };
 
@@ -46,14 +55,18 @@ export const getAllComparisonHistory = async (): Promise<BackendEnvelope<unknown
     return requestBackendJson<BackendEnvelope<unknown[]>>('/comparison-history/admin/history', {
         method: 'GET',
         token: accessToken ?? undefined,
+        next: { tags: ['COMPARISON_HISTORY'] },
     });
 };
 
 export const clearComparisonHistory = async (): Promise<BackendEnvelope<null>> => {
     const accessToken = await getValidAccessTokenForServerActions();
 
-    return requestBackendJson<BackendEnvelope<null>>('/comparison-history/history', {
+    const result = await requestBackendJson<BackendEnvelope<null>>('/comparison-history/history', {
         method: 'DELETE',
         token: accessToken ?? undefined,
     });
+
+    updateTag('COMPARISON_HISTORY');
+    return result;
 };

@@ -5,16 +5,19 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import type { Product } from '@/lib/storefront-types';
 import { useWishlistStore } from '@/lib/wishlist-store';
+import { removeWishlistItem } from '@/services/WishlistHistory';
 
 type Props = {
     suggestions: Product[];
+    savedProducts: Product[];
 };
 
-export function WishlistPageClient({ suggestions }: Props) {
+export function WishlistPageClient({ suggestions, savedProducts }: Props) {
     const items = useWishlistStore(state => state.items);
     const hydrated = useWishlistStore(state => state.hydrated);
     const remove = useWishlistStore(state => state.remove);
-    const products = hydrated && items.length > 0 ? items : suggestions;
+    const accountProducts = savedProducts.length > 0 ? savedProducts : [];
+    const products = hydrated && items.length > 0 ? items : accountProducts.length > 0 ? accountProducts : suggestions;
 
     return (
         <>
@@ -24,7 +27,9 @@ export function WishlistPageClient({ suggestions }: Props) {
                 <p className="mt-3 max-w-3xl text-sm leading-7 text-foreground/65 sm:text-base">
                     {hydrated && items.length > 0
                         ? `${items.length} saved product${items.length === 1 ? '' : 's'} from this browser.`
-                        : 'Save products from product pages; meanwhile, browse backend catalog suggestions.'}
+                        : accountProducts.length > 0
+                          ? `${accountProducts.length} saved product${accountProducts.length === 1 ? '' : 's'} from your account.`
+                          : 'Save products from product pages; logged-in wishlist activity is stored in the backend.'}
                 </p>
             </Card>
 
@@ -36,7 +41,12 @@ export function WishlistPageClient({ suggestions }: Props) {
                             <Button
                                 type="button"
                                 variant="outline"
-                                onClick={() => remove(product.sku)}
+                                onClick={() => {
+                                    remove(product.sku);
+                                    if (product.id) {
+                                        void removeWishlistItem(product.id);
+                                    }
+                                }}
                                 className="h-9 w-full rounded-full border-border text-xs font-semibold text-foreground/70"
                             >
                                 Remove from wishlist

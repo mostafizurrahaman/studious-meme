@@ -1,4 +1,5 @@
 export type StorefrontProduct = {
+    id?: string;
     title: string;
     slug: string;
     href: '/shop';

@@ -31,7 +31,7 @@ export function ProductCard({ product }: Props) {
                 </Link>
                 <div className="absolute right-2 top-2 z-10 flex flex-col gap-1.5 opacity-0 transition duration-300 group-hover:opacity-100">
                     {[
-                        ['Compare', '/compare'],
+                        ['Compare', product.id ? `/compare?ids=${product.id}` : '/compare'],
                         ['Quick view', `/product/${product.slug}`],
                         ['Wishlist', '/wishlist'],
                     ].map(([label, href]) => (

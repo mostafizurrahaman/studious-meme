@@ -20,6 +20,12 @@ type BackendEnvelope<T> = {
     message?: string;
     data?: T;
     error?: string;
+    meta?: {
+        page?: number;
+        limit?: number;
+        total?: number;
+        totalPages?: number;
+    };
 };
 
 const unsupported = <T>(message: string): BackendEnvelope<T> => ({ success: false, message });
@@ -30,9 +36,23 @@ export const getDashboardMetaData = async (): Promise<BackendEnvelope<unknown>> 
 export const updateNewsStatus = async (): Promise<BackendEnvelope<unknown>> =>
     unsupported('Endpoint not supported by current backend.');
 
-export const getAllUsers = async (): Promise<BackendEnvelope<unknown>> => {
+type GetAllUsersParams = {
+    page?: number;
+    limit?: number;
+    searchTerm?: string;
+};
+
+export const getAllUsers = async (params: GetAllUsersParams = {}): Promise<BackendEnvelope<unknown>> => {
     const accessToken = await getValidAccessTokenForServerHandlerGet();
-    return requestBackendJson<BackendEnvelope<unknown>>('/user/admin-get-all', {
+    const searchParams = new URLSearchParams();
+
+    if (params.page) searchParams.set('page', String(params.page));
+    if (params.limit) searchParams.set('limit', String(params.limit));
+    if (params.searchTerm?.trim()) searchParams.set('searchTerm', params.searchTerm.trim());
+
+    const query = searchParams.toString();
+
+    return requestBackendJson<BackendEnvelope<unknown>>(`/user/admin-get-all${query ? `?${query}` : ''}`, {
         method: 'GET',
         token: accessToken ?? undefined,
     });
