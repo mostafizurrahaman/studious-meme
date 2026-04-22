@@ -12,7 +12,7 @@ type BackendEnvelope<T> = {
     message?: string;
     data?: T;
     error?: string;
-    meta?: { page: number; limit: number; total: number; totalPage: number };
+    meta?: { page: number; limit: number; total: number; totalPages: number };
 };
 
 export type BackendOrderItem = {

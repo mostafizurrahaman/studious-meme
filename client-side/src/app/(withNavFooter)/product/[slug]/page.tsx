@@ -49,16 +49,12 @@ export default async function ProductPage({ params }: Props) {
     if (!product) notFound();
 
     const productsResult = await getAllProducts({
-        limit: 5,
+        limit: 4,
         category: product.category,
+        excludeSlug: product.slug,
     }).catch(() => null);
     const related = productsResult?.data?.length
-        ? await Promise.all(
-              productsResult.data
-                  .filter(item => item.slug !== product.slug)
-                  .slice(0, 4)
-                  .map(mapBackendProductToStorefrontProduct),
-          )
+        ? await Promise.all(productsResult.data.map(mapBackendProductToStorefrontProduct))
         : allProducts.filter(item => item.slug !== product.slug).slice(0, 4);
     const gallery = [product.image, ...related.map(item => item.image)].slice(0, 4);
 

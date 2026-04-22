@@ -25,7 +25,7 @@ export default async function PromotionsPage({ searchParams }: Props) {
   const products = productsResult?.data?.length
     ? await Promise.all(productsResult.data.map(mapBackendProductToStorefrontProduct))
     : offerProducts;
-  const totalPage = productsResult?.meta?.totalPage ?? productsResult?.meta?.totalPage ?? 1;
+  const totalPages = productsResult?.meta?.totalPages ?? 1;
 
   return (
     <>
@@ -69,7 +69,7 @@ export default async function PromotionsPage({ searchParams }: Props) {
 
           <Card className="mt-6 flex flex-wrap items-center justify-between gap-3 p-4 text-sm shadow-sm">
             <span className="text-foreground/60">
-              Page {productsResult?.meta?.page ?? page} of {totalPage}
+              Page {productsResult?.meta?.page ?? page} of {totalPages}
             </span>
             <div className="flex gap-2">
               {page > 1 ? (
@@ -80,7 +80,7 @@ export default async function PromotionsPage({ searchParams }: Props) {
                   Prev
                 </a>
               ) : null}
-              {page < totalPage ? (
+              {page < totalPages ? (
                 <a
                   href={`/promotions?page=${page + 1}`}
                   className="rounded-full border border-border px-4 py-2 text-xs font-semibold text-foreground/70"

@@ -742,13 +742,13 @@ const deleteSpecificUserAccountIntoDB = async (user: IUser) => {
 //   const facetResult = result[0] || { data: [], meta: [] };
 
 //   const total = facetResult.meta[0]?.total || 0;
-//   const totalPage = Math.ceil(total / limit) || 1;
+//   const totalPages = Math.ceil(total / limit) || 1;
 
 //   const meta = {
 //     page,
 //     limit,
 //     total,
-//     totalPage,
+//     totalPages,
 //   };
 
 //   return { data: facetResult.data, meta };
@@ -855,13 +855,13 @@ const adminGetAllUsersFromDB = async (query: Record<string, unknown>) => {
     const facetResult = result[0] || { data: [], meta: [] };
 
     const total = facetResult.meta[0]?.total || 0;
-    const totalPage = Math.ceil(total / limit) || 1;
+    const totalPages = Math.ceil(total / limit) || 1;
 
     const meta = {
         page,
         limit,
         total,
-        totalPage,
+        totalPages,
     };
 
     return { data: facetResult.data, meta };
@@ -1225,13 +1225,13 @@ const adminDeleteUserIntoDB = async (userId: string) => {
 //   const facetResult = result[0] || { data: [], meta: [] };
 
 //   const total = facetResult.meta[0]?.total || 0;
-//   const totalPage = Math.ceil(total / limit) || 1;
+//   const totalPages = Math.ceil(total / limit) || 1;
 
 //   const meta = {
 //     page,
 //     limit,
 //     total,
-//     totalPage,
+//     totalPages,
 //   };
 
 //   return { data: facetResult.data, meta };

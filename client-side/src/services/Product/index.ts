@@ -13,14 +13,16 @@ type BackendEnvelope<T> = {
   data?: T;
   error?: string;
   meta?: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPage: number;
+    page?: number;
+    limit?: number;
+    total?: number;
+    totalPages?: number;
   };
 };
 
-type BackendProductRef = { _id?: string; name?: string; slug?: string } | string;
+type BackendProductRef =
+  | { _id?: string; name?: string; slug?: string }
+  | string;
 
 export type BackendProduct = {
   _id?: string;
@@ -59,7 +61,8 @@ export async function mapBackendProductToStorefrontProduct(
     href: '/shop',
     image: product.image,
     price: String(product.price),
-    oldPrice: product.oldPrice === undefined ? undefined : String(product.oldPrice),
+    oldPrice:
+      product.oldPrice === undefined ? undefined : String(product.oldPrice),
     badge: product.badge,
     brand: resolveName(product.brand),
     sku: product.sku,
@@ -87,6 +90,8 @@ type GetAllProductsParams = {
   sort?: string;
   subCategorySlug?: string;
   subCategory?: string;
+  includeInactive?: boolean;
+  excludeSlug?: string;
 };
 
 export const getAllProducts = async (
@@ -96,9 +101,11 @@ export const getAllProducts = async (
 
   if (params.page) searchParams.set('page', String(params.page));
   if (params.limit) searchParams.set('limit', String(params.limit));
-  if (params.searchTerm?.trim()) searchParams.set('searchTerm', params.searchTerm.trim());
+  if (params.searchTerm?.trim())
+    searchParams.set('searchTerm', params.searchTerm.trim());
   if (params.c?.trim()) searchParams.set('c', params.c.trim());
-  if (params.category?.trim()) searchParams.set('category', params.category.trim());
+  if (params.category?.trim())
+    searchParams.set('category', params.category.trim());
   if (params.stock?.trim()) searchParams.set('stock', params.stock.trim());
   if (params.s?.trim()) searchParams.set('s', params.s.trim());
   if (params.tag?.trim()) searchParams.set('tag', params.tag.trim());
@@ -107,8 +114,15 @@ export const getAllProducts = async (
   if (params.brand?.trim()) searchParams.set('brand', params.brand.trim());
   if (params.b?.trim()) searchParams.set('b', params.b.trim());
   if (params.sort?.trim()) searchParams.set('sort', params.sort.trim());
-  if (params.subCategorySlug?.trim()) searchParams.set('subCategorySlug', params.subCategorySlug.trim());
-  if (params.subCategory?.trim()) searchParams.set('subCategory', params.subCategory.trim());
+  if (params.subCategorySlug?.trim())
+    searchParams.set('subCategorySlug', params.subCategorySlug.trim());
+  if (params.subCategory?.trim())
+    searchParams.set('subCategory', params.subCategory.trim());
+  if (typeof params.includeInactive === 'boolean') {
+    searchParams.set('includeInactive', String(params.includeInactive));
+  }
+  if (params.excludeSlug?.trim())
+    searchParams.set('excludeSlug', params.excludeSlug.trim());
 
   const query = searchParams.toString();
 
@@ -118,10 +132,15 @@ export const getAllProducts = async (
   );
 };
 
-export const getProductBySlug = async (slug: string): Promise<BackendEnvelope<BackendProduct>> => {
-  return requestBackendJson<BackendEnvelope<BackendProduct>>(`/product/products/${slug}`, {
-    method: 'GET',
-  });
+export const getProductBySlug = async (
+  slug: string,
+): Promise<BackendEnvelope<BackendProduct>> => {
+  return requestBackendJson<BackendEnvelope<BackendProduct>>(
+    `/product/products/${slug}`,
+    {
+      method: 'GET',
+    },
+  );
 };
 
 export const getProductsByCategorySlug = async (
@@ -148,10 +167,24 @@ export const getProductsByCategorySlug = async (
 
 export const getProductsBySubCategorySlug = async (
   slug: string,
+  params: Omit<GetAllProductsParams, 'subCategorySlug' | 'subCategory'> = {},
 ): Promise<BackendEnvelope<BackendProduct[]>> => {
-  return requestBackendJson<BackendEnvelope<BackendProduct[]>>(`/product/products/by-sub-category/${slug}`, {
-    method: 'GET',
+  const searchParams = new URLSearchParams();
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && String(value).trim()) {
+      searchParams.set(key, String(value).trim());
+    }
   });
+
+  const query = searchParams.toString();
+
+  return requestBackendJson<BackendEnvelope<BackendProduct[]>>(
+    `/product/products/by-sub-category/${slug}${query ? `?${query}` : ''}`,
+    {
+      method: 'GET',
+    },
+  );
 };
 
 type ProductMutationPayload = {
@@ -174,7 +207,10 @@ type ProductMutationPayload = {
 function toFormData(payload: Record<string, unknown>) {
   const formData = new FormData();
 
-  const { image, ...rest } = payload as { image?: File | string; [key: string]: unknown };
+  const { image, ...rest } = payload as {
+    image?: File | string;
+    [key: string]: unknown;
+  };
 
   formData.set(
     'data',
@@ -195,14 +231,17 @@ export const createProduct = async (
   payload: ProductMutationPayload,
 ): Promise<BackendEnvelope<BackendProduct>> => {
   const accessToken = await getValidAccessTokenForServerActions();
-  const result = await requestBackendJson<BackendEnvelope<BackendProduct>>('/product/products', {
-    method: 'POST',
-    body: toFormData({
-      ...payload,
-      slug: slugify(payload.slug),
-    }),
-    token: accessToken ?? undefined,
-  });
+  const result = await requestBackendJson<BackendEnvelope<BackendProduct>>(
+    '/product/products',
+    {
+      method: 'POST',
+      body: toFormData({
+        ...payload,
+        slug: slugify(payload.slug),
+      }),
+      token: accessToken ?? undefined,
+    },
+  );
 
   updateTag('PRODUCTS');
   return result;
@@ -213,25 +252,33 @@ export const updateProduct = async (
   payload: Partial<ProductMutationPayload>,
 ): Promise<BackendEnvelope<BackendProduct>> => {
   const accessToken = await getValidAccessTokenForServerActions();
-  const result = await requestBackendJson<BackendEnvelope<BackendProduct>>(`/product/products/${slug}`, {
-    method: 'PATCH',
-    body: toFormData({
-      ...payload,
-      slug: payload.slug ? slugify(payload.slug) : payload.slug,
-    }),
-    token: accessToken ?? undefined,
-  });
+  const result = await requestBackendJson<BackendEnvelope<BackendProduct>>(
+    `/product/products/${slug}`,
+    {
+      method: 'PATCH',
+      body: toFormData({
+        ...payload,
+        slug: payload.slug ? slugify(payload.slug) : payload.slug,
+      }),
+      token: accessToken ?? undefined,
+    },
+  );
 
   updateTag('PRODUCTS');
   return result;
 };
 
-export const deleteProduct = async (slug: string): Promise<BackendEnvelope<BackendProduct>> => {
+export const deleteProduct = async (
+  slug: string,
+): Promise<BackendEnvelope<BackendProduct>> => {
   const accessToken = await getValidAccessTokenForServerActions();
-  const result = await requestBackendJson<BackendEnvelope<BackendProduct>>(`/product/products/${slug}`, {
-    method: 'DELETE',
-    token: accessToken ?? undefined,
-  });
+  const result = await requestBackendJson<BackendEnvelope<BackendProduct>>(
+    `/product/products/${slug}`,
+    {
+      method: 'DELETE',
+      token: accessToken ?? undefined,
+    },
+  );
 
   updateTag('PRODUCTS');
   return result;

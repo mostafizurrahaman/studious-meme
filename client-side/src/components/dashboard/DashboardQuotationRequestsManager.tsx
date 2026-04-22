@@ -21,7 +21,7 @@ import type { BackendContact } from '@/services/Contact';
 
 type Props = {
   contacts: BackendContact[];
-  meta: { page: number; limit: number; total: number; totalPage: number };
+  meta: { page: number; limit: number; total: number; totalPages: number };
   searchTerm?: string;
 };
 

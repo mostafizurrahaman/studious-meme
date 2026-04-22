@@ -29,7 +29,7 @@ export default async function AdminQuotationsPage({ searchParams }: Props) {
         page: Number(page) || 1,
         limit: Number(limit) || 50,
         total: contacts.length,
-        totalPage: Math.ceil(contacts.length / (Number(limit) || 50)) || 1,
+        totalPages: Math.ceil(contacts.length / (Number(limit) || 50)) || 1,
     };
 
     return <DashboardQuotationRequestsManager contacts={contacts} meta={meta} searchTerm={searchTerm} />;

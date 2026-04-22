@@ -17,7 +17,7 @@ type Props = {
     total: number;
     limit: number;
     page: number;
-    totalPage: number;
+    totalPages: number;
   };
 };
 
@@ -36,8 +36,8 @@ export function CategoryPageClient({ category, products, brands, meta }: Props) 
   const activeBrands = parseGroupValues(searchParams.get('b'));
   const activeStock = searchParams.get('s') ?? '';
   const activePrice = searchParams.get('p') ?? '';
-  const totalPage = Math.max(meta.totalPage, 1);
-  const page = Math.min(meta.page, totalPage);
+  const totalPages = Math.max(meta.totalPages, 1);
+  const page = Math.min(meta.page, totalPages);
   const activeCount = activeBrands.length + [activeStock, activePrice].filter(Boolean).length;
 
   function updateParam(key: string, value: string) {
@@ -139,7 +139,7 @@ export function CategoryPageClient({ category, products, brands, meta }: Props) 
 
       <Card className="mt-6 flex flex-wrap items-center justify-between gap-3 p-4 text-sm shadow-sm">
         <span className="text-foreground/60">
-          Page {page} of {totalPage}
+          Page {page} of {totalPages}
         </span>
         <div className="flex items-center gap-2">
           <Button
@@ -154,7 +154,7 @@ export function CategoryPageClient({ category, products, brands, meta }: Props) 
           <Button
             type="button"
             variant="outline"
-            disabled={page >= totalPage}
+            disabled={page >= totalPages}
             onClick={() => updatePage(page + 1)}
             className="h-9 rounded-full border-border px-4 text-xs font-semibold"
           >

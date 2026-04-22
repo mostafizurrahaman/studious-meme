@@ -10,6 +10,7 @@ import { BrandModel } from '../Brand/brand.model';
 type ProductSort = Record<string, 1 | -1>;
 
 const DEFAULT_PRODUCTS_LIMIT = 50;
+const MAX_PRODUCTS_LIMIT = 100;
 
 const normalizeSlug = (value: string) =>
     value
@@ -62,6 +63,7 @@ const buildProductFilters = async (query: Record<string, unknown>) => {
     const tag = getString(query.tag);
     const price = getString(query.price || query.p);
     const brandValues = csv(query.brand || query.b);
+    const excludeSlug = getString(query.excludeSlug);
 
     filter.isActive = query.includeInactive === 'true' ? undefined : true;
     if (filter.isActive === undefined) delete filter.isActive;
@@ -153,6 +155,10 @@ const buildProductFilters = async (query: Record<string, unknown>) => {
         filter.$and = and;
     }
 
+    if (excludeSlug) {
+        filter.slug = { $ne: excludeSlug };
+    }
+
     return filter;
 };
 
@@ -183,7 +189,8 @@ const createProductIntoDB = async (payload: Partial<IProduct>, imageFile?: Multe
 // 2. getAllProductsFromDB
 const getAllProductsFromDB = async (query: Record<string, unknown>) => {
     const page = parsePositiveInteger(query.page, 1);
-    const limit = parsePositiveInteger(query.limit, DEFAULT_PRODUCTS_LIMIT);
+    const requestedLimit = parsePositiveInteger(query.limit, DEFAULT_PRODUCTS_LIMIT);
+    const limit = Math.min(requestedLimit, MAX_PRODUCTS_LIMIT);
     const skip = (page - 1) * limit;
     const filter = await buildProductFilters(query);
     const sort = pickSort(query.sort);
@@ -205,7 +212,7 @@ const getAllProductsFromDB = async (query: Record<string, unknown>) => {
             page,
             limit,
             total,
-            totalPage: Math.ceil(total / limit) || 1,
+            totalPages: Math.ceil(total / limit) || 1,
         },
     };
 };
@@ -283,8 +290,10 @@ const getProductsByCategorySlugFromDB = async (slug: string, query: Record<strin
 };
 
 // 7. getProductsBySubCategorySlugFromDB
-const getProductsBySubCategorySlugFromDB = async (subCategorySlug: string) =>
-    ProductModel.find({ subCategorySlug, isActive: true }).populate('brand').populate('category').lean();
+const getProductsBySubCategorySlugFromDB = async (
+    subCategorySlug: string,
+    query: Record<string, unknown> = {},
+) => getAllProductsFromDB({ ...query, subCategorySlug });
 
 // // 7. getProductsBySubCategorySlugFromDB
 // const getProductsBySubCategorySlugFromDB = async (subCategorySlug: string) => {

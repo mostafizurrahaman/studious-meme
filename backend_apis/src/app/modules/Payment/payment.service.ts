@@ -11,7 +11,7 @@ type PaymentServiceResult = {
     url?: string;
     transactionId?: string;
     data?: unknown[];
-    meta?: { page: number; limit: number; total: number; totalPage: number };
+    meta?: { page: number; limit: number; total: number; totalPages: number };
     summary?: { totalAmount: number };
 };
 
@@ -255,7 +255,7 @@ const getAllPaymentsForAdminFromDB = async (query: Record<string, unknown>) => {
             page,
             limit,
             total,
-            totalPage: Math.ceil(total / limit) || 1,
+            totalPages: Math.ceil(total / limit) || 1,
         },
         summary: {
             totalAmount: summary[0]?.totalAmount || 0,

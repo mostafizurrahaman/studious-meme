@@ -79,7 +79,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
     total: productsResult?.meta?.total ?? products.length,
     limit: productsResult?.meta?.limit ?? limit,
     page: productsResult?.meta?.page ?? page,
-    totalPage: productsResult?.meta?.totalPage ?? productsResult?.meta?.totalPage ?? 1,
+    totalPages: productsResult?.meta?.totalPages ?? 1,
   };
   const brandFilters = brandsResult?.data?.map(brand => brand.name).filter(Boolean) ?? [];
 

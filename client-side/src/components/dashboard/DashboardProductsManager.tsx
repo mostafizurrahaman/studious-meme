@@ -24,7 +24,7 @@ type Option = { value: string; label: string };
 
 type DashboardProductsManagerProps = {
   products: BackendProduct[];
-  paginationMeta: { page: number; limit: number; total: number; totalPage: number };
+  paginationMeta: { page: number; limit: number; total: number; totalPages: number };
   searchTerm?: string;
   brandOptions: Option[];
   categories: BackendCategory[];
@@ -649,9 +649,7 @@ export function DashboardProductsManager({
                           {product.isFeatured ? 'Featured' : 'No'}
                         </Badge>
                       </TableCell>
-                      <TableCell className="min-w-0">
-                        {product.price}
-                      </TableCell>
+                      <TableCell className="min-w-0">{product.price}</TableCell>
                       <TableCell className="min-w-0">
                         <span title={formatDashboardDate(product.createdAt, { time: true })}>
                           {formatDashboardDate(product.createdAt)}

@@ -79,12 +79,14 @@ const getProductsByCategorySlug = asyncHandler(async (req, res) => {
 const getProductsBySubCategorySlug = asyncHandler(async (req, res) => {
     const result = await ProductService.getProductsBySubCategorySlugFromDB(
         getParam(req.params.subCategorySlug),
+        req.query,
     );
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
         message: 'Products fetched successfully!',
-        data: result,
+        data: result.data,
+        meta: result.meta,
     });
 });
 

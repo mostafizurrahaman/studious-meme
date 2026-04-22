@@ -15,7 +15,7 @@ type Props = {
     total: number;
     limit: number;
     page: number;
-    totalPage: number;
+    totalPages: number;
   };
 };
 
@@ -34,8 +34,8 @@ export function ShopPageClient({ products, categories, meta }: Props) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const filters = getActiveFilters(searchParams);
-  const totalPage = Math.max(meta.totalPage, 1);
-  const page = Math.min(meta.page, totalPage);
+  const totalPages = Math.max(meta.totalPages, 1);
+  const page = Math.min(meta.page, totalPages);
 
   function updateFilter(key: string, value: string) {
     const params = new URLSearchParams(searchParams.toString());
@@ -181,7 +181,7 @@ export function ShopPageClient({ products, categories, meta }: Props) {
 
         <Card className="flex flex-wrap items-center justify-between gap-3 p-4 text-sm shadow-sm">
           <span className="text-foreground/60">
-            Page {page} of {totalPage}
+            Page {page} of {totalPages}
           </span>
           <div className="flex items-center gap-2">
             <Button
@@ -202,7 +202,7 @@ export function ShopPageClient({ products, categories, meta }: Props) {
             <Button
               type="button"
               variant="outline"
-              disabled={page >= totalPage}
+              disabled={page >= totalPages}
               onClick={() => updatePage(page + 1)}
               className="h-9 rounded-full border-border px-4 text-xs font-semibold"
             >

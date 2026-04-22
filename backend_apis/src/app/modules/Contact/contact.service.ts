@@ -39,7 +39,7 @@ const adminGetAllContactsFromDB = async (
         page: pageNumber,
         limit: limitNumber,
         total,
-        totalPage: Math.ceil(total / limitNumber) || 0,
+        totalPages: Math.ceil(total / limitNumber) || 0,
     };
 
     return { data: contacts, meta };

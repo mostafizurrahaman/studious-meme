@@ -13,7 +13,7 @@ type TablePaginationProps = {
 };
 
 export function TablePagination({ page, limit, total, onPageChange, onLimitChange }: TablePaginationProps) {
-  const totalPage = Math.ceil(total / limit) || 1;
+  const totalPages = Math.ceil(total / limit) || 1;
   const start = total === 0 ? 0 : (page - 1) * limit + 1;
   const end = Math.min(page * limit, total);
 
@@ -51,14 +51,14 @@ export function TablePagination({ page, limit, total, onPageChange, onLimitChang
           <ChevronLeft className="size-4" />
         </Button>
         <span className="text-sm">
-          Page {page} of {totalPage}
+          Page {page} of {totalPages}
         </span>
         <Button
           type="button"
           variant="outline"
           size="icon"
           onClick={() => onPageChange(page + 1)}
-          disabled={page >= totalPage}
+          disabled={page >= totalPages}
         >
           <ChevronRight className="size-4" />
         </Button>

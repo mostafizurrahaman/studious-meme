@@ -176,7 +176,7 @@ const getAllOrdersForAdminFromDB = async (query: Record<string, unknown>) => {
             page,
             limit,
             total,
-            totalPage: Math.ceil(total / limit) || 1,
+            totalPages: Math.ceil(total / limit) || 1,
         },
     };
 };
