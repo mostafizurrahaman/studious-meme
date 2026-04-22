@@ -19,8 +19,11 @@ const adminGetAllContactsFromDB = async (
     if (searchTerm) {
         filters.$or = [
             { name: { $regex: searchTerm, $options: 'i' } },
+            { company: { $regex: searchTerm, $options: 'i' } },
             { email: { $regex: searchTerm, $options: 'i' } },
             { subject: { $regex: searchTerm, $options: 'i' } },
+            { products: { $regex: searchTerm, $options: 'i' } },
+            { brand: { $regex: searchTerm, $options: 'i' } },
             { message: { $regex: searchTerm, $options: 'i' } },
         ];
     }

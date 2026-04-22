@@ -1,0 +1,36 @@
+import type { Metadata } from 'next';
+import { DashboardQuotationRequestsManager } from '@/components/dashboard/DashboardQuotationRequestsManager';
+import { requireDashboardRoles } from '@/lib/dashboard-auth';
+import { buildMetadata } from '@/lib/seo';
+import { getAllContacts } from '@/services/Contact';
+
+type Props = {
+    searchParams: Promise<{ page?: string; limit?: string; searchTerm?: string }>;
+};
+
+export const metadata: Metadata = buildMetadata({
+    title: 'Quotation Requests',
+    description: 'Review customer quotation requests and contact submissions.',
+    path: '/dashboard/super-admin/quotations',
+    noindex: true,
+});
+
+export const dynamic = 'force-dynamic';
+
+export default async function SuperAdminQuotationsPage({ searchParams }: Props) {
+    await requireDashboardRoles(['SUPER_ADMIN']);
+    const query = await searchParams;
+    const page = query.page ?? '1';
+    const limit = query.limit ?? '20';
+    const searchTerm = query.searchTerm?.trim() ?? '';
+    const result = await getAllContacts(page, limit, searchTerm).catch(() => null);
+    const contacts = result?.data ?? [];
+    const meta = result?.meta ?? {
+        page: Number(page) || 1,
+        limit: Number(limit) || 20,
+        total: contacts.length,
+        totalPage: Math.ceil(contacts.length / (Number(limit) || 20)) || 1,
+    };
+
+    return <DashboardQuotationRequestsManager contacts={contacts} meta={meta} searchTerm={searchTerm} />;
+}

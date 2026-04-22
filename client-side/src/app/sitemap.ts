@@ -56,7 +56,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             priority: 0.4,
         },
         {
-            url: toAbsoluteUrl('/terms-and-condition'),
+            url: toAbsoluteUrl('/about-us'),
+            lastModified: now,
+            changeFrequency: 'yearly',
+            priority: 0.4,
+        },
+        {
+            url: toAbsoluteUrl('/terms-and-conditions'),
             lastModified: now,
             changeFrequency: 'yearly',
             priority: 0.2,
@@ -68,7 +74,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             priority: 0.2,
         },
         {
-            url: toAbsoluteUrl('/delivery-return'),
+            url: toAbsoluteUrl('/return-policy'),
             lastModified: now,
             changeFrequency: 'yearly',
             priority: 0.2,

@@ -233,38 +233,38 @@ export const privacyPolicySchemas = [
 export const termsAndConditionMetadata = buildMetadata({
     title: 'Terms and Conditions',
     description: 'Review the storefront usage terms and conditions.',
-    path: '/terms-and-condition',
+    path: '/terms-and-conditions',
     noindex: true,
 });
 
 export const termsAndConditionSchemas = [
     buildBreadcrumbSchema([
         { name: 'Home', url: '/' },
-        { name: 'Terms and Conditions', url: '/terms-and-condition' },
+        { name: 'Terms and Conditions', url: '/terms-and-conditions' },
     ]),
     buildArticleSchema(
         'Terms and Conditions',
         'Review the storefront usage terms and conditions.',
-        '/terms-and-condition',
+        '/terms-and-conditions',
     ),
 ];
 
 export const deliveryReturnMetadata = buildMetadata({
     title: 'Delivery and Return Policy',
     description: 'Read the delivery, return and refund policy for the storefront.',
-    path: '/delivery-return',
+    path: '/return-policy',
     noindex: true,
 });
 
 export const deliveryReturnSchemas = [
     buildBreadcrumbSchema([
         { name: 'Home', url: '/' },
-        { name: 'Delivery and Return Policy', url: '/delivery-return' },
+        { name: 'Delivery and Return Policy', url: '/return-policy' },
     ]),
     buildArticleSchema(
         'Delivery and Return Policy',
         'Read the delivery, return and refund policy for the storefront.',
-        '/delivery-return',
+        '/return-policy',
     ),
 ];
 

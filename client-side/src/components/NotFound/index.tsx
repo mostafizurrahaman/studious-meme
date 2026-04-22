@@ -1,51 +1,65 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { ArrowLeft, Home, Search, ShoppingBag } from 'lucide-react';
 import notFoundImage from '@/assets/404.png';
-import { ArrowLeft, Home } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+
+const helpfulLinks = [
+    { label: 'Shop', href: '/shop', icon: ShoppingBag },
+    { label: 'Return Policy', href: '/return-policy', icon: Search },
+    { label: 'Contact', href: '/our-contacts', icon: Search },
+];
 
 const NotFound = () => {
     const router = useRouter();
 
     return (
-        <section className="bg-green-50 dark:bg-gray-900">
-            <div className="container flex items-center min-h-screen px-6 py-12 mx-auto">
-                <div className="flex flex-col items-center max-w-sm mx-auto text-center">
-                    <div className="relative w-64 h-64 mb-6">
-                        <Image src={notFoundImage} alt="404 Not Found" fill className="object-contain" />
-                    </div>
+        <main className="flex min-h-[70vh] items-center bg-muted/20 px-4 py-12">
+            <Card className="mx-auto grid w-full max-w-260 items-center gap-8 overflow-hidden p-6 shadow-sm md:grid-cols-[0.9fr_1.1fr] md:p-10">
+                <div className="relative mx-auto aspect-square w-full max-w-70">
+                    <Image src={notFoundImage} alt="404 Not Found" fill className="object-contain" priority />
+                </div>
 
-                    <div className="flex items-center gap-2 mb-4">
-                        <h4 className="text-2xl font-semibold text-gray-800 dark:text-green-400 md:text-3xl">
-                            Oops! Wrong Path
-                        </h4>
-                    </div>
-
-                    <p className="mt-2 text-gray-600 dark:text-gray-300">
-                        This path doesn&apos;t exist. Let&apos;s get you back on track!
+                <div className="text-center md:text-left">
+                    <p className="text-xs font-bold uppercase tracking-[0.3em] text-primary">Page not found</p>
+                    <h1 className="mt-4 text-3xl font-black text-secondary sm:text-5xl">This page is out of stock</h1>
+                    <p className="mt-4 max-w-xl text-sm leading-7 text-foreground/65 sm:text-base">
+                        The page may have moved, the link may be old, or the product shelf you were looking for is no
+                        longer available.
                     </p>
 
-                    <div className="flex flex-col w-full mt-8 gap-4 sm:flex-row sm:w-auto">
-                        <button
-                            onClick={() => router.back()}
-                            className="flex items-center justify-center gap-2 px-6 py-2 text-sm font-medium text-gray-700 transition-colors duration-200 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-700"
-                        >
-                            <ArrowLeft className="w-5 h-5 text-green-500" />
-                            <span>Go Back</span>
-                        </button>
+                    <div className="mt-6 flex flex-col gap-3 sm:flex-row md:justify-start">
+                        <Button type="button" size="lg" onClick={() => router.back()}>
+                            <ArrowLeft className="size-4" />
+                            Go back
+                        </Button>
+                        <Button asChild variant="outline" size="lg">
+                            <Link href="/">
+                                <Home className="size-4" />
+                                Home
+                            </Link>
+                        </Button>
+                    </div>
 
-                        <button
-                            onClick={() => router.push('/')}
-                            className="flex items-center justify-center gap-2 px-6 py-2 text-sm font-medium text-white transition-colors duration-200 bg-green-600 rounded-lg shadow-sm hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600"
-                        >
-                            <Home className="w-5 h-5" />
-                            <span>Take Me Home</span>
-                        </button>
+                    <div className="mt-8 grid gap-2 sm:grid-cols-3">
+                        {helpfulLinks.map(item => (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className="flex items-center justify-center gap-2 rounded-lg border border-border bg-background px-3 py-3 text-sm font-semibold transition hover:border-primary/35 hover:bg-primary hover:text-white md:justify-start"
+                            >
+                                <item.icon className="size-4" />
+                                {item.label}
+                            </Link>
+                        ))}
                     </div>
                 </div>
-            </div>
-        </section>
+            </Card>
+        </main>
     );
 };
 

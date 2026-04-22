@@ -1,21 +1,21 @@
 import { ManagedPageContent } from '@/components/ManagedPageContent';
 import { SeoScripts } from '@/components/SeoScripts';
 import { policySections } from '@/lib/malamal-content';
-import { privacyPolicyMetadata, privacyPolicySchemas } from '@/lib/seo';
+import { termsAndConditionMetadata, termsAndConditionSchemas } from '@/lib/seo';
 import { getPageByType } from '@/services/Page';
 
-export const metadata = privacyPolicyMetadata;
+export const metadata = termsAndConditionMetadata;
 
-export default async function PrivacyPolicyPage() {
-    const pageResult = await getPageByType('privacy-policy').catch(() => null);
+export default async function TermsAndConditionsPage() {
+    const pageResult = await getPageByType('terms-and-conditions').catch(() => null);
 
     return (
         <>
-            <SeoScripts data={privacyPolicySchemas} />
+            <SeoScripts data={termsAndConditionSchemas} />
             <ManagedPageContent
                 page={pageResult?.data ?? null}
-                fallbackTitle="Privacy Policy"
-                fallbackDescription="Privacy policy for the Malamal storefront."
+                fallbackTitle="Terms & Conditions"
+                fallbackDescription="Terms and conditions for using the Malamal storefront."
                 fallback={
                     <div className="space-y-6">
                         {policySections.map(section => (

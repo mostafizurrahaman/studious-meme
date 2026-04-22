@@ -143,7 +143,7 @@ export function Header() {
                                                     : []),
                                                 ['Hardware Store', '/main-categories'],
                                                 ['Our Contacts', '/our-contacts'],
-                                                ['Delivery & Return', '/delivery-return'],
+                                                ['Return Policy', '/return-policy'],
                                                 ['Wishlist', '/wishlist'],
                                                 ['Compare', '/compare'],
                                             ] as const
@@ -368,18 +368,18 @@ export function Header() {
                                 All Categories
                             </Link> */}
                             <Link
-                                className={navLinkClass('/delivery-return')}
-                                href="/delivery-return"
-                                style={activeStyle('/delivery-return')}
+                                className={navLinkClass('/return-policy')}
+                                href="/return-policy"
+                                style={activeStyle('/return-policy')}
                             >
-                                Delivery & Return
+                                Return Policy
                             </Link>
                             <Link
-                                className={navLinkClass('/terms-and-condition')}
-                                href="/terms-and-condition"
-                                style={activeStyle('/terms-and-condition')}
+                                className={navLinkClass('/terms-and-conditions')}
+                                href="/terms-and-conditions"
+                                style={activeStyle('/terms-and-conditions')}
                             >
-                                Terms & Condition
+                                Terms & Conditions
                             </Link>
                         </div>
                     </nav>
@@ -396,8 +396,8 @@ export function Header() {
                                         ['Promotions/Campaigns', '/promotions'],
                                         ['Main Categories', '/main-categories'],
                                         ['Shop By Brands', '/shop-by-brands'],
-                                        ['Delivery & Return', '/delivery-return'],
-                                        ['Terms & Condition', '/terms-and-condition'],
+                                        ['Return Policy', '/return-policy'],
+                                        ['Terms & Conditions', '/terms-and-conditions'],
                                         ['Quotation Request', '/quotation-request'],
                                         ['Our Contacts', '/our-contacts'],
                                         ['Compare', '/compare'],

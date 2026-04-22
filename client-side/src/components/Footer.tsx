@@ -62,6 +62,9 @@ export function Footer() {
                             <Link className="hover:text-secondary-foreground" href="/our-contacts">
                                 Our Contacts
                             </Link>
+                            <Link className="hover:text-secondary-foreground" href="/about-us">
+                                About Us
+                            </Link>
                         </div>
                     </div>
 
@@ -82,6 +85,15 @@ export function Footer() {
                             </Link>
                             <Link className="hover:text-secondary-foreground" href="/wishlist">
                                 My Wishlist
+                            </Link>
+                            <Link className="hover:text-secondary-foreground" href="/privacy-policy">
+                                Privacy Policy
+                            </Link>
+                            <Link className="hover:text-secondary-foreground" href="/terms-and-conditions">
+                                Terms & Conditions
+                            </Link>
+                            <Link className="hover:text-secondary-foreground" href="/return-policy">
+                                Return Policy
                             </Link>
                         </div>
                     </div>

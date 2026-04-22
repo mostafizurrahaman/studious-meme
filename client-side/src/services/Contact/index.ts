@@ -10,10 +10,26 @@ type BackendEnvelope<T> = {
     message?: string;
     data?: T;
     error?: string;
+    meta?: { page: number; limit: number; total: number; totalPage: number };
 };
 
-export const createContact = async (contactData: FieldValues): Promise<BackendEnvelope<unknown>> => {
-    const result = await requestBackendJson<BackendEnvelope<unknown>>('/contact', {
+export type BackendContact = {
+    _id: string;
+    name: string;
+    company?: string;
+    email: string;
+    phone: string;
+    subject: string;
+    products?: string;
+    brand?: string;
+    message: string;
+    isReplied: boolean;
+    createdAt: string;
+    updatedAt?: string;
+};
+
+export const createContact = async (contactData: FieldValues): Promise<BackendEnvelope<BackendContact>> => {
+    const result = await requestBackendJson<BackendEnvelope<BackendContact>>('/contact', {
         method: 'POST',
         body: contactData as Record<string, unknown>,
     });
@@ -25,11 +41,14 @@ export const createContact = async (contactData: FieldValues): Promise<BackendEn
 export const getAllContacts = async (
     page: string = '1',
     limit: string = '20',
-): Promise<BackendEnvelope<unknown>> => {
+    searchTerm: string = '',
+): Promise<BackendEnvelope<BackendContact[]>> => {
     const accessToken = await getValidAccessTokenForServerHandlerGet();
 
     const query = new URLSearchParams({ page, limit });
-    return requestBackendJson<BackendEnvelope<unknown>>(`/contact?${query.toString()}`, {
+    if (searchTerm.trim()) query.set('searchTerm', searchTerm.trim());
+
+    return requestBackendJson<BackendEnvelope<BackendContact[]>>(`/contact?${query.toString()}`, {
         method: 'GET',
         token: accessToken ?? undefined,
     });

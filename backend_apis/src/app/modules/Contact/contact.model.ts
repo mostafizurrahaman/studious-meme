@@ -7,6 +7,9 @@ const contactSchema = new Schema<IContact>(
             type: String,
             required: [true, 'Name is required!'],
         },
+        company: {
+            type: String,
+        },
         email: {
             type: String,
             required: [true, 'Email is required!'],
@@ -19,6 +22,13 @@ const contactSchema = new Schema<IContact>(
         subject: {
             type: String,
             required: [true, 'Subject is required!'],
+        },
+        products: {
+            type: String,
+            required: [true, 'Interested products are required!'],
+        },
+        brand: {
+            type: String,
         },
 
         message: {

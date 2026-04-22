@@ -5,6 +5,7 @@ import { updateTag } from 'next/cache';
 
 import { requestBackendJson } from '@/lib/backend-api';
 import { getValidAccessTokenForServerActions } from '@/lib/getValidAccessToken';
+import type { BackendPage } from '@/lib/page-content';
 
 type BackendEnvelope<T> = {
     success?: boolean;
@@ -13,15 +14,25 @@ type BackendEnvelope<T> = {
     error?: string;
 };
 
-export const getPageByType = async (type: string): Promise<BackendEnvelope<unknown>> => {
-    return requestBackendJson<BackendEnvelope<unknown>>(`/page/retrieve/${type}`, {
+export const getAllPages = async (): Promise<BackendEnvelope<BackendPage[]>> => {
+    return requestBackendJson<BackendEnvelope<BackendPage[]>>('/page/retrieve', {
         method: 'GET',
+        next: { tags: ['PAGES'] },
     });
 };
 
-export const createOrUpdatePageByType = async (data: FieldValues): Promise<BackendEnvelope<unknown>> => {
+export const getPageByType = async (type: string): Promise<BackendEnvelope<BackendPage | null>> => {
+    return requestBackendJson<BackendEnvelope<BackendPage | null>>(`/page/retrieve/${type}`, {
+        method: 'GET',
+        next: { tags: ['PAGES'] },
+    });
+};
+
+export const createOrUpdatePageByType = async (
+    data: FieldValues,
+): Promise<BackendEnvelope<BackendPage>> => {
     const accessToken = await getValidAccessTokenForServerActions();
-    const result = await requestBackendJson<BackendEnvelope<unknown>>('/page/create-or-update', {
+    const result = await requestBackendJson<BackendEnvelope<BackendPage>>('/page/create-or-update', {
         method: 'PUT',
         body: data as Record<string, unknown>,
         token: accessToken ?? undefined,
