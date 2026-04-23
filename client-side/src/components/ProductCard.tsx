@@ -9,9 +9,10 @@ import type { Product } from '@/lib/storefront-types';
 
 type Props = {
   product: Product;
+  priority?: boolean;
 };
 
-export function ProductCard({ product }: Props) {
+export function ProductCard({ product, priority = false }: Props) {
   return (
     <Card className="group overflow-hidden border-border transition hover:-translate-y-0.5 hover:shadow-md">
       <div className="relative aspect-square bg-muted p-2">
@@ -20,6 +21,7 @@ export function ProductCard({ product }: Props) {
             src={product.image}
             alt={product.title}
             fill
+            priority={priority}
             sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
             className="ui-image-card object-contain p-2 transition duration-300 group-hover:scale-105"
           />

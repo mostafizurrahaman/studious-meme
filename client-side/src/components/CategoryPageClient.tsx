@@ -145,8 +145,8 @@ export function CategoryPageClient({ category, products, brands, meta, selectedS
             </Card>
 
             <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-                {products.map(product => (
-                    <ProductCard key={product.sku} product={product} />
+                {products.map((product, index) => (
+                    <ProductCard key={product.sku} product={product} priority={index === 0} />
                 ))}
             </section>
 
