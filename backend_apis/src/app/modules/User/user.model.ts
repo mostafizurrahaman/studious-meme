@@ -82,6 +82,8 @@ const userSchema = new Schema<IUser, IUserModel>(
     { timestamps: true, versionKey: false },
 );
 
+userSchema.index({ role: 1, createdAt: -1 }, { name: 'user_role_createdAt_idx' });
+
 // Custom hooks/methods
 
 // Hash password before saving

@@ -35,13 +35,14 @@ const wishlistProductSnapshotSchema = new Schema<WishlistProductSnapshot>(
 
 const wishlistHistorySchema = new Schema<WishlistHistoryDoc>(
     {
-        user: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
-        product: { type: Schema.Types.ObjectId, ref: 'Product', required: true, index: true },
+        user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+        product: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
         productSnapshot: { type: wishlistProductSnapshotSchema, required: true },
     },
     { timestamps: true, versionKey: false },
 );
 
 wishlistHistorySchema.index({ user: 1, product: 1 }, { unique: true });
+wishlistHistorySchema.index({ user: 1, updatedAt: -1 }, { name: 'wishlistHistory_user_updatedAt_idx' });
 
 export const WishlistHistoryModel = model<WishlistHistoryDoc>('WishlistHistory', wishlistHistorySchema);

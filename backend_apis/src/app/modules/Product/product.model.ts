@@ -5,9 +5,9 @@ export type { IProduct } from './product.interface';
 
 const productSchema = new Schema<IProduct>(
     {
-        title: { type: String, required: [true, 'Product title is required!'], index: true },
-        slug: { type: String, required: [true, 'Product slug is required!'], unique: true, index: true },
-        sku: { type: String, required: [true, 'SKU is required!'], unique: true, index: true },
+        title: { type: String, required: [true, 'Product title is required!'] },
+        slug: { type: String, required: [true, 'Product slug is required!'], unique: true },
+        sku: { type: String, required: [true, 'SKU is required!'], unique: true },
         image: { type: String, required: true },
         price: { type: Number, required: true, min: 0 },
         oldPrice: { type: Number, min: 0 },
@@ -18,12 +18,13 @@ const productSchema = new Schema<IProduct>(
         stock: { type: Number, required: true, min: 0 },
         rating: { type: Number, required: true, min: 0 },
         isFeatured: { type: Boolean, default: false, index: true },
-        isActive: { type: Boolean, default: true, index: true },
+        isActive: { type: Boolean, default: true },
     },
     { timestamps: true, versionKey: false },
 );
 
-productSchema.index({ category: 1, subCategorySlug: 1, isFeatured: 1 }, { name: 'product_category_index' });
+productSchema.index({ isActive: 1, category: 1, brand: 1, createdAt: -1 }, { name: 'product_active_category_brand_createdAt_idx' });
+productSchema.index({ isActive: 1, subCategorySlug: 1, createdAt: -1 }, { name: 'product_active_subCategory_createdAt_idx' });
 productSchema.index({ isActive: 1, isFeatured: 1, createdAt: -1 }, { name: 'product_active_featured_createdAt_idx' });
 
 export const ProductModel = model<IProduct>('Product', productSchema);

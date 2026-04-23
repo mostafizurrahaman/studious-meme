@@ -41,11 +41,13 @@ const comparisonProductSnapshotSchema = new Schema<ComparisonProductSnapshot>(
 
 const comparisonHistorySchema = new Schema<ComparisonHistoryDoc>(
     {
-        user: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+        user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
         IDs: { type: [String], required: true },
         products: { type: [comparisonProductSnapshotSchema], default: [] },
     },
     { timestamps: true, versionKey: false },
 );
+
+comparisonHistorySchema.index({ user: 1, createdAt: -1 }, { name: 'comparisonHistory_user_createdAt_idx' });
 
 export const ComparisonHistoryModel = model<ComparisonHistoryDoc>('ComparisonHistory', comparisonHistorySchema);

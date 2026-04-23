@@ -31,8 +31,8 @@ const orderCustomerSchema = new Schema(
 
 const orderSchema = new Schema<IOrder>(
     {
-        orderId: { type: String, required: true, unique: true, index: true },
-        user: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+        orderId: { type: String, required: true, unique: true },
+        user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
         items: { type: [orderItemSnapshotSchema], required: true },
         customer: { type: orderCustomerSchema, required: true },
         subtotal: { type: Number, required: true },
@@ -44,28 +44,26 @@ const orderSchema = new Schema<IOrder>(
             type: String,
             enum: ['CASH_ON_DELIVERY', 'SSL_COMMERZ'],
             required: true,
-            index: true,
         },
         paymentStatus: {
             type: String,
             enum: ['UNPAID', 'PENDING', 'PAID', 'FAILED', 'CANCELLED'],
             required: true,
             default: 'UNPAID',
-            index: true,
         },
         status: {
             type: String,
             enum: ['PLACED', 'PROCESSING', 'DELIVERED', 'CANCELLED'],
             required: true,
             default: 'PLACED',
-            index: true,
         },
-        transactionId: { type: String, index: true },
+        transactionId: { type: String },
         gatewayUrl: { type: String },
     },
     { timestamps: true, versionKey: false },
 );
 
 orderSchema.index({ user: 1, createdAt: -1 }, { name: 'order_user_createdAt_idx' });
+orderSchema.index({ status: 1, createdAt: -1 }, { name: 'order_status_createdAt_idx' });
 
 export const OrderModel = model<IOrder>('Order', orderSchema);
