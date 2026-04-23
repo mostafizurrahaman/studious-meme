@@ -18,10 +18,17 @@ const NotFound = () => {
     const router = useRouter();
 
     return (
-        <main className="flex min-h-[70vh] items-center bg-muted/20 px-4 py-12">
+        <main className="flex min-h-dvh items-center justify-center bg-muted/20 px-4 py-8">
             <Card className="mx-auto grid w-full max-w-260 items-center gap-8 overflow-hidden p-6 shadow-sm md:grid-cols-[0.9fr_1.1fr] md:p-10">
                 <div className="relative mx-auto aspect-square w-full max-w-70">
-                    <Image src={notFoundImage} alt="404 Not Found" fill className="object-contain" priority />
+                    <Image
+                        src={notFoundImage}
+                        alt="404 Not Found"
+                        fill
+                        sizes="(max-width: 768px) 100vw, 280px"
+                        className="object-contain"
+                        priority
+                    />
                 </div>
 
                 <div className="text-center md:text-left">
