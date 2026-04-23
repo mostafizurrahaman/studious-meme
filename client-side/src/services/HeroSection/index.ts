@@ -22,6 +22,14 @@ export type BackendHeroCard = {
     clickUrl: string;
 };
 
+export type HeroSectionFormCard = {
+    image: string | File | null;
+    imageAlt: string;
+    title: string;
+    description: string;
+    clickUrl: string;
+};
+
 export type BackendHeroSection = {
     _id?: string;
     slides: BackendHeroCard[];
@@ -67,14 +75,42 @@ export const getHeroSectionById = async (id: string): Promise<BackendEnvelope<Ba
 };
 
 type HeroMutationPayload = {
-    slides: BackendHeroCard[];
-    features: BackendHeroCard[];
+    slides: HeroSectionFormCard[];
+    features: HeroSectionFormCard[];
     isActive?: boolean;
 };
 
-function toFormData(payload: Record<string, unknown>) {
+function toFormData(payload: Partial<HeroMutationPayload>) {
     const formData = new FormData();
-    formData.set('data', JSON.stringify(payload));
+    const slides = payload.slides ?? [];
+    const features = payload.features ?? [];
+
+    const normalizedPayload = {
+        ...payload,
+        slides: slides.map(({ image, ...slide }) => ({
+            ...slide,
+            ...(typeof image === 'string' && image ? { image } : {}),
+        })),
+        features: features.map(({ image, ...feature }) => ({
+            ...feature,
+            ...(typeof image === 'string' && image ? { image } : {}),
+        })),
+    };
+
+    formData.set('data', JSON.stringify(normalizedPayload));
+
+    slides.forEach((card, index) => {
+        if (card.image instanceof File) {
+            formData.append(`slides.${index}.image`, card.image);
+        }
+    });
+
+    features.forEach((card, index) => {
+        if (card.image instanceof File) {
+            formData.append(`features.${index}.image`, card.image);
+        }
+    });
+
     return formData;
 }
 

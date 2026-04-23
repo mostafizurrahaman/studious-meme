@@ -1,104 +1,158 @@
 'use server';
 
-import { getNewAccessToken, logOut } from '@/services/Auth';
 import { jwtDecode } from 'jwt-decode';
 import { cookies } from 'next/headers';
+import { requestBackendJson } from '@/lib/backend-api';
 
-// isTokenExpired
-export const isTokenExpired = async (token: string): Promise<boolean> => {
-    if (!token) return true;
+type TokenPayload = {
+    exp?: number;
+};
+
+type BackendEnvelope<T> = {
+    success?: boolean;
+    message?: string;
+    data?: T;
+    error?: string;
+};
+
+type RefreshResponse = BackendEnvelope<{ accessToken?: string; refreshToken?: string }>;
+
+const refreshInFlight = new Map<string, Promise<string | null>>();
+
+const getTokenExpiryMs = (token: string): number | null => {
+    if (!token) return null;
 
     try {
-        const decoded: { exp: number } = jwtDecode(token);
-
-        return decoded.exp * 1000 < Date.now();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-        console.error(err);
-        return true;
+        const decoded = jwtDecode<TokenPayload>(token);
+        return decoded.exp ? decoded.exp * 1000 : null;
+    } catch {
+        return null;
     }
 };
 
-// getValidAccessTokenForServerActions
-export const getValidAccessTokenForServerActions = async (): Promise<string | void> => {
+const clearAuthCookies = async () => {
     const cookieStore = await cookies();
+    cookieStore.set('accessToken', '', {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+        maxAge: 0,
+    });
+    cookieStore.set('refreshToken', '', {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+        maxAge: 0,
+    });
+};
 
-    let accessToken = cookieStore.get('accessToken')?.value;
+export const isTokenExpired = async (token: string): Promise<boolean> => {
+    const expiryMs = getTokenExpiryMs(token);
+    return !expiryMs || expiryMs <= Date.now();
+};
 
-    if (!accessToken || (await isTokenExpired(accessToken))) {
-        const refreshToken = cookieStore.get('refreshToken')?.value;
+async function refreshAccessToken(refreshToken: string, writeCookie: boolean): Promise<string | null> {
+    const inflight = refreshInFlight.get(refreshToken);
 
+    if (inflight) {
+        return inflight;
+    }
+
+    const promise = (async () => {
+        try {
+            const result = await requestBackendJson<RefreshResponse>('/user/access-token', {
+                method: 'GET',
+                token: refreshToken,
+            });
+
+            const accessToken = result?.data?.accessToken ?? null;
+
+            if (!accessToken) {
+                if (writeCookie) {
+                    await clearAuthCookies();
+                }
+                return null;
+            }
+
+            if (writeCookie) {
+                const cookieStore = await cookies();
+                cookieStore.set('accessToken', accessToken, { path: '/' });
+            }
+
+            return accessToken;
+        } catch {
+            if (writeCookie) {
+                await clearAuthCookies();
+            }
+            return null;
+        }
+    })();
+
+    refreshInFlight.set(refreshToken, promise);
+
+    try {
+        return await promise;
+    } finally {
+        refreshInFlight.delete(refreshToken);
+    }
+}
+
+async function resolveAccessToken(writeCookie: boolean): Promise<string | null> {
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get('accessToken')?.value ?? null;
+    const refreshToken = cookieStore.get('refreshToken')?.value ?? null;
+
+    if (!accessToken) {
         if (!refreshToken) {
-            return logOut();
+            return null;
         }
 
-        const { data } = await getNewAccessToken(refreshToken);
+        const refreshed = await refreshAccessToken(refreshToken, writeCookie);
 
-        accessToken = data?.accessToken;
-
-        if (!data?.accessToken || !accessToken) {
-            return logOut();
+        if (!refreshed) {
+            if (writeCookie) {
+                await clearAuthCookies();
+            }
+            return null;
         }
 
-        (await cookies()).set('accessToken', accessToken, { path: '/' });
+        return refreshed;
+    }
+
+    if (await isTokenExpired(accessToken)) {
+        if (!refreshToken) {
+            return null;
+        }
+
+        const refreshed = await refreshAccessToken(refreshToken, writeCookie);
+
+        if (!refreshed) {
+            if (writeCookie) {
+                await clearAuthCookies();
+            }
+            return null;
+        }
+
+        return refreshed;
+    }
+
+    return accessToken;
+}
+
+// getValidAccessTokenForServerActions
+export const getValidAccessTokenForServerActions = async (): Promise<string | null> => {
+    const accessToken = await resolveAccessToken(true);
+
+    if (!accessToken) {
+        return null;
     }
 
     return accessToken;
 };
 
 // getValidAccessTokenForServerHandlerGet
-let cachedAccessToken: string | null = null; // for not getting new token again and again
-let tokenExpiry: number | null = null; // for not getting new token again and again
-export const getValidAccessTokenForServerHandlerGet = async (clientCall = false): Promise<string | null> => {
-    const now = Date.now();
-
-    // ✅ Step 1: read the current cookie token
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get('accessToken')?.value;
-
-    if (!accessToken) {
-        return null; // 🚫 user not logged in
-    }
-
-    if (cachedAccessToken !== accessToken) {
-        cachedAccessToken = null;
-        tokenExpiry = null;
-    }
-
-    // ✅ Step 2: if cached token is still valid and matches cookie, reuse it
-    if (cachedAccessToken && tokenExpiry && now < tokenExpiry) {
-        return cachedAccessToken;
-    }
-
-    if (accessToken && (await isTokenExpired(accessToken))) {
-        const refreshToken = cookieStore.get('refreshToken')!.value;
-
-        // ✅ Step 3: get new access token from server
-        const { data } = await getNewAccessToken(refreshToken);
-
-        if (!data?.accessToken) {
-            return null; // 🚫 refresh failed
-        }
-
-        const newAccessToken: string = data?.accessToken;
-
-        // ✅ Step 4: decode expiry from JWT payload
-        const payload: { exp: number } = jwtDecode(newAccessToken);
-        tokenExpiry = payload.exp * 1000; // convert sec → ms
-
-        // ✅ Step 5: save in cookie if clientCall = true
-        if (clientCall) {
-            (await cookies()).set('accessToken', newAccessToken, { path: '/' });
-        }
-
-        cachedAccessToken = newAccessToken;
-
-        return cachedAccessToken;
-    }
-
-    const payload: { exp: number } = jwtDecode(accessToken);
-    tokenExpiry = payload.exp * 1000;
-    cachedAccessToken = accessToken;
-
-    return accessToken;
+export const getValidAccessTokenForServerHandlerGet = async (): Promise<string | null> => {
+    return resolveAccessToken(false);
 };

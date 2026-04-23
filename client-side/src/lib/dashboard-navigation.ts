@@ -54,6 +54,7 @@ function getAdminNavigationItems(role: AuthRole): DashboardNavigationItem[] {
 
     return [
         { label: 'Dashboard', href: base, description: 'Role overview' },
+        { label: 'Hero Sections', href: `${base}/hero-sections`, description: 'Manage homepage hero banners' },
         { label: 'Products', href: `${base}/products`, description: 'Manage product catalog' },
         { label: 'Brands', href: `${base}/brands`, description: 'Manage brands' },
         { label: 'Categories', href: `${base}/categories`, description: 'Manage categories' },
@@ -73,6 +74,7 @@ function getSuperAdminNavigationItems(role: AuthRole): DashboardNavigationItem[]
     return [
         { label: 'Dashboard', href: base, description: 'Role overview' },
         { label: 'Admins', href: `${base}/admins`, description: 'Manage admins' },
+        { label: 'Hero Sections', href: `${base}/hero-sections`, description: 'Manage homepage hero banners' },
         { label: 'Users', href: `${base}/users`, description: 'Manage users' },
         { label: 'Products', href: `${base}/products`, description: 'Manage product catalog' },
         { label: 'Brands', href: `${base}/brands`, description: 'Manage brands' },

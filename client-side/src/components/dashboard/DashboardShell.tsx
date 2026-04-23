@@ -218,6 +218,7 @@
 
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -313,7 +314,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
     {
       label: 'Management',
       items: navItems.filter(item =>
-        ['Admins', 'Users', 'Products', 'Brands', 'Categories'].includes(item.label),
+        ['Admins', 'Hero Sections', 'Users', 'Products', 'Brands', 'Categories'].includes(item.label),
       ),
     },
     {
@@ -338,9 +339,14 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
             href="/"
             className="group flex items-center gap-3 rounded-lg border border-sidebar-border/70 bg-sidebar-accent/40 p-3 shadow-sm transition hover:border-primary/35 hover:bg-sidebar-accent/65"
           >
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary text-sm font-black text-primary-foreground shadow-md shadow-primary/20">
-              M
-            </div>
+            <Image
+              src="/icon.png"
+              alt="Malamal icon"
+              width={48}
+              height={48}
+              // className="size-12 shrink-0 rounded-lg object-contain shadow-md shadow-primary/20"
+              className="size-12 object-contain"
+            />
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-bold text-sidebar-foreground">Malamal Dashboard</p>
               <p className="truncate text-xs font-medium text-sidebar-foreground/65">{roleConfig.eyebrow}</p>
@@ -458,18 +464,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
 
         <SidebarFooter className="border-t border-sidebar-border/60 p-3">
           <div className="rounded-lg border border-sidebar-border/70 bg-sidebar-accent/35 p-1 shadow-sm">
-            <UserDropdownMenu
-              user={
-                user
-                  ? {
-                      name: user.name ?? 'Guest',
-                      email: user.email ?? '',
-                      image: user.image?.trim() || null,
-                      role: role,
-                    }
-                  : null
-              }
-            />
+            <UserDropdownMenu />
           </div>
         </SidebarFooter>
         <SidebarRail />

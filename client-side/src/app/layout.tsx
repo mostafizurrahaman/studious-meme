@@ -26,7 +26,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en-US" className={cn('h-full', 'antialiased', poppins.variable, 'font-sans', inter.variable)}>
+    <html
+      lang="en-US"
+      data-scroll-behavior="smooth"
+      className={cn('h-full', 'antialiased', poppins.variable, 'font-sans', inter.variable)}
+    >
       <body className="storefront-layout min-h-full flex flex-col bg-background text-foreground">
         {googleAnalyticsId ? (
           <>

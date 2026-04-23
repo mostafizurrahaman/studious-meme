@@ -56,13 +56,16 @@ export function HomeHeroCarousel({ slides, features }: HomeHeroCarouselProps) {
         <Card className="overflow-hidden shadow-sm">
             <div className="grid h-full gap-0 p-0 sm:gap-4 sm:p-6 lg:grid-cols-[1.22fr_0.78fr] lg:p-6">
                 <div className="ui-image-card relative min-h-105 overflow-hidden rounded-3xl bg-background sm:min-h-125 lg:min-h-125">
-                    <Image
-                        src={heroSlide.image}
-                        alt={heroSlide.title}
-                        fill
-                        sizes="(max-width: 1024px) 100vw, 760px"
-                        className="object-cover object-[center_top] transition duration-500 ease-out"
-                    />
+                    <Link href={heroSlide.href} aria-label={heroSlide.title} className="absolute inset-0 z-10">
+                        <Image
+                            src={heroSlide.image}
+                            alt={heroSlide.title}
+                            fill
+                            loading="eager"
+                            sizes="(max-width: 1024px) 100vw, 760px"
+                            className="object-cover object-[center_top] transition duration-500 ease-out"
+                        />
+                    </Link>
 
                     {slides.length > 1 ? (
                         <>

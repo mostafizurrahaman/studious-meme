@@ -1,63 +1,88 @@
 'use client';
 
-import { ImagePlus, Link2, Loader2, X } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { ImagePlus, Link2, X } from 'lucide-react';
+import Image from 'next/image';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import Image from 'next/image';
 
 type FileUploadProps = {
-  value?: string;
-  onChange: (url: string) => void;
+  value?: string | File | null;
+  onChange: (urlOrFile: string | File | null) => void;
+  onBlur?: () => void;
   placeholder?: string;
   disabled?: boolean;
 };
 
-/**
- * Hybrid image input: paste URL OR select local file for preview (upload on form submit)
- */
-export function FileUpload({ value, onChange, placeholder = 'Paste image URL', disabled }: FileUploadProps) {
+export function FileUpload({ value, onChange, onBlur, placeholder = 'Paste image URL', disabled }: FileUploadProps) {
   const [isEditing, setIsEditing] = useState(!value);
-  const [url, setUrl] = useState(value || '');
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [isLoading, setIsLoading] = useState(false);
+  const [url, setUrl] = useState(typeof value === 'string' ? value : '');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const previewUrl = useMemo(() => {
+    if (!value) return '';
+    if (typeof value === 'string') return value;
+
+    return URL.createObjectURL(value);
+  }, [value]);
+
+  useEffect(() => {
+    if (!(value instanceof File)) {
+      return;
+    }
+
+    return () => URL.revokeObjectURL(previewUrl);
+  }, [previewUrl, value]);
+
   const handleUrlSubmit = () => {
-    if (url) onChange(url);
+    if (!url) return;
+    onChange(url);
+    setIsEditing(false);
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const objectUrl = URL.createObjectURL(file);
-      setUrl(objectUrl);
-    }
+    if (!file) return;
+
+    onChange(file);
+    setIsEditing(false);
   };
 
   const handleClear = () => {
-    onChange('');
-    setUrl('');
+    onChange(null);
     setIsEditing(true);
+    setUrl('');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
-  if (value && !isEditing) {
+  if (previewUrl && !isEditing) {
     return (
       <div className="space-y-2">
-        <div className="relative overflow-hidden rounded-lg border bg-muted">
-          <Image src={value} alt="Preview" className="h-32 w-full object-cover" />
-          <Button
-            type="button"
-            size="sm"
-            variant="destructive"
-            className="absolute right-2 top-2 h-8 w-8 rounded-full p-0"
-            onClick={handleClear}
-            disabled={disabled}
-          >
-            <X className="size-4" />
-          </Button>
+        <div className="overflow-hidden rounded-2xl border border-border bg-muted shadow-sm">
+          <div className="relative aspect-video w-full">
+            <Image src={previewUrl} alt="Selected image preview" fill unoptimized className="object-cover" />
+          </div>
+          <div className="flex items-center justify-between gap-2 border-t border-border px-3 py-2">
+            <span className="truncate text-xs text-muted-foreground">
+              {typeof value === 'string' ? value : value?.name ?? 'Selected file'}
+            </span>
+            <Button
+              type="button"
+              size="sm"
+              variant="destructive"
+              className="h-8 rounded-full px-3"
+              onClick={handleClear}
+              disabled={disabled}
+            >
+              <X className="mr-1 size-4" />
+              Clear
+            </Button>
+          </div>
         </div>
+
         <Button
           type="button"
           variant="outline"
@@ -66,7 +91,7 @@ export function FileUpload({ value, onChange, placeholder = 'Paste image URL', d
           disabled={disabled}
         >
           <ImagePlus className="mr-2 size-4" />
-          Change
+          Change image
         </Button>
       </div>
     );
@@ -74,31 +99,20 @@ export function FileUpload({ value, onChange, placeholder = 'Paste image URL', d
 
   return (
     <div className="space-y-2">
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        className="hidden"
-        onChange={handleFileSelect}
-        disabled={disabled}
-      />
+      <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileSelect} disabled={disabled} />
       <div className="flex gap-2">
         <Input
           value={url}
           onChange={e => setUrl(e.target.value)}
+          onBlur={onBlur}
           placeholder={placeholder}
           disabled={disabled}
           className="flex-1"
         />
         <Button type="button" onClick={handleUrlSubmit} disabled={disabled || !url}>
-          {isLoading ? <Loader2 className="size-4 animate-spin" /> : <Link2 className="size-4" />}
+          <Link2 className="size-4" />
         </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={disabled}
-        >
+        <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} disabled={disabled}>
           <ImagePlus className="size-4" />
         </Button>
       </div>

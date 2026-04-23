@@ -8,6 +8,28 @@ import { IHeroSection } from './heroSection.interface';
 import { deleteImageFromCloudinary, uploadFilesAndInjectUrls } from '../../lib';
 import { MulterFile } from '../../lib/upload';
 
+const getHeroSectionImages = (heroSection: Pick<IHeroSection, 'slides' | 'features'>) =>
+    [...(heroSection.slides || []), ...(heroSection.features || [])].map(card => card.image).filter(Boolean);
+
+const deleteHeroSectionImages = async (heroSection: Pick<IHeroSection, 'slides' | 'features'>) => {
+    await Promise.all(getHeroSectionImages(heroSection).map(image => deleteImageFromCloudinary(image)));
+};
+
+const keepOnlyLatestHeroSection = async () => {
+    const heroSections = await HeroSectionModel.find({}).sort({ updatedAt: -1, createdAt: -1 }).lean();
+
+    if (heroSections.length <= 1) {
+        return heroSections[0] ?? null;
+    }
+
+    const [latest, ...duplicates] = heroSections;
+
+    await Promise.all(duplicates.map(heroSection => deleteHeroSectionImages(heroSection)));
+    await HeroSectionModel.deleteMany({ _id: { $in: duplicates.map(heroSection => heroSection._id) } });
+
+    return latest;
+};
+
 // 1. ensureHeroSectionImages
 const ensureHeroSectionImages = (payload: Partial<IHeroSection>) => {
     const cards = [...(payload.slides || []), ...(payload.features || [])];
@@ -65,11 +87,46 @@ const getHomeContentFromDB = async () => {
 const createHeroSectionIntoDB = async (payload: Partial<IHeroSection>, files?: MulterFile[] | unknown) => {
     const nextPayload = await uploadFilesAndInjectUrls(payload, Array.isArray(files) ? files : []);
     ensureHeroSectionImages(nextPayload);
-    return HeroSectionModel.create(nextPayload);
+
+    const existing = await HeroSectionModel.findOne({}).sort({ updatedAt: -1, createdAt: -1 });
+
+    if (!existing) {
+        const created = await HeroSectionModel.findOneAndUpdate({}, nextPayload, {
+            upsert: true,
+            new: true,
+            runValidators: true,
+            setDefaultsOnInsert: true,
+        });
+
+        if (!created) {
+            throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to create hero section!');
+        }
+
+        await keepOnlyLatestHeroSection();
+        return created;
+    }
+
+    const previousImages = getHeroSectionImages(existing.toObject());
+    const updated = await HeroSectionModel.findByIdAndUpdate(existing._id, nextPayload, {
+        returnDocument: 'after',
+        runValidators: true,
+    });
+
+    if (!updated) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Hero section not found!');
+    }
+
+    await Promise.all(previousImages.filter(image => !getHeroSectionImages(updated.toObject()).includes(image)).map(image => deleteImageFromCloudinary(image)));
+    await keepOnlyLatestHeroSection();
+
+    return updated;
 };
 
 // 4. getAllHeroSectionsFromDB
-const getAllHeroSectionsFromDB = async () => HeroSectionModel.find({}).sort({ createdAt: -1 }).lean();
+const getAllHeroSectionsFromDB = async () => {
+    await keepOnlyLatestHeroSection();
+    return HeroSectionModel.find({}).sort({ createdAt: -1 }).lean();
+};
 
 // 5. getHeroSectionByIdFromDB
 const getHeroSectionByIdFromDB = async (id: string) => {
@@ -84,20 +141,21 @@ const updateHeroSectionIntoDB = async (
     payload: Partial<IHeroSection>,
     files?: MulterFile[] | unknown,
 ) => {
-    const existing = await HeroSectionModel.findById(id);
+    const singleton = await HeroSectionModel.findOne({}).sort({ updatedAt: -1, createdAt: -1 });
 
-    if (!existing) {
+    if (!singleton) {
         throw new AppError(httpStatus.NOT_FOUND, 'Hero section not found!');
     }
 
-    const previousImages = [...existing.slides, ...existing.features].map(card => card.image).filter(Boolean);
+    const targetId = singleton._id.toString() || id;
+    const previousImages = getHeroSectionImages(singleton.toObject());
     let updatedPayload: Partial<IHeroSection> | undefined;
 
     try {
         updatedPayload = await uploadFilesAndInjectUrls(payload, Array.isArray(files) ? files : []);
         ensureHeroSectionImages(updatedPayload);
 
-        const updated = await HeroSectionModel.findByIdAndUpdate(id, updatedPayload, {
+        const updated = await HeroSectionModel.findByIdAndUpdate(targetId, updatedPayload, {
             returnDocument: 'after',
             runValidators: true,
         });
@@ -106,12 +164,14 @@ const updateHeroSectionIntoDB = async (
             throw new AppError(httpStatus.NOT_FOUND, 'Hero section not found!');
         }
 
-        const nextImages = [...updated.slides, ...updated.features].map(card => card.image).filter(Boolean);
+        const nextImages = getHeroSectionImages(updated.toObject());
         await Promise.all(
             previousImages
                 .filter(image => !nextImages.includes(image))
                 .map(image => deleteImageFromCloudinary(image)),
         );
+
+        await keepOnlyLatestHeroSection();
 
         return updated;
     } catch (error) {

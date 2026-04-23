@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useEffect } from 'react';
+import { useActionState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useUser } from '@/context/UserContext';
@@ -19,17 +19,12 @@ import { UserAvatar } from '@/components/UserAvatar';
 
 type UserDropdownMenuProps = {
   compact?: boolean;
-  user?: {
-    name: string;
-    email: string;
-    image?: string | null;
-    role: string;
-  } | null;
 };
 
-export function UserDropdownMenu({ compact = false, user: providedUser }: UserDropdownMenuProps) {
+export function UserDropdownMenu({ compact = false }: UserDropdownMenuProps) {
   const router = useRouter();
   const { user: contextUser, setIsLoading, setUser } = useUser();
+  const logoutFormRef = useRef<HTMLFormElement>(null);
   const [logoutState, logoutAction, logoutPending] = useActionState<SignOutState, FormData>(submitSignOut, {
     ok: false,
     message: '',
@@ -41,19 +36,11 @@ export function UserDropdownMenu({ compact = false, user: providedUser }: UserDr
     }
 
     setUser(null);
-    setIsLoading(true);
-    router.push('/my-account');
+    setIsLoading(false);
+    router.replace('/my-account');
   }, [logoutState, router, setIsLoading, setUser]);
 
-  const user = contextUser
-    ? {
-        ...(providedUser ?? {}),
-        ...contextUser,
-        image: contextUser.image?.trim() || providedUser?.image || null,
-      }
-    : logoutState.ok
-      ? null
-      : providedUser;
+  const user = contextUser;
 
   if (!user) {
     return (
@@ -103,15 +90,19 @@ export function UserDropdownMenu({ compact = false, user: providedUser }: UserDr
           <Link href={profilePath}>Profile</Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <form action={logoutAction} className="px-1 py-1">
-          <button
-            type="submit"
-            disabled={logoutPending}
-            className="w-full rounded-md px-2 py-1.5 text-left text-xs text-destructive hover:bg-destructive/10 disabled:opacity-60"
-          >
-            {logoutPending ? 'Logging out...' : 'Logout'}
-          </button>
-        </form>
+        <button
+          type="button"
+          onClick={() => {
+            setUser(null);
+            setIsLoading(false);
+            logoutFormRef.current?.requestSubmit();
+          }}
+          disabled={logoutPending}
+          className="w-full rounded-md px-2 py-1.5 text-left text-xs text-destructive hover:bg-destructive/10 disabled:opacity-60"
+        >
+          {logoutPending ? 'Logging out...' : 'Logout'}
+        </button>
+        <form ref={logoutFormRef} action={logoutAction} className="hidden" aria-hidden="true" />
       </DropdownMenuContent>
     </DropdownMenu>
   );

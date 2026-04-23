@@ -3,9 +3,11 @@
 import { cookies } from 'next/headers';
 import type { FieldValues } from 'react-hook-form';
 import { requestBackendJson } from '@/lib/backend-api';
-import { getValidAccessTokenForServerActions } from '@/lib/getValidAccessToken';
+import {
+    getValidAccessTokenForServerActions,
+} from '@/lib/getValidAccessToken';
 import type { AuthUser } from '@/types';
-import { getAuthUserFromCookies } from '@/lib/auth/server';
+import { decodeAuthToken } from '@/lib/auth/session';
 
 type BackendEnvelope<T> = {
     success?: boolean;
@@ -58,8 +60,21 @@ async function setAuthCookies(tokens: AuthTokens) {
 async function clearAuthCookies() {
     const cookieStore = await getCookieStore();
 
-    cookieStore.delete('accessToken');
-    cookieStore.delete('refreshToken');
+    cookieStore.set('accessToken', '', {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+        maxAge: 0,
+    });
+
+    cookieStore.set('refreshToken', '', {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+        maxAge: 0,
+    });
 }
 
 async function setPasswordFlowCookies(token: string) {
@@ -257,8 +272,8 @@ export const setNewPasswordIntoDB = async (newPassword: string): Promise<Backend
 
 // getCurrentUser
 export const getCurrentUser = async (): Promise<AuthUser | null> => {
-    const user = await getAuthUserFromCookies();
-    return user;
+    const accessToken = await getValidAccessTokenForServerActions();
+    return decodeAuthToken(accessToken);
 };
 
 // logOut
