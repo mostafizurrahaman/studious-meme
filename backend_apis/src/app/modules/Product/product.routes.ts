@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { auth, validateRequestFromFormData } from '../../middlewares';
+import { adminLimiter, auth, burstProtection, publicLimiter, validateRequestFromFormData } from '../../middlewares';
 import { multerUpload } from '../../lib';
 import { ROLE } from '../User/user.constant';
 import { ProductController } from './product.controller';
@@ -12,33 +12,37 @@ router
     .route('/products')
     .post(
         auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
+        adminLimiter,
+        burstProtection('admin', 10_000, 15),
         multerUpload.single('image'),
         validateRequestFromFormData(ProductValidation.productCreateSchema),
         ProductController.createProduct,
     )
-    .get(ProductController.getAllProducts);
+    .get(publicLimiter, ProductController.getAllProducts);
 
 // 2. public active product list/detail
-router.route('/products/active').get(ProductController.getAllActiveProducts);
-router.route('/products/active/:slug').get(ProductController.getActiveProduct);
+router.route('/products/active').get(publicLimiter, ProductController.getAllActiveProducts);
+router.route('/products/active/:slug').get(publicLimiter, ProductController.getActiveProduct);
 
 // 2. getProduct, updateProduct, deleteProduct
 router
     .route('/products/:slug')
-    .get(ProductController.getProduct)
+    .get(publicLimiter, ProductController.getProduct)
     .patch(
         auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
+        adminLimiter,
+        burstProtection('admin', 10_000, 15),
         multerUpload.single('image'),
         validateRequestFromFormData(ProductValidation.productUpdateSchema),
         ProductController.updateProduct,
     )
-    .delete(auth(ROLE.ADMIN, ROLE.SUPER_ADMIN), ProductController.deleteProduct);
+    .delete(auth(ROLE.ADMIN, ROLE.SUPER_ADMIN), adminLimiter, ProductController.deleteProduct);
 
 // 3. getProductsByCategorySlug
-router.route('/products/by-category/:slug').get(ProductController.getProductsByCategorySlug);
+router.route('/products/by-category/:slug').get(publicLimiter, ProductController.getProductsByCategorySlug);
 // 4. getProductsBySubCategorySlug
 router
     .route('/products/by-sub-category/:subCategorySlug')
-    .get(ProductController.getProductsBySubCategorySlug);
+    .get(publicLimiter, ProductController.getProductsBySubCategorySlug);
 
 export const ProductRoutes = router;

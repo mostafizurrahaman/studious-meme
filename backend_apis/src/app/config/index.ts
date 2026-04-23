@@ -16,6 +16,9 @@ dotenv.config({
 export default {
     NODE_ENV: process.env.NODE_ENV,
     contact_us_email: process.env.CONTACT_US_EMAIL,
+    allowed_origins: process.env.ALLOWED_ORIGINS
+        ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim().replace(/^['"]|['"]$/g, ''))
+        : [],
 
     port: process.env.PORT,
 
@@ -28,26 +31,6 @@ export default {
 
     bcrypt_salt_rounds: process.env.BCRYPT_SALT_ROUNDS,
     otp_expiry_minutes: process.env.OTP_EXPIRY_MINUTES,
-
-    // Apify configuration
-    apify_api_key: process.env.APIFY_API_KEY,
-    apify_run_max_items:
-        process.env.APIFY_RUN_MAX_ITEMS && String(process.env.APIFY_RUN_MAX_ITEMS).trim() !== ''
-            ? Number(process.env.APIFY_RUN_MAX_ITEMS)
-            : 5000,
-    apify_run_timeout_ms:
-        process.env.APIFY_RUN_TIMEOUT_MS && String(process.env.APIFY_RUN_TIMEOUT_MS).trim() !== ''
-            ? Number(process.env.APIFY_RUN_TIMEOUT_MS)
-            : 60 * 60 * 1000,
-    apify_actors: [
-        'harvestedge/jumbo-supermarket-scraper',
-        'harvestedge/dutch-supermarkets-all-11',
-        'harvestedge/my-actor',
-    ]
-        .join(',')
-        .split(',')
-        .map(s => s.trim())
-        .filter(Boolean),
 
     jwt: {
         access_secret: process.env.JWT_ACCESS_SECRET,
@@ -90,6 +73,36 @@ export default {
         validation_api:
             process.env.SSLCOMMERZ_VALIDATION_API ??
             'https://sandbox.sslcommerz.com/validator/api/validationserverAPI.php',
+        webhook_ip_allowlist: process.env.PAYMENT_WEBHOOK_IP_ALLOWLIST,
+    },
+
+    redis: {
+        url: process.env.REDIS_URL,
+        rateLimitPrefix: process.env.REDIS_RATE_LIMIT_PREFIX ?? 'malamal:rate-limit',
+    },
+
+    rateLimit: {
+        globalWindowMs: Number(process.env.RATE_LIMIT_GLOBAL_WINDOW_MS ?? 15 * 60 * 1000),
+        globalMax: Number(process.env.RATE_LIMIT_GLOBAL_MAX ?? 200),
+
+        publicWindowMs: Number(process.env.RATE_LIMIT_PUBLIC_WINDOW_MS ?? 60 * 1000),
+        publicMax: Number(process.env.RATE_LIMIT_PUBLIC_MAX ?? 180),
+
+        authWindowMs: Number(process.env.RATE_LIMIT_AUTH_WINDOW_MS ?? 60 * 1000),
+        authMax: Number(process.env.RATE_LIMIT_AUTH_MAX ?? 8),
+
+        actionWindowMs: Number(process.env.RATE_LIMIT_ACTION_WINDOW_MS ?? 60 * 1000),
+        actionMax: Number(process.env.RATE_LIMIT_ACTION_MAX ?? 30),
+
+        adminWindowMs: Number(process.env.RATE_LIMIT_ADMIN_WINDOW_MS ?? 60 * 1000),
+        adminMax: Number(process.env.RATE_LIMIT_ADMIN_MAX ?? 60),
+
+        paymentWindowMs: Number(process.env.RATE_LIMIT_PAYMENT_WINDOW_MS ?? 60 * 1000),
+        paymentMax: Number(process.env.RATE_LIMIT_PAYMENT_MAX ?? 12),
+
+        botPenaltyFloor: Number(process.env.RATE_LIMIT_BOT_PENALTY_FLOOR ?? 2),
+
+        duplicateWindowMs: Number(process.env.REQUEST_DEDUP_WINDOW_MS ?? 5000),
     },
 
     urls: {

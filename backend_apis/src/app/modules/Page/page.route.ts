@@ -1,4 +1,4 @@
-import { auth, validateRequest } from '../../middlewares';
+import { adminLimiter, auth, burstProtection, publicLimiter, validateRequest } from '../../middlewares';
 import { ROLE } from '../User/user.constant';
 import { Router } from 'express';
 import { pageZodValidation } from './page.validation';
@@ -11,14 +11,16 @@ router
     .route('/create-or-update')
     .put(
         auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
+        adminLimiter,
+        burstProtection('admin', 10_000, 15),
         validateRequest(pageZodValidation.createOrUpdatePageSchema),
         PageController.createOrUpdatePage,
     );
 
 // getAllPage
-router.route('/retrieve').get(PageController.getAllPages);
+router.route('/retrieve').get(publicLimiter, PageController.getAllPages);
 
 // getPageBySlug
-router.route('/retrieve/:slug').get(PageController.getPageBySlug);
+router.route('/retrieve/:slug').get(publicLimiter, PageController.getPageBySlug);
 
 export const PageRoutes = router;

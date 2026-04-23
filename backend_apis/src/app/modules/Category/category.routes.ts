@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { auth, validateRequestFromFormData } from '../../middlewares';
+import { adminLimiter, auth, burstProtection, publicLimiter, validateRequestFromFormData } from '../../middlewares';
 import { multerUpload } from '../../lib';
 import { ROLE } from '../User/user.constant';
 import { CategoryController } from './category.controller';
@@ -12,33 +12,39 @@ router
     .route('/categories')
     .post(
         auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
+        adminLimiter,
+        burstProtection('admin', 10_000, 15),
         multerUpload.single('image'),
         validateRequestFromFormData(CategoryValidation.categoryCreateSchema),
         CategoryController.createCategory,
     )
-    .get(CategoryController.getAllCategories);
+    .get(publicLimiter, CategoryController.getAllCategories);
 
 // 2. public active categories
-router.route('/categories/active').get(CategoryController.getActiveCategories);
-router.route('/categories/active/:slug').get(CategoryController.getActiveCategory);
+router.route('/categories/active').get(publicLimiter, CategoryController.getActiveCategories);
+router.route('/categories/active/:slug').get(publicLimiter, CategoryController.getActiveCategory);
 
 // 2. getCategory, updateCategory, deleteCategory
 router
     .route('/categories/:slug')
-    .get(CategoryController.getCategory)
+    .get(publicLimiter, CategoryController.getCategory)
     .patch(
         auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
+        adminLimiter,
+        burstProtection('admin', 10_000, 15),
         multerUpload.single('image'),
         validateRequestFromFormData(CategoryValidation.categoryUpdateSchema),
         CategoryController.updateCategory,
     )
-    .delete(auth(ROLE.ADMIN, ROLE.SUPER_ADMIN), CategoryController.deleteCategory);
+    .delete(auth(ROLE.ADMIN, ROLE.SUPER_ADMIN), adminLimiter, CategoryController.deleteCategory);
 
 // 3. createCategorySubCategory
 router
     .route('/categories/:slug/sub-categories')
     .post(
         auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
+        adminLimiter,
+        burstProtection('admin', 10_000, 15),
         multerUpload.single('image'),
         validateRequestFromFormData(CategoryValidation.categorySubCategoryCreateSchema),
         CategoryController.createCategorySubCategory,
@@ -49,10 +55,12 @@ router
     .route('/categories/:slug/sub-categories/:subCategorySlug')
     .patch(
         auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
+        adminLimiter,
+        burstProtection('admin', 10_000, 15),
         multerUpload.single('image'),
         validateRequestFromFormData(CategoryValidation.categorySubCategoryUpdateSchema),
         CategoryController.updateCategorySubCategory,
     )
-    .delete(auth(ROLE.ADMIN, ROLE.SUPER_ADMIN), CategoryController.deleteCategorySubCategory);
+    .delete(auth(ROLE.ADMIN, ROLE.SUPER_ADMIN), adminLimiter, CategoryController.deleteCategorySubCategory);
 
 export const CategoryRoutes = router;

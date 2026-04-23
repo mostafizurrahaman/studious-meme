@@ -8,9 +8,12 @@ import os from 'os';
 import path from 'path';
 import config from './app/config';
 import serverHomePage, { getMonitorStats } from './app/helpers/serverHomePage';
+import { globalLimiter } from './app/middlewares';
 // import { responseTimeLogger } from './app/middlewares/logger';
 
 const app: Application = express();
+
+app.set('trust proxy', 1);
 
 // (3)
 // response time logger
@@ -20,13 +23,7 @@ const app: Application = express();
 app.use(
     cors({
         credentials: true,
-        origin: [
-            'http://localhost:3000',
-            'http://localhost:3001',
-            'http://localhost:3002',
-            'http://localhost:3003',
-            'http://localhost:5173',
-        ],
+        origin: config.allowed_origins.length ? config.allowed_origins : ['http://localhost:3000'],
     }),
 );
 
@@ -42,6 +39,9 @@ app.use(express.json());
 
 // form data parser
 app.use(express.urlencoded({ extended: true }));
+
+// global rate limiting
+app.use(globalLimiter);
 
 // for static files
 // app.use('/public', express.static('public'));
