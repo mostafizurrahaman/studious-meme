@@ -14,15 +14,13 @@ import { formatMoney } from '@/lib/cart';
 import { useCartStore } from '@/lib/cart-store';
 import { submitCheckoutAction } from '@/app/(withNavFooter)/checkout/actions';
 import type { CheckoutActionState } from '@/app/(withNavFooter)/checkout/actions';
+import { calculateFulfillmentSummary, formatShippingZoneLabel } from '@/lib/fulfillment';
 
 export function CheckoutPageClient() {
     const items = useCartStore(state => state.items);
     const hydrated = useCartStore(state => state.hydrated);
     const checkout = useCartStore(state => state.checkout);
     const appliedCoupon = useCartStore(state => state.appliedCoupon);
-    const subtotal = useCartStore(state =>
-        state.items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0),
-    );
     const updateCheckout = useCartStore(state => state.updateCheckout);
     const clear = useCartStore(state => state.clear);
     const router = useRouter();
@@ -31,10 +29,26 @@ export function CheckoutPageClient() {
         { ok: false, error: '' },
     );
 
-    const discount = appliedCoupon?.kind === 'percent' ? (subtotal * appliedCoupon.value) / 100 : 0;
-    const delivery = subtotal > 0 && appliedCoupon?.kind !== 'shipping' ? 250 : 0;
-    const total = Math.max(subtotal - discount + delivery, 0);
+    const fulfillment = calculateFulfillmentSummary({
+        items,
+        city: checkout.city,
+        address: checkout.address,
+        couponCode: appliedCoupon?.code,
+    });
+    const paymentValue = checkout.payment === 'SSLCommerz' ? 'SSLCommerz' : 'Cash on delivery';
+    const selectedPayment = paymentValue === 'Cash on delivery' && !fulfillment.codEligible ? 'SSLCommerz' : paymentValue;
+    const discount = fulfillment.discount;
+    const delivery = fulfillment.shippingCharge;
+    const total = fulfillment.total;
     const summaryItems = items.slice(0, 4);
+
+    useEffect(() => {
+        if (fulfillment.codEligible || paymentValue !== 'Cash on delivery') {
+            return;
+        }
+
+        updateCheckout('payment', 'SSLCommerz');
+    }, [checkout.payment, fulfillment.codEligible, paymentValue, updateCheckout]);
 
     useEffect(() => {
         if (!result.ok) return;
@@ -77,6 +91,15 @@ export function CheckoutPageClient() {
                     <p className="mt-3 max-w-3xl text-sm leading-7 text-foreground/65 sm:text-base">
                         Complete your order with cash on delivery or SSLCommerz online payment.
                     </p>
+                    <div className="mt-4 flex flex-wrap gap-2 text-xs font-semibold text-foreground/60">
+                        <span className="rounded-full bg-muted px-3 py-1">{formatShippingZoneLabel(fulfillment.zone)}</span>
+                        <span className="rounded-full bg-muted px-3 py-1">
+                            Weight {fulfillment.totalWeightKg.toFixed(2)} kg
+                        </span>
+                        <span className="rounded-full bg-muted px-3 py-1">
+                            COD {fulfillment.codEligible ? 'available' : 'restricted'}
+                        </span>
+                    </div>
                 </Card>
 
                 <section className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
@@ -131,15 +154,27 @@ export function CheckoutPageClient() {
                                 Payment method
                                 <select
                                     name="payment"
-                                    value={checkout.payment}
+                                    value={selectedPayment}
                                     onChange={event => updateCheckout('payment', event.target.value)}
                                     className="h-11 rounded-2xl border border-input bg-background px-4 outline-none"
                                 >
                                     {['Cash on delivery', 'SSLCommerz'].map(option => (
-                                        <option key={option}>{option}</option>
+                                        <option
+                                            key={option}
+                                            value={option}
+                                            disabled={option === 'Cash on delivery' && !fulfillment.codEligible}
+                                        >
+                                            {option}
+                                        </option>
                                     ))}
                                 </select>
                             </label>
+
+                            {!fulfillment.codEligible ? (
+                                <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                                    {fulfillment.codReasons.join(' ')}
+                                </div>
+                            ) : null}
 
                             <div className="mt-2 flex flex-wrap gap-3">
                                 <Button
@@ -165,7 +200,7 @@ export function CheckoutPageClient() {
                         <div className="mt-4 space-y-3 text-sm text-secondary-foreground/80">
                             <div className="flex justify-between">
                                 <span>Subtotal</span>
-                                <span>{formatMoney(subtotal)}</span>
+                                <span>{formatMoney(fulfillment.subtotal)}</span>
                             </div>
                             {discount > 0 ? (
                                 <div className="flex justify-between">
@@ -174,8 +209,12 @@ export function CheckoutPageClient() {
                                 </div>
                             ) : null}
                             <div className="flex justify-between">
-                                <span>Delivery</span>
+                                <span>Shipping</span>
                                 <span>{formatMoney(delivery)}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>Shipping zone</span>
+                                <span>{formatShippingZoneLabel(fulfillment.zone)}</span>
                             </div>
                             <div className="flex justify-between font-bold text-secondary-foreground">
                                 <span>Total</span>

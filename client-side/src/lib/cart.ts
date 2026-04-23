@@ -10,6 +10,8 @@ export type CartItem = {
     unitPriceLabel: string;
     oldPriceLabel?: string;
     quantity: number;
+    weightKg: number;
+    isNoCOD: boolean;
 };
 
 export function parseMoney(value: string) {
@@ -34,5 +36,7 @@ export function toCartItem(product: Product): CartItem {
         unitPriceLabel: product.price,
         oldPriceLabel: product.oldPrice,
         quantity: 1,
+        weightKg: typeof product.weightKg === 'number' ? product.weightKg : 1,
+        isNoCOD: Boolean(product.isNoCOD),
     };
 }

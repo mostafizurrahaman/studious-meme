@@ -15,9 +15,11 @@ const productSchema = new Schema<IProduct>(
         brand: { type: Schema.Types.ObjectId, ref: 'Brand', required: true, index: true },
         category: { type: Schema.Types.ObjectId, ref: 'Category', required: true, index: true },
         subCategorySlug: { type: String, index: true },
+        weightKg: { type: Number, required: true, min: 0.01, default: 1 },
         stock: { type: Number, required: true, min: 0 },
         rating: { type: Number, required: true, min: 0 },
         isFeatured: { type: Boolean, default: false, index: true },
+        isNoCOD: { type: Boolean, default: false, index: true },
         isActive: { type: Boolean, default: true },
     },
     { timestamps: true, versionKey: false },
@@ -26,5 +28,6 @@ const productSchema = new Schema<IProduct>(
 productSchema.index({ isActive: 1, category: 1, brand: 1, createdAt: -1 }, { name: 'product_active_category_brand_createdAt_idx' });
 productSchema.index({ isActive: 1, subCategorySlug: 1, createdAt: -1 }, { name: 'product_active_subCategory_createdAt_idx' });
 productSchema.index({ isActive: 1, isFeatured: 1, createdAt: -1 }, { name: 'product_active_featured_createdAt_idx' });
+productSchema.index({ isActive: 1, isNoCOD: 1, createdAt: -1 }, { name: 'product_active_noCod_createdAt_idx' });
 
 export const ProductModel = model<IProduct>('Product', productSchema);

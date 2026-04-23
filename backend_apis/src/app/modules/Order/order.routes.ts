@@ -17,6 +17,16 @@ router
         OrderController.createOrder,
     );
 
+router
+    .route('/checkout-preview')
+    .post(
+        auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN),
+        actionLimiter,
+        burstProtection('action', 10_000, 12),
+        validateRequest(OrderValidation.orderCheckoutPreviewSchema),
+        OrderController.previewCheckout,
+    );
+
 router.route('/my-orders').get(auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN), actionLimiter, OrderController.getMyOrders);
 
 router

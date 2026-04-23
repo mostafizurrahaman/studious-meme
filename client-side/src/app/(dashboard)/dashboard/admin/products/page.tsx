@@ -55,6 +55,7 @@ export default async function AdminProductsPage({ searchParams }: Props) {
 
   return (
     <DashboardProductsManager
+      key={searchTerm}
       products={products}
       paginationMeta={paginationMeta}
       searchTerm={searchTerm}

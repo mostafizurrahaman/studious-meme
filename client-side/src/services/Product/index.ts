@@ -34,9 +34,11 @@ export type BackendProduct = {
   brand: BackendProductRef;
   category: BackendProductRef;
   subCategorySlug?: string;
+  weightKg?: number;
   stock: number;
   rating: number;
   isFeatured: boolean;
+  isNoCOD: boolean;
   isActive: boolean;
   createdAt?: string;
   updatedAt?: string;
@@ -77,6 +79,8 @@ export async function mapBackendProductToStorefrontProduct(
     category: resolveName(product.category),
     categorySlug: resolveSlug(product.category),
     isFeatured: product.isFeatured,
+    isNoCOD: Boolean(product.isNoCOD),
+    weightKg: typeof product.weightKg === 'number' ? product.weightKg : 1,
     createdAt: product.createdAt,
   };
 }
@@ -267,7 +271,9 @@ type ProductMutationPayload = {
   subCategorySlug?: string;
   stock: number;
   rating: number;
+  weightKg: number;
   isFeatured?: boolean;
+  isNoCOD?: boolean;
   isActive?: boolean;
 };
 

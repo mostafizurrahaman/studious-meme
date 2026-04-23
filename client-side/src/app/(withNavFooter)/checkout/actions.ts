@@ -1,6 +1,6 @@
 'use server';
 
-import { createOrder } from '@/services/Order';
+import { createOrder, previewCheckout } from '@/services/Order';
 import { initiateSslCommerzPayment } from '@/services/Payment';
 
 type CartItem = {
@@ -73,7 +73,6 @@ export async function submitCheckoutAction(
         address: readString(formData, 'address'),
         city: readString(formData, 'city'),
         note: readString(formData, 'note'),
-        payment: readString(formData, 'payment') || 'Cash on delivery',
     };
 
     if (!customer.name || !customer.phone || !customer.address || !customer.city) {
@@ -82,7 +81,23 @@ export async function submitCheckoutAction(
 
     const couponCode = readString(formData, 'couponCode');
 
-    const normalizedPayment = customer.payment === 'SSLCommerz' ? 'SSL_COMMERZ' : 'CASH_ON_DELIVERY';
+    const payment = readString(formData, 'payment') || 'Cash on delivery';
+    const normalizedPayment = payment === 'SSLCommerz' ? 'SSL_COMMERZ' : 'CASH_ON_DELIVERY';
+
+    const previewResult = await previewCheckout({
+        items: items.map(item => ({ sku: item.sku, quantity: item.quantity })),
+        customer,
+        couponCode,
+        paymentMethod: normalizedPayment,
+    });
+
+    if (!previewResult?.success || !previewResult.data) {
+        return fail(previewResult?.message ?? 'Failed to preview checkout summary.');
+    }
+
+    if (normalizedPayment === 'CASH_ON_DELIVERY' && !previewResult.data.codEligible) {
+        return fail(previewResult.data.codReasons.join(' '));
+    }
 
     const orderResult = await createOrder({
         items: items.map(item => ({ sku: item.sku, quantity: item.quantity })),

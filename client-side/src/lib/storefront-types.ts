@@ -14,6 +14,8 @@ export type StorefrontProduct = {
     category: string;
     categorySlug?: string;
     isFeatured?: boolean;
+    isNoCOD?: boolean;
+    weightKg?: number;
     createdAt?: string;
 };
 

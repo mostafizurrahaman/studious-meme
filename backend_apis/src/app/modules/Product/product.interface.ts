@@ -11,9 +11,11 @@ export interface IProduct {
     brand: Types.ObjectId;
     category: Types.ObjectId;
     subCategorySlug?: string;
+    weightKg: number;
     stock: number;
     rating: number;
     isFeatured: boolean;
+    isNoCOD: boolean;
     isActive: boolean;
     createdAt?: Date;
     updatedAt?: Date;

@@ -14,6 +14,16 @@ const createOrder = asyncHandler(async (req, res) => {
     });
 });
 
+const previewCheckout = asyncHandler(async (req, res) => {
+    const result = await OrderService.previewCheckoutFromDB(req.body);
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        message: 'Checkout preview generated successfully!',
+        data: result,
+    });
+});
+
 const getMyOrders = asyncHandler(async (req, res) => {
     const result = await OrderService.getMyOrdersFromDB(req.user);
 
@@ -63,6 +73,7 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 
 export const OrderController = {
     createOrder,
+    previewCheckout,
     getMyOrders,
     getMySingleOrder,
     getAllOrdersForAdmin,

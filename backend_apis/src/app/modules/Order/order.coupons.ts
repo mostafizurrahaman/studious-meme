@@ -1,4 +1,4 @@
-export type Coupon = {
+export type TCoupon = {
     code: string;
     label: string;
     kind: 'percent' | 'shipping';
@@ -7,14 +7,7 @@ export type Coupon = {
     minSubtotal?: number;
 };
 
-export type OrderSummary = {
-    subtotal: number;
-    discount: number;
-    delivery: number;
-    total: number;
-};
-
-export const coupons: Record<string, Coupon> = {
+export const coupons: Record<string, TCoupon> = {
     SAVE10: {
         code: 'SAVE10',
         label: '10% off',
@@ -41,7 +34,7 @@ export const coupons: Record<string, Coupon> = {
     },
 };
 
-export function isCouponActive(coupon: Coupon, subtotal: number) {
+export function isCouponActive(coupon: TCoupon, subtotal: number) {
     const notExpired = new Date(coupon.expiresAt).getTime() > Date.now();
     const meetsMinimum = !coupon.minSubtotal || subtotal >= coupon.minSubtotal;
 
@@ -56,24 +49,4 @@ export function findCoupon(code: string, subtotal: number) {
     }
 
     return coupon;
-}
-
-export function calculateOrderSummary(
-    items: Array<{ unitPrice: number; quantity: number }>,
-    couponCode: string,
-    shippingCharge = 0,
-) {
-    const subtotal = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
-    const coupon = findCoupon(couponCode, subtotal);
-    const discount = coupon?.kind === 'percent' ? (subtotal * coupon.value) / 100 : 0;
-    const delivery = coupon?.kind === 'shipping' ? 0 : shippingCharge;
-    const total = Math.max(subtotal - discount + delivery, 0);
-
-    return {
-        subtotal,
-        discount,
-        delivery,
-        total,
-        coupon,
-    };
 }

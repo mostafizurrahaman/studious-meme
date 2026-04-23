@@ -4,13 +4,15 @@ import type { Brand, Category, Product } from '@/lib/storefront-types';
 
 export const siteConfig = {
   name: 'Malamal.com.bd',
-  url: 'https://malamal.com.bd',
+  url: process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ?? 'https://malamal.com.bd',
   description:
     'Best Online Hardware Store in Bangladesh – Buy tools & hardware for sale online near Dhaka at low prices.',
   phone: '+880 9638212121',
   email: 'sales@malamal.com.bd',
   supportEmail: 'info@malamal.com.bd',
   address: 'Level 11 & 12, Medona Tower, 28, Mohakhali C/A, Dhaka-1212.',
+  ogImage: process.env.NEXT_PUBLIC_SITE_OG_IMAGE?.trim() || '/logo.png',
+  googleVerification: process.env.GOOGLE_SITE_VERIFICATION?.trim() || '',
 };
 
 export function absoluteUrl(path: string) {
@@ -30,15 +32,21 @@ type MetadataInput = {
 };
 
 export function buildMetadata({ title, description, path, image, noindex = false }: MetadataInput): Metadata {
-  const images = image ? [{ url: absoluteUrl(image) }] : undefined;
+  const resolvedImage = image ?? siteConfig.ogImage;
+  const images = resolvedImage ? [{ url: absoluteUrl(resolvedImage) }] : undefined;
 
-  return {
-    title,
-    description,
-    alternates: {
-      canonical: absoluteUrl(path),
+    return {
+      title,
+      description,
+      alternates: {
+        canonical: absoluteUrl(path),
+      },
+      robots: noindex ? { index: false, follow: false } : { index: true, follow: true },
+      icons: {
+        icon: '/icon.png',
+        shortcut: '/icon.png',
+        apple: '/logo.png',
     },
-    robots: noindex ? { index: false, follow: false } : { index: true, follow: true },
     openGraph: {
       title,
       description,
@@ -51,26 +59,39 @@ export function buildMetadata({ title, description, path, image, noindex = false
       card: 'summary_large_image',
       title,
       description,
-      images: image ? [absoluteUrl(image)] : undefined,
+      images: images?.map(item => item.url),
     },
   };
 }
 
 export const siteMetadata: Metadata = {
-  title: siteConfig.name,
+  title: {
+    default: siteConfig.name,
+    template: `%s | ${siteConfig.name}`,
+  },
   description: siteConfig.description,
   metadataBase: new URL(siteConfig.url),
+  alternates: {
+    canonical: siteConfig.url,
+  },
+  icons: {
+    icon: '/icon.png',
+    shortcut: '/icon.png',
+    apple: '/logo.png',
+  },
   openGraph: {
     title: siteConfig.name,
     description: siteConfig.description,
     url: siteConfig.url,
     siteName: siteConfig.name,
     type: 'website',
+    images: [{ url: absoluteUrl(siteConfig.ogImage) }],
   },
   twitter: {
     card: 'summary_large_image',
     title: siteConfig.name,
     description: siteConfig.description,
+    images: [absoluteUrl(siteConfig.ogImage)],
   },
 };
 

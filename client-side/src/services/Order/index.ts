@@ -22,6 +22,8 @@ export type BackendOrderItem = {
     brand: string;
     category: string;
     unitPrice: number;
+    weightKg: number;
+    isNoCOD: boolean;
     quantity: number;
     lineTotal: number;
 };
@@ -41,6 +43,11 @@ export type BackendOrder = {
     subtotal: number;
     discount: number;
     delivery: number;
+    shippingZone?: 'inside_dhaka' | 'outside_dhaka';
+    shippingCharge?: number;
+    totalWeightKg?: number;
+    codEligible?: boolean;
+    codReasons?: string[];
     total: number;
     couponCode?: string;
     paymentMethod: 'CASH_ON_DELIVERY' | 'SSL_COMMERZ';
@@ -66,9 +73,34 @@ export type CreateOrderPayload = {
     paymentMethod: 'CASH_ON_DELIVERY' | 'SSL_COMMERZ';
 };
 
+export type PreviewCheckoutPayload = CreateOrderPayload;
+
+export type CheckoutPreview = {
+    items: BackendOrderItem[];
+    subtotal: number;
+    discount: number;
+    shippingZone: 'inside_dhaka' | 'outside_dhaka';
+    shippingCharge: number;
+    totalWeightKg: number;
+    codEligible: boolean;
+    codReasons: string[];
+    total: number;
+};
+
 export const createOrder = async (payload: CreateOrderPayload): Promise<BackendEnvelope<BackendOrder>> => {
     const accessToken = await getValidAccessTokenForServerActions();
     return requestBackendJson<BackendEnvelope<BackendOrder>>('/order/orders', {
+        method: 'POST',
+        body: payload,
+        token: accessToken ?? undefined,
+    });
+};
+
+export const previewCheckout = async (
+    payload: PreviewCheckoutPayload,
+): Promise<BackendEnvelope<CheckoutPreview>> => {
+    const accessToken = await getValidAccessTokenForServerActions();
+    return requestBackendJson<BackendEnvelope<CheckoutPreview>>('/order/checkout-preview', {
         method: 'POST',
         body: payload,
         token: accessToken ?? undefined,

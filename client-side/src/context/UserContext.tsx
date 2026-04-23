@@ -36,9 +36,13 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
     // };
 
     useEffect(() => {
-        if (isLoading) {
-            handleUser();
-        }
+        if (!isLoading) return;
+
+        const timeout = window.setTimeout(() => {
+            void handleUser();
+        }, 0);
+
+        return () => window.clearTimeout(timeout);
     }, [isLoading]);
 
     return (

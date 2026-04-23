@@ -1,4 +1,5 @@
 import { Document, Types } from 'mongoose';
+import type { TShippingZone } from './order.constants';
 
 export type TOrderStatus = 'PLACED' | 'PROCESSING' | 'DELIVERED' | 'CANCELLED';
 export type TPaymentMethod = 'CASH_ON_DELIVERY' | 'SSL_COMMERZ';
@@ -13,6 +14,8 @@ export interface IOrderItemSnapshot {
     brand: string;
     category: string;
     unitPrice: number;
+    weightKg: number;
+    isNoCOD: boolean;
     quantity: number;
     lineTotal: number;
 }
@@ -34,6 +37,11 @@ export interface IOrder extends Document {
     subtotal: number;
     discount: number;
     delivery: number;
+    shippingZone: TShippingZone;
+    shippingCharge: number;
+    totalWeightKg: number;
+    codEligible: boolean;
+    codReasons: string[];
     total: number;
     couponCode?: string;
     paymentMethod: TPaymentMethod;

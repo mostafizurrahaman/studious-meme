@@ -53,6 +53,8 @@ export function OrderDetailClient({
         unitPrice: item.unitPrice,
         unitPriceLabel: formatMoney(item.unitPrice),
         quantity: item.quantity,
+        weightKg: item.weightKg ?? 1,
+        isNoCOD: Boolean(item.isNoCOD),
     }));
 
     const download = (filename: string, content: string, type: string) => {

@@ -12,9 +12,11 @@ const productBaseSchema = z.object({
     brand: z.string({ error: 'Brand is required!' }).trim().min(1, { message: 'Brand is required!' }),
     category: z.string({ error: 'Category is required!' }).trim().min(1, { message: 'Category is required!' }),
     subCategorySlug: z.string().optional(),
+    weightKg: z.coerce.number({ error: 'Weight is required!' }).min(0.01, { message: 'Weight must be greater than 0!' }),
     stock: z.coerce.number({ error: 'Stock is required!' }).int().min(0, { message: 'Stock is required!' }),
     rating: z.coerce.number({ error: 'Rating is required!' }).min(0, { message: 'Rating is required!' }),
     isFeatured: z.boolean().optional(),
+    isNoCOD: z.boolean().optional(),
     isActive: z.boolean().optional(),
 });
 

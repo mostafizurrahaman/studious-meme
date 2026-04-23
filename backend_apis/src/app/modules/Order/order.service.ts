@@ -4,6 +4,8 @@ import { IUser } from '../User/user.interface';
 import { ProductModel } from '../Product/product.model';
 import { OrderModel } from './order.model';
 import { IOrderItemSnapshot, TOrderStatus, TPaymentMethod, TPaymentStatus } from './order.interface';
+import { calculateCodEligibility, calculateShippingCharge, deriveShippingZone, getTotalWeightKg } from './order.utils';
+import { findCoupon } from './order.coupons';
 
 type CreateOrderPayload = {
     items: Array<{ sku: string; quantity: number }>;
@@ -19,12 +21,36 @@ type CreateOrderPayload = {
     paymentMethod: TPaymentMethod;
 };
 
+type ProductForCheckout = {
+    _id: unknown;
+    sku: string;
+    title: string;
+    slug: string;
+    image: string;
+    price: number;
+    stock: number;
+    weightKg?: number;
+    isNoCOD?: boolean;
+    brand: unknown;
+    category: unknown;
+};
+
 const parsePrice = (value: number) => {
     if (!Number.isFinite(value)) {
         throw new AppError(httpStatus.BAD_REQUEST, 'Invalid product price found in catalog.');
     }
 
     return value;
+};
+
+const parseWeight = (value: number | undefined) => {
+    const weight = Number(value ?? 1);
+
+    if (!Number.isFinite(weight) || weight < 0.01) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'Invalid product weight found in catalog.');
+    }
+
+    return weight;
 };
 
 const createOrderId = () => `ORD-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
@@ -43,12 +69,117 @@ const decrementProductStock = async (sku: string, quantity: number) => {
     return updated;
 };
 
-const createOrderIntoDB = async (user: IUser, payload: CreateOrderPayload) => {
+const resolveName = (value: unknown) => {
+    if (typeof value === 'string') {
+        return value;
+    }
+
+    if (value && typeof value === 'object' && 'name' in value && typeof (value as { name?: unknown }).name === 'string') {
+        return (value as { name: string }).name;
+    }
+
+    return 'Unknown';
+};
+
+const buildOrderSnapshot = (product: ProductForCheckout, quantity: number): IOrderItemSnapshot => {
+    const unitPrice = parsePrice(product.price);
+    const weightKg = parseWeight(product.weightKg);
+
+    return {
+        product: product._id as never,
+        title: product.title,
+        slug: product.slug,
+        sku: product.sku,
+        image: product.image,
+        brand: resolveName(product.brand),
+        category: resolveName(product.category),
+        unitPrice,
+        weightKg,
+        isNoCOD: Boolean(product.isNoCOD),
+        quantity,
+        lineTotal: unitPrice * quantity,
+    };
+};
+
+const calculateOrderTotals = (payload: CreateOrderPayload, items: IOrderItemSnapshot[]) => {
+    const subtotal = items.reduce((sum, item) => sum + item.lineTotal, 0);
+    const totalWeightKg = getTotalWeightKg(items.reduce((sum, item) => sum + item.weightKg * item.quantity, 0));
+    const shippingZone = deriveShippingZone(payload.customer.city, payload.customer.address);
+    const coupon = payload.couponCode ? findCoupon(payload.couponCode, subtotal) : null;
+    const discount = coupon?.kind === 'percent' ? (subtotal * coupon.value) / 100 : 0;
+    const shippingCharge = coupon?.kind === 'shipping' ? 0 : calculateShippingCharge({ totalWeightKg, zone: shippingZone });
+    const codEligibility = calculateCodEligibility({
+        subtotal,
+        itemBlocksCod: items.some(item => item.isNoCOD),
+    });
+
+    return {
+        subtotal,
+        discount,
+        totalWeightKg,
+        shippingZone,
+        shippingCharge,
+        codEligibility,
+    };
+};
+
+const previewCheckoutFromDB = async (payload: CreateOrderPayload) => {
     const skuList = payload.items.map(item => item.sku);
-    const products = await ProductModel.find({ sku: { $in: skuList }, isActive: true })
+    const products = (await ProductModel.find({ sku: { $in: skuList }, isActive: true })
         .populate('brand', 'name')
         .populate('category', 'name')
-        .lean();
+        .lean()) as ProductForCheckout[];
+
+    if (products.length !== skuList.length) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'One or more products are unavailable for ordering.');
+    }
+
+    const productMap = new Map(products.map(product => [product.sku, product]));
+
+    const items: IOrderItemSnapshot[] = payload.items.map(item => {
+        const product = productMap.get(item.sku);
+
+        if (!product) {
+            throw new AppError(httpStatus.BAD_REQUEST, `Product with SKU ${item.sku} is unavailable.`);
+        }
+
+        if (!Number.isInteger(item.quantity) || item.quantity <= 0) {
+            throw new AppError(httpStatus.BAD_REQUEST, `Invalid quantity for SKU ${item.sku}.`);
+        }
+
+        const unitStock = Number(product.stock);
+
+        if (!Number.isFinite(unitStock) || unitStock < item.quantity) {
+            throw new AppError(httpStatus.BAD_REQUEST, `Not enough stock available for SKU ${item.sku}.`);
+        }
+
+        return buildOrderSnapshot(product, item.quantity);
+    });
+
+    const { subtotal, discount, totalWeightKg, shippingZone, shippingCharge, codEligibility } = calculateOrderTotals(
+        payload,
+        items,
+    );
+
+    return {
+        items,
+        subtotal,
+        discount,
+        shippingZone,
+        shippingCharge,
+        totalWeightKg,
+        codEligible: codEligibility.eligible,
+        codReasons: codEligibility.reasons,
+        total: Math.max(subtotal - discount + shippingCharge, 0),
+    };
+};
+
+const createOrderIntoDB = async (user: IUser, payload: CreateOrderPayload) => {
+    const skuList = payload.items.map(item => item.sku);
+    const products = (await ProductModel.find({ sku: { $in: skuList }, isActive: true })
+        .populate('brand', 'name')
+        .populate('category', 'name')
+        .lean()) as ProductForCheckout[];
 
     if (products.length !== skuList.length) {
         throw new AppError(httpStatus.BAD_REQUEST, 'One or more products are unavailable for ordering.');
@@ -76,20 +207,7 @@ const createOrderIntoDB = async (user: IUser, payload: CreateOrderPayload) => {
                 throw new AppError(httpStatus.BAD_REQUEST, `Not enough stock available for SKU ${item.sku}.`);
             }
 
-            const unitPrice = parsePrice(product.price);
-
-            return {
-                product: product._id,
-                title: product.title,
-                slug: product.slug,
-                sku: product.sku,
-                image: product.image,
-                brand: (product.brand as unknown as { name: string }).name,
-                category: (product.category as unknown as { name: string }).name,
-                unitPrice,
-                quantity: item.quantity,
-                lineTotal: unitPrice * item.quantity,
-            };
+            return buildOrderSnapshot(product, item.quantity);
         });
 
         for (const item of payload.items) {
@@ -97,10 +215,17 @@ const createOrderIntoDB = async (user: IUser, payload: CreateOrderPayload) => {
             updatedStocks.push({ sku: item.sku, quantity: item.quantity });
         }
 
-        const subtotal = items.reduce((sum, item) => sum + item.lineTotal, 0);
-        const discount = 0;
-        const delivery = subtotal > 0 ? 250 : 0;
-        const total = Math.max(subtotal - discount + delivery, 0);
+        const { subtotal, discount, totalWeightKg, shippingZone, shippingCharge, codEligibility } = calculateOrderTotals(
+            payload,
+            items,
+        );
+        const delivery = shippingCharge;
+        const total = Math.max(subtotal - discount + shippingCharge, 0);
+
+        if (payload.paymentMethod === 'CASH_ON_DELIVERY' && !codEligibility.eligible) {
+            throw new AppError(httpStatus.BAD_REQUEST, codEligibility.reasons.join(' '));
+        }
+
         const paymentStatus: TPaymentStatus = payload.paymentMethod === 'SSL_COMMERZ' ? 'PENDING' : 'UNPAID';
         const status: TOrderStatus = 'PLACED';
 
@@ -116,6 +241,11 @@ const createOrderIntoDB = async (user: IUser, payload: CreateOrderPayload) => {
             subtotal,
             discount,
             delivery,
+            shippingZone,
+            shippingCharge,
+            totalWeightKg,
+            codEligible: codEligibility.eligible,
+            codReasons: codEligibility.reasons,
             total,
             couponCode: payload.couponCode || undefined,
             paymentMethod: payload.paymentMethod,
@@ -228,6 +358,7 @@ const updateOrderPaymentIntoDB = async (
 
 export const OrderService = {
     createOrderIntoDB,
+    previewCheckoutFromDB,
     getMyOrdersFromDB,
     getSingleOrderForUserFromDB,
     getAllOrdersForAdminFromDB,

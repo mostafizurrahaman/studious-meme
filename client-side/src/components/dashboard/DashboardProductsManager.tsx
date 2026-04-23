@@ -53,7 +53,14 @@ const productEditSchema = z.object({
 
   rating: z.string({ error: 'Rating is required!' }).trim().min(1, { message: 'Rating is required!' }),
 
+  weightKg: z
+    .string({ error: 'Weight is required!' })
+    .trim()
+    .min(1, { message: 'Weight is required!' })
+    .refine(value => Number(value) > 0, { message: 'Weight must be greater than 0!' }),
+
   isFeatured: z.boolean().default(false),
+  isNoCOD: z.boolean().default(false),
   isActive: z.boolean().default(true),
 });
 
@@ -80,7 +87,14 @@ const productCreateSchema = z.object({
 
   rating: z.string({ error: 'Rating is required!' }).trim().min(1, { message: 'Rating is required!' }),
 
+  weightKg: z
+    .string({ error: 'Weight is required!' })
+    .trim()
+    .min(1, { message: 'Weight is required!' })
+    .refine(value => Number(value) > 0, { message: 'Weight must be greater than 0!' }),
+
   isFeatured: z.boolean().default(false),
+  isNoCOD: z.boolean().default(false),
   isActive: z.boolean().default(true),
 });
 
@@ -131,7 +145,9 @@ export function DashboardProductsManager({
       subCategorySlug: '',
       stock: '',
       rating: '5',
+      weightKg: '1',
       isFeatured: false,
+      isNoCOD: false,
       isActive: true,
     },
     mode: 'onTouched',
@@ -170,7 +186,9 @@ export function DashboardProductsManager({
       subCategorySlug: '',
       stock: '0',
       rating: '5',
+      weightKg: '1',
       isFeatured: false,
+      isNoCOD: false,
       isActive: true,
     },
     mode: 'onTouched',
@@ -218,10 +236,6 @@ export function DashboardProductsManager({
       }
     };
   }, [editingProductImagePreview, productImagePreview]);
-
-  useEffect(() => {
-    setSearch(searchTerm);
-  }, [searchTerm]);
 
   const updateProductQuery = useCallback(
     (updates: { page?: number; limit?: number; searchTerm?: string }) => {
@@ -311,7 +325,9 @@ export function DashboardProductsManager({
       subCategorySlug: product.subCategorySlug ?? '',
       stock: String(product.stock),
       rating: String(product.rating),
+      weightKg: String(product.weightKg ?? 1),
       isFeatured: product.isFeatured,
+      isNoCOD: product.isNoCOD,
       isActive: product.isActive,
     });
     setEditingProductImageFile(null);
@@ -332,7 +348,9 @@ export function DashboardProductsManager({
       subCategorySlug: '',
       stock: '',
       rating: '5',
+      weightKg: '1',
       isFeatured: false,
+      isNoCOD: false,
       isActive: true,
     });
     setEditingProductImageFile(null);
@@ -460,9 +478,23 @@ export function DashboardProductsManager({
               />
               <ErrorText message={productCreateForm.formState.errors.rating?.message} />
             </div>
+            <div className="grid gap-1.5">
+              <DashboardInput
+                placeholder="Weight (kg)"
+                type="number"
+                min={0.01}
+                step="0.01"
+                {...productCreateForm.register('weightKg')}
+              />
+              <ErrorText message={productCreateForm.formState.errors.weightKg?.message} />
+            </div>
             <label className="flex items-center gap-2 self-start text-sm">
               <input type="checkbox" {...productCreateForm.register('isFeatured')} />
               Featured
+            </label>
+            <label className="flex items-center gap-2 self-start text-sm">
+              <input type="checkbox" {...productCreateForm.register('isNoCOD')} />
+              No COD
             </label>
             <label className="flex items-center gap-2 self-start text-sm">
               <input type="checkbox" {...productCreateForm.register('isActive')} />
@@ -493,7 +525,9 @@ export function DashboardProductsManager({
                     subCategorySlug: values.subCategorySlug?.trim() || undefined,
                     stock: Number(values.stock),
                     rating: Number(values.rating),
+                    weightKg: Number(values.weightKg),
                     isFeatured: values.isFeatured,
+                    isNoCOD: values.isNoCOD,
                     isActive: values.isActive,
                   });
                   setIsCreating(false);
@@ -513,7 +547,9 @@ export function DashboardProductsManager({
                     subCategorySlug: '',
                     stock: '',
                     rating: '5',
+                    weightKg: '1',
                     isFeatured: false,
+                    isNoCOD: false,
                     isActive: true,
                   });
                   setProductImageFile(null);
@@ -612,6 +648,8 @@ export function DashboardProductsManager({
                 <TableHead>Status</TableHead>
                 <TableHead>Stock</TableHead>
                 <TableHead>Featured</TableHead>
+                <TableHead>No COD</TableHead>
+                <TableHead>Weight</TableHead>
                 <TableHead>Price</TableHead>
                 <TableHead>Created At</TableHead>
                 <TableHead>Updated At</TableHead>
@@ -649,6 +687,12 @@ export function DashboardProductsManager({
                           {product.isFeatured ? 'Featured' : 'No'}
                         </Badge>
                       </TableCell>
+                      <TableCell className="min-w-0">
+                        <Badge variant={product.isNoCOD ? 'destructive' : 'secondary'}>
+                          {product.isNoCOD ? 'Blocked' : 'Allowed'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="min-w-0">{(product.weightKg ?? 1).toFixed(2)} kg</TableCell>
                       <TableCell className="min-w-0">{product.price}</TableCell>
                       <TableCell className="min-w-0">
                         <span title={formatDashboardDate(product.createdAt, { time: true })}>
@@ -681,7 +725,9 @@ export function DashboardProductsManager({
                                     subCategorySlug: values.subCategorySlug?.trim() || undefined,
                                     stock: Number(values.stock),
                                     rating: Number(values.rating),
+                                    weightKg: Number(values.weightKg),
                                     isFeatured: values.isFeatured,
+                                    isNoCOD: values.isNoCOD,
                                     isActive: values.isActive,
                                     image: editingProductImageFile ?? undefined,
                                   });
@@ -734,7 +780,7 @@ export function DashboardProductsManager({
                     </TableRow>
                     {isEditing ? (
                       <TableRow key={`${product.sku}-edit`}>
-                        <TableCell colSpan={10} className="bg-muted/20">
+                        <TableCell colSpan={12} className="bg-muted/20">
                           <div className="grid gap-6 rounded-xl border bg-background p-4 xl:grid-cols-[minmax(0,1fr)_340px]">
                             <div className="grid gap-3 md:grid-cols-2">
                               <div className="grid gap-1.5 md:col-span-2">
@@ -875,9 +921,24 @@ export function DashboardProductsManager({
                                 <ErrorText message={productEditForm.formState.errors.rating?.message} />
                               </div>
 
+                              <div className="grid gap-1.5">
+                                <DashboardInput
+                                  placeholder="Weight (kg)"
+                                  type="number"
+                                  min={0.01}
+                                  step="0.01"
+                                  {...productEditForm.register('weightKg')}
+                                />
+                                <ErrorText message={productEditForm.formState.errors.weightKg?.message} />
+                              </div>
+
                               <label className="flex items-center gap-2 text-sm">
                                 <input type="checkbox" {...productEditForm.register('isFeatured')} />
                                 Featured
+                              </label>
+                              <label className="flex items-center gap-2 text-sm">
+                                <input type="checkbox" {...productEditForm.register('isNoCOD')} />
+                                No COD
                               </label>
                               <label className="flex items-center gap-2 text-sm">
                                 <input type="checkbox" {...productEditForm.register('isActive')} />

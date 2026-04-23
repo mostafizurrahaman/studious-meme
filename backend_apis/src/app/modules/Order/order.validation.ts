@@ -21,6 +21,10 @@ const createOrderSchema = z.object({
             error: 'Payment method is required!',
         }),
     }),
+    });
+
+const orderCheckoutPreviewSchema = z.object({
+    body: createOrderSchema.shape.body.pick({ items: true, customer: true, couponCode: true, paymentMethod: true }),
 });
 
 const updateOrderStatusSchema = z.object({
@@ -36,5 +40,6 @@ const updateOrderStatusSchema = z.object({
 
 export const OrderValidation = {
     createOrderSchema,
+    orderCheckoutPreviewSchema,
     updateOrderStatusSchema,
 };
