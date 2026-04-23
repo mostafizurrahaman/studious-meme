@@ -26,7 +26,8 @@ const MainLayout = async ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div>
-      <Header categories={categories} brands={brands} />
+      {/* <Header categories={categories} brands={brands} /> */}
+      <Header categories={categories} />
       <FloatingCategoryRail categories={categories} />
       <div className="min-h-screen">{children}</div>
       <Footer categories={categories} brands={brands} />

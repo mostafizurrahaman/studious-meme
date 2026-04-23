@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Card } from '@/components/ui/card';
 import type { Category } from '@/lib/storefront-types';
@@ -12,6 +12,12 @@ type Props = {
 
 export function FloatingCategoryRail({ categories }: Props) {
     const [open, setOpen] = useState(false);
+    const [activeCategorySlug, setActiveCategorySlug] = useState(categories[0]?.slug ?? '');
+
+    const activeCategory = useMemo(
+        () => categories.find(category => category.slug === activeCategorySlug) ?? categories[0] ?? null,
+        [activeCategorySlug, categories],
+    );
 
     return (
         <div
@@ -42,7 +48,11 @@ export function FloatingCategoryRail({ categories }: Props) {
                         <Link
                             key={category.name}
                             href={category.href}
-                            className="flex items-center gap-2 rounded-md px-0.5 py-1.5 hover:bg-muted"
+                            onMouseEnter={() => setActiveCategorySlug(category.slug)}
+                            onFocus={() => setActiveCategorySlug(category.slug)}
+                            className={`flex items-center gap-2 rounded-md px-0.5 py-1.5 hover:bg-muted ${
+                                activeCategorySlug === category.slug ? 'bg-muted' : ''
+                            }`}
                         >
                             <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border border-border bg-background">
                                 {category.image ? (
@@ -66,6 +76,25 @@ export function FloatingCategoryRail({ categories }: Props) {
                             </span>
                         </Link>
                     ))}
+
+                    {open && activeCategory?.subCategories?.length ? (
+                        <div className="mt-2 rounded-xl border border-border bg-background p-2">
+                            <div className="px-1 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-primary">
+                                {activeCategory.name} sub categories
+                            </div>
+                            <div className="mt-1 grid gap-1">
+                                {activeCategory.subCategories.map(subCategory => (
+                                    <Link
+                                        key={subCategory.slug}
+                                        href={`/category/${activeCategory.slug}?subCategorySlug=${subCategory.slug}`}
+                                        className="rounded-md px-2 py-1.5 text-xs font-medium text-foreground/75 transition hover:bg-primary/5 hover:text-primary"
+                                    >
+                                        {subCategory.name}
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+                    ) : null}
 
                     <Link
                         href="/main-categories"

@@ -8,7 +8,7 @@ import { buildCategoryMetadata, buildCategorySchemas } from '@/lib/seo';
 import { getActiveBrands } from '@/services/Brand';
 import { getActiveCategories, getActiveCategoryBySlug } from '@/services/Category';
 import { mapBackendCategoryToCategoryPageEntry, type BackendCategory } from '@/services/Category/mappers';
-import { getProductsByCategorySlug, mapBackendProductToStorefrontProduct } from '@/services/Product';
+import { getProductsByCategorySlug, getProductsBySubCategorySlug, mapBackendProductToStorefrontProduct } from '@/services/Product';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -16,6 +16,7 @@ type Props = {
     b?: string;
     s?: string;
     p?: string;
+    subCategorySlug?: string;
     page?: string;
     limit?: string;
   }>;
@@ -65,14 +66,25 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   }
 
   const title = 'name' in category ? category.name : category.title;
+  const subCategorySlug = query.subCategorySlug?.trim() ?? '';
+  const selectedSubCategory =
+    'subCategories' in category ? category.subCategories?.find(item => item.slug === subCategorySlug) ?? null : null;
   const [productsResult, brandsResult] = await Promise.all([
-    getProductsByCategorySlug(slug, {
-      page,
-      limit,
-      b: query.b,
-      s: query.s,
-      p: query.p,
-    }).catch(() => null),
+    subCategorySlug
+      ? getProductsBySubCategorySlug(subCategorySlug, {
+          page,
+          limit,
+          b: query.b,
+          s: query.s,
+          p: query.p,
+        }).catch(() => null)
+      : getProductsByCategorySlug(slug, {
+          page,
+          limit,
+          b: query.b,
+          s: query.s,
+          p: query.p,
+        }).catch(() => null),
     getActiveBrands().catch(() => null),
   ]);
   const products = productsResult?.data?.length
@@ -109,7 +121,13 @@ export default async function CategoryPage({ params, searchParams }: Props) {
             </ol>
           </nav>
           <Suspense fallback={<Card className="p-6 shadow-sm">Loading category...</Card>}>
-            <CategoryPageClient category={category} products={products} brands={brandFilters} meta={meta} />
+            <CategoryPageClient
+              category={category}
+              products={products}
+              brands={brandFilters}
+              meta={meta}
+              selectedSubCategory={selectedSubCategory}
+            />
           </Suspense>
           <Card className="mt-6 flex items-center justify-between p-4 text-sm shadow-sm">
             <span className="text-foreground/60">Need a broader view?</span>

@@ -28,6 +28,13 @@ export type StorefrontCategory = {
     image?: string;
     description: string;
     accent: string;
+    subCategories?: Array<{
+        name: string;
+        slug: string;
+        description?: string;
+        image?: string;
+        accent?: string;
+    }>;
 };
 
 export type Category = StorefrontCategory;

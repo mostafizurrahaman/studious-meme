@@ -13,6 +13,11 @@ type Props = {
     category: CategoryPageEntry;
     products: Product[];
     brands: string[];
+    selectedSubCategory?: {
+        name: string;
+        slug: string;
+        description?: string;
+    } | null;
     meta: {
         total: number;
         limit: number;
@@ -28,7 +33,7 @@ function parseGroupValues(value: string | null) {
         .filter(Boolean);
 }
 
-export function CategoryPageClient({ category, products, brands, meta }: Props) {
+export function CategoryPageClient({ category, products, brands, meta, selectedSubCategory }: Props) {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -36,9 +41,10 @@ export function CategoryPageClient({ category, products, brands, meta }: Props) 
     const activeBrands = parseGroupValues(searchParams.get('b'));
     const activeStock = searchParams.get('s') ?? '';
     const activePrice = searchParams.get('p') ?? '';
+    const activeSubCategory = searchParams.get('subCategorySlug') ?? '';
     const totalPages = Math.max(meta.totalPages, 1);
     const page = Math.min(meta.page, totalPages);
-    const activeCount = activeBrands.length + [activeStock, activePrice].filter(Boolean).length;
+    const activeCount = activeBrands.length + [activeStock, activePrice, activeSubCategory].filter(Boolean).length;
 
     function updateParam(key: string, value: string) {
         const params = new URLSearchParams(searchParams.toString());
@@ -69,7 +75,7 @@ export function CategoryPageClient({ category, products, brands, meta }: Props) 
                 </p>
                 <h1 className="mt-4 text-3xl font-black sm:text-4xl">{title}</h1>
                 <p className="mt-3 max-w-3xl text-sm leading-7 text-white/78 sm:text-base">
-                    {category.description}
+                    {selectedSubCategory ? `${selectedSubCategory.name}: ${selectedSubCategory.description ?? category.description}` : category.description}
                 </p>
             </section>
 
@@ -92,6 +98,15 @@ export function CategoryPageClient({ category, products, brands, meta }: Props) 
 
             <Card className="mt-6 p-4 shadow-sm">
                 <div className="flex flex-wrap gap-2 text-xs font-semibold">
+                    {selectedSubCategory ? (
+                        <Button
+                            type="button"
+                            onClick={() => updateParam('subCategorySlug', '')}
+                            className="h-auto cursor-pointer rounded-full bg-secondary px-3 py-2 text-xs font-semibold text-secondary-foreground transition hover:bg-secondary/90"
+                        >
+                            {selectedSubCategory.name} ×
+                        </Button>
+                    ) : null}
                     {[
                         ['s', 'in-stock', 'In stock', activeStock],
                         ['p', 'under-10000', 'Under Tk. 10k', activePrice],

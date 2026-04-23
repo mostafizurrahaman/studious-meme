@@ -50,6 +50,13 @@ export function mapBackendCategoryToStorefrontCategory(category: BackendCategory
         image: category.image,
         description: category.description ?? `${category.name} catalog and related hardware listings.`,
         accent: getAccent(category.slug, category.accent),
+        subCategories: category.subCategories?.filter(subCategory => subCategory.isActive !== false).map(subCategory => ({
+            name: subCategory.name,
+            slug: subCategory.slug,
+            description: subCategory.description,
+            image: subCategory.image,
+            accent: subCategory.accent,
+        })),
     };
 }
 
