@@ -53,6 +53,7 @@ type CartState = {
     addItems: (items: CartItem[]) => void;
     addOrder: (order: OrderRecord) => void;
     updateOrderStatus: (id: string, status: OrderStatus) => void;
+    replaceItems: (items: CartItem[]) => void;
     setHydrated: (hydrated: boolean) => void;
 };
 
@@ -138,6 +139,7 @@ export const useCartStore = create<CartState>()(
                 set(state => ({
                     items: [...state.items, ...items],
                 })),
+            replaceItems: items => set({ items }),
             addOrder: order =>
                 set(state => ({
                     orders: [order, ...state.orders],

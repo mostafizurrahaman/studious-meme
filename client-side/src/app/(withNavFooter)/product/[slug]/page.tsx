@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ProductCard } from '@/components/ProductCard';
 import { AddToCartButton } from '@/components/cart/AddToCartButton';
+import { AddToCompareButton } from '@/components/compare/AddToCompareButton';
 import { AddToWishlistButton } from '@/components/wishlist/AddToWishlistButton';
 import { SeoScripts } from '@/components/SeoScripts';
 import { buildProductMetadata, buildProductSchemas } from '@/lib/seo';
@@ -157,8 +158,9 @@ export default async function ProductPage({ params }: Props) {
                 <div className="rounded-2xl bg-white/10 px-4 py-3">Bulk quotation available</div>
               </Card>
 
-              <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              <div className="mt-6 grid gap-3 sm:grid-cols-3">
                 <AddToCartButton product={product} />
+                <AddToCompareButton product={product} />
                 <AddToWishlistButton product={product} />
               </div>
 

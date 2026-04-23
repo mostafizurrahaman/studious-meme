@@ -4,11 +4,14 @@ type WishlistProductSnapshot = {
     title: string;
     brand: string;
     category: string;
+    categorySlug?: string;
     image: string;
     sku: string;
     slug: string;
     price: number;
     stock: number;
+    weightKg?: number;
+    isNoCOD?: boolean;
 };
 
 type WishlistHistoryDoc = {

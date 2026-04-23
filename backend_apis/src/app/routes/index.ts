@@ -10,6 +10,7 @@ import { BrandRoutes } from '../modules/Brand/brand.routes';
 import { CategoryRoutes } from '../modules/Category/category.routes';
 import { ProductRoutes } from '../modules/Product/product.routes';
 import { OrderRoutes } from '../modules/Order/order.routes';
+import { CartRoutes } from '../modules/Cart/cart.routes';
 import { WishlistHistoryRoutes } from '../modules/WishlistHistory/wishlistHistory.routes';
 
 const router = Router();
@@ -32,11 +33,11 @@ const moduleRoutes = [
         route: PaymentRoutes,
     },
     {
-        path: '/comparison-history',
+        path: '/compare',
         route: ComparisonHistoryRoutes,
     },
     {
-        path: '/wishlist-history',
+        path: '/wishlist',
         route: WishlistHistoryRoutes,
     },
     {
@@ -62,6 +63,10 @@ const moduleRoutes = [
     {
         path: '/order',
         route: OrderRoutes,
+    },
+    {
+        path: '/cart',
+        route: CartRoutes,
     },
 ];
 

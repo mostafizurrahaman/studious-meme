@@ -29,12 +29,12 @@ export type DashboardWishlistRecord = {
 export type DashboardComparisonRecord = {
     _id?: string;
     user?: UserSummary;
-    products?: Array<{
+    productSnapshot?: {
         title: string;
         brand: string;
         sku: string;
         image: string;
-    }>;
+    };
     createdAt?: string;
 };
 
@@ -88,7 +88,7 @@ export function DashboardWishlistManager({
         <Card className="shadow-sm">
             <CardHeader>
                 <CardTitle>Wishlist activity</CardTitle>
-                <CardDescription>Products currently saved by users in backend wishlist records.</CardDescription>
+                <CardDescription>Products saved by users in the last 30 days.</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="mb-4 text-sm text-muted-foreground">
@@ -162,8 +162,8 @@ export function DashboardComparisonManager({
     return (
         <Card className="shadow-sm">
             <CardHeader>
-                <CardTitle>Comparison history</CardTitle>
-                <CardDescription>Backend-saved product comparison sessions from users.</CardDescription>
+                <CardTitle>Comparison activity</CardTitle>
+                <CardDescription>Products compared by users in the last 30 days.</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="mb-4 text-sm text-muted-foreground">
@@ -172,7 +172,7 @@ export function DashboardComparisonManager({
                 <div className="grid gap-4">
                     {records.length === 0 ? (
                         <div className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-                            No comparison history found.
+                            No comparison activity found.
                         </div>
                     ) : null}
                     {records.map(record => (
@@ -187,14 +187,14 @@ export function DashboardComparisonManager({
                                 </Badge>
                             </div>
                             <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                                {record.products?.map(product => (
-                                    <div key={`${record._id}-${product.sku}`} className="rounded-xl bg-muted p-3 text-sm">
-                                        <div className="font-semibold">{product.title}</div>
+                                {record.productSnapshot ? (
+                                    <div className="rounded-xl bg-muted p-3 text-sm">
+                                        <div className="font-semibold">{record.productSnapshot.title}</div>
                                         <div className="mt-1 text-xs text-muted-foreground">
-                                            {product.brand} / {product.sku}
+                                            {record.productSnapshot.brand} / {record.productSnapshot.sku}
                                         </div>
                                     </div>
-                                ))}
+                                ) : null}
                             </div>
                         </div>
                     ))}

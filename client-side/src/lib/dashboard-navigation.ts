@@ -62,7 +62,7 @@ function getAdminNavigationItems(role: AuthRole): DashboardNavigationItem[] {
         { label: 'Payments', href: `${base}/payments`, description: 'Review payments' },
         { label: 'Quotations', href: `${base}/quotations`, description: 'Review quotation requests' },
         { label: 'Wishlist', href: `${base}/wishlist`, description: 'Review saved products' },
-        { label: 'Compare', href: `${base}/compare`, description: 'Review comparison history' },
+        { label: 'Compare', href: `${base}/compare`, description: 'Review comparison activity' },
         { label: 'Users', href: `${base}/users`, description: 'Manage users' },
         { label: 'Profile', href: `${base}/profile`, description: 'Update profile' },
     ];
@@ -83,7 +83,7 @@ function getSuperAdminNavigationItems(role: AuthRole): DashboardNavigationItem[]
         { label: 'Payments', href: `${base}/payments`, description: 'Review payments' },
         { label: 'Quotations', href: `${base}/quotations`, description: 'Review quotation requests' },
         { label: 'Wishlist', href: `${base}/wishlist`, description: 'Review saved products' },
-        { label: 'Compare', href: `${base}/compare`, description: 'Review comparison history' },
+        { label: 'Compare', href: `${base}/compare`, description: 'Review comparison activity' },
         { label: 'Profile', href: `${base}/profile`, description: 'Update profile' },
     ];
 }

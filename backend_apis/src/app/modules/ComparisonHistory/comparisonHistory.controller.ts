@@ -2,36 +2,37 @@ import httpStatus from 'http-status';
 import { asyncHandler, sendResponse } from '../../utils';
 import { ComparisonHistoryService } from './comparisonHistory.service';
 
-// 1. getComparisonSuggestions
-const getComparisonSuggestions = asyncHandler(async (_req, res) => {
-    const result = await ComparisonHistoryService.getComparisonSuggestionsFromDB();
+// 1. addComparisonItem
+const addComparisonItem = asyncHandler(async (req, res) => {
+    const { productId } = req.body as { productId: string };
+    const result = await ComparisonHistoryService.addComparisonItemIntoDB(req.user, productId);
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
-        message: 'Comparison suggestions fetched successfully!',
+        message: 'Added to compare successfully!',
         data: result,
     });
 });
 
-// 2. compareProducts
-const compareProducts = asyncHandler(async (req, res) => {
-    const { IDs } = req.body as { IDs: string[] };
-    const result = await ComparisonHistoryService.compareProductsFromDB(req.user, IDs);
-
-    sendResponse(res, {
-        statusCode: httpStatus.OK,
-        message: 'Products compared successfully!',
-        data: result,
-    });
-});
-
-// 3. getMyComparisonHistory
+// 2. getMyComparisonHistory
 const getMyComparisonHistory = asyncHandler(async (req, res) => {
     const result = await ComparisonHistoryService.getMyComparisonHistoryFromDB(req.user);
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
-        message: 'Comparison history fetched successfully!',
+        message: 'Compare list fetched successfully!',
+        data: result,
+    });
+});
+
+// 3. removeComparisonItem
+const removeComparisonItem = asyncHandler(async (req, res) => {
+    const productId = Array.isArray(req.params.productId) ? req.params.productId[0] : req.params.productId;
+    const result = await ComparisonHistoryService.removeComparisonItemFromDB(req.user, productId);
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        message: 'Removed from compare successfully!',
         data: result,
     });
 });
@@ -42,27 +43,27 @@ const getAllComparisonHistory = asyncHandler(async (req, res) => {
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
-        message: 'Comparison history fetched successfully!',
+        message: 'Comparison activity fetched successfully!',
         data: result.data,
         meta: result.meta,
     });
 });
 
-// 5. clearComparisonHistory
-const clearComparisonHistory = asyncHandler(async (_req, res) => {
-    await ComparisonHistoryService.clearComparisonHistoryFromDB();
+// 5. getComparisonInsights
+const getComparisonInsights = asyncHandler(async (_req, res) => {
+    const result = await ComparisonHistoryService.getComparisonInsightsFromDB();
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
-        message: 'Comparison history cleared successfully!',
-        data: null,
+        message: 'Comparison insights fetched successfully!',
+        data: result,
     });
 });
 
 export const ComparisonHistoryController = {
-    getComparisonSuggestions,
-    compareProducts,
+    addComparisonItem,
     getMyComparisonHistory,
+    removeComparisonItem,
     getAllComparisonHistory,
-    clearComparisonHistory,
+    getComparisonInsights,
 };

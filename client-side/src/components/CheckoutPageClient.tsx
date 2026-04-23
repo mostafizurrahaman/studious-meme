@@ -15,6 +15,7 @@ import { useCartStore } from '@/lib/cart-store';
 import { submitCheckoutAction } from '@/app/(withNavFooter)/checkout/actions';
 import type { CheckoutActionState } from '@/app/(withNavFooter)/checkout/actions';
 import { calculateFulfillmentSummary, formatShippingZoneLabel } from '@/lib/fulfillment';
+import { getMyCart } from '@/services/Cart';
 
 export function CheckoutPageClient() {
     const items = useCartStore(state => state.items);
@@ -23,6 +24,7 @@ export function CheckoutPageClient() {
     const appliedCoupon = useCartStore(state => state.appliedCoupon);
     const updateCheckout = useCartStore(state => state.updateCheckout);
     const clear = useCartStore(state => state.clear);
+    const replaceItems = useCartStore(state => state.replaceItems);
     const router = useRouter();
     const [result, formAction, pending] = useActionState<CheckoutActionState, FormData>(
         submitCheckoutAction,
@@ -49,6 +51,41 @@ export function CheckoutPageClient() {
 
         updateCheckout('payment', 'SSLCommerz');
     }, [checkout.payment, fulfillment.codEligible, paymentValue, updateCheckout]);
+
+    useEffect(() => {
+        let active = true;
+
+        getMyCart()
+            .then(result => {
+                if (!active || !result.success || !Array.isArray(result.data?.items)) {
+                    return;
+                }
+
+                replaceItems(
+                    result.data.items.map(item => ({
+                        sku: item.productSnapshot.sku,
+                        title: item.productSnapshot.title,
+                        href: '/shop',
+                        image: item.productSnapshot.image,
+                        brand: item.productSnapshot.brand,
+                        unitPrice: item.priceSnapshot,
+                        unitPriceLabel: `Tk. ${item.priceSnapshot.toLocaleString('en-US', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                        })}`,
+                        oldPriceLabel: undefined,
+                        quantity: item.quantity,
+                        weightKg: item.productSnapshot.weightKg ?? 1,
+                        isNoCOD: Boolean(item.productSnapshot.isNoCOD),
+                    })),
+                );
+            })
+            .catch(() => null);
+
+        return () => {
+            active = false;
+        };
+    }, [replaceItems]);
 
     useEffect(() => {
         if (!result.ok) return;

@@ -1,112 +1,123 @@
-import { AppError } from '../../utils';
 import httpStatus from 'http-status';
-import { ComparisonHistoryModel } from './comparisonHistory.model';
+import { Types } from 'mongoose';
+import { AppError } from '../../utils';
 import { ProductModel } from '../Product/product.model';
 import { IUser } from '../User/user.interface';
-import { BrandModel } from '../Brand/brand.model';
-import { CategoryModel } from '../Category/category.model';
+import { ComparisonHistoryModel } from './comparisonHistory.model';
+import { ComparisonHistoryEventModel } from './comparisonHistoryEvent.model';
 
-const getComparisonSuggestionsFromDB = async () => {
-    const [activeBrandIds, activeCategoryIds] = await Promise.all([
-        BrandModel.find({ isActive: true }).distinct('_id'),
-        CategoryModel.find({ isActive: true }).distinct('_id'),
-    ]);
+const MAX_COMPARE_ITEMS = 4;
 
-    return ProductModel.find({
-        isActive: true,
-        isFeatured: true,
-        brand: { $in: activeBrandIds },
-        category: { $in: activeCategoryIds },
-    })
-        .populate('brand')
-        .populate('category')
-        .sort({ createdAt: -1 })
-        .limit(3)
-        .lean();
-};
-
-// 1. compareProductsFromDB
-const compareProductsFromDB = async (user: IUser, IDs: string[]) => {
-    const uniqueIDs = [...new Set(IDs)];
-
-    if (uniqueIDs.length < 2) {
-        throw new AppError(httpStatus.BAD_REQUEST, 'At least two valid IDs are required!');
+const toObjectId = (value: string) => {
+    if (!Types.ObjectId.isValid(value)) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'Invalid product ID!');
     }
 
-    const selectedProducts = await ProductModel.find({ _id: { $in: uniqueIDs }, isActive: true })
+    return new Types.ObjectId(value);
+};
+
+const getProductSnapshot = async (productId: string) => {
+    const product = await ProductModel.findOne({ _id: toObjectId(productId), isActive: true })
         .populate({ path: 'brand', match: { isActive: true } })
         .populate({ path: 'category', match: { isActive: true } })
         .lean();
 
-    if (selectedProducts.length !== uniqueIDs.length || selectedProducts.some(product => !product.brand || !product.category)) {
-        throw new AppError(httpStatus.NOT_FOUND, 'One or more products were not found or are inactive!');
+    if (!product || !product.brand || !product.category) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Product not found!');
     }
 
-    const record = await ComparisonHistoryModel.create({
-        user: user._id.toString(),
-        IDs: uniqueIDs,
-        products: selectedProducts.map(product => ({
+    return {
+        product,
+        snapshot: {
             title: product.title,
             brand: (product.brand as unknown as { name: string }).name,
             category: (product.category as unknown as { name: string }).name,
-            subCategorySlug: product.subCategorySlug,
+            subCategorySlug: product.subCategorySlug ?? '',
             image: product.image,
             sku: product.sku,
             slug: product.slug,
+            price: product.price,
             stock: product.stock,
             rating: product.rating,
-            isFeatured: product.isFeatured,
             oldPrice: product.oldPrice,
-        })),
-    });
-
-    return {
-        record,
-        comparison: selectedProducts,
-        rows: [
-            {
-                label: 'Brand',
-                values: selectedProducts.map(product => (product.brand as unknown as { name: string }).name),
-            },
-            { label: 'SKU', values: selectedProducts.map(product => product.sku) },
-            { label: 'Title', values: selectedProducts.map(product => product.title) },
-            { label: 'Slug', values: selectedProducts.map(product => product.slug) },
-            { label: 'Image', values: selectedProducts.map(product => product.image) },
-            {
-                label: 'Category',
-                values: selectedProducts.map(
-                    product => (product.category as unknown as { name: string }).name,
-                ),
-            },
-            { label: 'SubCategorySlug', values: selectedProducts.map(product => product.subCategorySlug) },
-            { label: 'Stock', values: selectedProducts.map(product => product.stock) },
-            { label: 'isFeatured', values: selectedProducts.map(product => product.isFeatured) },
-            { label: 'Rating', values: selectedProducts.map(product => product.rating) },
-            { label: 'Price', values: selectedProducts.map(product => product.price ?? '-') },
-            { label: 'Old price', values: selectedProducts.map(product => product.oldPrice ?? '-') },
-        ],
+            isFeatured: product.isFeatured,
+            weightKg: product.weightKg,
+            isNoCOD: product.isNoCOD,
+        },
     };
 };
 
-// 2. getMyComparisonHistoryFromDB
-const getMyComparisonHistoryFromDB = async (user: IUser) => {
-    return ComparisonHistoryModel.find({ user: user._id.toString() }).sort({ createdAt: -1 }).lean();
+const addComparisonItemIntoDB = async (user: IUser, productId: string) => {
+    const { product, snapshot } = await getProductSnapshot(productId);
+    const currentItems = await ComparisonHistoryModel.find({ user: user._id }).lean();
+
+    if (currentItems.some(item => String(item.product) === String(product._id))) {
+        return currentItems.find(item => String(item.product) === String(product._id)) ?? null;
+    }
+
+    if (currentItems.length >= MAX_COMPARE_ITEMS) {
+        throw new AppError(httpStatus.BAD_REQUEST, `You can compare up to ${MAX_COMPARE_ITEMS} products at a time.`);
+    }
+
+    if (currentItems.length > 0) {
+        const currentCategory = currentItems[0]?.productSnapshot?.category;
+        if (currentCategory && currentCategory !== snapshot.category) {
+            throw new AppError(httpStatus.BAD_REQUEST, 'You can compare only products from the same category.');
+        }
+    }
+
+    const result = await ComparisonHistoryModel.create({
+        user: user._id,
+        product: product._id,
+        productSnapshot: snapshot,
+    });
+
+    await ComparisonHistoryEventModel.create({ user: user._id, product: product._id, productSnapshot: snapshot, action: 'add' });
+
+    return result;
 };
 
-// 3. getAllComparisonHistoryFromDB
+const removeComparisonItemFromDB = async (user: IUser, productId: string) => {
+    const productObjectId = toObjectId(productId);
+    const existing = await ComparisonHistoryModel.findOne({ user: user._id, product: productObjectId }).lean();
+    await ComparisonHistoryModel.findOneAndDelete({ user: user._id, product: productObjectId });
+
+    if (existing?.productSnapshot) {
+        await ComparisonHistoryEventModel.create({
+            user: user._id,
+            product: productObjectId,
+            productSnapshot: existing.productSnapshot,
+            action: 'remove',
+        });
+    }
+
+    return null;
+};
+
+const getMyComparisonHistoryFromDB = async (user: IUser) => {
+    return ComparisonHistoryModel.find({ user: user._id }).sort({ updatedAt: -1 }).lean();
+};
+
 const getAllComparisonHistoryFromDB = async (query: Record<string, unknown>) => {
     const page = Number(query.page) || 1;
     const limit = Number(query.limit) || 50;
     const skip = (page - 1) * limit;
+    const category = typeof query.category === 'string' ? query.category.trim() : '';
+    const user = typeof query.user === 'string' ? query.user.trim() : '';
+
+    const filter: Record<string, unknown> = {};
+    if (category) filter['productSnapshot.category'] = category;
+    if (user) filter.user = toObjectId(user);
 
     const [data, total] = await Promise.all([
-        ComparisonHistoryModel.find({})
+        ComparisonHistoryEventModel.find(filter)
             .populate('user', 'name email phone image role isActive')
+            .populate('product')
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit)
             .lean(),
-        ComparisonHistoryModel.countDocuments(),
+        ComparisonHistoryEventModel.countDocuments(filter),
     ]);
 
     return {
@@ -120,16 +131,52 @@ const getAllComparisonHistoryFromDB = async (query: Record<string, unknown>) => 
     };
 };
 
-// 4. clearComparisonHistoryFromDB
-const clearComparisonHistoryFromDB = async () => {
-    await ComparisonHistoryModel.deleteMany({});
-    return null;
+const getComparisonInsightsFromDB = async () => {
+    const [categorySummary, productSummary, userSummary, total] = await Promise.all([
+        ComparisonHistoryEventModel.aggregate([
+            {
+                $group: {
+                    _id: '$productSnapshot.category',
+                    count: { $sum: 1 },
+                    users: { $addToSet: '$user' },
+                },
+            },
+            { $project: { _id: 0, category: '$_id', count: 1, userCount: { $size: '$users' } } },
+            { $sort: { count: -1 } },
+        ]),
+        ComparisonHistoryEventModel.aggregate([
+            {
+                $group: {
+                    _id: '$productSnapshot.title',
+                    count: { $sum: 1 },
+                    category: { $first: '$productSnapshot.category' },
+                },
+            },
+            { $project: { _id: 0, product: '$_id', count: 1, category: 1 } },
+            { $sort: { count: -1 } },
+            { $limit: 10 },
+        ]),
+        ComparisonHistoryEventModel.aggregate([
+            { $group: { _id: '$user', count: { $sum: 1 } } },
+            { $project: { _id: 0, user: '$_id', count: 1 } },
+            { $sort: { count: -1 } },
+            { $limit: 10 },
+        ]),
+        ComparisonHistoryEventModel.countDocuments(),
+    ]);
+
+    return {
+        total,
+        categorySummary,
+        productSummary,
+        userSummary,
+    };
 };
 
 export const ComparisonHistoryService = {
-    getComparisonSuggestionsFromDB,
-    compareProductsFromDB,
+    addComparisonItemIntoDB,
+    removeComparisonItemFromDB,
     getMyComparisonHistoryFromDB,
     getAllComparisonHistoryFromDB,
-    clearComparisonHistoryFromDB,
+    getComparisonInsightsFromDB,
 };

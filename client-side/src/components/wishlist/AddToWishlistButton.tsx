@@ -23,9 +23,15 @@ export function AddToWishlistButton({ product }: Props) {
 
         startTransition(async () => {
             if (nextSaved) {
-                await addWishlistItem(product.id!);
+                const result = await addWishlistItem(product.id!);
+                if (!result.success) {
+                    toggle(product);
+                }
             } else {
-                await removeWishlistItem(product.id!);
+                const result = await removeWishlistItem(product.id!);
+                if (!result.success) {
+                    toggle(product);
+                }
             }
         });
     }

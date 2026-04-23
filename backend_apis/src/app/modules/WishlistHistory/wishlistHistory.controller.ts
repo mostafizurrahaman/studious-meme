@@ -32,7 +32,7 @@ const getMyWishlist = asyncHandler(async (req, res) => {
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
-        message: 'Wishlist fetched successfully!',
+        message: 'Wishlist list fetched successfully!',
         data: result,
     });
 });
@@ -48,9 +48,20 @@ const getAllWishlist = asyncHandler(async (req, res) => {
     });
 });
 
+const getWishlistInsights = asyncHandler(async (_req, res) => {
+    const result = await WishlistHistoryService.getWishlistInsightsFromDB();
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        message: 'Wishlist insights fetched successfully!',
+        data: result,
+    });
+});
+
 export const WishlistHistoryController = {
     addWishlistItem,
     removeWishlistItem,
     getMyWishlist,
     getAllWishlist,
+    getWishlistInsights,
 };

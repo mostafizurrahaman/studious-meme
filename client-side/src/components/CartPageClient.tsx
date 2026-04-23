@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { formatMoney } from '@/lib/cart';
 import { useCartStore } from '@/lib/cart-store';
 import { calculateFulfillmentSummary, formatShippingZoneLabel } from '@/lib/fulfillment';
+import { clearCart as clearCartPersisted, getMyCart, removeCartItem, updateCartItem } from '@/services/Cart';
 
 export function CartPageClient() {
     const items = useCartStore(state => state.items);
@@ -27,6 +28,7 @@ export function CartPageClient() {
     const applyCoupon = useCartStore(state => state.applyCoupon);
     const clearCoupon = useCartStore(state => state.clearCoupon);
     const updateCheckout = useCartStore(state => state.updateCheckout);
+    const replaceItems = useCartStore(state => state.replaceItems);
     const [couponMessage, setCouponMessage] = useState('');
     const [toast, setToast] = useState('');
 
@@ -49,6 +51,47 @@ export function CartPageClient() {
 
         updateCheckout('payment', 'SSLCommerz');
     }, [checkout.payment, fulfillment.codEligible, paymentValue, updateCheckout]);
+
+    useEffect(() => {
+        let active = true;
+
+        getMyCart()
+            .then(result => {
+                if (!active || !result.success || !Array.isArray(result.data?.items)) {
+                    return;
+                }
+
+                replaceItems(
+                    result.data.items.map(item => {
+                        const product = item.product as { _id?: string } | string | undefined;
+                        const productId = typeof product === 'string' ? product : product?._id;
+
+                        return {
+                            productId,
+                            sku: item.productSnapshot.sku,
+                            title: item.productSnapshot.title,
+                            href: '/shop',
+                            image: item.productSnapshot.image,
+                            brand: item.productSnapshot.brand,
+                            unitPrice: item.priceSnapshot,
+                            unitPriceLabel: `Tk. ${item.priceSnapshot.toLocaleString('en-US', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                            })}`,
+                            oldPriceLabel: undefined,
+                            quantity: item.quantity,
+                            weightKg: item.productSnapshot.weightKg ?? 1,
+                            isNoCOD: Boolean(item.productSnapshot.isNoCOD),
+                        };
+                    }),
+                );
+            })
+            .catch(() => null);
+
+        return () => {
+            active = false;
+        };
+    }, [replaceItems]);
 
     if (!hydrated) {
         return (
@@ -125,7 +168,16 @@ export function CartPageClient() {
                                             <Button
                                                 type="button"
                                                 variant="ghost"
-                                                onClick={() => decrease(item.sku)}
+                                                onClick={() => {
+                                                    const nextQuantity = item.quantity - 1;
+                                                    decrease(item.sku);
+
+                                                    if (item.productId) {
+                                                        void (nextQuantity > 0
+                                                            ? updateCartItem(item.productId, nextQuantity)
+                                                            : removeCartItem(item.productId)).catch(() => null);
+                                                    }
+                                                }}
                                                 className="h-auto px-2 text-lg leading-none text-foreground/70 hover:bg-transparent"
                                             >
                                                 −
@@ -136,7 +188,13 @@ export function CartPageClient() {
                                             <Button
                                                 type="button"
                                                 variant="ghost"
-                                                onClick={() => increase(item.sku)}
+                                                onClick={() => {
+                                                    const nextQuantity = item.quantity + 1;
+                                                    increase(item.sku);
+                                                    if (item.productId) {
+                                                        void updateCartItem(item.productId, nextQuantity).catch(() => null);
+                                                    }
+                                                }}
                                                 className="h-auto px-2 text-lg leading-none text-foreground/70 hover:bg-transparent"
                                             >
                                                 +
@@ -148,7 +206,12 @@ export function CartPageClient() {
                                         <Button
                                             type="button"
                                             variant="link"
-                                            onClick={() => remove(item.sku)}
+                                            onClick={() => {
+                                                remove(item.sku);
+                                                if (item.productId) {
+                                                    void removeCartItem(item.productId).catch(() => null);
+                                                }
+                                            }}
                                             className="h-auto p-0 text-xs font-semibold text-primary"
                                         >
                                             Remove
@@ -261,7 +324,10 @@ export function CartPageClient() {
                             </Button>
                             <Button
                                 type="button"
-                                onClick={clear}
+                                onClick={() => {
+                                    clear();
+                                    void clearCartPersisted().catch(() => null);
+                                }}
                                 variant="outline"
                                 className="h-11 rounded-full border-white/20 px-6 text-sm font-bold text-white hover:bg-white/10"
                             >

@@ -9,7 +9,7 @@ import { getAllComparisonHistory } from '@/services/ComparisonHistory';
 
 export const metadata: Metadata = buildMetadata({
   title: 'Comparison History',
-  description: 'Review backend-saved product comparison history.',
+  description: 'Review backend-saved product comparison activity.',
   path: '/dashboard/admin/compare',
   noindex: true,
 });

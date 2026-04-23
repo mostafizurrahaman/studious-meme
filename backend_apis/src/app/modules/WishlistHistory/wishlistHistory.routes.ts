@@ -23,6 +23,10 @@ router
     .get(auth(ROLE.ADMIN, ROLE.SUPER_ADMIN), adminLimiter, WishlistHistoryController.getAllWishlist);
 
 router
+    .route('/admin/summary')
+    .get(auth(ROLE.ADMIN, ROLE.SUPER_ADMIN), adminLimiter, WishlistHistoryController.getWishlistInsights);
+
+router
     .route('/:productId')
     .delete(auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN), actionLimiter, WishlistHistoryController.removeWishlistItem);
 

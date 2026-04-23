@@ -23,11 +23,14 @@ export type WishlistHistoryRecord = {
         title: string;
         brand: string;
         category: string;
+        categorySlug?: string;
         image: string;
         sku: string;
         slug: string;
         price: number;
         stock: number;
+        weightKg?: number;
+        isNoCOD?: boolean;
     };
     createdAt?: string;
     updatedAt?: string;
@@ -40,7 +43,7 @@ export const addWishlistItem = async (productId: string): Promise<BackendEnvelop
         return { success: false, message: 'Sign in to save wishlist items to your account.' };
     }
 
-    const result = await requestBackendJson<BackendEnvelope<WishlistHistoryRecord>>('/wishlist-history', {
+    const result = await requestBackendJson<BackendEnvelope<WishlistHistoryRecord>>('/wishlist', {
         method: 'POST',
         body: { productId },
         token: accessToken,
@@ -57,7 +60,7 @@ export const removeWishlistItem = async (productId: string): Promise<BackendEnve
         return { success: false, message: 'Sign in to update wishlist items on your account.' };
     }
 
-    const result = await requestBackendJson<BackendEnvelope<null>>(`/wishlist-history/${productId}`, {
+    const result = await requestBackendJson<BackendEnvelope<null>>(`/wishlist/${productId}`, {
         method: 'DELETE',
         token: accessToken,
     });
@@ -73,7 +76,7 @@ export const getMyWishlist = async (): Promise<BackendEnvelope<WishlistHistoryRe
         return { success: false, data: [] };
     }
 
-    return requestBackendJson<BackendEnvelope<WishlistHistoryRecord[]>>('/wishlist-history', {
+    return requestBackendJson<BackendEnvelope<WishlistHistoryRecord[]>>('/wishlist', {
         method: 'GET',
         token: accessToken,
         next: { tags: ['WISHLIST'] },
@@ -100,7 +103,24 @@ export const getAllWishlist = async (
 ): Promise<BackendEnvelope<WishlistHistoryRecord[]>> => {
     const accessToken = await getValidAccessTokenForServerHandlerGet();
 
-    return requestBackendJson<BackendEnvelope<WishlistHistoryRecord[]>>(`/wishlist-history/admin${buildHistoryQuery(params)}`, {
+    return requestBackendJson<BackendEnvelope<WishlistHistoryRecord[]>>(`/wishlist/admin${buildHistoryQuery(params)}`, {
+        method: 'GET',
+        token: accessToken ?? undefined,
+        next: { tags: ['WISHLIST'] },
+    });
+};
+
+export type WishlistInsightSummary = {
+    total: number;
+    categorySummary: Array<{ category: string; count: number; userCount: number }>;
+    productSummary: Array<{ product: string; count: number; category: string }>;
+    userSummary: Array<{ user: string; count: number }>;
+};
+
+export const getWishlistInsights = async (): Promise<BackendEnvelope<WishlistInsightSummary>> => {
+    const accessToken = await getValidAccessTokenForServerHandlerGet();
+
+    return requestBackendJson<BackendEnvelope<WishlistInsightSummary>>('/wishlist/admin/summary', {
         method: 'GET',
         token: accessToken ?? undefined,
         next: { tags: ['WISHLIST'] },

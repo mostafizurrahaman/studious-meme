@@ -1,6 +1,7 @@
 import type { Product } from '@/lib/storefront-types';
 
 export type CartItem = {
+    productId?: string;
     sku: string;
     title: string;
     href: Product['href'];
@@ -27,6 +28,7 @@ export function formatMoney(value: number) {
 
 export function toCartItem(product: Product): CartItem {
     return {
+        productId: product.id,
         sku: product.sku,
         title: product.title,
         href: product.href,

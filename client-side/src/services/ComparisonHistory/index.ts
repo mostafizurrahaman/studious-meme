@@ -15,24 +15,40 @@ type BackendEnvelope<T> = {
     meta?: { page: number; limit: number; total: number; totalPages: number };
 };
 
-export type ComparisonPayload = {
-    IDs: string[];
+export type ComparisonHistoryRecord = {
+    _id?: string;
+    user?: unknown;
+    product?: unknown;
+    productSnapshot?: {
+        title: string;
+        brand: string;
+        category: string;
+        subCategorySlug?: string;
+        image: string;
+        sku: string;
+        slug: string;
+        price: number;
+        stock: number;
+        rating: number;
+        oldPrice?: number;
+        isFeatured: boolean;
+        weightKg?: number;
+        isNoCOD?: boolean;
+    };
+    createdAt?: string;
+    updatedAt?: string;
 };
 
-export const getComparisonSuggestions = async (): Promise<BackendEnvelope<unknown[]>> => {
-    return requestBackendJson<BackendEnvelope<unknown[]>>('/comparison-history', { method: 'GET' });
-};
-
-export const compareProducts = async (payload: ComparisonPayload): Promise<BackendEnvelope<unknown>> => {
+export const addCompareItem = async (productId: string): Promise<BackendEnvelope<ComparisonHistoryRecord | null>> => {
     const accessToken = await getValidAccessTokenForServerActions();
 
     if (!accessToken) {
-        return { success: false, message: 'Sign in to save comparison history.' };
+        return { success: false, message: 'Sign in to save comparison items to your account.' };
     }
 
-    const result = await requestBackendJson<BackendEnvelope<unknown>>('/comparison-history/compare', {
+    const result = await requestBackendJson<BackendEnvelope<ComparisonHistoryRecord | null>>('/compare', {
         method: 'POST',
-        body: payload,
+        body: { productId },
         token: accessToken,
     });
 
@@ -40,12 +56,32 @@ export const compareProducts = async (payload: ComparisonPayload): Promise<Backe
     return result;
 };
 
-export const getMyComparisonHistory = async (): Promise<BackendEnvelope<unknown[]>> => {
+export const removeCompareItem = async (productId: string): Promise<BackendEnvelope<null>> => {
+    const accessToken = await getValidAccessTokenForServerActions();
+
+    if (!accessToken) {
+        return { success: false, message: 'Sign in to update comparison items on your account.' };
+    }
+
+    const result = await requestBackendJson<BackendEnvelope<null>>(`/compare/${productId}`, {
+        method: 'DELETE',
+        token: accessToken,
+    });
+
+    updateTag('COMPARISON_HISTORY');
+    return result;
+};
+
+export const getMyComparisonHistory = async (): Promise<BackendEnvelope<ComparisonHistoryRecord[]>> => {
     const accessToken = await getValidAccessTokenForServerHandlerGet();
 
-    return requestBackendJson<BackendEnvelope<unknown[]>>('/comparison-history/history', {
+    if (!accessToken) {
+        return { success: false, data: [] };
+    }
+
+    return requestBackendJson<BackendEnvelope<ComparisonHistoryRecord[]>>('/compare', {
         method: 'GET',
-        token: accessToken ?? undefined,
+        token: accessToken,
         next: { tags: ['COMPARISON_HISTORY'] },
     });
 };
@@ -67,24 +103,32 @@ const buildHistoryQuery = (params: HistoryListParams = {}) => {
 
 export const getAllComparisonHistory = async (
     params: HistoryListParams = {},
-): Promise<BackendEnvelope<unknown[]>> => {
+): Promise<BackendEnvelope<ComparisonHistoryRecord[]>> => {
     const accessToken = await getValidAccessTokenForServerHandlerGet();
 
-    return requestBackendJson<BackendEnvelope<unknown[]>>(`/comparison-history/admin/history${buildHistoryQuery(params)}`, {
+    return requestBackendJson<BackendEnvelope<ComparisonHistoryRecord[]>>(
+        `/compare/admin${buildHistoryQuery(params)}`,
+        {
+            method: 'GET',
+            token: accessToken ?? undefined,
+            next: { tags: ['COMPARISON_HISTORY'] },
+        },
+    );
+};
+
+export type ComparisonInsightSummary = {
+    total: number;
+    categorySummary: Array<{ category: string; count: number; userCount: number }>;
+    productSummary: Array<{ product: string; count: number; category: string }>;
+    userSummary: Array<{ user: string; count: number }>;
+};
+
+export const getComparisonInsights = async (): Promise<BackendEnvelope<ComparisonInsightSummary>> => {
+    const accessToken = await getValidAccessTokenForServerHandlerGet();
+
+    return requestBackendJson<BackendEnvelope<ComparisonInsightSummary>>('/compare/admin/summary', {
         method: 'GET',
         token: accessToken ?? undefined,
         next: { tags: ['COMPARISON_HISTORY'] },
     });
-};
-
-export const clearComparisonHistory = async (): Promise<BackendEnvelope<null>> => {
-    const accessToken = await getValidAccessTokenForServerActions();
-
-    const result = await requestBackendJson<BackendEnvelope<null>>('/comparison-history/history', {
-        method: 'DELETE',
-        token: accessToken ?? undefined,
-    });
-
-    updateTag('COMPARISON_HISTORY');
-    return result;
 };
