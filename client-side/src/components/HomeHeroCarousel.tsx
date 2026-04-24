@@ -53,16 +53,18 @@ export function HomeHeroCarousel({ slides, features }: HomeHeroCarouselProps) {
 
   return (
     <Card className="overflow-hidden shadow-sm">
-      <div className="grid h-full gap-0 p-0 sm:gap-4 sm:p-6 lg:grid-cols-[1.22fr_0.78fr] lg:p-6">
-        <div className="ui-image-card relative min-h-105 overflow-hidden rounded-3xl bg-background sm:min-h-125 lg:min-h-125">
+      <div className="grid h-full items-stretch gap-0 p-0 sm:gap-4 sm:p-6 lg:grid-cols-2 lg:p-6">
+        <div className="ui-image-card relative h-full min-h-96 overflow-hidden rounded-3xl bg-background">
           <Link href={heroSlide.href} aria-label={heroSlide.title} className="absolute inset-0 z-10">
             <Image
               src={heroSlide.image}
               alt={heroSlide.title}
               fill
               loading="eager"
-              sizes="(max-width: 1024px) 100vw, 760px"
-              className="object-cover object-[center_top] transition duration-500 ease-out"
+              // quality={100}
+              // unoptimized
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover object-center transition duration-500 ease-out"
             />
           </Link>
 
@@ -74,7 +76,7 @@ export function HomeHeroCarousel({ slides, features }: HomeHeroCarouselProps) {
                 aria-label="Previous banner"
                 variant="secondary"
                 size="icon"
-                className="absolute left-3 top-1/2 z-20 h-10 w-10 -translate-y-1/2 rounded-full bg-transparent text-foreground shadow-md backdrop-blur-sm transition hover:bg-background"
+                className="absolute left-3 top-1/2 z-20 h-10 w-10 -translate-y-1/2 rounded-full bg-transparent text-foreground shadow-md backdrop-blur-sm transition hover:bg-background hover:text-primary"
               >
                 <ArrowLeft className="h-4 w-4" />
               </Button>
@@ -84,7 +86,7 @@ export function HomeHeroCarousel({ slides, features }: HomeHeroCarouselProps) {
                 aria-label="Next banner"
                 variant="secondary"
                 size="icon"
-                className="absolute right-3 top-1/2 z-20 h-10 w-10 -translate-y-1/2 rounded-full bg-transparent text-foreground shadow-md backdrop-blur-sm transition hover:bg-background"
+                className="absolute right-3 top-1/2 z-20 h-10 w-10 -translate-y-1/2 rounded-full bg-transparent text-foreground shadow-md backdrop-blur-sm transition hover:bg-background hover:text-primary"
               >
                 <ArrowRight className="h-4 w-4" />
               </Button>
@@ -109,7 +111,7 @@ export function HomeHeroCarousel({ slides, features }: HomeHeroCarouselProps) {
         <div className="hidden gap-4 lg:grid lg:grid-cols-1">
           <Link
             href={topFeature.href}
-            className="ui-image-card group relative min-h-80 cursor-pointer overflow-hidden rounded-3xl border border-border bg-muted shadow-sm"
+            className="ui-image-card group relative aspect-[2.6/1] cursor-pointer overflow-hidden rounded-3xl border border-border bg-muted shadow-sm"
           >
             <Image
               src={topFeature.image}
@@ -117,8 +119,10 @@ export function HomeHeroCarousel({ slides, features }: HomeHeroCarouselProps) {
               fill
               loading="eager"
               fetchPriority="high"
-              sizes="(max-width: 1024px) 33vw, 300px"
-              className="object-cover transition duration-300 group-hover:scale-105"
+              quality={100}
+              unoptimized
+              sizes="(max-width: 1024px) 50vw, 25vw"
+              className="object-cover object-center transition duration-300 group-hover:scale-105"
             />
             {/* <div className="absolute inset-0 bg-linear-to-r from-black/10 via-black/5 to-transparent" /> */}
             {/* <Badge className="absolute left-4 top-4 rounded-full bg-primary px-3 py-1 text-[10px] uppercase tracking-[0.28em] text-white shadow-sm">
@@ -131,15 +135,17 @@ export function HomeHeroCarousel({ slides, features }: HomeHeroCarouselProps) {
               <Link
                 key={`${slide.title}-${index}`}
                 href={slide.href}
-                className="ui-image-card group relative min-h-40 cursor-pointer overflow-hidden rounded-3xl border border-border bg-muted shadow-sm"
+                className="ui-image-card group relative aspect-[1.85/1] cursor-pointer overflow-hidden rounded-3xl border border-border bg-muted shadow-sm"
               >
                 <Image
                   src={slide.image}
                   alt={slide.title}
                   fill
                   loading="eager"
-                  sizes="(max-width: 1024px) 16vw, 150px"
-                  className="object-cover transition duration-300 group-hover:scale-105"
+                  // quality={100}
+                  // unoptimized
+                  sizes="(max-width: 1024px) 50vw, 12.5vw"
+                  className="object-cover object-center transition duration-300 group-hover:scale-105"
                 />
                 {/* <div className="absolute inset-0 bg-linear-to-r from-black/10 via-black/5 to-transparent" /> */}
                 {/* <Badge className="absolute left-3 top-3 rounded-full bg-primary px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-white shadow-sm">
