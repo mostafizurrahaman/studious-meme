@@ -26,7 +26,7 @@ export default async function MainCategoriesPage() {
     <>
       <SeoScripts data={buildMainCategoriesSchemas(backendCategories)} />
       <main className="flex-1 bg-background pb-16">
-        <div className="mx-auto w-full max-w-350 px-4 py-6 lg:px-6">
+        <div className="px-4 py-6 lg:px-6">
           <Card className="p-6 shadow-sm sm:p-8">
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">Main categories</p>
             <h1 className="mt-4 text-3xl font-black text-secondary sm:text-4xl">All Categories</h1>

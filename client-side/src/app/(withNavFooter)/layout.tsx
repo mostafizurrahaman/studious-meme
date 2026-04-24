@@ -2,6 +2,7 @@ import { FloatingCategoryRail } from '@/components/FloatingCategoryRail';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
 import { MobileToolbar } from '@/components/MobileToolbar';
+import { Container } from '@/components/Container';
 import { getActiveBrands, mapBackendBrandToStorefrontBrand } from '@/services/Brand';
 import { getActiveCategories } from '@/services/Category';
 import { mapBackendCategoryToStorefrontCategory, type BackendCategory } from '@/services/Category/mappers';
@@ -29,7 +30,9 @@ const MainLayout = async ({ children }: { children: React.ReactNode }) => {
       {/* <Header categories={categories} brands={brands} /> */}
       <Header categories={categories} />
       <FloatingCategoryRail categories={categories} />
-      <div className="min-h-screen">{children}</div>
+      <Container>
+        <div className="min-h-screen">{children}</div>
+      </Container>
       <Footer categories={categories} brands={brands} />
       <MobileToolbar />
     </div>

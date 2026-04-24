@@ -102,7 +102,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
     <>
       <SeoScripts data={buildCategorySchemas(category, products)} />
       <main className="flex-1 bg-background pb-16">
-        <div className="mx-auto w-full max-w-350 px-4 py-6 lg:px-6">
+        <div className="px-4 py-6 lg:px-6">
           <nav aria-label="Breadcrumb" className="mb-4 text-sm text-foreground/55">
             <ol className="flex flex-wrap items-center gap-2">
               <li>

@@ -36,7 +36,7 @@ export default async function PromotionsPage({ searchParams }: Props) {
     <>
       <SeoScripts data={buildPromotionsSchemas(products)} />
       <main className="flex-1 bg-background pb-16">
-        <div className="mx-auto w-full max-w-350 px-4 py-6 lg:px-6">
+        <div className="px-4 py-6 lg:px-6">
           <Card className="border-0 bg-linear-to-r from-primary to-secondary p-6 text-white shadow-sm sm:p-8">
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-white/70">
               Campaigns and offers
