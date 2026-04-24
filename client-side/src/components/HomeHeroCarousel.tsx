@@ -4,8 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
-
-import { Badge } from '@/components/ui/badge';
+// import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
@@ -121,10 +120,10 @@ export function HomeHeroCarousel({ slides, features }: HomeHeroCarouselProps) {
               sizes="(max-width: 1024px) 33vw, 300px"
               className="object-cover transition duration-300 group-hover:scale-105"
             />
-            <div className="absolute inset-0 bg-linear-to-r from-black/10 via-black/5 to-transparent" />
-            <Badge className="absolute left-4 top-4 rounded-full bg-primary px-3 py-1 text-[10px] uppercase tracking-[0.28em] text-white shadow-sm">
+            {/* <div className="absolute inset-0 bg-linear-to-r from-black/10 via-black/5 to-transparent" /> */}
+            {/* <Badge className="absolute left-4 top-4 rounded-full bg-primary px-3 py-1 text-[10px] uppercase tracking-[0.28em] text-white shadow-sm">
               Feature 1
-            </Badge>
+            </Badge> */}
           </Link>
 
           <div className="grid grid-cols-2 gap-4">
@@ -142,10 +141,10 @@ export function HomeHeroCarousel({ slides, features }: HomeHeroCarouselProps) {
                   sizes="(max-width: 1024px) 16vw, 150px"
                   className="object-cover transition duration-300 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-linear-to-r from-black/10 via-black/5 to-transparent" />
-                <Badge className="absolute left-3 top-3 rounded-full bg-primary px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-white shadow-sm">
+                {/* <div className="absolute inset-0 bg-linear-to-r from-black/10 via-black/5 to-transparent" /> */}
+                {/* <Badge className="absolute left-3 top-3 rounded-full bg-primary px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-white shadow-sm">
                   Feature {index + 2}
-                </Badge>
+                </Badge> */}
               </Link>
             ))}
           </div>
