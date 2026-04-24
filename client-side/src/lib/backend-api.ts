@@ -1,33 +1,9 @@
 import { CATALOG_REVALIDATE_SECONDS } from '@/lib/isr';
 
-export type JsonRecord = Record<string, unknown>;
+type JsonRecord = Record<string, unknown>;
 
-export interface BackendApiErrorPayload {
-    message?: string;
-    error?: string;
-    [key: string]: unknown;
-}
-
-export class BackendApiError extends Error {
-    status: number;
-
-    payload: unknown;
-
-    constructor(message: string, status: number, payload: unknown) {
-        super(message);
-        this.name = 'BackendApiError';
-        this.status = status;
-        this.payload = payload;
-    }
-}
-
-export function getBackendApiBase(): string {
+function getBackendApiBase(): string {
     return (process.env.NEXT_PUBLIC_BACKEND_FULL_URL as string).replace(/\/$/, '');
-}
-
-export function buildBackendApiUrl(path: string): string {
-    const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-    return `${getBackendApiBase()}${normalizedPath}`;
 }
 
 function isJsonSerializableBody(body: unknown): body is JsonRecord {
@@ -64,7 +40,7 @@ async function readJsonSafely(response: Response): Promise<unknown> {
     }
 }
 
-export interface BackendRequestOptions extends Omit<RequestInit, 'body' | 'headers'> {
+interface BackendRequestOptions extends Omit<RequestInit, 'body' | 'headers'> {
     body?: RequestInit['body'] | JsonRecord | unknown[];
     headers?: HeadersInit;
     token?: string | null;
@@ -112,15 +88,5 @@ export async function requestBackendJson<T>(path: string, options: BackendReques
         },
     );
 
-    const payload = await readJsonSafely(response);
-
-    // if (!response.ok) { // i am sending no ok field in response, so this will always be true, and error will always be thrown, so commenting out
-    //     throw new BackendApiError(
-    //         getErrorMessage(payload, response.statusText || 'Request failed'),
-    //         response.status,
-    //         payload,
-    //     );
-    // }
-
-    return payload as T;
+    return (await readJsonSafely(response)) as T;
 }
