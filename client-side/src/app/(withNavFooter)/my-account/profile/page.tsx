@@ -1,4 +1,3 @@
-import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
@@ -6,13 +5,9 @@ import { Card } from '@/components/ui/card';
 import { UserAvatar } from '@/components/UserAvatar';
 import { getCurrentUser } from '@/services/Auth';
 import { ProfileSettingsForm } from '@/components/ProfileSettingsForm';
-import { buildMetadata } from '@/lib/seo';
+import { myProfileMetadata } from '@/lib/seo';
 
-export const metadata: Metadata = buildMetadata({
-    title: 'My Profile',
-    description: 'Manage your account profile and settings.',
-    path: '/my-account/profile',
-});
+export const metadata = myProfileMetadata;
 
 type Props = Record<string, unknown>;
 

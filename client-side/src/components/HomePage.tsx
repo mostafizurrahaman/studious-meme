@@ -8,6 +8,7 @@ import { getCategoryAccentClassName, getCategoryAccentStyle } from '@/lib/catego
 import { ProductCard } from '@/components/ProductCard';
 import { SectionHeading } from '@/components/SectionHeading';
 import { HomeHeroCarousel } from '@/components/HomeHeroCarousel';
+import { siteConfig } from '@/lib/seo';
 import { mapBackendBrandToStorefrontBrand, type BackendBrand } from '@/services/Brand';
 import { mapBackendCategoryToStorefrontCategory, type BackendCategory } from '@/services/Category/mappers';
 import { mapBackendProductToStorefrontProduct, type BackendProduct } from '@/services/Product';
@@ -44,7 +45,7 @@ type HomePageProps = {
 
 function SectionMarquee() {
   const message =
-    'Welcome to Malamal.com.bd. Thank you for staying with Malamal | Malamal এর পক্ষ থেকে সবাইকে জানাই স্বাগত ও শুভকামনা ।';
+    `Welcome to ${siteConfig.name}. Thank you for staying with Malamal | Malamal এর পক্ষ থেকে সবাইকে জানাই স্বাগত ও শুভকামনা ।`;
 
   return (
     <Card className="overflow-hidden border-primary/20 py-3 shadow-sm">
@@ -252,14 +253,14 @@ export async function HomePage({ heroContent }: HomePageProps) {
         <Card className="mt-8 shadow-sm">
           <CardContent className="p-6">
             <h2 className="text-xl font-black text-secondary sm:text-2xl">
-              Malamal.com.bd hardware store overview
-            </h2>
+                {siteConfig.name} hardware store overview
+              </h2>
             <Separator className="my-5" />
             <div className="grid gap-6 text-sm leading-7 text-foreground/70 lg:grid-cols-2">
               <div className="space-y-4">
                 <p>
-                  Malamal.com.bd is positioned as a trusted online hardware and industrial supply store in
-                  Bangladesh, serving workshop, maintenance and project buyers with a broad catalog.
+                    {siteConfig.name} is positioned as a trusted online hardware and industrial supply store in
+                    Bangladesh, serving workshop, maintenance and project buyers with a broad catalog.
                 </p>
                 <p>
                   This frontend keeps the storefront hierarchy, brand focus and product merchandising style

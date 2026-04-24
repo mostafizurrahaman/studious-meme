@@ -1,18 +1,20 @@
+import { siteConfig } from '@/lib/seo';
+
 export const contactChannels = [
     {
         label: 'Hotline',
-        value: '+880 9638212121',
-        href: 'tel:+8809638212121',
+        value: siteConfig.phone,
+        href: `tel:${siteConfig.phone.replace(/\s+/g, '')}`,
     },
     {
         label: 'Sales',
-        value: 'sales@malamal.com.bd',
-        href: 'mailto:sales@malamal.com.bd',
+        value: siteConfig.email,
+        href: `mailto:${siteConfig.email}`,
     },
     {
         label: 'Support',
-        value: 'info@malamal.com.bd',
-        href: 'mailto:info@malamal.com.bd',
+        value: siteConfig.supportEmail,
+        href: `mailto:${siteConfig.supportEmail}`,
     },
     {
         label: 'WhatsApp',

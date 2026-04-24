@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/card';
 import { formatMoney, type CartItem } from '@/lib/cart';
 import { formatDashboardDate } from '@/lib/formatDate';
 import { useCartStore } from '@/lib/cart-store';
+import { siteConfig } from '@/lib/seo';
 import type { BackendOrder } from '@/services/Order';
 
 export function OrderDetailClient({
@@ -144,7 +145,7 @@ export function OrderDetailClient({
                                 <div>
                                     <div className="text-sm font-bold text-secondary">Invoice</div>
                                     <div className="mt-1 text-sm text-foreground/55">
-                                        Malamal.com.bd order receipt
+                                        {siteConfig.name} order receipt
                                     </div>
                                 </div>
                                 <div className="text-right text-sm text-foreground/65">

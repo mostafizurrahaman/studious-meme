@@ -1,13 +1,9 @@
 import type { Metadata } from 'next';
 import { ManagedPageContent } from '@/components/ManagedPageContent';
-import { buildMetadata } from '@/lib/seo';
+import { aboutUsMetadata } from '@/lib/seo';
 import { getPageByType } from '@/services/Page';
 
-export const metadata: Metadata = buildMetadata({
-    title: 'About Us',
-    description: 'Learn more about Malamal and the storefront experience.',
-    path: '/about-us',
-});
+export const metadata: Metadata = aboutUsMetadata;
 
 export default async function AboutUsPage() {
     const pageResult = await getPageByType('about-us').catch(() => null);

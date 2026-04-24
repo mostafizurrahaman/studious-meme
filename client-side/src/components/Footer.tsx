@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
 import { Container } from '@/components/Container';
 import { contactChannels } from '@/lib/static-site-content';
+import { siteConfig } from '@/lib/seo';
 import type { Brand, Category } from '@/lib/storefront-types';
 
 type Props = {
@@ -17,26 +18,26 @@ export function Footer({ categories, brands }: Props) {
                     <div>
                         <h3 className="text-sm font-bold tracking-wide">Registered Office</h3>
                         <p className="mt-3 text-sm leading-6 text-secondary-foreground/80">
-                            Level 11 & 12, Medona Tower, 28, Mohakhali C/A, Dhaka-1212
+                            {siteConfig.address}
                         </p>
                         <div className="mt-4 space-y-2 text-sm">
                             <a
                                 className="block text-secondary-foreground/90 hover:text-secondary-foreground"
-                                href="mailto:info@malamal.com.bd"
+                                href={`mailto:${siteConfig.supportEmail}`}
                             >
-                                info@malamal.com.bd
+                                {siteConfig.supportEmail}
                             </a>
                             <a
                                 className="block text-secondary-foreground/90 hover:text-secondary-foreground"
-                                href="mailto:sales@malamal.com.bd"
+                                href={`mailto:${siteConfig.email}`}
                             >
-                                sales@malamal.com.bd
+                                {siteConfig.email}
                             </a>
                             <a
                                 className="block text-secondary-foreground/90 hover:text-secondary-foreground"
-                                href="tel:+8809638212121"
+                                href={`tel:${siteConfig.phone.replace(/\s+/g, '')}`}
                             >
-                                Hotline: +8809638212121 (10am to 7pm)
+                                Hotline: {siteConfig.phone} (10am to 7pm)
                             </a>
                             <a
                                 className="block text-secondary-foreground/90 hover:text-secondary-foreground"
@@ -133,7 +134,7 @@ export function Footer({ categories, brands }: Props) {
 
                 <Separator className="bg-white/15" />
                 <div className="py-6 text-xs text-secondary-foreground/70">
-                    © {new Date().getFullYear()} Malamal.com.bd
+                    © {new Date().getFullYear()} {siteConfig.name}
                 </div>
             </Container>
         </footer>

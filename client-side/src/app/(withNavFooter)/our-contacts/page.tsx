@@ -1,6 +1,7 @@
 import { SeoScripts } from '@/components/SeoScripts';
 import { Card } from '@/components/ui/card';
 import { contactChannels } from '@/lib/static-site-content';
+import { siteConfig } from '@/lib/seo';
 import { ourContactsMetadata, ourContactsSchemas } from '@/lib/seo';
 export const metadata = ourContactsMetadata;
 
@@ -36,7 +37,7 @@ export default function OurContactsPage() {
                         <Card className="border-0 bg-secondary p-6 text-secondary-foreground shadow-sm">
                             <h2 className="text-2xl font-black">Office</h2>
                             <p className="mt-3 max-w-xl text-sm leading-7 text-secondary-foreground/78">
-                                Level 11 & 12, Medona Tower, 28, Mohakhali C/A, Dhaka-1212.
+                                {siteConfig.address}
                             </p>
                             <div className="mt-6 rounded-2xl bg-white/10 p-4 text-sm text-secondary-foreground/82">
                                 B2B support, quotation follow-up and direct sales assistance are handled here.

@@ -6,7 +6,7 @@ export const siteConfig = {
   name: 'Malamal.com.bd',
   url: process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ?? 'https://malamal.com.bd',
   description:
-    'Best Online Hardware Store in Bangladesh – Buy tools & hardware for sale online near Dhaka at low prices.',
+    'Best Online Hardware Store in Bangladesh - Buy tools & hardware for sale online near Dhaka at low prices.',
   phone: '+880 9638212121',
   email: 'sales@malamal.com.bd',
   supportEmail: 'info@malamal.com.bd',
@@ -191,9 +191,16 @@ export const deliveryReturnMetadata = buildMetadata({
 });
 
 export const aboutUsMetadata = buildMetadata({
-  title: 'About Us - Malamal.com.bd',
+  title: 'About Us',
   description: 'Learn about Malamal, your trusted online hardware store in Bangladesh.',
   path: '/about-us',
+});
+
+export const myProfileMetadata = buildMetadata({
+  title: 'My Profile',
+  description: 'Manage your account profile and settings.',
+  path: '/my-account/profile',
+  noindex: true,
 });
 
 export const myAccountMetadata = buildMetadata({
@@ -359,7 +366,7 @@ const organizationSchema = {
   telephone: siteConfig.phone,
   address: {
     '@type': 'PostalAddress',
-    streetAddress: 'Level 11 & 12, Medona Tower, 28, Mohakhali C/A',
+    streetAddress: siteConfig.address,
     addressLocality: 'Dhaka',
     postalCode: '1212',
     addressCountry: 'BD',

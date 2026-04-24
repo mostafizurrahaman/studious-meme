@@ -14,6 +14,7 @@ import { useUser } from '@/context/UserContext';
 import { useCompareStore } from '@/lib/compare-store';
 import { useWishlistStore } from '@/lib/wishlist-store';
 import { getDashboardPath } from '@/lib/dashboard';
+import { siteConfig } from '@/lib/seo';
 import type { Category } from '@/lib/storefront-types';
 
 type Props = {
@@ -98,12 +99,12 @@ export function Header({ categories }: Props) {
                 <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background text-lg leading-none text-foreground">
                   ☰
                 </span>
-                <Link href="/" className="flex justify-center" aria-label="Malamal Home">
-                  <Image
-                    src="/logo.png"
-                    alt="Malamal.com.bd"
-                    width={160}
-                    height={32}
+                    <Link href="/" className="flex justify-center" aria-label="Malamal Home">
+                      <Image
+                        src="/logo.png"
+                        alt={siteConfig.name}
+                        width={160}
+                        height={32}
                     priority
                     className="h-7 w-34 object-contain sm:w-36"
                   />
@@ -192,7 +193,7 @@ export function Header({ categories }: Props) {
           <Link href="/" className="flex shrink-0 items-center" aria-label="Malamal Home">
             <Image
               src="/logo.png"
-              alt="Malamal.com.bd"
+              alt={siteConfig.name}
               width={182}
               height={36}
               priority
