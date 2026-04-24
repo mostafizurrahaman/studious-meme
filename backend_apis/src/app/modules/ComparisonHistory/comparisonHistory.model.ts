@@ -4,7 +4,8 @@ type ComparisonProductSnapshot = {
     title: string;
     brand: string;
     category: string;
-    subCategorySlug: string;
+    categorySlug?: string;
+    subCategorySlug?: string;
     image: string;
     sku: string;
     slug: string;
@@ -30,7 +31,8 @@ const comparisonProductSnapshotSchema = new Schema<ComparisonProductSnapshot>(
         title: { type: String, required: true },
         brand: { type: String, required: true },
         category: { type: String, required: true },
-        subCategorySlug: { type: String, required: true },
+        categorySlug: { type: String },
+        subCategorySlug: { type: String },
         image: { type: String, required: true },
         sku: { type: String, required: true },
         slug: { type: String, required: true },

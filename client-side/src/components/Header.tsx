@@ -11,6 +11,8 @@ import { Container } from '@/components/Container';
 import { MiniCartDropdown } from '@/components/cart/MiniCartDropdown';
 import { UserDropdownMenu } from '@/components/account/UserDropdownMenu';
 import { useUser } from '@/context/UserContext';
+import { useCompareStore } from '@/lib/compare-store';
+import { useWishlistStore } from '@/lib/wishlist-store';
 import { getDashboardPath } from '@/lib/dashboard';
 import type { Category } from '@/lib/storefront-types';
 
@@ -24,6 +26,8 @@ export function Header({ categories }: Props) {
   const categoriesRef = useRef<HTMLDetailsElement>(null);
   const menuRef = useRef<HTMLDetailsElement>(null);
   const cartRef = useRef<HTMLDetailsElement>(null);
+  const compareCount = useCompareStore(state => state.items.length);
+  const wishlistCount = useWishlistStore(state => state.items.length);
   const [mobileDrawerTab, setMobileDrawerTab] = useState<'categories' | 'menu'>('categories');
   const [activeCategorySlug, setActiveCategorySlug] = useState(categories[0]?.slug ?? '');
   const activeCategory =
@@ -280,10 +284,10 @@ export function Header({ categories }: Props) {
           <div className="ml-auto hidden items-center gap-3 md:flex">
             {(
               [
-                ['Compare', '/compare'],
-                ['Wishlist', '/wishlist'],
+                ['Compare', '/compare', compareCount],
+                ['Wishlist', '/wishlist', wishlistCount],
               ] as const
-            ).map(([label, href]) => (
+            ).map(([label, href, count]) => (
               <Link
                 key={label}
                 href={href}
@@ -291,15 +295,14 @@ export function Header({ categories }: Props) {
                 style={activePillStyle(href)}
               >
                 {label}
+                {count > 0 ? (
+                  <span className="ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold leading-none text-white">
+                    {count}
+                  </span>
+                ) : null}
               </Link>
             ))}
             <MiniCartDropdown ref={cartRef} active={pathname === '/cart'} />
-            <div className="text-sm leading-tight">
-              <div className="font-semibold text-foreground">Dedicated Support</div>
-              <a className="font-semibold text-secondary" href="tel:+8809638212121">
-                +880 9638212121
-              </a>
-            </div>
             {/* Quotation Request button */}
             <Link
               className="inline-flex h-10 items-center justify-center rounded-full border border-border px-3 text-xs font-semibold text-foreground transition hover:border-primary/30 hover:bg-primary! hover:text-white!"
@@ -350,13 +353,6 @@ export function Header({ categories }: Props) {
               >
                 Our Contacts
               </Link>
-            </div>
-
-            {/* right part */}
-            <div className="flex flex-wrap items-center gap-5">
-              {/* <Link className={navLinkClass('/main-categories')} href="/main-categories">
-                                All Categories
-                            </Link> */}
               <Link
                 className={navLinkClass('/return-policy')}
                 href="/return-policy"
@@ -371,6 +367,16 @@ export function Header({ categories }: Props) {
               >
                 Terms & Conditions
               </Link>
+            </div>
+
+            {/* right part */}
+            <div className="flex flex-wrap items-center gap-5">
+              <div className="text-sm leading-tight text-right">
+                <div className="font-semibold text-foreground">Dedicated Support</div>
+                <a className="font-semibold text-secondary" href="tel:+8809638212121">
+                  +880 9638212121
+                </a>
+              </div>
             </div>
           </nav>
 

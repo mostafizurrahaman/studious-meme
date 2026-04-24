@@ -23,6 +23,7 @@ import { slugify } from '@/lib/slug';
 import { formatDashboardDate } from '@/lib/formatDate';
 import Image from 'next/image';
 import { makeZodResolver } from '@/lib/form-validation';
+import { DeleteConfirmationDialog } from '@/components/dashboard/DeleteConfirmationDialog';
 
 type CategoryRow = {
   name: string;
@@ -159,6 +160,11 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
   const [editingSubCategoryImageFile, setEditingSubCategoryImageFile] = useState<File | null>(null);
   const [editingSubCategoryImagePreview, setEditingSubCategoryImagePreview] = useState('');
   const [editingSubCategoryDragging, setEditingSubCategoryDragging] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState<
+    | { type: 'category'; categorySlug: string; label: string }
+    | { type: 'sub-category'; categorySlug: string; subCategorySlug: string; label: string }
+    | null
+  >(null);
   const categoryImageInputRef = useRef<HTMLInputElement>(null);
   const editingCategoryImageInputRef = useRef<HTMLInputElement>(null);
   const editingSubCategoryImageInputRef = useRef<HTMLInputElement>(null);
@@ -440,6 +446,19 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
     });
   }
 
+  function requestDeleteCategory(category: CategoryRow) {
+    if (!category.slug) {
+      toast.error('A category slug is required to delete this item.');
+      return;
+    }
+
+    setPendingDelete({
+      type: 'category',
+      categorySlug: category.slug,
+      label: category.name,
+    });
+  }
+
   function startEditingCategory(category: CategoryRow) {
     setEditingSlug(category.slug ?? null);
     categoryEditForm.reset({
@@ -619,6 +638,38 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
       }
       refreshWithToast(result.message ?? 'Sub-category deleted successfully.', 'success');
     });
+  }
+
+  function requestDeleteSubCategory(categorySlug?: string, subCategorySlug?: string, label?: string) {
+    if (!categorySlug || !subCategorySlug) {
+      toast.error('Sub-category identifiers are required.');
+      return;
+    }
+
+    setPendingDelete({
+      type: 'sub-category',
+      categorySlug,
+      subCategorySlug,
+      label: label ?? subCategorySlug,
+    });
+  }
+
+  function closeDeleteDialog() {
+    if (isPending) return;
+    setPendingDelete(null);
+  }
+
+  function confirmDelete() {
+    if (!pendingDelete) return;
+
+    if (pendingDelete.type === 'category') {
+      handleDelete(pendingDelete.categorySlug);
+      setPendingDelete(null);
+      return;
+    }
+
+    handleDeleteSubCategory(pendingDelete.categorySlug, pendingDelete.subCategorySlug);
+    setPendingDelete(null);
   }
 
   return (
@@ -970,7 +1021,7 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                             size="sm"
                             variant="outline"
                             disabled={isPending}
-                            onClick={() => handleDelete(category.slug)}
+                            onClick={() => requestDeleteCategory(category)}
                           >
                             <Trash2 className="size-4" />
                           </Button>
@@ -1327,7 +1378,11 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
                                               variant="outline"
                                               disabled={isPending}
                                               onClick={() =>
-                                                handleDeleteSubCategory(category.slug, subCategory.slug)
+                                                requestDeleteSubCategory(
+                                                  category.slug,
+                                                  subCategory.slug,
+                                                  subCategory.name,
+                                                )
                                               }
                                             >
                                               <Trash2 className="size-4" />
@@ -1353,6 +1408,21 @@ export function DashboardCategoriesManager({ categories }: DashboardCategoriesMa
           </Table>
         </CardContent>
       </Card>
+      <DeleteConfirmationDialog
+        open={Boolean(pendingDelete)}
+        onOpenChange={open => {
+          if (!open) closeDeleteDialog();
+        }}
+        onConfirm={confirmDelete}
+        isPending={isPending}
+        title={pendingDelete?.type === 'sub-category' ? 'Delete sub-category?' : 'Delete category?'}
+        description={
+          pendingDelete?.type === 'sub-category'
+            ? `This will permanently delete ${pendingDelete.label} from its category.`
+            : `This will permanently delete ${pendingDelete?.label || 'this category'} and remove it from the dashboard.`
+        }
+        confirmLabel={pendingDelete?.type === 'sub-category' ? 'Delete sub-category' : 'Delete category'}
+      />
     </div>
   );
 }

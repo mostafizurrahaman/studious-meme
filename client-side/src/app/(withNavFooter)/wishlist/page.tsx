@@ -10,6 +10,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function WishlistPage() {
   const wishlistResult = await getMyWishlist().catch(() => null);
+  const authenticated = Boolean(wishlistResult?.success);
   const savedProducts = Array.isArray(wishlistResult?.data)
     ? (
         await Promise.all(
@@ -26,7 +27,7 @@ export default async function WishlistPage() {
       <SeoScripts data={wishlistSchemas} />
       <main className="flex-1 bg-background pb-16">
         <div className="mx-auto w-full max-w-350 px-4 py-6 lg:px-6">
-          <WishlistPageClient savedProducts={savedProducts} />
+          <WishlistPageClient authenticated={authenticated} savedProducts={savedProducts} />
         </div>
       </main>
     </>

@@ -18,6 +18,10 @@ router
         ComparisonHistoryController.addComparisonItem,
     );
 
+router
+    .route('/my-items')
+    .get(auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN), actionLimiter, ComparisonHistoryController.getMyComparisonHistory);
+
 // 3. getAllComparisonHistory
 router
     .route('/admin')

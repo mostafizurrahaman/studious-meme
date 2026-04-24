@@ -40,11 +40,10 @@ export default async function AdminWishlistPage({ searchParams }: Props) {
     totalPages: result?.meta?.totalPages ?? (Math.ceil(records.length / limit) || 1),
   };
 
-  return (
-    <DashboardWishlistManager
-      records={records}
-      paginationMeta={paginationMeta}
-      listBaseHref="/dashboard/admin/wishlist"
-    />
-  );
+    return (
+      <DashboardWishlistManager
+        records={records}
+        paginationMeta={paginationMeta}
+      />
+    );
 }

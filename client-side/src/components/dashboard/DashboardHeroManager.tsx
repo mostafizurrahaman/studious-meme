@@ -16,6 +16,7 @@ import {
     type BackendHeroSection,
     updateHeroSection,
 } from '@/services/HeroSection';
+import { DeleteConfirmationDialog } from '@/components/dashboard/DeleteConfirmationDialog';
 
 const heroCardSchema = z.object({
     image: z.union([z.string(), z.instanceof(File)]).optional(),
@@ -139,6 +140,7 @@ export function DashboardHeroManager({ heroes }: { heroes: BackendHeroSection[] 
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editingForm, setEditingForm] = useState(emptyHero());
     const [editingErrors, setEditingErrors] = useState<HeroSectionErrors>(emptyErrors());
+    const [pendingDeleteHero, setPendingDeleteHero] = useState<{ id: string; label: string } | null>(null);
     const rows = useMemo(() => heroes.slice(0, 10), [heroes]);
     const hasExistingHero = rows.length > 0;
 
@@ -149,6 +151,24 @@ export function DashboardHeroManager({ heroes }: { heroes: BackendHeroSection[] 
             toast.error(message);
         }
         router.refresh();
+    }
+
+    function closeDeleteDialog() {
+        if (isPending) return;
+        setPendingDeleteHero(null);
+    }
+
+    function confirmDeleteHero() {
+        const heroId = pendingDeleteHero?.id;
+        if (!heroId) return;
+
+        startTransition(async () => {
+            const result = await deleteHeroSection(heroId);
+            if (!result?.success)
+                return refresh(result?.message ?? 'Failed to delete hero section.', 'error');
+            setPendingDeleteHero(null);
+            refresh(result.message ?? 'Hero section deleted successfully.', 'success');
+        });
     }
 
     const renderCards = (
@@ -481,24 +501,14 @@ export function DashboardHeroManager({ heroes }: { heroes: BackendHeroSection[] 
                                             <Button
                                                 variant="outline"
                                                 disabled={isPending || !hero._id}
-                                                onClick={() => {
-                                                    const heroId = hero._id;
-                                                    if (!heroId) return;
-                                                    startTransition(async () => {
-                                                        const result = await deleteHeroSection(heroId);
-                                                        if (!result?.success)
-                                                            return refresh(
-                                                                result?.message ??
-                                                                    'Failed to delete hero section.',
-                                                                'error',
-                                                            );
-                                                        refresh(
-                                                            result.message ??
-                                                                'Hero section deleted successfully.',
-                                                            'success',
-                                                        );
-                                                    });
-                                                }}
+                                                onClick={() =>
+                                                    hero._id
+                                                        ? setPendingDeleteHero({
+                                                              id: hero._id,
+                                                              label: hero.slides[0]?.title || 'this hero section',
+                                                          })
+                                                        : undefined
+                                                }
                                             >
                                                 <Trash2 className="size-4" />
                                             </Button>
@@ -510,6 +520,17 @@ export function DashboardHeroManager({ heroes }: { heroes: BackendHeroSection[] 
                     );
                 })}
             </div>
+            <DeleteConfirmationDialog
+                open={Boolean(pendingDeleteHero)}
+                onOpenChange={open => {
+                    if (!open) closeDeleteDialog();
+                }}
+                onConfirm={confirmDeleteHero}
+                isPending={isPending}
+                title="Delete hero section?"
+                description={`This will permanently delete ${pendingDeleteHero?.label || 'this hero section'} and its slides/features.`}
+                confirmLabel="Delete hero"
+            />
         </div>
     );
 }

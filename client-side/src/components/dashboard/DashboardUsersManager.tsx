@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useTransition } from 'react';
+import { useCallback, useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,7 @@ import { formatDashboardDate } from '@/lib/formatDate';
 import { deleteUserById, updateUserStatus } from '@/services/Admin';
 import { TableFilter } from '@/components/ui/table-filter';
 import { TablePagination } from '@/components/ui/table-pagination';
+import { DeleteConfirmationDialog } from '@/components/dashboard/DeleteConfirmationDialog';
 
 type DashboardUserRecord = {
     _id?: string;
@@ -42,6 +43,13 @@ export function DashboardUsersManager({
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const [isPending, startTransition] = useTransition();
+    const [pendingDeleteUser, setPendingDeleteUser] = useState<Pick<
+        DashboardUserRecord,
+        '_id' | 'name' | 'email'
+    > | null>(null);
+    const [pendingStatusUser, setPendingStatusUser] = useState<
+        (Pick<DashboardUserRecord, '_id' | 'name' | 'email'> & { nextIsActive: boolean }) | null
+    >(null);
     const updateQuery = useCallback(
         (updates: { page?: number; limit?: number; searchTerm?: string }) => {
             const params = new URLSearchParams(searchParams.toString());
@@ -71,6 +79,48 @@ export function DashboardUsersManager({
         }
 
         router.refresh();
+    }
+
+    function closeDeleteDialog() {
+        if (isPending) return;
+        setPendingDeleteUser(null);
+    }
+
+    function confirmDeleteUser() {
+        const userId = pendingDeleteUser?._id;
+        if (!userId) return;
+
+        startTransition(async () => {
+            const result = await deleteUserById(userId);
+
+            if (!result?.success) {
+                return refresh(result?.message ?? 'Failed to delete user.', 'error');
+            }
+
+            setPendingDeleteUser(null);
+            refresh(result.message ?? 'User deleted successfully.', 'success');
+        });
+    }
+
+    function closeStatusDialog() {
+        if (isPending) return;
+        setPendingStatusUser(null);
+    }
+
+    function confirmStatusChange() {
+        const userId = pendingStatusUser?._id;
+        if (!userId) return;
+
+        startTransition(async () => {
+            const result = await updateUserStatus(userId, pendingStatusUser.nextIsActive);
+
+            if (!result?.success) {
+                return refresh(result?.message ?? 'Failed to update user status.', 'error');
+            }
+
+            setPendingStatusUser(null);
+            refresh(result.message ?? 'User status updated successfully.', 'success');
+        });
     }
 
     return (
@@ -154,26 +204,14 @@ export function DashboardUsersManager({
                                             size="sm"
                                             variant="outline"
                                             disabled={isPending}
-                                            onClick={() => {
-                                                const userId = user._id;
-                                                if (!userId) return;
-
-                                                startTransition(async () => {
-                                                    const result = await updateUserStatus(
-                                                        userId,
-                                                        user.isActive === false,
-                                                    );
-
-                                                    if (!result?.success) {
-                                                        return refresh(
-                                                            result?.message ?? 'Failed to update user status.',
-                                                            'error',
-                                                        );
-                                                    }
-
-                                                    refresh(result.message ?? 'User status updated successfully.', 'success');
-                                                });
-                                            }}
+                                            onClick={() =>
+                                                setPendingStatusUser({
+                                                    _id: user._id,
+                                                    name: user.name,
+                                                    email: user.email,
+                                                    nextIsActive: user.isActive === false,
+                                                })
+                                            }
                                         >
                                             {user.isActive === false ? 'Unblock' : 'Block'}
                                         </Button>
@@ -181,23 +219,13 @@ export function DashboardUsersManager({
                                             size="sm"
                                             variant="outline"
                                             disabled={isPending}
-                                            onClick={() => {
-                                                const userId = user._id;
-                                                if (!userId) return;
-
-                                                startTransition(async () => {
-                                                    const result = await deleteUserById(userId);
-
-                                                    if (!result?.success) {
-                                                        return refresh(
-                                                            result?.message ?? 'Failed to delete user.',
-                                                            'error',
-                                                        );
-                                                    }
-
-                                                    refresh(result.message ?? 'User deleted successfully.', 'success');
-                                                });
-                                            }}
+                                            onClick={() =>
+                                                setPendingDeleteUser({
+                                                    _id: user._id,
+                                                    name: user.name,
+                                                    email: user.email,
+                                                })
+                                            }
                                         >
                                             Delete
                                         </Button>
@@ -216,6 +244,34 @@ export function DashboardUsersManager({
                         onLimitChange={limit => updateQuery({ page: 1, limit })}
                     />
                 ) : null}
+                <DeleteConfirmationDialog
+                    open={Boolean(pendingDeleteUser)}
+                    onOpenChange={open => {
+                        if (!open) closeDeleteDialog();
+                    }}
+                    onConfirm={confirmDeleteUser}
+                    isPending={isPending}
+                    title="Delete user account?"
+                    description={`This will permanently delete ${
+                        pendingDeleteUser?.name || pendingDeleteUser?.email || 'this user'
+                    } from the dashboard.`}
+                    confirmLabel="Delete user"
+                />
+                <DeleteConfirmationDialog
+                    open={Boolean(pendingStatusUser)}
+                    onOpenChange={open => {
+                        if (!open) closeStatusDialog();
+                    }}
+                    onConfirm={confirmStatusChange}
+                    isPending={isPending}
+                    title={pendingStatusUser?.nextIsActive ? 'Unblock user account?' : 'Block user account?'}
+                    description={
+                        pendingStatusUser?.nextIsActive
+                            ? `This will restore dashboard access for ${pendingStatusUser?.name || pendingStatusUser?.email || 'this user'}.`
+                            : `This will block ${pendingStatusUser?.name || pendingStatusUser?.email || 'this user'} from accessing their account.`
+                    }
+                    confirmLabel={pendingStatusUser?.nextIsActive ? 'Unblock user' : 'Block user'}
+                />
             </CardContent>
         </Card>
     );

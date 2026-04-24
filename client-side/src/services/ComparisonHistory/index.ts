@@ -23,6 +23,7 @@ export type ComparisonHistoryRecord = {
         title: string;
         brand: string;
         category: string;
+        categorySlug?: string;
         subCategorySlug?: string;
         image: string;
         sku: string;
@@ -79,7 +80,7 @@ export const getMyComparisonHistory = async (): Promise<BackendEnvelope<Comparis
         return { success: false, data: [] };
     }
 
-    return requestBackendJson<BackendEnvelope<ComparisonHistoryRecord[]>>('/compare', {
+    return requestBackendJson<BackendEnvelope<ComparisonHistoryRecord[]>>('/compare/my-items', {
         method: 'GET',
         token: accessToken,
         next: { tags: ['COMPARISON_HISTORY'] },

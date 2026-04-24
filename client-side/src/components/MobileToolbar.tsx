@@ -5,6 +5,8 @@ import { ArrowLeftRight, Heart, ShoppingCart, UserRound } from 'lucide-react';
 
 import { useUser } from '@/context/UserContext';
 import { useCartStore } from '@/lib/cart-store';
+import { useCompareStore } from '@/lib/compare-store';
+import { useWishlistStore } from '@/lib/wishlist-store';
 import { getDashboardPathByRole } from '@/lib/auth/roles';
 
 const items = [
@@ -17,6 +19,8 @@ const items = [
 export function MobileToolbar() {
     const { user } = useUser();
     const cartCount = useCartStore(state => state.items.reduce((sum, item) => sum + item.quantity, 0));
+    const compareCount = useCompareStore(state => state.items.length);
+    const wishlistCount = useWishlistStore(state => state.items.length);
 
     const accountHref = user ? (getDashboardPathByRole(user.role) ?? '/dashboard') : '/my-account';
 
@@ -33,7 +37,11 @@ export function MobileToolbar() {
                             <Icon className="h-5 w-5" />
                             {label === 'Account' ? null : (
                                 <span className="absolute -right-2 -top-2 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] font-bold leading-none text-white">
-                                    {label === 'Cart' ? cartCount : 0}
+                                    {label === 'Cart'
+                                        ? cartCount
+                                        : label === 'Compare'
+                                          ? compareCount
+                                          : wishlistCount}
                                 </span>
                             )}
                         </span>

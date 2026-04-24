@@ -52,6 +52,30 @@ const pickSort = (value: unknown): ProductSort => {
     }
 };
 
+const parseCustomPriceRange = (value: string) => {
+    const match = value.match(/^(\d*)-(\d*)$/);
+    if (!match) return null;
+
+    const rawMin = match[1];
+    const rawMax = match[2];
+
+    if (!rawMin && !rawMax) return null;
+
+    const parsedMin = rawMin ? Number(rawMin) : undefined;
+    const parsedMax = rawMax ? Number(rawMax) : undefined;
+
+    const min = typeof parsedMin === 'number' && Number.isFinite(parsedMin) && parsedMin >= 0 ? parsedMin : undefined;
+    const max = typeof parsedMax === 'number' && Number.isFinite(parsedMax) && parsedMax >= 0 ? parsedMax : undefined;
+
+    if (min === undefined && max === undefined) return null;
+
+    if (min !== undefined && max !== undefined) {
+        return min <= max ? { min, max } : { min: max, max: min };
+    }
+
+    return { min, max };
+};
+
 const buildProductFilters = async (query: Record<string, unknown>) => {
     const filter: Record<string, unknown> = {};
     const and: Record<string, unknown>[] = [];
@@ -124,6 +148,24 @@ const buildProductFilters = async (query: Record<string, unknown>) => {
         filter.price = { $gte: 10000, $lt: 50000 };
     } else if (price === '50000-plus') {
         filter.price = { $gte: 50000 };
+    } else if (price) {
+        const customRange = parseCustomPriceRange(price);
+
+        if (customRange) {
+            const rangeFilter: Record<string, number> = {};
+
+            if (customRange.min !== undefined) {
+                rangeFilter.$gte = customRange.min;
+            }
+
+            if (customRange.max !== undefined) {
+                rangeFilter.$lte = customRange.max;
+            }
+
+            if (Object.keys(rangeFilter).length > 0) {
+                filter.price = rangeFilter;
+            }
+        }
     }
 
     if (stock === 'featured' || tag === 'featured') {

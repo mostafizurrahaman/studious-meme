@@ -15,6 +15,7 @@ import { createUser, deleteAdmin, updateAdmin } from '@/services/Admin';
 import { formatDashboardDate } from '@/lib/formatDate';
 import Image from 'next/image';
 import { dashboardFormSchemas, makeZodResolver } from '@/lib/form-validation';
+import { DeleteConfirmationDialog } from '@/components/dashboard/DeleteConfirmationDialog';
 
 type AdminRow = {
   _id?: string;
@@ -52,6 +53,7 @@ export function DashboardAdminsManager({ admins }: DashboardAdminsManagerProps) 
   const [editingAdminImageFile, setEditingAdminImageFile] = useState<File | null>(null);
   const [editingAdminImagePreview, setEditingAdminImagePreview] = useState('');
   const [editingAdminImageDragging, setEditingAdminImageDragging] = useState(false);
+  const [adminPendingDelete, setAdminPendingDelete] = useState<Pick<AdminRow, '_id' | 'name' | 'email'> | null>(null);
   const adminImageInputRef = useRef<HTMLInputElement>(null);
   const editingAdminImageInputRef = useRef<HTMLInputElement>(null);
 
@@ -102,6 +104,27 @@ export function DashboardAdminsManager({ admins }: DashboardAdminsManagerProps) 
       [...admins].sort((a, b) => (a.createdAt && b.createdAt ? b.createdAt.localeCompare(a.createdAt) : 0)),
     [admins],
   );
+
+  function closeDeleteDialog() {
+    if (isPending) return;
+    setAdminPendingDelete(null);
+  }
+
+  function confirmDeleteAdmin() {
+    const adminId = adminPendingDelete?._id;
+    if (!adminId) return;
+
+    startTransition(async () => {
+      const result = await deleteAdmin(adminId);
+      if (!result?.success) {
+        toast.error(result?.message ?? 'Failed to delete admin.');
+        return;
+      }
+      toast.success(result.message ?? 'Admin deleted successfully.');
+      setAdminPendingDelete(null);
+      router.refresh();
+    });
+  }
 
   return (
     <div className="space-y-6">
@@ -495,19 +518,13 @@ export function DashboardAdminsManager({ admins }: DashboardAdminsManagerProps) 
                               size="sm"
                               variant="outline"
                               disabled={isPending || !admin._id}
-                              onClick={() => {
-                                const adminId = admin._id;
-                                if (!adminId) return;
-                                startTransition(async () => {
-                                  const result = await deleteAdmin(adminId);
-                                  if (!result?.success) {
-                                    toast.error(result?.message ?? 'Failed to delete admin.');
-                                    return;
-                                  }
-                                  toast.success(result.message ?? 'Admin deleted successfully.');
-                                  router.refresh();
-                                });
-                              }}
+                              onClick={() =>
+                                setAdminPendingDelete({
+                                  _id: admin._id,
+                                  name: admin.name,
+                                  email: admin.email,
+                                })
+                              }
                             >
                               <Trash2 className="size-4" />
                             </Button>
@@ -522,6 +539,19 @@ export function DashboardAdminsManager({ admins }: DashboardAdminsManagerProps) 
           </Table>
         </CardContent>
       </Card>
+      <DeleteConfirmationDialog
+        open={Boolean(adminPendingDelete)}
+        onOpenChange={open => {
+          if (!open) closeDeleteDialog();
+        }}
+        onConfirm={confirmDeleteAdmin}
+        isPending={isPending}
+        title="Delete admin account?"
+        description={`This will permanently delete ${
+          adminPendingDelete?.name || adminPendingDelete?.email || 'this admin'
+        } from the dashboard.`}
+        confirmLabel="Delete admin"
+      />
     </div>
   );
 }

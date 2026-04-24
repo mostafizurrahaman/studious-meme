@@ -1,6 +1,8 @@
 'use client';
 
 import { useTransition } from 'react';
+import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import type { Product } from '@/lib/storefront-types';
 import { useWishlistStore } from '@/lib/wishlist-store';
@@ -8,29 +10,38 @@ import { addWishlistItem, removeWishlistItem } from '@/services/WishlistHistory'
 
 type Props = {
     product: Product;
+    compact?: boolean;
+    className?: string;
 };
 
-export function AddToWishlistButton({ product }: Props) {
+export function AddToWishlistButton({ product, compact = false, className }: Props) {
     const hydrated = useWishlistStore(state => state.hydrated);
     const saved = useWishlistStore(state => state.items.some(item => item.sku === product.sku));
     const toggle = useWishlistStore(state => state.toggle);
     const [isPending, startTransition] = useTransition();
 
     function handleToggle() {
-        const nextSaved = toggle(product);
+        if (!product.id) {
+            toast.error('This product cannot be saved right now.');
+            return;
+        }
 
-        if (!product.id) return;
+        const productId = product.id;
+
+        const nextSaved = toggle(product);
 
         startTransition(async () => {
             if (nextSaved) {
-                const result = await addWishlistItem(product.id!);
+                const result = await addWishlistItem(productId);
                 if (!result.success) {
                     toggle(product);
+                    toast.error(result.message ?? 'Unable to update wishlist.');
                 }
             } else {
-                const result = await removeWishlistItem(product.id!);
+                const result = await removeWishlistItem(productId);
                 if (!result.success) {
                     toggle(product);
+                    toast.error(result.message ?? 'Unable to update wishlist.');
                 }
             }
         });
@@ -42,9 +53,14 @@ export function AddToWishlistButton({ product }: Props) {
             variant={saved ? 'secondary' : 'outline'}
             disabled={!hydrated || isPending}
             onClick={handleToggle}
-            className="h-12 rounded-full px-6 text-sm font-bold shadow-sm"
+            className={cn(
+                compact
+                    ? 'h-9 w-full justify-center rounded-full border-border px-2 py-0.5 text-[10px] font-semibold shadow-sm'
+                    : 'h-12 rounded-full px-6 text-sm font-bold shadow-sm',
+                className,
+            )}
         >
-            {saved ? 'Saved in wishlist' : 'Add to wishlist'}
+            {saved ? 'In wishlist' : compact ? 'Wishlist' : 'Add to wishlist'}
         </Button>
     );
 }

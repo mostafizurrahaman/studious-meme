@@ -9,6 +9,7 @@ type ComparisonHistoryEventDoc = {
         title: string;
         brand: string;
         category: string;
+        categorySlug?: string;
         subCategorySlug?: string;
         image: string;
         sku: string;
@@ -35,6 +36,7 @@ const comparisonHistoryEventSchema = new Schema<ComparisonHistoryEventDoc>(
             title: { type: String, required: true },
             brand: { type: String, required: true },
             category: { type: String, required: true },
+            categorySlug: { type: String },
             subCategorySlug: { type: String },
             image: { type: String, required: true },
             sku: { type: String, required: true },

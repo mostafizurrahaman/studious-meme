@@ -19,6 +19,7 @@ import { slugify } from '@/lib/slug';
 import { formatDashboardDate } from '@/lib/formatDate';
 import Image from 'next/image';
 import { dashboardFormSchemas, makeZodResolver } from '@/lib/form-validation';
+import { DeleteConfirmationDialog } from '@/components/dashboard/DeleteConfirmationDialog';
 
 const brandEditSchema = z.object({
   name: z.string({ error: 'Brand name is required!' }).trim().min(1, { message: 'Brand name is required!' }),
@@ -67,6 +68,7 @@ export function DashboardBrandsManager({
   const [editingBrandImagePreview, setEditingBrandImagePreview] = useState('');
   const [editingBrandSlugSynced, setEditingBrandSlugSynced] = useState(true);
   const [isEditingDragging, setIsEditingDragging] = useState(false);
+  const [pendingDeleteBrand, setPendingDeleteBrand] = useState<Pick<BackendBrand, 'slug' | 'name'> | null>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const editingImageInputRef = useRef<HTMLInputElement>(null);
 
@@ -115,6 +117,23 @@ export function DashboardBrandsManager({
       toast.error(message);
     }
     router.refresh();
+  }
+
+  function closeDeleteDialog() {
+    if (isPending) return;
+    setPendingDeleteBrand(null);
+  }
+
+  function confirmDeleteBrand() {
+    const slug = pendingDeleteBrand?.slug;
+    if (!slug) return;
+
+    startTransition(async () => {
+      const result = await deleteBrand(slug);
+      if (!result?.success) return refresh(result?.message ?? 'Failed to delete brand.', 'error');
+      setPendingDeleteBrand(null);
+      refresh(result.message ?? 'Brand deleted successfully.', 'success');
+    });
   }
 
   function updateQuery(updates: { page?: number; limit?: number; searchTerm?: string }) {
@@ -609,14 +628,7 @@ export function DashboardBrandsManager({
                               size="sm"
                               variant="outline"
                               disabled={isPending}
-                              onClick={() =>
-                                startTransition(async () => {
-                                  const result = await deleteBrand(brand.slug);
-                                  if (!result?.success)
-                                    return refresh(result?.message ?? 'Failed to delete brand.', 'error');
-                                  refresh(result.message ?? 'Brand deleted successfully.', 'success');
-                                })
-                              }
+                              onClick={() => setPendingDeleteBrand({ slug: brand.slug, name: brand.name })}
                             >
                               <Trash2 className="size-4" />
                             </Button>
@@ -642,6 +654,17 @@ export function DashboardBrandsManager({
           )}
         </CardContent>
       </Card>
+      <DeleteConfirmationDialog
+        open={Boolean(pendingDeleteBrand)}
+        onOpenChange={open => {
+          if (!open) closeDeleteDialog();
+        }}
+        onConfirm={confirmDeleteBrand}
+        isPending={isPending}
+        title="Delete brand?"
+        description={`This will permanently delete ${pendingDeleteBrand?.name || 'this brand'} from the catalog.`}
+        confirmLabel="Delete brand"
+      />
     </div>
   );
 }

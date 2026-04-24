@@ -227,7 +227,7 @@ export function CartPageClient() {
                                 </p>
                                 <Button
                                     asChild
-                                    className="mt-6 h-11 rounded-full px-6 text-sm font-bold shadow-sm"
+                                    className="mt-6 h-11 rounded-full px-6 text-sm font-bold text-white! shadow-sm"
                                 >
                                     <Link href="/shop">Browse shop</Link>
                                 </Button>
@@ -317,8 +317,7 @@ export function CartPageClient() {
                             </Button>
                             <Button
                                 asChild
-                                variant="outline"
-                                className="h-11 rounded-full border-white/20 bg-white px-6 text-sm font-bold text-secondary hover:bg-white/90"
+                                className="h-11 rounded-full px-6 text-sm font-bold shadow-sm"
                             >
                                 <Link href="/checkout">Proceed to checkout</Link>
                             </Button>

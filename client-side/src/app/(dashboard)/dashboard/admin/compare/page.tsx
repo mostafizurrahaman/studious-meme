@@ -40,11 +40,10 @@ export default async function AdminComparePage({ searchParams }: Props) {
     totalPages: result?.meta?.totalPages ?? (Math.ceil(records.length / limit) || 1),
   };
 
-  return (
-    <DashboardComparisonManager
-      records={records}
-      paginationMeta={paginationMeta}
-      listBaseHref="/dashboard/admin/compare"
-    />
-  );
+    return (
+      <DashboardComparisonManager
+        records={records}
+        paginationMeta={paginationMeta}
+      />
+    );
 }

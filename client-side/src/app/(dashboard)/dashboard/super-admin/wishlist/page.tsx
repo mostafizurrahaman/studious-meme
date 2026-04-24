@@ -40,11 +40,10 @@ export default async function SuperAdminWishlistPage({ searchParams }: Props) {
     totalPages: result?.meta?.totalPages ?? (Math.ceil(records.length / limit) || 1),
   };
 
-  return (
-    <DashboardWishlistManager
-      records={records}
-      paginationMeta={paginationMeta}
-      listBaseHref="/dashboard/super-admin/wishlist"
-    />
-  );
+    return (
+      <DashboardWishlistManager
+        records={records}
+        paginationMeta={paginationMeta}
+      />
+    );
 }

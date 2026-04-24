@@ -19,6 +19,7 @@ import { slugify } from '@/lib/slug';
 import type { BackendCategory } from '@/services/Category/mappers';
 import Image from 'next/image';
 import { makeZodResolver } from '@/lib/form-validation';
+import { DeleteConfirmationDialog } from '@/components/dashboard/DeleteConfirmationDialog';
 
 type Option = { value: string; label: string };
 
@@ -134,6 +135,10 @@ export function DashboardProductsManager({
   const [isCreating, setIsCreating] = useState(false);
   const [editingSlug, setEditingSlug] = useState<string | null>(null);
   const [isEditingSaving, setIsEditingSaving] = useState(false);
+  const [pendingDeleteProduct, setPendingDeleteProduct] = useState<Pick<
+    BackendProduct,
+    'slug' | 'title'
+  > | null>(null);
   const productImageInputRef = useRef<HTMLInputElement>(null);
   const editingProductImageInputRef = useRef<HTMLInputElement>(null);
   // Filter state
@@ -278,6 +283,23 @@ export function DashboardProductsManager({
       toast.error(message);
     }
     router.refresh();
+  }
+
+  function closeDeleteDialog() {
+    if (isPending) return;
+    setPendingDeleteProduct(null);
+  }
+
+  function confirmDeleteProduct() {
+    const slug = pendingDeleteProduct?.slug;
+    if (!slug) return;
+
+    startTransition(async () => {
+      const result = await deleteProduct(slug);
+      if (!result?.success) return refresh(result?.message ?? 'Failed to delete product.', 'error');
+      setPendingDeleteProduct(null);
+      refresh(result.message ?? 'Product deleted successfully.', 'success');
+    });
   }
 
   function handleTitleChange(value: string) {
@@ -801,12 +823,7 @@ export function DashboardProductsManager({
                                 variant="outline"
                                 disabled={isPending}
                                 onClick={() =>
-                                  startTransition(async () => {
-                                    const result = await deleteProduct(product.slug);
-                                    if (!result?.success)
-                                      return refresh(result?.message ?? 'Failed to delete product.', 'error');
-                                    refresh(result.message ?? 'Product deleted successfully.', 'success');
-                                  })
+                                  setPendingDeleteProduct({ slug: product.slug, title: product.title })
                                 }
                               >
                                 <Trash2 className="size-4" />
@@ -874,7 +891,10 @@ export function DashboardProductsManager({
                               </div>
 
                               <div className="grid gap-1.5">
-                                <DashboardInput placeholder="Badge" {...productEditForm.register('badge')} />
+                                <DashboardInput
+                                  placeholder="Badge. ex: Sale, New, Hot"
+                                  {...productEditForm.register('badge')}
+                                />
                                 <ErrorText message={productEditForm.formState.errors.badge?.message} />
                               </div>
 
@@ -1062,6 +1082,17 @@ export function DashboardProductsManager({
           )}
         </CardContent>
       </Card>
+      <DeleteConfirmationDialog
+        open={Boolean(pendingDeleteProduct)}
+        onOpenChange={open => {
+          if (!open) closeDeleteDialog();
+        }}
+        onConfirm={confirmDeleteProduct}
+        isPending={isPending}
+        title="Delete product?"
+        description={`This will permanently delete ${pendingDeleteProduct?.title || 'this product'} from the catalog.`}
+        confirmLabel="Delete product"
+      />
     </div>
   );
 }
@@ -1963,7 +1994,7 @@ export function DashboardProductsManager({
 
 //                                 <div className="grid gap-1.5">
 //                                   <DashboardInput
-//                                     placeholder="Badge"
+//                                     placeholder="Badge. ex: Sale, New, Hot"
 //                                     {...productEditForm.register('badge')}
 //                                   />
 //                                   <ErrorText message={productEditForm.formState.errors.badge?.message} />

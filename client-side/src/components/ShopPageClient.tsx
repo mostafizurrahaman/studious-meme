@@ -3,6 +3,7 @@
 import { type Route } from 'next';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useState } from 'react';
 import { ProductCard } from '@/components/ProductCard';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -29,6 +30,119 @@ function getActiveFilters(searchParams: URLSearchParams) {
     };
 }
 
+function parsePriceRange(value: string) {
+    const match = value.match(/^(\d*)-(\d*)$/);
+    if (!match) {
+        return { min: '', max: '' };
+    }
+
+    return {
+        min: match[1] ?? '',
+        max: match[2] ?? '',
+    };
+}
+
+function formatPrice(value: number) {
+    return `Tk. ${value.toLocaleString('en-US')}`;
+}
+
+function roundRangeCeiling(value: number) {
+    if (value <= 10000) return 10000;
+    if (value <= 50000) return 50000;
+    if (value <= 100000) return 100000;
+
+    return Math.ceil(value / 50000) * 50000;
+}
+
+function PriceRangeSlider({
+    initialValue,
+    maxValue,
+    onApply,
+    onReset,
+}: {
+    initialValue: string;
+    maxValue: number;
+    onApply: (value: string) => void;
+    onReset: () => void;
+}) {
+    const parsed = parsePriceRange(initialValue);
+    const initialMin = Math.max(0, Number(parsed.min || '0') || 0);
+    const initialMax = Math.min(maxValue, Number(parsed.max || String(maxValue)) || maxValue);
+    const [minPrice, setMinPrice] = useState(Math.min(initialMin, initialMax));
+    const [maxPrice, setMaxPrice] = useState(Math.max(initialMin, initialMax));
+    const range = Math.max(maxValue, 1);
+    const minPercent = (minPrice / range) * 100;
+    const maxPercent = (maxPrice / range) * 100;
+
+    function commit(nextMin: number, nextMax: number) {
+        if (nextMin <= 0 && nextMax >= maxValue) {
+            onReset();
+            return;
+        }
+
+        onApply(`${nextMin}-${nextMax}`);
+    }
+
+    return (
+        <div className="mt-3 space-y-3">
+            <div className="flex items-center justify-between gap-3 rounded-2xl bg-muted/60 px-3 py-2 text-xs font-semibold text-foreground/75">
+                <span>{formatPrice(minPrice)}</span>
+                <span>{formatPrice(maxPrice)}</span>
+            </div>
+
+            <div className="relative h-10">
+                <div className="absolute top-1/2 left-0 h-2 w-full -translate-y-1/2 rounded-full bg-muted" />
+                <div
+                    className="absolute top-1/2 h-2 -translate-y-1/2 rounded-full bg-primary"
+                    style={{
+                        left: `${minPercent}%`,
+                        width: `${Math.max(maxPercent - minPercent, 0)}%`,
+                    }}
+                />
+                <input
+                    type="range"
+                    min={0}
+                    max={maxValue}
+                    step={500}
+                    value={minPrice}
+                    onChange={event => {
+                        const nextMin = Math.min(Number(event.target.value), maxPrice);
+                        setMinPrice(nextMin);
+                    }}
+                    onMouseUp={() => commit(minPrice, maxPrice)}
+                    onTouchEnd={() => commit(minPrice, maxPrice)}
+                    className="pointer-events-none absolute inset-0 z-20 h-10 w-full appearance-none bg-transparent [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:size-5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-primary [&::-webkit-slider-thumb]:bg-background [&::-webkit-slider-thumb]:shadow-sm"
+                    aria-label="Minimum price"
+                />
+                <input
+                    type="range"
+                    min={0}
+                    max={maxValue}
+                    step={500}
+                    value={maxPrice}
+                    onChange={event => {
+                        const nextMax = Math.max(Number(event.target.value), minPrice);
+                        setMaxPrice(nextMax);
+                    }}
+                    onMouseUp={() => commit(minPrice, maxPrice)}
+                    onTouchEnd={() => commit(minPrice, maxPrice)}
+                    className="pointer-events-none absolute inset-0 z-30 h-10 w-full appearance-none bg-transparent [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:size-5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-primary [&::-webkit-slider-thumb]:bg-background [&::-webkit-slider-thumb]:shadow-sm"
+                    aria-label="Maximum price"
+                />
+            </div>
+
+            <div className="flex gap-2">
+                <Button type="button" size="sm" className="flex-1" onClick={() => commit(minPrice, maxPrice)}>
+                    Apply range
+                </Button>
+                <Button type="button" size="sm" variant="outline" onClick={onReset}>
+                    Reset
+                </Button>
+            </div>
+        </div>
+    );
+}
+
 export function ShopPageClient({ products, categories, meta }: Props) {
     const router = useRouter();
     const pathname = usePathname();
@@ -36,6 +150,13 @@ export function ShopPageClient({ products, categories, meta }: Props) {
     const filters = getActiveFilters(searchParams);
     const totalPages = Math.max(meta.totalPages, 1);
     const page = Math.min(meta.page, totalPages);
+    const maxProductPrice = products.reduce((highest, product) => {
+        const numericPrice = Number(String(product.price).replace(/[^\d.]/g, '')) || 0;
+        return Math.max(highest, numericPrice);
+    }, 0);
+    const parsedFilterRange = parsePriceRange(filters.price);
+    const activeMaxPrice = Number(parsedFilterRange.max || '0') || 0;
+    const sliderMax = roundRangeCeiling(Math.max(maxProductPrice, activeMaxPrice, 100000));
 
     function updateFilter(key: string, value: string) {
         const params = new URLSearchParams(searchParams.toString());
@@ -57,6 +178,10 @@ export function ShopPageClient({ products, categories, meta }: Props) {
 
     function clearFilters() {
         router.replace(pathname as Route, { scroll: false });
+    }
+
+    function applyCustomPriceRange(value: string) {
+        updateFilter('price', value);
     }
 
     const activeCount = [
@@ -143,6 +268,17 @@ export function ShopPageClient({ products, categories, meta }: Props) {
                                     {label}
                                 </button>
                             ))}
+                        </div>
+                        <div
+                            key={filters.price}
+                            className="mt-3"
+                        >
+                            <PriceRangeSlider
+                                initialValue={filters.price}
+                                maxValue={sliderMax}
+                                onApply={applyCustomPriceRange}
+                                onReset={() => updateFilter('price', '')}
+                            />
                         </div>
                     </div>
                 </div>
