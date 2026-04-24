@@ -229,6 +229,7 @@ import {
   Heart,
   LayoutDashboard,
   ShoppingBag,
+  ShoppingCart,
   Sparkles,
   Tags,
   ReceiptText,
@@ -293,6 +294,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
     Quotations: ReceiptText,
     Wishlist: Heart,
     Compare: GitCompareArrows,
+    Cart: ShoppingCart,
     Profile: Settings,
   };
   const navItems = getDashboardNavigationItems(role).map(item => ({
@@ -319,7 +321,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
     },
     {
       label: 'Sales',
-      items: navItems.filter(item => ['Orders', 'Payments', 'Quotations', 'Wishlist', 'Compare'].includes(item.label)),
+      items: navItems.filter(item => ['Orders', 'Payments', 'Quotations', 'Wishlist', 'Compare', 'Cart'].includes(item.label)),
     },
     {
       label: 'Account',

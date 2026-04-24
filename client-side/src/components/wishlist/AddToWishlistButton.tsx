@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -15,9 +16,9 @@ type Props = {
 };
 
 export function AddToWishlistButton({ product, compact = false, className }: Props) {
+    const router = useRouter();
     const hydrated = useWishlistStore(state => state.hydrated);
     const saved = useWishlistStore(state => state.items.some(item => item.sku === product.sku));
-    const toggle = useWishlistStore(state => state.toggle);
     const [isPending, startTransition] = useTransition();
 
     function handleToggle() {
@@ -27,22 +28,31 @@ export function AddToWishlistButton({ product, compact = false, className }: Pro
         }
 
         const productId = product.id;
-
-        const nextSaved = toggle(product);
+        const nextSaved = !saved;
 
         startTransition(async () => {
             if (nextSaved) {
                 const result = await addWishlistItem(productId);
                 if (!result.success) {
-                    toggle(product);
+                    if (result.message === 'Sign in to save wishlist items to your account.') {
+                        router.push('/my-account?notice=wishlist');
+                        return;
+                    }
+
                     toast.error(result.message ?? 'Unable to update wishlist.');
+                    return;
                 }
+
+                useWishlistStore.getState().add(product);
+                return;
             } else {
                 const result = await removeWishlistItem(productId);
                 if (!result.success) {
-                    toggle(product);
                     toast.error(result.message ?? 'Unable to update wishlist.');
+                    return;
                 }
+
+                useWishlistStore.getState().remove(product.sku);
             }
         });
     }

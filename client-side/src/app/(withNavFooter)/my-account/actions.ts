@@ -1,9 +1,23 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { logOut, sendSignupOtpAgain, signInUser, signUpUser, verifySignupOtp } from '@/services/Auth';
+import {
+    forgotPassword,
+    logOut,
+    sendForgotPasswordOtpAgain,
+    sendSignupOtpAgain,
+    setNewPasswordIntoDB,
+    signInUser,
+    signUpUser,
+    verifyOtpForForgotPassword,
+    verifySignupOtp,
+} from '@/services/Auth';
 
 export type SignInState = { ok: false; message: string } | { ok: true; message: string };
+
+export type ForgotPasswordState =
+    | { ok: false; message: string; email?: string; step?: 'email' | 'otp' | 'reset' }
+    | { ok: true; message: string; email?: string; step: 'otp' | 'reset' | 'done' };
 
 export type SignUpState =
     | { ok: false; message: string; email?: string }
@@ -105,4 +119,82 @@ export async function submitSignupOtp(_prevState: SignUpState, formData: FormDat
 
 export async function resendSignupOtpAction(email: string) {
     return sendSignupOtpAgain(email);
+}
+
+export async function submitForgotPassword(_prevState: ForgotPasswordState, formData: FormData): Promise<ForgotPasswordState> {
+    const email = readValue(formData, 'email').toLowerCase();
+
+    if (!email) {
+        return { ok: false, message: 'Email is required.', step: 'email' };
+    }
+
+    const result = await forgotPassword(email);
+
+    if (!result?.success) {
+        return { ok: false, message: result?.message ?? 'Failed to start password reset.', email, step: 'email' };
+    }
+
+    return {
+        ok: true,
+        message: result.message ?? 'OTP sent successfully.',
+        email,
+        step: 'otp',
+    };
+}
+
+export async function submitForgotPasswordOtp(
+    _prevState: ForgotPasswordState,
+    formData: FormData,
+): Promise<ForgotPasswordState> {
+    const otp = readValue(formData, 'otp');
+
+    if (!otp) {
+        return { ok: false, message: 'OTP is required.', step: 'otp' };
+    }
+
+    const result = await verifyOtpForForgotPassword(otp);
+
+    if (!result?.success) {
+        return { ok: false, message: result?.message ?? 'Failed to verify OTP.', step: 'otp' };
+    }
+
+    return {
+        ok: true,
+        message: result.message ?? 'OTP verified successfully.',
+        step: 'reset',
+    };
+}
+
+export async function resendForgotPasswordOtpAction() {
+    return sendForgotPasswordOtpAgain();
+}
+
+export async function submitResetPassword(
+    _prevState: ForgotPasswordState,
+    formData: FormData,
+): Promise<ForgotPasswordState> {
+    const newPassword = readValue(formData, 'newPassword');
+    const confirmPassword = readValue(formData, 'confirmPassword');
+
+    if (!newPassword || !confirmPassword) {
+        return { ok: false, message: 'All password fields are required.', step: 'reset' };
+    }
+
+    if (newPassword !== confirmPassword) {
+        return { ok: false, message: 'Passwords must match.', step: 'reset' };
+    }
+
+    const result = await setNewPasswordIntoDB(newPassword);
+
+    if (!result?.success) {
+        return { ok: false, message: result?.message ?? 'Failed to reset password.', step: 'reset' };
+    }
+
+    revalidatePath('/my-account');
+
+    return {
+        ok: true,
+        message: result.message ?? 'Password reset successfully.',
+        step: 'done',
+    };
 }

@@ -135,9 +135,7 @@ export async function HomePage({ heroContent }: HomePageProps) {
             <CardContent className="px-5 pb-5 pt-6 sm:px-6">
               <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-5">
                 {featuredCatalog.length > 0 ? (
-                  featuredCatalog.map(product => (
-                    <ProductCard key={product.sku} product={product} />
-                  ))
+                  featuredCatalog.map(product => <ProductCard key={product.sku} product={product} />)
                 ) : (
                   <div className="col-span-full text-center text-foreground/60 py-12">
                     No featured products available
@@ -154,9 +152,7 @@ export async function HomePage({ heroContent }: HomePageProps) {
             <CardContent className="px-5 pb-5 pt-6 sm:px-6">
               <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-5">
                 {latestCatalog.length > 0 ? (
-                  latestCatalog.map(product => (
-                    <ProductCard key={product.sku} product={product} />
-                  ))
+                  latestCatalog.map(product => <ProductCard key={product.sku} product={product} />)
                 ) : (
                   <div className="col-span-full text-center text-foreground/60 py-12">
                     No latest products available
@@ -181,9 +177,7 @@ export async function HomePage({ heroContent }: HomePageProps) {
                   >
                     Category spotlight
                   </Badge>
-                  <h3 className="mt-6 text-[26px] font-black leading-tight text-white">
-                    {card.name}
-                  </h3>
+                  <h3 className="mt-6 text-[26px] font-black leading-tight text-white">{card.name}</h3>
                   <p className="mt-3 max-w-md text-sm leading-7 text-white/90">{card.description}</p>
                   <span className="mt-auto self-center rounded-full bg-white/18 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm transition group-hover:bg-white/24">
                     Explore category
@@ -204,7 +198,7 @@ export async function HomePage({ heroContent }: HomePageProps) {
                     <Link
                       key={brand.name}
                       href={brand.href}
-                      className="rounded-xl border border-border px-4 py-5 text-center text-sm font-bold text-foreground transition hover:border-primary/30 hover:bg-primary hover:text-primary-foreground cursor-pointer"
+                      className="cursor-pointer rounded-xl border border-border px-4 py-5 text-center text-sm font-bold text-foreground transition hover:border-primary/30 hover:bg-primary hover:text-white!"
                     >
                       <div className="mx-auto flex h-20 w-20 items-center justify-center overflow-hidden rounded-lg bg-background shadow-sm">
                         {brand.image ? (

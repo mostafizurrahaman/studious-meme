@@ -44,6 +44,35 @@ export type BackendCart = {
     updatedAt?: string;
 };
 
+export type CartHistoryRecord = {
+    _id?: string;
+    user?: {
+        _id?: string;
+        name?: string;
+        email?: string;
+        phone?: string;
+        image?: string;
+    } | string;
+    product?: { _id?: string } | string | null;
+    productSnapshot?: {
+        title: string;
+        brand: string;
+        category: string;
+        categorySlug?: string;
+        image: string;
+        sku: string;
+        slug: string;
+        price: number;
+        stock: number;
+        weightKg?: number;
+        isNoCOD?: boolean;
+    };
+    action?: 'add' | 'update' | 'remove' | 'clear';
+    quantity?: number;
+    createdAt?: string;
+    updatedAt?: string;
+};
+
 export const getMyCart = async (): Promise<BackendEnvelope<BackendCart>> => {
     const accessToken = await getValidAccessTokenForServerHandlerGet();
 
@@ -134,10 +163,10 @@ const buildAdminQuery = (params: AdminListParams = {}) => {
     return query ? `?${query}` : '';
 };
 
-export const getAllCarts = async (params: AdminListParams = {}): Promise<BackendEnvelope<BackendCart[]>> => {
+export const getAllCarts = async (params: AdminListParams = {}): Promise<BackendEnvelope<CartHistoryRecord[]>> => {
     const accessToken = await getValidAccessTokenForServerHandlerGet();
 
-    return requestBackendJson<BackendEnvelope<BackendCart[]>>(`/cart/admin${buildAdminQuery(params)}`, {
+    return requestBackendJson<BackendEnvelope<CartHistoryRecord[]>>(`/cart/admin${buildAdminQuery(params)}`, {
         method: 'GET',
         token: accessToken ?? undefined,
         next: { tags: ['CART'] },

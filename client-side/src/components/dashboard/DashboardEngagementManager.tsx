@@ -1,58 +1,150 @@
-"use client";
+'use client';
 
-import { useCallback } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useCallback, useMemo } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { TablePagination } from '@/components/ui/table-pagination';
 import { formatDashboardDate } from '@/lib/formatDate';
+import {
+    buildDashboardActivityCards,
+    type DashboardActivityCard,
+    type DashboardActivityRecord,
+} from '@/lib/dashboard-activity';
 
-type UserSummary = {
-    name?: string;
-    email?: string;
-    phone?: string;
-};
-
-export type DashboardWishlistRecord = {
-    _id?: string;
-    user?: UserSummary;
-    productSnapshot?: {
-        title: string;
-        brand: string;
-        image: string;
-        sku: string;
-        price: number;
-    };
-    createdAt?: string;
-    updatedAt?: string;
-};
-
-export type DashboardComparisonRecord = {
-    _id?: string;
-    user?: UserSummary;
-    productSnapshot?: {
-        title: string;
-        brand: string;
-        sku: string;
-        image: string;
-    };
-    createdAt?: string;
-};
+export type DashboardWishlistRecord = DashboardActivityRecord;
+export type DashboardComparisonRecord = DashboardActivityRecord;
+export type DashboardCartRecord = DashboardActivityRecord;
 
 type PaginationMeta = { page: number; limit: number; total: number; totalPages: number };
 
-export function DashboardWishlistManager({
+type ActivityManagerProps = {
+    records: DashboardActivityRecord[];
+    paginationMeta: PaginationMeta;
+    title: string;
+    description: string;
+    emptyTitle: string;
+    emptyDescription: string;
+    actionLabel: string;
+};
+
+function ActivityCardView({ card, actionLabel }: { card: DashboardActivityCard; actionLabel: string }) {
+    return (
+        <Card className={`overflow-hidden border shadow-sm transition hover:shadow-md ${card.toneClass}`}>
+            <CardContent className="p-4 sm:p-5">
+                <div className="flex flex-col gap-4 lg:flex-row">
+                    <div className="relative h-28 w-full overflow-hidden rounded-2xl border bg-muted sm:h-32 lg:h-36 lg:w-36 lg:shrink-0">
+                        {card.image ? (
+                            <Image src={card.image} alt={card.title} fill className="object-cover" />
+                        ) : (
+                            <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
+                                No image
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="min-w-0 flex-1 space-y-3">
+                        <div className="flex flex-wrap items-start justify-between gap-3">
+                            <div className="min-w-0">
+                                <h3 className="truncate text-lg font-black text-secondary">{card.title}</h3>
+                                <p className="mt-1 text-sm text-muted-foreground">
+                                    {card.brand} · SKU {card.sku}
+                                </p>
+                                <p className="mt-1 text-sm text-muted-foreground">
+                                    User: {card.userName} ({card.userEmail})
+                                </p>
+                            </div>
+
+                            <div className="flex flex-wrap items-center gap-2">
+                                <Badge variant={card.isActive ? 'default' : 'secondary'}>
+                                    {card.lastAction === 'clear'
+                                        ? 'Cleared'
+                                        : card.clearedAt
+                                          ? 'Cleared'
+                                          : card.isActive
+                                            ? 'Active'
+                                            : 'Removed'}
+                                </Badge>
+                                <Badge variant="outline">{actionLabel}</Badge>
+                                <Badge variant="outline">{card.eventCount} events</Badge>
+                                {typeof card.quantity === 'number' ? <Badge variant="outline">Qty {card.quantity}</Badge> : null}
+                            </div>
+                        </div>
+
+                        <div className="grid gap-3 rounded-2xl border border-border/70 bg-muted/25 p-4 text-sm sm:grid-cols-2 xl:grid-cols-4">
+                            <div>
+                                <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                                    Added on
+                                </div>
+                                <div className="mt-1 font-semibold text-foreground">
+                                    {card.addedAt ? formatDashboardDate(card.addedAt, { time: true }) : '—'}
+                                </div>
+                            </div>
+                            <div>
+                                <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                                    {card.clearedAt ? 'Cleared on' : 'Removed on'}
+                                </div>
+                                <div className="mt-1 font-semibold text-foreground">
+                                    {card.clearedAt
+                                        ? formatDashboardDate(card.clearedAt, { time: true })
+                                        : card.removedAt
+                                          ? formatDashboardDate(card.removedAt, { time: true })
+                                          : '—'}
+                                </div>
+                            </div>
+                            <div>
+                                <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                                    Last activity
+                                </div>
+                                <div className="mt-1 font-semibold text-foreground">
+                                    {card.updatedAt ? formatDashboardDate(card.updatedAt, { time: true }) : '—'}
+                                </div>
+                            </div>
+                            <div>
+                                <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                                    Category
+                                </div>
+                                <div className="mt-1 font-semibold text-foreground">
+                                    {card.category ?? '—'}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-muted-foreground">
+                            {card.slug ? (
+                                <Button asChild variant="outline" size="sm" className="rounded-full">
+                                    <Link href={`/product/${card.slug}`}>View product</Link>
+                                </Button>
+                            ) : null}
+                            <span className="rounded-full bg-muted px-3 py-1">
+                                {card.isActive ? 'Still active in list' : 'No longer active'}
+                            </span>
+                            <span className="rounded-full bg-muted px-3 py-1">{card.lastAction ?? 'add'}</span>
+                        </div>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
+
+function ActivityManager({
     records,
     paginationMeta,
-}: {
-    records: DashboardWishlistRecord[];
-    paginationMeta: PaginationMeta;
-}) {
+    title,
+    description,
+    emptyTitle,
+    emptyDescription,
+    actionLabel,
+}: ActivityManagerProps) {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
+
+    const cards = useMemo(() => buildDashboardActivityCards(records), [records]);
 
     const updateQuery = useCallback(
         (updates: { page?: number; limit?: number }) => {
@@ -69,67 +161,34 @@ export function DashboardWishlistManager({
     return (
         <Card className="shadow-sm">
             <CardHeader>
-                <CardTitle>Wishlist activity</CardTitle>
-                <CardDescription>Products saved by users in the last 30 days.</CardDescription>
+                <CardTitle>{title}</CardTitle>
+                <CardDescription>{description}</CardDescription>
             </CardHeader>
-            <CardContent>
-                <div className="mb-4 text-sm text-muted-foreground">
-                    Showing {records.length} of {paginationMeta.total} wishlist records
+            <CardContent className="space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div className="text-sm text-muted-foreground">
+                        Showing {cards.length} grouped cards from {paginationMeta.total} activity records
+                    </div>
+                    <div className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                        {actionLabel}
+                    </div>
                 </div>
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Product</TableHead>
-                            <TableHead>User</TableHead>
-                            <TableHead>Brand</TableHead>
-                            <TableHead>SKU</TableHead>
-                            <TableHead>Price</TableHead>
-                            <TableHead>Saved</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                    {records.length === 0 ? (
-                        <TableRow>
-                            <TableCell colSpan={6} className="py-0">
-                                <div className="my-4 rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-                                    No wishlist activity found.
-                                </div>
-                            </TableCell>
-                        </TableRow>
-                    ) : null}
-                    {records.map(record => {
-                            const product = record.productSnapshot;
-                            return (
-                                <TableRow key={record._id ?? `${record.user?.email}-${product?.sku}`}>
-                                    <TableCell>
-                                        <div className="flex items-center gap-3">
-                                            <div className="relative size-12 overflow-hidden rounded-xl border bg-muted">
-                                                {product?.image ? (
-                                                    <Image src={product.image} alt={product.title} fill className="object-cover" />
-                                                ) : null}
-                                            </div>
-                                            <div className="font-medium">{product?.title ?? '-'}</div>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="font-medium">{record.user?.name ?? '-'}</div>
-                                        <div className="text-xs text-muted-foreground">{record.user?.email ?? '-'}</div>
-                                    </TableCell>
-                                    <TableCell>{product?.brand ?? '-'}</TableCell>
-                                    <TableCell>{product?.sku ?? '-'}</TableCell>
-                                    <TableCell>{product?.price ? `Tk. ${product.price.toLocaleString('en-BD')}` : '-'}</TableCell>
-                                    <TableCell>
-                                        <span title={formatDashboardDate(record.updatedAt ?? record.createdAt, { time: true })}>
-                                            {formatDashboardDate(record.updatedAt ?? record.createdAt)}
-                                        </span>
-                                    </TableCell>
-                                </TableRow>
-                            );
-                        })}
-                    </TableBody>
-                </Table>
+
+                {cards.length === 0 ? (
+                    <div className="rounded-2xl border border-dashed border-border p-8 text-center">
+                        <div className="text-lg font-black text-primary">{emptyTitle}</div>
+                        <p className="mt-2 text-sm text-foreground/55">{emptyDescription}</p>
+                    </div>
+                ) : (
+                    <div className="grid gap-4">
+                        {cards.map(card => (
+                            <ActivityCardView key={card.id} card={card} actionLabel={actionLabel} />
+                        ))}
+                    </div>
+                )}
+
                 {paginationMeta.total > 0 ? (
-                    <div className="mt-4 border-t pt-4">
+                    <div className="border-t pt-4">
                         <TablePagination
                             page={paginationMeta.page}
                             limit={paginationMeta.limit}
@@ -144,6 +203,26 @@ export function DashboardWishlistManager({
     );
 }
 
+export function DashboardWishlistManager({
+    records,
+    paginationMeta,
+}: {
+    records: DashboardWishlistRecord[];
+    paginationMeta: PaginationMeta;
+}) {
+    return (
+        <ActivityManager
+            records={records}
+            paginationMeta={paginationMeta}
+            title="Wishlist activity"
+            description="Saved and removed wishlist items grouped into easy-to-read cards."
+            emptyTitle="No wishlist activity found"
+            emptyDescription="Wishlist actions will appear here with added and removed dates."
+            actionLabel="Wishlist"
+        />
+    );
+}
+
 export function DashboardComparisonManager({
     records,
     paginationMeta,
@@ -151,74 +230,35 @@ export function DashboardComparisonManager({
     records: DashboardComparisonRecord[];
     paginationMeta: PaginationMeta;
 }) {
-    const router = useRouter();
-    const pathname = usePathname();
-    const searchParams = useSearchParams();
-
-    const updateQuery = useCallback(
-        (updates: { page?: number; limit?: number }) => {
-            const params = new URLSearchParams(searchParams.toString());
-
-            params.set('page', String(updates.page ?? paginationMeta.page));
-            params.set('limit', String(updates.limit ?? paginationMeta.limit));
-
-            router.push(`${pathname}?${params.toString()}`);
-        },
-        [paginationMeta.limit, paginationMeta.page, pathname, router, searchParams],
-    );
-
     return (
-        <Card className="shadow-sm">
-            <CardHeader>
-                <CardTitle>Comparison activity</CardTitle>
-                <CardDescription>Products compared by users in the last 30 days.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <div className="mb-4 text-sm text-muted-foreground">
-                    Showing {records.length} of {paginationMeta.total} comparison records
-                </div>
-                <div className="grid gap-4">
-                    {records.length === 0 ? (
-                        <div className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-                            No comparison activity found.
-                        </div>
-                    ) : null}
-                    {records.map(record => (
-                        <div key={record._id ?? record.createdAt} className="rounded-2xl border border-border p-4">
-                            <div className="flex flex-wrap items-center justify-between gap-3">
-                                <div>
-                                    <div className="font-semibold">{record.user?.name ?? 'Unknown user'}</div>
-                                    <div className="text-xs text-muted-foreground">{record.user?.email ?? '-'}</div>
-                                </div>
-                                <Badge variant="secondary">
-                                    {record.createdAt ? formatDashboardDate(record.createdAt) : 'Recent'}
-                                </Badge>
-                            </div>
-                            <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                                {record.productSnapshot ? (
-                                    <div className="rounded-xl bg-muted p-3 text-sm">
-                                        <div className="font-semibold">{record.productSnapshot.title}</div>
-                                        <div className="mt-1 text-xs text-muted-foreground">
-                                            {record.productSnapshot.brand} / {record.productSnapshot.sku}
-                                        </div>
-                                    </div>
-                                ) : null}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-                {paginationMeta.total > 0 ? (
-                    <div className="mt-4 border-t pt-4">
-                        <TablePagination
-                            page={paginationMeta.page}
-                            limit={paginationMeta.limit}
-                            total={paginationMeta.total}
-                            onPageChange={page => updateQuery({ page })}
-                            onLimitChange={limit => updateQuery({ page: 1, limit })}
-                        />
-                    </div>
-                ) : null}
-            </CardContent>
-        </Card>
+        <ActivityManager
+            records={records}
+            paginationMeta={paginationMeta}
+            title="Comparison activity"
+            description="Comparison actions grouped into cards with added and removed dates."
+            emptyTitle="No comparison activity found"
+            emptyDescription="Comparison actions will appear here with the latest timeline details."
+            actionLabel="Compare"
+        />
+    );
+}
+
+export function DashboardCartManager({
+    records,
+    paginationMeta,
+}: {
+    records: DashboardCartRecord[];
+    paginationMeta: PaginationMeta;
+}) {
+    return (
+        <ActivityManager
+            records={records}
+            paginationMeta={paginationMeta}
+            title="Cart activity"
+            description="Cart additions, removals, updates, and clears grouped for quick review."
+            emptyTitle="No cart activity found"
+            emptyDescription="Cart actions will appear here with added and removed dates."
+            actionLabel="Cart"
+        />
     );
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -16,10 +17,10 @@ type Props = {
 };
 
 export function AddToCompareButton({ product, compact = false, className }: Props) {
+    const router = useRouter();
     const hydrated = useCompareStore(state => state.hydrated);
     const items = useCompareStore(state => state.items);
     const saved = useCompareStore(state => state.items.some(item => item.sku === product.sku));
-    const toggle = useCompareStore(state => state.toggle);
     const [isPending, startTransition] = useTransition();
     const canAdd = canAddToCompare(items, product);
 
@@ -36,15 +37,27 @@ export function AddToCompareButton({ product, compact = false, className }: Prop
             return;
         }
 
-        const nextSaved = toggle(product);
+        const nextSaved = !saved;
 
         startTransition(async () => {
             const result = nextSaved ? await addCompareItem(productId) : await removeCompareItem(productId);
 
             if (!result.success) {
-                toggle(product);
+                if (result.message === 'Sign in to save comparison items to your account.') {
+                    router.push('/my-account?notice=compare');
+                    return;
+                }
+
                 toast.error(result.message ?? 'Unable to update compare list.');
+                return;
             }
+
+            if (nextSaved) {
+                useCompareStore.getState().add(product);
+                return;
+            }
+
+            useCompareStore.getState().remove(product.sku);
         });
     }
 

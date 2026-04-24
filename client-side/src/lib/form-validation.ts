@@ -102,6 +102,32 @@ export const authFormSchemas = {
     email: requiredEmail(),
     password: requiredPassword('Password'),
   }),
+  forgotPassword: z.object({
+    email: requiredEmail(),
+  }),
+  forgotPasswordOtp: z.object({
+    otp: z
+      .string({ error: 'OTP is required!' })
+      .trim()
+      .min(6, { message: 'OTP must be 6 digits long!' })
+      .max(6, { message: 'OTP must be 6 digits long!' }),
+  }),
+  forgotPasswordReset: z
+    .object({
+      newPassword: requiredPassword('New password'),
+      confirmPassword: z.string({ error: 'Confirm password is required!' }).trim().min(1, {
+        message: 'Confirm password is required!',
+      }),
+    })
+    .superRefine(({ newPassword, confirmPassword }, ctx) => {
+      if (newPassword !== confirmPassword) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['confirmPassword'],
+          message: 'Passwords must match!',
+        });
+      }
+    }),
   signUp: z
     .object({
       name: requiredText('Name', 2),
