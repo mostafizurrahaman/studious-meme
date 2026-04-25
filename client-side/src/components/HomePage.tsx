@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { ArrowUpRight } from 'lucide-react';
 
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { getCategoryAccentClassName, getCategoryAccentStyle } from '@/lib/category-accent';
@@ -12,6 +12,33 @@ import { siteConfig } from '@/lib/seo';
 import { mapBackendBrandToStorefrontBrand, type BackendBrand } from '@/services/Brand';
 import { mapBackendCategoryToStorefrontCategory, type BackendCategory } from '@/services/Category/mappers';
 import { mapBackendProductToStorefrontProduct, type BackendProduct } from '@/services/Product';
+
+const directoryTileLinkClass =
+  'group block rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background';
+
+const directoryTileCardClass =
+  'relative h-full overflow-hidden rounded-2xl border border-border/70 bg-card/95 shadow-sm transition-all duration-300 ease-out motion-safe:hover:-translate-y-1 motion-safe:hover:border-primary/35 motion-safe:hover:shadow-[0_18px_40px_rgba(15,23,42,0.12)] active:translate-y-0 active:scale-[0.99]';
+
+const directoryTileSheenClass =
+  'pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.96),transparent_58%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100';
+
+const directoryTileTopBarClass =
+  'pointer-events-none absolute inset-x-0 top-0 h-1 opacity-80 transition-opacity duration-300 group-hover:opacity-100';
+
+const directoryTileOrbClass =
+  'pointer-events-none absolute -right-10 -top-10 size-28 rounded-full opacity-15 blur-2xl transition-opacity duration-300 group-hover:opacity-25';
+
+const brandTileCardClass =
+  'relative h-full overflow-hidden rounded-2xl border border-border/70 bg-card/95 shadow-sm transition-all duration-300 ease-out motion-safe:hover:-translate-y-1 motion-safe:hover:rotate-1 motion-safe:hover:shadow-[0_18px_40px_rgba(15,23,42,0.12)] active:translate-y-0 active:scale-[0.99]';
+
+const brandTileSheenClass =
+  'pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.96),transparent_58%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100';
+
+const brandTileSweepClass =
+  'pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 bg-gradient-to-r from-transparent via-white/55 to-transparent opacity-0 transition-all duration-700 ease-out group-hover:translate-x-[240%] group-hover:opacity-100';
+
+const brandTileGlowClass =
+  'pointer-events-none absolute -bottom-10 left-1/2 size-24 -translate-x-1/2 rounded-full bg-primary/10 blur-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100';
 
 type HeroSlide = {
   title: string;
@@ -162,28 +189,71 @@ export async function HomePage({ heroContent }: HomePageProps) {
         </Card>
 
         {categoryCards.length > 0 && (
-          <section className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {categoryCards.map(card => (
-              <Link
-                key={card.slug}
-                href={card.href}
-                className={`ui-card group flex h-full cursor-pointer flex-col p-6 text-white shadow-sm ${getCategoryAccentClassName(card.accent)}`}
-                style={getCategoryAccentStyle(card.accent)}
-              >
-                <Badge
-                  variant="secondary"
-                  className="w-fit rounded-full px-3 py-1 text-[10px] uppercase tracking-[0.32em]"
-                >
-                  Category spotlight
-                </Badge>
-                <h3 className="mt-6 text-[26px] font-black leading-tight text-white">{card.name}</h3>
-                <p className="mt-3 max-w-md text-sm leading-7 text-white/90">{card.description}</p>
-                <span className="mt-auto self-center rounded-full bg-white/18 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm transition group-hover:bg-white/24">
-                  Explore category
-                </span>
-              </Link>
-            ))}
-          </section>
+          <Card className="mt-8 shadow-sm">
+            <CardHeader className="px-5 pb-0 pt-5 sm:px-6">
+              <SectionHeading title="Shop By Category" actionHref="/main-categories" />
+            </CardHeader>
+            <CardContent className="px-5 pb-5 pt-6 sm:px-6">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {categoryCards.map(card => (
+                  <Link key={card.slug} href={card.href} className={directoryTileLinkClass}>
+                    <Card className={`${directoryTileCardClass} p-4`}>
+                      <span className={directoryTileSheenClass} />
+                      <span
+                        className={directoryTileTopBarClass}
+                        style={getCategoryAccentStyle(card.accent)}
+                      />
+                      <span
+                        className={`pointer-events-none absolute -right-10 -top-10 size-28 rounded-full opacity-15 blur-2xl transition-opacity duration-300 group-hover:opacity-25 ${getCategoryAccentClassName(card.accent)}`}
+                        style={getCategoryAccentStyle(card.accent)}
+                      />
+                      <div className="relative flex items-start gap-3">
+                        <div className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-border/70 bg-transparent shadow-[inset_0_1px_0_rgba(255,255,255,0.45)] transition-all duration-300 group-hover:scale-105 group-hover:border-primary/30 group-hover:shadow-[0_10px_30px_rgba(15,23,42,0.12)]">
+                          {card.image ? (
+                            <Image
+                              src={card.image}
+                              alt={card.name}
+                              width={80}
+                              height={80}
+                              className="h-full w-full rounded-2xl bg-transparent object-contain p-2 mix-blend-multiply transition duration-300 group-hover:scale-110"
+                            />
+                          ) : (
+                            <span className="px-2 text-center text-xs font-black text-secondary transition-colors duration-300 group-hover:text-primary">
+                              {card.name}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="min-w-0 flex-1 text-left">
+                          <div className="inline-flex rounded-full border border-border/70 bg-background/90 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.28em] text-foreground/55 transition-colors duration-300 group-hover:text-primary">
+                            Category
+                          </div>
+                          <div className="mt-3 text-lg font-black leading-tight text-secondary transition-colors duration-300 group-hover:text-primary">
+                            {card.name}
+                          </div>
+                          <p className="mt-2 text-sm leading-6 text-foreground/65">{card.description}</p>
+                        </div>
+
+                        <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-border/70 bg-background/90 text-foreground/50 transition-all duration-300 group-hover:border-primary/25 group-hover:bg-primary group-hover:text-white group-hover:shadow-sm">
+                          <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                        </span>
+                      </div>
+
+                      <div className="relative mt-4 flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2 text-xs font-semibold text-foreground/55 transition-colors duration-300 group-hover:text-primary">
+                          <span className="h-1.5 w-1.5 rounded-full bg-primary/60 transition-transform duration-300 group-hover:scale-125" />
+                          <span>Explore category</span>
+                        </div>
+                        <span className="rounded-full border border-border/70 bg-background/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.24em] text-foreground/45 transition-colors duration-300 group-hover:text-primary">
+                          {card.subCategories?.length ?? 0} sub
+                        </span>
+                      </div>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         )}
 
         {brandItems.length > 0 && (
@@ -192,29 +262,39 @@ export async function HomePage({ heroContent }: HomePageProps) {
               <SectionHeading title="Shop By Brands" actionHref="/shop-by-brands" />
             </CardHeader>
             <CardContent className="px-5 pb-5 pt-6 sm:px-6">
-              <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
                 {brandItems.map(brand => (
                   <Link
                     key={brand.name}
                     href={brand.href}
-                    className="cursor-pointer rounded-xl border border-border px-4 py-5 text-center text-sm font-bold text-foreground transition hover:border-primary/30 hover:bg-primary hover:text-white!"
+                    className={directoryTileLinkClass}
                   >
-                    <div className="mx-auto flex h-20 w-20 items-center justify-center overflow-hidden rounded-lg bg-background shadow-sm">
-                      {brand.image ? (
-                        <Image
-                          src={brand.image}
-                          alt={brand.name}
-                          width={64}
-                          height={64}
-                          className="h-full w-full rounded-xl object-contain p-2"
-                        />
-                      ) : (
-                        <span className="px-2 text-center text-xs font-black text-secondary">
-                          {brand.name}
-                        </span>
-                      )}
-                    </div>
-                    <div className="mt-3">{brand.name}</div>
+                    <Card className={`${brandTileCardClass} p-4 text-center`}>
+                      <span className={brandTileSheenClass} />
+                      <span className={brandTileSweepClass} />
+                      <span className={brandTileGlowClass} />
+                      <div className="relative mx-auto flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl border border-border/70 bg-transparent shadow-[inset_0_1px_0_rgba(255,255,255,0.45)] transition-all duration-300 group-hover:scale-110 group-hover:rotate-[-2deg] group-hover:border-primary/30 group-hover:shadow-[0_10px_30px_rgba(15,23,42,0.12)]">
+                        {brand.image ? (
+                          <Image
+                            src={brand.image}
+                            alt={brand.name}
+                            width={64}
+                            height={64}
+                            className="h-full w-full rounded-2xl bg-transparent object-contain p-2 mix-blend-multiply transition duration-300 group-hover:scale-[1.14]"
+                          />
+                        ) : (
+                          <span className="px-2 text-center text-xs font-black text-secondary transition-colors duration-300 group-hover:text-primary">
+                            {brand.name}
+                          </span>
+                        )}
+                      </div>
+                      <div className="relative mt-3 text-sm font-black text-secondary transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:text-primary">
+                        {brand.name}
+                      </div>
+                      <div className="relative mt-2 inline-flex rounded-full border border-border/70 bg-background/90 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.24em] text-foreground/45 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:border-primary/25 group-hover:text-primary">
+                        View brand
+                      </div>
+                    </Card>
                   </Link>
                 ))}
               </div>

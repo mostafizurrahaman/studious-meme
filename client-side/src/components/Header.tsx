@@ -27,10 +27,15 @@ export function Header({ categories }: Props) {
   const categoriesRef = useRef<HTMLDetailsElement>(null);
   const menuRef = useRef<HTMLDetailsElement>(null);
   const cartRef = useRef<HTMLDetailsElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
+  const lastScrollYRef = useRef(0);
+  const scrollTickRef = useRef(false);
   const compareCount = useCompareStore(state => state.items.length);
   const wishlistCount = useWishlistStore(state => state.items.length);
   const [mobileDrawerTab, setMobileDrawerTab] = useState<'categories' | 'menu'>('categories');
   const [activeCategorySlug, setActiveCategorySlug] = useState(categories[0]?.slug ?? '');
+  const [isHidden, setIsHidden] = useState(false);
+  const [headerHeight, setHeaderHeight] = useState(0);
   const activeCategory =
     categories.find(category => category.slug === activeCategorySlug) ?? categories[0] ?? null;
 
@@ -55,6 +60,68 @@ export function Header({ categories }: Props) {
 
     return () => document.removeEventListener('pointerdown', handlePointerDown);
   }, []);
+
+  useEffect(() => {
+    const syncHeaderHeight = () => {
+      const nextHeight = Math.ceil(headerRef.current?.getBoundingClientRect().height ?? 0);
+      document.documentElement.style.setProperty('--storefront-header-height', `${nextHeight}px`);
+      setHeaderHeight(prev => (prev === nextHeight ? prev : nextHeight));
+    };
+
+    window.requestAnimationFrame(syncHeaderHeight);
+
+    if (!headerRef.current || typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', syncHeaderHeight);
+
+      return () => window.removeEventListener('resize', syncHeaderHeight);
+    }
+
+    const observer = new ResizeObserver(() => {
+      window.requestAnimationFrame(syncHeaderHeight);
+    });
+
+    observer.observe(headerRef.current);
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const updateVisibility = () => {
+      const currentScrollY = window.scrollY;
+      const previousScrollY = lastScrollYRef.current;
+      const delta = currentScrollY - previousScrollY;
+      const nearTop = currentScrollY <= Math.max(24, headerHeight * 0.35);
+
+      if (nearTop) {
+        setIsHidden(false);
+      } else if (delta > 10) {
+        setIsHidden(true);
+      } else if (delta < -10) {
+        setIsHidden(false);
+      }
+
+      if (delta > 10 && !nearTop) {
+        if (categoriesRef.current) categoriesRef.current.open = false;
+        if (menuRef.current) menuRef.current.open = false;
+        if (cartRef.current) cartRef.current.open = false;
+      }
+
+      lastScrollYRef.current = currentScrollY;
+      scrollTickRef.current = false;
+    };
+
+    const onScroll = () => {
+      if (scrollTickRef.current) return;
+
+      scrollTickRef.current = true;
+      window.requestAnimationFrame(updateVisibility);
+    };
+
+    lastScrollYRef.current = window.scrollY;
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [headerHeight]);
 
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/';
@@ -89,7 +156,10 @@ export function Header({ categories }: Props) {
     isActive(href) ? { backgroundColor: 'var(--primary)', color: '#ffffff' } : undefined;
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border bg-background text-foreground shadow-sm">
+    <header
+      ref={headerRef}
+      className={`fixed inset-x-0 top-0 z-40 w-full border-b border-border/50 bg-background/75 text-foreground shadow-[0_12px_40px_rgba(15,23,42,0.08)] backdrop-blur-xl supports-backdrop-filter:bg-background/60 motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out motion-reduce:transition-none ${isHidden ? '-translate-y-full' : 'translate-y-0'}`}
+    >
       {/* 1st layer */}
       <Container>
         <div className="lg:hidden">
@@ -99,12 +169,12 @@ export function Header({ categories }: Props) {
                 <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background text-lg leading-none text-foreground">
                   ☰
                 </span>
-                    <Link href="/" className="flex justify-center" aria-label="Malamal Home">
-                      <Image
-                        src="/logo.png"
-                        alt={siteConfig.name}
-                        width={160}
-                        height={32}
+                <Link href="/" className="flex justify-center" aria-label="Malamal Home">
+                  <Image
+                    src="/logo.png"
+                    alt={siteConfig.name}
+                    width={160}
+                    height={32}
                     priority
                     className="h-7 w-34 object-contain sm:w-36"
                   />
@@ -197,7 +267,7 @@ export function Header({ categories }: Props) {
               width={182}
               height={36}
               priority
-              className="h-8 w-32 object-contain sm:w-36  lg:w-44"
+              className="h-8 w-32 object-contain sm:w-36  lg:w-48"
             />
           </Link>
 

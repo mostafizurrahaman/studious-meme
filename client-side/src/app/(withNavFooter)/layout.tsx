@@ -1,8 +1,9 @@
 import { FloatingCategoryRail } from '@/components/FloatingCategoryRail';
 import { Footer } from '@/components/Footer';
-import { Header } from '@/components/Header';
 import { MobileToolbar } from '@/components/MobileToolbar';
 import { Container } from '@/components/Container';
+import { StorefrontHeader } from '@/components/StorefrontHeader';
+import { StorefrontFloatingContact } from '@/components/StorefrontFloatingContact';
 import { getActiveBrands, mapBackendBrandToStorefrontBrand } from '@/services/Brand';
 import { getActiveCategories } from '@/services/Category';
 import { mapBackendCategoryToStorefrontCategory, type BackendCategory } from '@/services/Category/mappers';
@@ -27,14 +28,20 @@ const MainLayout = async ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div>
-      {/* <Header categories={categories} brands={brands} /> */}
-      <Header categories={categories} />
-      <FloatingCategoryRail categories={categories} />
-      <Container>
-        <div className="min-h-screen">{children}</div>
-      </Container>
+      <StorefrontHeader categories={categories} />
+      <main
+        style={{
+          paddingTop: 'var(--storefront-header-height, clamp(120px, 12vw, 160px))',
+        }}
+      >
+        <FloatingCategoryRail categories={categories} />
+        <Container>
+          <div className="min-h-screen">{children}</div>
+        </Container>
+      </main>
       <Footer categories={categories} brands={brands} />
       <MobileToolbar />
+      <StorefrontFloatingContact />
     </div>
   );
 };
