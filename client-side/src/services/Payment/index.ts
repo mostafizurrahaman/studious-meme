@@ -26,12 +26,12 @@ export type BackendPayment = {
     valId?: string;
 };
 
-export const initiateSslCommerzPayment = async (
+export const initiatePortPosPayment = async (
     orderId: string,
 ): Promise<BackendEnvelope<{ url?: string; transactionId?: string }>> => {
     const accessToken = await getValidAccessTokenForServerActions();
     return requestBackendJson<BackendEnvelope<{ url?: string; transactionId?: string }>>(
-        `/payment/sslcommerz/init/${orderId}`,
+        `/payment/portpos/init/${orderId}`,
         {
             method: 'POST',
             token: accessToken ?? undefined,

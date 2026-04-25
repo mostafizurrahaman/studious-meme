@@ -41,7 +41,7 @@ export default async function AdminPaymentsPage({ searchParams }: Props) {
         <DashboardPaymentsManager
             payments={payments}
             title="Payments"
-            description="Browse through all the payments received via SSLCommerz."
+            description="Browse through all the payments received via PortPOS."
             listBaseHref="/dashboard/admin/payments"
             paginationMeta={paginationMeta}
         />

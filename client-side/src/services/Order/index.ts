@@ -2,173 +2,173 @@
 
 import { requestBackendJson } from '@/lib/backend-api';
 import {
-    getValidAccessTokenForServerActions,
-    getValidAccessTokenForServerHandlerGet,
+  getValidAccessTokenForServerActions,
+  getValidAccessTokenForServerHandlerGet,
 } from '@/lib/getValidAccessToken';
 
 type BackendEnvelope<T> = {
-    success?: boolean;
-    message?: string;
-    data?: T;
-    error?: string;
-    meta?: { page: number; limit: number; total: number; totalPages: number };
+  success?: boolean;
+  message?: string;
+  data?: T;
+  error?: string;
+  meta?: { page: number; limit: number; total: number; totalPages: number };
 };
 
 export type BackendOrderItem = {
-    title: string;
-    slug: string;
-    sku: string;
-    image: string;
-    brand: string;
-    category: string;
-    unitPrice: number;
-    weightKg: number;
-    isNoCOD: boolean;
-    quantity: number;
-    lineTotal: number;
+  title: string;
+  slug: string;
+  sku: string;
+  image: string;
+  brand: string;
+  category: string;
+  unitPrice: number;
+  weightKg: number;
+  isNoCOD: boolean;
+  quantity: number;
+  lineTotal: number;
 };
 
 export type BackendOrder = {
-    _id: string;
-    orderId: string;
-    items: BackendOrderItem[];
-    customer: {
-        name: string;
-        phone: string;
-        email?: string;
-        address: string;
-        city: string;
-        note?: string;
-    };
-    subtotal: number;
-    discount: number;
-    delivery: number;
-    shippingZone?: 'inside_dhaka' | 'outside_dhaka';
-    shippingCharge?: number;
-    totalWeightKg?: number;
-    codEligible?: boolean;
-    codReasons?: string[];
-    total: number;
-    couponCode?: string;
-    paymentMethod: 'CASH_ON_DELIVERY' | 'SSL_COMMERZ';
-    paymentStatus: 'UNPAID' | 'PENDING' | 'PAID' | 'FAILED' | 'CANCELLED';
-    status: 'PLACED' | 'PROCESSING' | 'DELIVERED' | 'CANCELLED';
-    transactionId?: string;
-    gatewayUrl?: string;
-    createdAt: string;
-    updatedAt: string;
+  _id: string;
+  orderId: string;
+  items: BackendOrderItem[];
+  customer: {
+    name: string;
+    phone: string;
+    email?: string;
+    address: string;
+    city: string;
+    note?: string;
+  };
+  subtotal: number;
+  discount: number;
+  delivery: number;
+  shippingZone?: 'inside_dhaka' | 'outside_dhaka';
+  shippingCharge?: number;
+  totalWeightKg?: number;
+  codEligible?: boolean;
+  codReasons?: string[];
+  total: number;
+  couponCode?: string;
+  paymentMethod: 'CASH_ON_DELIVERY' | 'PORTPOS';
+  paymentStatus: 'UNPAID' | 'PENDING' | 'PAID' | 'FAILED' | 'CANCELLED';
+  status: 'PLACED' | 'PROCESSING' | 'DELIVERED' | 'CANCELLED';
+  transactionId?: string;
+  gatewayUrl?: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type CreateOrderPayload = {
-    items: Array<{ sku: string; quantity: number }>;
-    customer: {
-        name: string;
-        phone: string;
-        email?: string;
-        address: string;
-        city: string;
-        note?: string;
-    };
-    couponCode?: string;
-    paymentMethod: 'CASH_ON_DELIVERY' | 'SSL_COMMERZ';
+  items: Array<{ sku: string; quantity: number }>;
+  customer: {
+    name: string;
+    phone: string;
+    email?: string;
+    address: string;
+    city: string;
+    note?: string;
+  };
+  couponCode?: string;
+  paymentMethod: 'CASH_ON_DELIVERY' | 'PORTPOS';
 };
 
 export type PreviewCheckoutPayload = CreateOrderPayload;
 
 export type CheckoutPreview = {
-    items: BackendOrderItem[];
-    subtotal: number;
-    discount: number;
-    shippingZone: 'inside_dhaka' | 'outside_dhaka';
-    shippingCharge: number;
-    totalWeightKg: number;
-    codEligible: boolean;
-    codReasons: string[];
-    total: number;
+  items: BackendOrderItem[];
+  subtotal: number;
+  discount: number;
+  shippingZone: 'inside_dhaka' | 'outside_dhaka';
+  shippingCharge: number;
+  totalWeightKg: number;
+  codEligible: boolean;
+  codReasons: string[];
+  total: number;
 };
 
 export const createOrder = async (payload: CreateOrderPayload): Promise<BackendEnvelope<BackendOrder>> => {
-    const accessToken = await getValidAccessTokenForServerActions();
-    return requestBackendJson<BackendEnvelope<BackendOrder>>('/order/orders', {
-        method: 'POST',
-        body: payload,
-        token: accessToken ?? undefined,
-    });
+  const accessToken = await getValidAccessTokenForServerActions();
+  return requestBackendJson<BackendEnvelope<BackendOrder>>('/order/checkout', {
+    method: 'POST',
+    body: payload,
+    token: accessToken ?? undefined,
+  });
 };
 
 export const previewCheckout = async (
-    payload: PreviewCheckoutPayload,
+  payload: PreviewCheckoutPayload,
 ): Promise<BackendEnvelope<CheckoutPreview>> => {
-    const accessToken = await getValidAccessTokenForServerActions();
-    return requestBackendJson<BackendEnvelope<CheckoutPreview>>('/order/checkout-preview', {
-        method: 'POST',
-        body: payload,
-        token: accessToken ?? undefined,
-    });
+  const accessToken = await getValidAccessTokenForServerActions();
+  return requestBackendJson<BackendEnvelope<CheckoutPreview>>('/order/checkout-preview', {
+    method: 'POST',
+    body: payload,
+    token: accessToken ?? undefined,
+  });
 };
 
 export const getMyOrders = async (): Promise<BackendEnvelope<BackendOrder[]>> => {
-    const accessToken = await getValidAccessTokenForServerHandlerGet();
-    return requestBackendJson<BackendEnvelope<BackendOrder[]>>('/order/my-orders', {
-        method: 'GET',
-        token: accessToken ?? undefined,
-    });
+  const accessToken = await getValidAccessTokenForServerHandlerGet();
+  return requestBackendJson<BackendEnvelope<BackendOrder[]>>('/order/my-orders', {
+    method: 'GET',
+    token: accessToken ?? undefined,
+  });
 };
 
 export const getMyOrderById = async (orderId: string): Promise<BackendEnvelope<BackendOrder>> => {
-    const accessToken = await getValidAccessTokenForServerHandlerGet();
-    return requestBackendJson<BackendEnvelope<BackendOrder>>(`/order/my-orders/${orderId}`, {
-        method: 'GET',
-        token: accessToken ?? undefined,
-    });
+  const accessToken = await getValidAccessTokenForServerHandlerGet();
+  return requestBackendJson<BackendEnvelope<BackendOrder>>(`/order/my-orders/${orderId}`, {
+    method: 'GET',
+    token: accessToken ?? undefined,
+  });
 };
 
 type AdminListParams = {
-    page?: number;
-    limit?: number;
-    status?: string;
+  page?: number;
+  limit?: number;
+  status?: string;
 };
 
 const buildAdminListQuery = (params: AdminListParams = {}) => {
-    const searchParams = new URLSearchParams();
+  const searchParams = new URLSearchParams();
 
-    if (params.page) searchParams.set('page', String(params.page));
-    if (params.limit) searchParams.set('limit', String(params.limit));
-    if (params.status?.trim()) searchParams.set('status', params.status.trim());
+  if (params.page) searchParams.set('page', String(params.page));
+  if (params.limit) searchParams.set('limit', String(params.limit));
+  if (params.status?.trim()) searchParams.set('status', params.status.trim());
 
-    const query = searchParams.toString();
-    return query ? `?${query}` : '';
+  const query = searchParams.toString();
+  return query ? `?${query}` : '';
 };
 
 export const getAllOrdersForAdmin = async (
-    params: AdminListParams = {},
+  params: AdminListParams = {},
 ): Promise<BackendEnvelope<BackendOrder[]>> => {
-    const accessToken = await getValidAccessTokenForServerHandlerGet();
-    return requestBackendJson<BackendEnvelope<BackendOrder[]>>(
-        `/order/admin/orders${buildAdminListQuery(params)}`,
-        {
-            method: 'GET',
-            token: accessToken ?? undefined,
-        },
-    );
+  const accessToken = await getValidAccessTokenForServerHandlerGet();
+  return requestBackendJson<BackendEnvelope<BackendOrder[]>>(
+    `/order/admin/orders${buildAdminListQuery(params)}`,
+    {
+      method: 'GET',
+      token: accessToken ?? undefined,
+    },
+  );
 };
 
 export const getOrderById = async (orderId: string): Promise<BackendEnvelope<BackendOrder>> => {
-    const accessToken = await getValidAccessTokenForServerHandlerGet();
-    return requestBackendJson<BackendEnvelope<BackendOrder>>(`/order/admin/orders/${orderId}`, {
-        method: 'GET',
-        token: accessToken ?? undefined,
-    });
+  const accessToken = await getValidAccessTokenForServerHandlerGet();
+  return requestBackendJson<BackendEnvelope<BackendOrder>>(`/order/admin/orders/${orderId}`, {
+    method: 'GET',
+    token: accessToken ?? undefined,
+  });
 };
 
 export const updateOrderStatus = async (
-    orderId: string,
-    status: BackendOrder['status'],
+  orderId: string,
+  status: BackendOrder['status'],
 ): Promise<BackendEnvelope<BackendOrder>> => {
-    const accessToken = await getValidAccessTokenForServerActions();
-    return requestBackendJson<BackendEnvelope<BackendOrder>>(`/order/admin/orders/${orderId}/status`, {
-        method: 'PATCH',
-        body: { status },
-        token: accessToken ?? undefined,
-    });
+  const accessToken = await getValidAccessTokenForServerActions();
+  return requestBackendJson<BackendEnvelope<BackendOrder>>(`/order/admin/orders/${orderId}/status`, {
+    method: 'PATCH',
+    body: { status },
+    token: accessToken ?? undefined,
+  });
 };

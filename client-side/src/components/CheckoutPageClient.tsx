@@ -12,6 +12,12 @@ import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { formatMoney } from '@/lib/cart';
 import { useCartStore } from '@/lib/cart-store';
+import {
+    CASH_ON_DELIVERY_LABEL,
+    CHECKOUT_PAYMENT_OPTIONS,
+    PORTPOS_LABEL,
+    getCheckoutPaymentLabel,
+} from '@/lib/payment-method';
 import { submitCheckoutAction } from '@/app/(withNavFooter)/checkout/actions';
 import type { CheckoutActionState } from '@/app/(withNavFooter)/checkout/actions';
 import { calculateFulfillmentSummary, formatShippingZoneLabel } from '@/lib/fulfillment';
@@ -37,19 +43,20 @@ export function CheckoutPageClient() {
         address: checkout.address,
         couponCode: appliedCoupon?.code,
     });
-    const paymentValue = checkout.payment === 'SSLCommerz' ? 'SSLCommerz' : 'Cash on delivery';
-    const selectedPayment = paymentValue === 'Cash on delivery' && !fulfillment.codEligible ? 'SSLCommerz' : paymentValue;
+    const paymentValue = getCheckoutPaymentLabel(checkout.payment);
+    const selectedPayment =
+        paymentValue === CASH_ON_DELIVERY_LABEL && !fulfillment.codEligible ? PORTPOS_LABEL : paymentValue;
     const discount = fulfillment.discount;
     const delivery = fulfillment.shippingCharge;
     const total = fulfillment.total;
     const summaryItems = items.slice(0, 4);
 
     useEffect(() => {
-        if (fulfillment.codEligible || paymentValue !== 'Cash on delivery') {
+        if (fulfillment.codEligible || paymentValue !== CASH_ON_DELIVERY_LABEL) {
             return;
         }
 
-        updateCheckout('payment', 'SSLCommerz');
+        updateCheckout('payment', PORTPOS_LABEL);
     }, [checkout.payment, fulfillment.codEligible, paymentValue, updateCheckout]);
 
     useEffect(() => {
@@ -93,7 +100,7 @@ export function CheckoutPageClient() {
         clear();
         toast.success(
             result.gatewayUrl
-                ? 'Redirecting to SSLCommerz payment gateway...'
+                ? 'Redirecting to PortPOS payment gateway...'
                 : 'Order submitted successfully.',
         );
 
@@ -126,7 +133,7 @@ export function CheckoutPageClient() {
                     <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">Checkout</p>
                     <h1 className="mt-4 text-3xl font-black text-secondary sm:text-4xl">Place order</h1>
                     <p className="mt-3 max-w-3xl text-sm leading-7 text-foreground/65 sm:text-base">
-                        Complete your order with cash on delivery or SSLCommerz online payment.
+                        Complete your order with cash on delivery or PortPOS online payment.
                     </p>
                     <div className="mt-4 flex flex-wrap gap-2 text-xs font-semibold text-foreground/60">
                         <span className="rounded-full bg-muted px-3 py-1">{formatShippingZoneLabel(fulfillment.zone)}</span>
@@ -195,11 +202,11 @@ export function CheckoutPageClient() {
                                     onChange={event => updateCheckout('payment', event.target.value)}
                                     className="h-11 rounded-2xl border border-input bg-background px-4 outline-none"
                                 >
-                                    {['Cash on delivery', 'SSLCommerz'].map(option => (
+                                    {CHECKOUT_PAYMENT_OPTIONS.map(option => (
                                         <option
                                             key={option}
                                             value={option}
-                                            disabled={option === 'Cash on delivery' && !fulfillment.codEligible}
+                                            disabled={option === CASH_ON_DELIVERY_LABEL && !fulfillment.codEligible}
                                         >
                                             {option}
                                         </option>

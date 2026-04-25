@@ -1,7 +1,8 @@
 'use server';
 
 import { createOrder, previewCheckout } from '@/services/Order';
-import { initiateSslCommerzPayment } from '@/services/Payment';
+import { initiatePortPosPayment } from '@/services/Payment';
+import { normalizeOrderPaymentMethod } from '@/lib/payment-method';
 
 type CartItem = {
     sku: string;
@@ -82,7 +83,7 @@ export async function submitCheckoutAction(
     const couponCode = readString(formData, 'couponCode');
 
     const payment = readString(formData, 'payment') || 'Cash on delivery';
-    const normalizedPayment = payment === 'SSLCommerz' ? 'SSL_COMMERZ' : 'CASH_ON_DELIVERY';
+    const normalizedPayment = normalizeOrderPaymentMethod(payment);
 
     const previewResult = await previewCheckout({
         items: items.map(item => ({ sku: item.sku, quantity: item.quantity })),
@@ -110,11 +111,11 @@ export async function submitCheckoutAction(
         return fail(orderResult?.message ?? 'Failed to place order.');
     }
 
-    if (normalizedPayment === 'SSL_COMMERZ') {
-        const paymentResult = await initiateSslCommerzPayment(orderResult.data.orderId);
+    if (normalizedPayment === 'PORTPOS') {
+        const paymentResult = await initiatePortPosPayment(orderResult.data.orderId);
 
         if (!paymentResult?.success || !paymentResult.data?.url) {
-            return fail(paymentResult?.message ?? 'Failed to initiate SSLCommerz payment.');
+            return fail(paymentResult?.message ?? 'Failed to initiate PortPOS payment.');
         }
 
         return { ok: true, orderId: orderResult.data.orderId, gatewayUrl: paymentResult.data.url };

@@ -11,6 +11,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { formatMoney } from '@/lib/cart';
 import { useCartStore } from '@/lib/cart-store';
 import { calculateFulfillmentSummary, formatShippingZoneLabel } from '@/lib/fulfillment';
+import {
+    CASH_ON_DELIVERY_LABEL,
+    CHECKOUT_PAYMENT_OPTIONS,
+    PORTPOS_LABEL,
+    getCheckoutPaymentLabel,
+} from '@/lib/payment-method';
 import { clearCart as clearCartPersisted, getMyCart, removeCartItem, updateCartItem } from '@/services/Cart';
 
 export function CartPageClient() {
@@ -38,18 +44,19 @@ export function CartPageClient() {
         address: checkout.address,
         couponCode: appliedCoupon?.code,
     });
-    const paymentValue = checkout.payment === 'SSLCommerz' ? 'SSLCommerz' : 'Cash on delivery';
-    const selectedPayment = paymentValue === 'Cash on delivery' && !fulfillment.codEligible ? 'SSLCommerz' : paymentValue;
+    const paymentValue = getCheckoutPaymentLabel(checkout.payment);
+    const selectedPayment =
+        paymentValue === CASH_ON_DELIVERY_LABEL && !fulfillment.codEligible ? PORTPOS_LABEL : paymentValue;
     const discount = fulfillment.discount;
     const delivery = fulfillment.shippingCharge;
     const total = fulfillment.total;
 
     useEffect(() => {
-        if (fulfillment.codEligible || paymentValue !== 'Cash on delivery') {
+        if (fulfillment.codEligible || paymentValue !== CASH_ON_DELIVERY_LABEL) {
             return;
         }
 
-        updateCheckout('payment', 'SSLCommerz');
+        updateCheckout('payment', PORTPOS_LABEL);
     }, [checkout.payment, fulfillment.codEligible, paymentValue, updateCheckout]);
 
     useEffect(() => {
@@ -394,11 +401,11 @@ export function CartPageClient() {
                                 onChange={event => updateCheckout('payment', event.target.value)}
                                 className="h-11 rounded-2xl border border-input bg-background px-4 outline-none"
                             >
-                                {['Cash on delivery', 'SSLCommerz'].map(option => (
+                                {CHECKOUT_PAYMENT_OPTIONS.map(option => (
                                     <option
                                         key={option}
                                         value={option}
-                                        disabled={option === 'Cash on delivery' && !fulfillment.codEligible}
+                                        disabled={option === CASH_ON_DELIVERY_LABEL && !fulfillment.codEligible}
                                     >
                                         {option}
                                     </option>
