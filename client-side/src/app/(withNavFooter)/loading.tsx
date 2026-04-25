@@ -1,7 +1,5 @@
 import Loading from '@/components/ui/loading';
 
-const LoadingPage = () => {
+export default function WithNavFooterLoading() {
   return <Loading />;
-};
-
-export default LoadingPage;
+}

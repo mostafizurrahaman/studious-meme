@@ -237,7 +237,7 @@ function Sidebar({
     );
 }
 
-function SidebarTrigger({ className, onClick, ...props }: React.ComponentProps<typeof Button>) {
+function SidebarTrigger({ className, children, onClick, ...props }: React.ComponentProps<typeof Button>) {
     const { toggleSidebar } = useSidebar();
 
     return (
@@ -245,7 +245,7 @@ function SidebarTrigger({ className, onClick, ...props }: React.ComponentProps<t
             data-sidebar="trigger"
             data-slot="sidebar-trigger"
             variant="ghost"
-            size="icon-sm"
+            size="default"
             className={cn(className)}
             onClick={event => {
                 onClick?.(event);
@@ -254,7 +254,7 @@ function SidebarTrigger({ className, onClick, ...props }: React.ComponentProps<t
             {...props}
         >
             <HugeiconsIcon icon={SidebarLeftIcon} strokeWidth={2} />
-            <span className="sr-only">Toggle Sidebar</span>
+            {children ?? <span className="sr-only">Toggle Sidebar</span>}
         </Button>
     );
 }
@@ -347,7 +347,7 @@ function SidebarContent({ className, ...props }: React.ComponentProps<'div'>) {
             data-slot="sidebar-content"
             data-sidebar="content"
             className={cn(
-                'no-scrollbar flex min-h-0 flex-1 flex-col gap-0 overflow-auto group-data-[collapsible=icon]:overflow-hidden',
+                'no-scrollbar flex min-h-0 flex-1 flex-col gap-0 overflow-y-auto overflow-x-hidden group-data-[collapsible=icon]:overflow-y-auto group-data-[collapsible=icon]:overflow-x-hidden',
                 className,
             )}
             {...props}

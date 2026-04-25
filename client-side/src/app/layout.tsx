@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Poppins, Inter } from 'next/font/google';
 import './globals.css';
+import './spinner.css';
 import { SeoScripts } from '@/components/SeoScripts';
 import { FacebookPixel } from '@/components/FacebookPixel';
 import { GoogleAnalytics } from '@/components/GoogleAnalytics';
