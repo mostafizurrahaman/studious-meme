@@ -78,9 +78,11 @@ const normalizeAmount = (value: number | string | undefined) => {
     return Number.isFinite(amount) ? amount : 0;
 };
 
-const isSuccessStatus = (status: string) => ['PAID', 'SUCCESS', 'VALID', 'VALIDATED', 'COMPLETED'].includes(status);
+const isSuccessStatus = (status: string) =>
+    ['PAID', 'SUCCESS', 'VALID', 'VALIDATED', 'COMPLETED'].includes(status);
 
-const isFailureStatus = (status: string) => ['FAILED', 'FAIL', 'CANCELLED', 'CANCELED', 'VOID', 'EXPIRED'].includes(status);
+const isFailureStatus = (status: string) =>
+    ['FAILED', 'FAIL', 'CANCELLED', 'CANCELED', 'VOID', 'EXPIRED'].includes(status);
 
 const getInvoiceIdFromPayload = (payload: GatewayPayload) => {
     const candidate = payload.invoice_id ?? payload.invoice ?? payload.invoiceId ?? payload.reference;
@@ -93,7 +95,9 @@ const getAmountFromPayload = (payload: GatewayPayload) => {
 };
 
 const getStatusFromPayload = (payload: GatewayPayload) => {
-    const candidate = payload.status ?? (payload.billing as { gateway?: { status?: unknown } } | undefined)?.gateway?.status;
+    const candidate =
+        payload.status ??
+        (payload.billing as { gateway?: { status?: unknown } } | undefined)?.gateway?.status;
     return typeof candidate === 'string' ? candidate.toUpperCase() : '';
 };
 
@@ -131,8 +135,14 @@ const initiatePortPosPayment = async (user: IUser, orderId: string): Promise<Por
         throw new AppError(httpStatus.BAD_REQUEST, 'This order is already paid.');
     }
 
-    const existingPayment = await Payment.findOne({ order: String(order._id) }).sort({ createdAt: -1 }).lean();
-    if (existingPayment && existingPayment.invoiceId && ['INITIATED', 'PAID'].includes(existingPayment.status)) {
+    const existingPayment = await Payment.findOne({ order: String(order._id) })
+        .sort({ createdAt: -1 })
+        .lean();
+    if (
+        existingPayment &&
+        existingPayment.invoiceId &&
+        ['INITIATED', 'PAID'].includes(existingPayment.status)
+    ) {
         return {
             orderId,
             invoiceId: existingPayment.invoiceId,
@@ -323,7 +333,13 @@ const handlePortPosIpn = async (payload: GatewayPayload) => {
     }
 
     if (isSuccessStatus(verifiedStatus)) {
-        return finalizePaymentFromGateway(order, payment, payload, verifiedResponse as Record<string, unknown>, 'PAID');
+        return finalizePaymentFromGateway(
+            order,
+            payment,
+            payload,
+            verifiedResponse as Record<string, unknown>,
+            'PAID',
+        );
     }
 
     return finalizePaymentFromGateway(
@@ -357,7 +373,9 @@ const verifyPortPosPayment = async (user: IUser, orderId: string) => {
     const verifiedData = verifiedResponse.data;
     const verifiedAmount = normalizeAmount(verifiedData?.order?.amount);
     const verifiedCurrency = String(verifiedData?.order?.currency ?? '').toUpperCase();
-    const verifiedStatus = String(verifiedData?.order?.status ?? verifiedData?.billing?.gateway?.status ?? '').toUpperCase();
+    const verifiedStatus = String(
+        verifiedData?.order?.status ?? verifiedData?.billing?.gateway?.status ?? '',
+    ).toUpperCase();
     const verifiedReference = String(verifiedData?.reference ?? '');
 
     if (!payment && invoiceId) {
@@ -387,7 +405,10 @@ const verifyPortPosPayment = async (user: IUser, orderId: string) => {
         throw new AppError(httpStatus.BAD_REQUEST, 'PortPOS currency mismatch detected.');
     }
 
-    if (verifiedAmount && verifiedAmount !== normalizeAmount(order.payableAmount ?? order.totalAmount ?? order.total)) {
+    if (
+        verifiedAmount &&
+        verifiedAmount !== normalizeAmount(order.payableAmount ?? order.totalAmount ?? order.total)
+    ) {
         throw new AppError(httpStatus.BAD_REQUEST, 'PortPOS amount mismatch detected.');
     }
 
@@ -395,7 +416,12 @@ const verifyPortPosPayment = async (user: IUser, orderId: string) => {
         await finalizePaymentFromGateway(
             order,
             payment,
-            { invoice_id: invoiceId, reference: order.orderId, amount: verifiedAmount, status: verifiedStatus },
+            {
+                invoice_id: invoiceId,
+                reference: order.orderId,
+                amount: verifiedAmount,
+                status: verifiedStatus,
+            },
             verifiedResponse as Record<string, unknown>,
             'PAID',
         );
@@ -403,7 +429,12 @@ const verifyPortPosPayment = async (user: IUser, orderId: string) => {
         await finalizePaymentFromGateway(
             order,
             payment,
-            { invoice_id: invoiceId, reference: order.orderId, amount: verifiedAmount, status: verifiedStatus },
+            {
+                invoice_id: invoiceId,
+                reference: order.orderId,
+                amount: verifiedAmount,
+                status: verifiedStatus,
+            },
             verifiedResponse as Record<string, unknown>,
             'FAILED',
         );
@@ -457,7 +488,10 @@ const refundPayment = async (orderId: string, amount?: number) => {
 
 const getMyPaymentsFromDB = async (user: IUser) => {
     return Payment.find({ user: user._id })
-        .populate('order', 'orderId total totalAmount payableAmount status orderStatus paymentStatus paymentGateway invoiceId transactionId')
+        .populate(
+            'order',
+            'orderId total totalAmount payableAmount status orderStatus paymentStatus paymentGateway invoiceId transactionId',
+        )
         .sort({ createdAt: -1 })
         .lean();
 };
@@ -470,7 +504,10 @@ const getAllPaymentsForAdminFromDB = async (query: Record<string, unknown>) => {
     const [data, total, summary] = await Promise.all([
         Payment.find({})
             .populate('user', 'name email phone role')
-            .populate('order', 'orderId total totalAmount payableAmount status orderStatus paymentStatus paymentGateway invoiceId transactionId')
+            .populate(
+                'order',
+                'orderId total totalAmount payableAmount status orderStatus paymentStatus paymentGateway invoiceId transactionId',
+            )
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit)
