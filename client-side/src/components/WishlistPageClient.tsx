@@ -29,7 +29,7 @@ export function WishlistPageClient({ authenticated, savedProducts }: Props) {
         <p className="mt-3 max-w-3xl text-sm leading-7 text-foreground/65 sm:text-base">
           Wishlist is tied to your account, so please sign in to view saved products.
         </p>
-        <Button asChild className="mt-6 h-11 rounded-full px-6 text-sm font-bold shadow-sm">
+        <Button asChild className="mt-6 h-11 rounded-full px-6 text-sm font-bold text-white! shadow-sm">
           <Link href="/my-account">Sign in</Link>
         </Button>
       </Card>

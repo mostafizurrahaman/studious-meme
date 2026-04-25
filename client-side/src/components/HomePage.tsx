@@ -1,7 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
-
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { getCategoryAccentClassName, getCategoryAccentStyle } from '@/lib/category-accent';
@@ -25,8 +24,8 @@ const directoryTileSheenClass =
 const directoryTileTopBarClass =
   'pointer-events-none absolute inset-x-0 top-0 h-1 opacity-80 transition-opacity duration-300 group-hover:opacity-100';
 
-const directoryTileOrbClass =
-  'pointer-events-none absolute -right-10 -top-10 size-28 rounded-full opacity-15 blur-2xl transition-opacity duration-300 group-hover:opacity-25';
+// const directoryTileOrbClass =
+//   'pointer-events-none absolute -right-10 -top-10 size-28 rounded-full opacity-15 blur-2xl transition-opacity duration-300 group-hover:opacity-25';
 
 const brandTileCardClass =
   'relative h-full overflow-hidden rounded-2xl border border-border/70 bg-card/95 shadow-sm transition-all duration-300 ease-out motion-safe:hover:-translate-y-1 motion-safe:hover:rotate-1 motion-safe:hover:shadow-[0_18px_40px_rgba(15,23,42,0.12)] active:translate-y-0 active:scale-[0.99]';
@@ -273,7 +272,7 @@ export async function HomePage({ heroContent }: HomePageProps) {
                       <span className={brandTileSheenClass} />
                       <span className={brandTileSweepClass} />
                       <span className={brandTileGlowClass} />
-                      <div className="relative mx-auto flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl border border-border/70 bg-transparent shadow-[inset_0_1px_0_rgba(255,255,255,0.45)] transition-all duration-300 group-hover:scale-110 group-hover:rotate-[-2deg] group-hover:border-primary/30 group-hover:shadow-[0_10px_30px_rgba(15,23,42,0.12)]">
+                      <div className="relative mx-auto flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl border border-border/70 bg-transparent shadow-[inset_0_1px_0_rgba(255,255,255,0.45)] transition-all duration-300 group-hover:scale-110 group-hover:-rotate-2 group-hover:border-primary/30 group-hover:shadow-[0_10px_30px_rgba(15,23,42,0.12)]">
                         {brand.image ? (
                           <Image
                             src={brand.image}
