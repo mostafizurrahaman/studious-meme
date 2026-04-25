@@ -1,7 +1,7 @@
-import { type NextFunction, type Request, type Response } from 'express';
-import httpStatus from 'http-status';
-import config from '../config';
-import { AppError } from '../utils';
+import { type NextFunction, type Request, type Response } from "express";
+import httpStatus from "http-status";
+import config from "../config";
+import { AppError } from "../utils";
 
 /*
 Temporary disable note:
@@ -15,57 +15,80 @@ Disabled pieces:
 - payment webhook IP allowlist guard (kept available, but not tied to rate limiting)
 */
 
-export const globalLimiter = (...args: [Request, Response, NextFunction]) => args[2]();
-export const publicLimiter = (...args: [Request, Response, NextFunction]) => args[2]();
-export const authLimiter = (...args: [Request, Response, NextFunction]) => args[2]();
-export const actionLimiter = (...args: [Request, Response, NextFunction]) => args[2]();
-export const adminLimiter = (...args: [Request, Response, NextFunction]) => args[2]();
-export const paymentLimiter = (...args: [Request, Response, NextFunction]) => args[2]();
+export const globalLimiter = (...args: [Request, Response, NextFunction]) =>
+  args[2]();
+export const publicLimiter = (...args: [Request, Response, NextFunction]) =>
+  args[2]();
+export const authLimiter = (...args: [Request, Response, NextFunction]) =>
+  args[2]();
+export const actionLimiter = (...args: [Request, Response, NextFunction]) =>
+  args[2]();
+export const adminLimiter = (...args: [Request, Response, NextFunction]) =>
+  args[2]();
+export const paymentLimiter = (...args: [Request, Response, NextFunction]) =>
+  args[2]();
 
 export const duplicateSubmissionGuard =
-    (_windowMs?: number) =>
-    (...args: [Request, Response, NextFunction]) => {
-        void _windowMs;
-        return args[2]();
-    };
+  (_windowMs?: number) =>
+  (...args: [Request, Response, NextFunction]) => {
+    void _windowMs;
+    return args[2]();
+  };
 export const burstProtection =
-    (_scope?: string, _windowMs?: number, _maxBursts?: number) =>
-    (...args: [Request, Response, NextFunction]) => {
-        void _scope;
-        void _windowMs;
-        void _maxBursts;
-        return args[2]();
-    };
+  (_scope?: string, _windowMs?: number, _maxBursts?: number) =>
+  (...args: [Request, Response, NextFunction]) => {
+    void _scope;
+    void _windowMs;
+    void _maxBursts;
+    return args[2]();
+  };
 
-const normalizeIp = (value: string) => value.replace(/^::ffff:/, '').trim();
+const normalizeIp = (value: string) => value.replace(/^::ffff:/, "").trim();
 
 const getClientIp = (req: Request) => {
-    const forwarded = req.headers['x-forwarded-for'];
-    const headerIp = Array.isArray(forwarded) ? forwarded[0] : forwarded;
+  const forwarded = req.headers["x-forwarded-for"];
+  const headerIp = Array.isArray(forwarded) ? forwarded[0] : forwarded;
 
-    return normalizeIp((headerIp ? String(headerIp).split(',')[0] : req.ip || req.socket.remoteAddress || 'unknown'));
+  return normalizeIp(
+    headerIp
+      ? String(headerIp).split(",")[0]
+      : req.ip || req.socket.remoteAddress || "unknown",
+  );
 };
 
-export const paymentWebhookGuard = (req: Request, _res: Response, next: NextFunction) => {
-    if (req.method !== 'POST') {
-        next(new AppError(httpStatus.METHOD_NOT_ALLOWED, 'Webhook method not allowed.'));
-        return;
+export const paymentWebhookGuard = (
+  req: Request,
+  _res: Response,
+  next: NextFunction,
+) => {
+  if (req.method !== "POST") {
+    next(
+      new AppError(
+        httpStatus.METHOD_NOT_ALLOWED,
+        "Webhook method not allowed.",
+      ),
+    );
+    return;
+  }
+
+  const allowlist = config.portpos.webhook_ip_allowlist
+    ? config.portpos.webhook_ip_allowlist
+        .split(",")
+        .map((ip) => normalizeIp(ip))
+    : [];
+
+  if (allowlist.length > 0) {
+    const clientIp = getClientIp(req);
+
+    if (!allowlist.includes(clientIp)) {
+      next(
+        new AppError(httpStatus.FORBIDDEN, "Webhook source is not allowed."),
+      );
+      return;
     }
+  }
 
-    const allowlist = config.portpos.webhook_ip_allowlist
-        ? config.portpos.webhook_ip_allowlist.split(',').map(ip => normalizeIp(ip))
-        : [];
-
-    if (allowlist.length > 0) {
-        const clientIp = getClientIp(req);
-
-        if (!allowlist.includes(clientIp)) {
-            next(new AppError(httpStatus.FORBIDDEN, 'Webhook source is not allowed.'));
-            return;
-        }
-    }
-
-    next();
+  next();
 };
 
 // import { createHash } from 'crypto';

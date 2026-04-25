@@ -1,10 +1,16 @@
-'use client';
+"use client";
 
-import { useCallback, useState } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { Eye, Mail, Phone } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useCallback, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Eye, Mail, Phone } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -12,12 +18,19 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { TableFilter } from '@/components/ui/table-filter';
-import { TablePagination } from '@/components/ui/table-pagination';
-import { formatDashboardDate } from '@/lib/formatDate';
-import type { BackendContact } from '@/services/Contact';
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { TableFilter } from "@/components/ui/table-filter";
+import { TablePagination } from "@/components/ui/table-pagination";
+import { formatDashboardDate } from "@/lib/formatDate";
+import type { BackendContact } from "@/services/Contact";
 
 type Props = {
   contacts: BackendContact[];
@@ -26,22 +39,32 @@ type Props = {
 };
 
 function compactText(value: string | undefined, length = 42) {
-  if (!value?.trim()) return '-';
+  if (!value?.trim()) return "-";
 
-  const normalized = value.replace(/\s+/g, ' ').trim();
-  return normalized.length > length ? `${normalized.slice(0, length)}...` : normalized;
+  const normalized = value.replace(/\s+/g, " ").trim();
+  return normalized.length > length
+    ? `${normalized.slice(0, length)}...`
+    : normalized;
 }
 
 function DetailBlock({ label, value }: { label: string; value?: string }) {
   return (
     <div className="rounded-lg border bg-muted/20 p-3">
-      <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">{label}</div>
-      <div className="mt-2 whitespace-pre-wrap text-sm leading-6 text-foreground">{value?.trim() || '-'}</div>
+      <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+        {label}
+      </div>
+      <div className="mt-2 whitespace-pre-wrap text-sm leading-6 text-foreground">
+        {value?.trim() || "-"}
+      </div>
     </div>
   );
 }
 
-export function DashboardQuotationRequestsManager({ contacts, meta, searchTerm = '' }: Props) {
+export function DashboardQuotationRequestsManager({
+  contacts,
+  meta,
+  searchTerm = "",
+}: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -52,13 +75,13 @@ export function DashboardQuotationRequestsManager({ contacts, meta, searchTerm =
       const nextParams = new URLSearchParams(searchParams.toString());
       const nextSearch = updates.searchTerm ?? search;
 
-      nextParams.set('page', String(updates.page ?? meta.page));
-      nextParams.set('limit', String(updates.limit ?? meta.limit));
+      nextParams.set("page", String(updates.page ?? meta.page));
+      nextParams.set("limit", String(updates.limit ?? meta.limit));
 
       if (nextSearch.trim()) {
-        nextParams.set('searchTerm', nextSearch.trim());
+        nextParams.set("searchTerm", nextSearch.trim());
       } else {
-        nextParams.delete('searchTerm');
+        nextParams.delete("searchTerm");
       }
 
       router.push(`${pathname}?${nextParams.toString()}`);
@@ -77,7 +100,8 @@ export function DashboardQuotationRequestsManager({ contacts, meta, searchTerm =
         <div>
           <CardTitle>Quotation Requests</CardTitle>
           <CardDescription>
-            Showing {contacts.length} of {meta.total} quotation/contact submissions.
+            Showing {contacts.length} of {meta.total} quotation/contact
+            submissions.
           </CardDescription>
         </div>
         <TableFilter
@@ -110,37 +134,62 @@ export function DashboardQuotationRequestsManager({ contacts, meta, searchTerm =
                 </TableCell>
               </TableRow>
             ) : null}
-            {contacts.map(contact => (
+            {contacts.map((contact) => (
               <TableRow key={contact._id}>
                 <TableCell className="font-medium">
                   <div className="truncate">{contact.name}</div>
                   {/* <div className="truncate text-xs text-muted-foreground">{contact.subject}</div> */}
                 </TableCell>
-                <TableCell className="truncate" title={contact.company || undefined}>
-                  {contact.company || '-'}
+                <TableCell
+                  className="truncate"
+                  title={contact.company || undefined}
+                >
+                  {contact.company || "-"}
                 </TableCell>
                 <TableCell>
-                  <div className="truncate" title={contact.email}>{contact.email}</div>
-                  <div className="truncate text-xs text-muted-foreground">{contact.phone}</div>
+                  <div className="truncate" title={contact.email}>
+                    {contact.email}
+                  </div>
+                  <div className="truncate text-xs text-muted-foreground">
+                    {contact.phone}
+                  </div>
                 </TableCell>
-                <TableCell className="truncate" title={contact.brand || 'Any suitable brand'}>
-                  {contact.brand || 'Any suitable brand'}
+                <TableCell
+                  className="truncate"
+                  title={contact.brand || "Any suitable brand"}
+                >
+                  {contact.brand || "Any suitable brand"}
                 </TableCell>
-                <TableCell className="truncate text-sm leading-6" title={contact.products || undefined}>
+                <TableCell
+                  className="truncate text-sm leading-6"
+                  title={contact.products || undefined}
+                >
                   {compactText(contact.products, 18)}
                 </TableCell>
-                <TableCell className="truncate text-sm leading-6" title={contact.message}>
+                <TableCell
+                  className="truncate text-sm leading-6"
+                  title={contact.message}
+                >
                   {compactText(contact.message, 20)}
                 </TableCell>
                 <TableCell className="whitespace-nowrap">
-                  <span title={formatDashboardDate(contact.createdAt, { time: true })}>
+                  <span
+                    title={formatDashboardDate(contact.createdAt, {
+                      time: true,
+                    })}
+                  >
                     {formatDashboardDate(contact.createdAt)}
                   </span>
                 </TableCell>
                 <TableCell className="text-right">
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button type="button" variant="outline" size="icon" aria-label="View quotation request">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        aria-label="View quotation request"
+                      >
                         <Eye className="size-4" />
                       </Button>
                     </DialogTrigger>
@@ -150,7 +199,10 @@ export function DashboardQuotationRequestsManager({ contacts, meta, searchTerm =
                           {contact.name}
                         </DialogTitle>
                         <DialogDescription>
-                          {contact.subject} · {formatDashboardDate(contact.createdAt, { time: true })}
+                          {contact.subject} ·{" "}
+                          {formatDashboardDate(contact.createdAt, {
+                            time: true,
+                          })}
                         </DialogDescription>
                       </DialogHeader>
 
@@ -183,11 +235,20 @@ export function DashboardQuotationRequestsManager({ contacts, meta, searchTerm =
                         </div>
 
                         <div className="grid gap-3 sm:grid-cols-2">
-                          <DetailBlock label="Company" value={contact.company} />
-                          <DetailBlock label="Brand preference" value={contact.brand || 'Any suitable brand'} />
+                          <DetailBlock
+                            label="Company"
+                            value={contact.company}
+                          />
+                          <DetailBlock
+                            label="Brand preference"
+                            value={contact.brand || "Any suitable brand"}
+                          />
                         </div>
 
-                        <DetailBlock label="Interested products" value={contact.products} />
+                        <DetailBlock
+                          label="Interested products"
+                          value={contact.products}
+                        />
                         <DetailBlock label="Message" value={contact.message} />
                       </div>
                     </DialogContent>
@@ -203,8 +264,8 @@ export function DashboardQuotationRequestsManager({ contacts, meta, searchTerm =
               page={meta.page}
               limit={meta.limit}
               total={meta.total}
-              onPageChange={page => updateQuery({ page })}
-              onLimitChange={limit => updateQuery({ page: 1, limit })}
+              onPageChange={(page) => updateQuery({ page })}
+              onLimitChange={(limit) => updateQuery({ page: 1, limit })}
             />
           </div>
         ) : null}

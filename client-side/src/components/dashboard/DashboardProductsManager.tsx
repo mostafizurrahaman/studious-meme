@@ -1,64 +1,121 @@
-'use client';
+"use client";
 
-import { Fragment, useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { toast } from 'sonner';
-import { ImagePlus, Pencil, Plus, Trash2, UploadCloud } from 'lucide-react';
-import { useForm, useWatch } from 'react-hook-form';
-import { z } from 'zod';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { DashboardInput } from '@/components/dashboard/DashboardInput';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { TableFilter } from '@/components/ui/table-filter';
-import { TablePagination } from '@/components/ui/table-pagination';
-import { createProduct, deleteProduct, type BackendProduct, updateProduct } from '@/services/Product';
-import { formatDashboardDate } from '@/lib/formatDate';
-import { slugify } from '@/lib/slug';
-import type { BackendCategory } from '@/services/Category/mappers';
-import Image from 'next/image';
-import { makeZodResolver } from '@/lib/form-validation';
-import { DeleteConfirmationDialog } from '@/components/dashboard/DeleteConfirmationDialog';
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { toast } from "sonner";
+import { ImagePlus, Pencil, Plus, Trash2, UploadCloud } from "lucide-react";
+import { useForm, useWatch } from "react-hook-form";
+import { z } from "zod";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { DashboardInput } from "@/components/dashboard/DashboardInput";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { TableFilter } from "@/components/ui/table-filter";
+import { TablePagination } from "@/components/ui/table-pagination";
+import {
+  createProduct,
+  deleteProduct,
+  type BackendProduct,
+  updateProduct,
+} from "@/services/Product";
+import { formatDashboardDate } from "@/lib/formatDate";
+import { slugify } from "@/lib/slug";
+import type { BackendCategory } from "@/services/Category/mappers";
+import Image from "next/image";
+import { makeZodResolver } from "@/lib/form-validation";
+import { DeleteConfirmationDialog } from "@/components/dashboard/DeleteConfirmationDialog";
 
 type Option = { value: string; label: string };
 
 type DashboardProductsManagerProps = {
   products: BackendProduct[];
-  paginationMeta: { page: number; limit: number; total: number; totalPages: number };
+  paginationMeta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
   searchTerm?: string;
   brandOptions: Option[];
   categories: BackendCategory[];
 };
 
 const productEditSchema = z.object({
-  title: z.string({ error: 'Title is required!' }).trim().min(1, { message: 'Title is required!' }),
+  title: z
+    .string({ error: "Title is required!" })
+    .trim()
+    .min(1, { message: "Title is required!" }),
 
-  slug: z.string({ error: 'Slug is required!' }).trim().min(1, { message: 'Slug is required!' }),
+  slug: z
+    .string({ error: "Slug is required!" })
+    .trim()
+    .min(1, { message: "Slug is required!" }),
 
-  sku: z.string({ error: 'SKU is required!' }).trim().min(1, { message: 'SKU is required!' }),
+  sku: z
+    .string({ error: "SKU is required!" })
+    .trim()
+    .min(1, { message: "SKU is required!" }),
 
-  price: z.string({ error: 'Price is required!' }).trim().min(1, { message: 'Price is required!' }),
+  price: z
+    .string({ error: "Price is required!" })
+    .trim()
+    .min(1, { message: "Price is required!" }),
 
   oldPrice: z.string().trim().optional(),
 
   badge: z.string().trim().optional(),
 
-  brand: z.string({ error: 'Brand is required!' }).trim().min(1, { message: 'Brand is required!' }),
+  brand: z
+    .string({ error: "Brand is required!" })
+    .trim()
+    .min(1, { message: "Brand is required!" }),
 
-  category: z.string({ error: 'Category is required!' }).trim().min(1, { message: 'Category is required!' }),
+  category: z
+    .string({ error: "Category is required!" })
+    .trim()
+    .min(1, { message: "Category is required!" }),
 
   subCategorySlug: z.string().trim().optional(),
 
-  stock: z.string({ error: 'Stock is required!' }).trim().min(1, { message: 'Stock is required!' }),
+  stock: z
+    .string({ error: "Stock is required!" })
+    .trim()
+    .min(1, { message: "Stock is required!" }),
 
-  rating: z.string({ error: 'Rating is required!' }).trim().min(1, { message: 'Rating is required!' }),
+  rating: z
+    .string({ error: "Rating is required!" })
+    .trim()
+    .min(1, { message: "Rating is required!" }),
 
   weightKg: z
-    .string({ error: 'Weight is required!' })
+    .string({ error: "Weight is required!" })
     .trim()
-    .min(1, { message: 'Weight is required!' })
-    .refine(value => Number(value) > 0, { message: 'Weight must be greater than 0!' }),
+    .min(1, { message: "Weight is required!" })
+    .refine((value) => Number(value) > 0, {
+      message: "Weight must be greater than 0!",
+    }),
 
   isFeatured: z.boolean().default(false),
   isNoCOD: z.boolean().default(false),
@@ -66,33 +123,59 @@ const productEditSchema = z.object({
 });
 
 const productCreateSchema = z.object({
-  title: z.string({ error: 'Title is required!' }).trim().min(1, { message: 'Title is required!' }),
+  title: z
+    .string({ error: "Title is required!" })
+    .trim()
+    .min(1, { message: "Title is required!" }),
 
-  slug: z.string({ error: 'Slug is required!' }).trim().min(1, { message: 'Slug is required!' }),
+  slug: z
+    .string({ error: "Slug is required!" })
+    .trim()
+    .min(1, { message: "Slug is required!" }),
 
-  sku: z.string({ error: 'SKU is required!' }).trim().min(1, { message: 'SKU is required!' }),
+  sku: z
+    .string({ error: "SKU is required!" })
+    .trim()
+    .min(1, { message: "SKU is required!" }),
 
-  price: z.string({ error: 'Price is required!' }).trim().min(1, { message: 'Price is required!' }),
+  price: z
+    .string({ error: "Price is required!" })
+    .trim()
+    .min(1, { message: "Price is required!" }),
 
   oldPrice: z.string().trim().optional(),
 
   badge: z.string().trim().optional(),
 
-  brand: z.string({ error: 'Brand is required!' }).trim().min(1, { message: 'Brand is required!' }),
+  brand: z
+    .string({ error: "Brand is required!" })
+    .trim()
+    .min(1, { message: "Brand is required!" }),
 
-  category: z.string({ error: 'Category is required!' }).trim().min(1, { message: 'Category is required!' }),
+  category: z
+    .string({ error: "Category is required!" })
+    .trim()
+    .min(1, { message: "Category is required!" }),
 
   subCategorySlug: z.string().trim().optional(),
 
-  stock: z.string({ error: 'Stock is required!' }).trim().min(1, { message: 'Stock is required!' }),
+  stock: z
+    .string({ error: "Stock is required!" })
+    .trim()
+    .min(1, { message: "Stock is required!" }),
 
-  rating: z.string({ error: 'Rating is required!' }).trim().min(1, { message: 'Rating is required!' }),
+  rating: z
+    .string({ error: "Rating is required!" })
+    .trim()
+    .min(1, { message: "Rating is required!" }),
 
   weightKg: z
-    .string({ error: 'Weight is required!' })
+    .string({ error: "Weight is required!" })
     .trim()
-    .min(1, { message: 'Weight is required!' })
-    .refine(value => Number(value) > 0, { message: 'Weight must be greater than 0!' }),
+    .min(1, { message: "Weight is required!" })
+    .refine((value) => Number(value) > 0, {
+      message: "Weight must be greater than 0!",
+    }),
 
   isFeatured: z.boolean().default(false),
   isNoCOD: z.boolean().default(false),
@@ -108,18 +191,18 @@ function ErrorText({ message }: { message?: string }) {
   return <p className="text-xs text-destructive">{message}</p>;
 }
 
-function resolveProductRefLabel(value: BackendProduct['brand']) {
-  if (typeof value === 'string') {
+function resolveProductRefLabel(value: BackendProduct["brand"]) {
+  if (typeof value === "string") {
     return value;
   }
 
-  return value.name ?? value.slug ?? 'Unknown';
+  return value.name ?? value.slug ?? "Unknown";
 }
 
 export function DashboardProductsManager({
   products,
   paginationMeta,
-  searchTerm = '',
+  searchTerm = "",
   brandOptions,
   categories,
 }: DashboardProductsManagerProps) {
@@ -128,16 +211,18 @@ export function DashboardProductsManager({
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [productImageFile, setProductImageFile] = useState<File | null>(null);
-  const [productImagePreview, setProductImagePreview] = useState('');
-  const [editingProductImageFile, setEditingProductImageFile] = useState<File | null>(null);
-  const [editingProductImagePreview, setEditingProductImagePreview] = useState('');
+  const [productImagePreview, setProductImagePreview] = useState("");
+  const [editingProductImageFile, setEditingProductImageFile] =
+    useState<File | null>(null);
+  const [editingProductImagePreview, setEditingProductImagePreview] =
+    useState("");
   const [slugAutoSync, setSlugAutoSync] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
   const [editingSlug, setEditingSlug] = useState<string | null>(null);
   const [isEditingSaving, setIsEditingSaving] = useState(false);
   const [pendingDeleteProduct, setPendingDeleteProduct] = useState<Pick<
     BackendProduct,
-    'slug' | 'title'
+    "slug" | "title"
   > | null>(null);
   const productImageInputRef = useRef<HTMLInputElement>(null);
   const editingProductImageInputRef = useRef<HTMLInputElement>(null);
@@ -147,39 +232,40 @@ export function DashboardProductsManager({
   const productCreateForm = useForm<ProductCreateValues>({
     resolver: makeZodResolver(productCreateSchema),
     defaultValues: {
-      title: '',
-      slug: '',
-      sku: '',
-      price: '',
-      oldPrice: '',
-      badge: '',
-      brand: '',
-      category: '',
-      subCategorySlug: '',
-      stock: '',
-      rating: '5',
-      weightKg: '1',
+      title: "",
+      slug: "",
+      sku: "",
+      price: "",
+      oldPrice: "",
+      badge: "",
+      brand: "",
+      category: "",
+      subCategorySlug: "",
+      stock: "",
+      rating: "5",
+      weightKg: "1",
       isFeatured: false,
       isNoCOD: false,
       isActive: true,
     },
-    mode: 'onTouched',
+    mode: "onTouched",
   });
 
   const createTitle = useWatch({
     control: productCreateForm.control,
-    name: 'title',
-    defaultValue: '',
+    name: "title",
+    defaultValue: "",
   });
 
   const createCategory = useWatch({
     control: productCreateForm.control,
-    name: 'category',
-    defaultValue: '',
+    name: "category",
+    defaultValue: "",
   });
 
   const selectedCategory = useMemo(
-    () => categories.find(category => category._id === createCategory) ?? null,
+    () =>
+      categories.find((category) => category._id === createCategory) ?? null,
     [categories, createCategory],
   );
 
@@ -188,41 +274,43 @@ export function DashboardProductsManager({
   const productEditForm = useForm<ProductEditValues>({
     resolver: makeZodResolver(productEditSchema),
     defaultValues: {
-      title: '',
-      slug: '',
-      sku: '',
-      price: '0',
-      oldPrice: '',
-      badge: '',
-      brand: '',
-      category: '',
-      subCategorySlug: '',
-      stock: '0',
-      rating: '5',
-      weightKg: '1',
+      title: "",
+      slug: "",
+      sku: "",
+      price: "0",
+      oldPrice: "",
+      badge: "",
+      brand: "",
+      category: "",
+      subCategorySlug: "",
+      stock: "0",
+      rating: "5",
+      weightKg: "1",
       isFeatured: false,
       isNoCOD: false,
       isActive: true,
     },
-    mode: 'onTouched',
+    mode: "onTouched",
   });
 
   const editingCategory = useWatch({
     control: productEditForm.control,
-    name: 'category',
-    defaultValue: '',
+    name: "category",
+    defaultValue: "",
   });
 
   const editingSelectedCategory = useMemo(
-    () => categories.find(category => category._id === editingCategory) ?? null,
+    () =>
+      categories.find((category) => category._id === editingCategory) ?? null,
     [categories, editingCategory],
   );
 
-  const editingSubCategoryOptions = editingSelectedCategory?.subCategories ?? [];
+  const editingSubCategoryOptions =
+    editingSelectedCategory?.subCategories ?? [];
 
   useEffect(() => {
     if (!editingSlug) return;
-    productEditForm.setValue('slug', productEditForm.getValues('slug'), {
+    productEditForm.setValue("slug", productEditForm.getValues("slug"), {
       shouldDirty: false,
       shouldTouch: false,
       shouldValidate: false,
@@ -231,7 +319,7 @@ export function DashboardProductsManager({
 
   useEffect(() => {
     if (slugAutoSync) {
-      productCreateForm.setValue('slug', slugify(createTitle), {
+      productCreateForm.setValue("slug", slugify(createTitle), {
         shouldDirty: true,
         shouldTouch: false,
         shouldValidate: false,
@@ -241,10 +329,10 @@ export function DashboardProductsManager({
 
   useEffect(() => {
     return () => {
-      if (productImagePreview.startsWith('blob:')) {
+      if (productImagePreview.startsWith("blob:")) {
         URL.revokeObjectURL(productImagePreview);
       }
-      if (editingProductImagePreview.startsWith('blob:')) {
+      if (editingProductImagePreview.startsWith("blob:")) {
         URL.revokeObjectURL(editingProductImagePreview);
       }
     };
@@ -257,18 +345,25 @@ export function DashboardProductsManager({
       const nextLimit = updates.limit ?? paginationMeta.limit;
       const nextSearchTerm = updates.searchTerm ?? search;
 
-      nextParams.set('page', String(nextPage));
-      nextParams.set('limit', String(nextLimit));
+      nextParams.set("page", String(nextPage));
+      nextParams.set("limit", String(nextLimit));
 
       if (nextSearchTerm.trim()) {
-        nextParams.set('searchTerm', nextSearchTerm.trim());
+        nextParams.set("searchTerm", nextSearchTerm.trim());
       } else {
-        nextParams.delete('searchTerm');
+        nextParams.delete("searchTerm");
       }
 
       router.push(`${pathname}?${nextParams.toString()}`);
     },
-    [paginationMeta.limit, paginationMeta.page, pathname, router, search, searchParams],
+    [
+      paginationMeta.limit,
+      paginationMeta.page,
+      pathname,
+      router,
+      search,
+      searchParams,
+    ],
   );
 
   const handleSearchChange = (value: string) => {
@@ -276,8 +371,8 @@ export function DashboardProductsManager({
     updateProductQuery({ page: 1, searchTerm: value });
   };
 
-  function refresh(message: string, type: 'success' | 'error') {
-    if (type === 'success') {
+  function refresh(message: string, type: "success" | "error") {
+    if (type === "success") {
       toast.success(message);
     } else {
       toast.error(message);
@@ -296,37 +391,42 @@ export function DashboardProductsManager({
 
     startTransition(async () => {
       const result = await deleteProduct(slug);
-      if (!result?.success) return refresh(result?.message ?? 'Failed to delete product.', 'error');
+      if (!result?.success)
+        return refresh(result?.message ?? "Failed to delete product.", "error");
       setPendingDeleteProduct(null);
-      refresh(result.message ?? 'Product deleted successfully.', 'success');
+      refresh(result.message ?? "Product deleted successfully.", "success");
     });
   }
 
   function handleTitleChange(value: string) {
-    productCreateForm.setValue('title', value, { shouldValidate: true });
+    productCreateForm.setValue("title", value, { shouldValidate: true });
     if (slugAutoSync) {
-      productCreateForm.setValue('slug', slugify(value), { shouldValidate: true });
+      productCreateForm.setValue("slug", slugify(value), {
+        shouldValidate: true,
+      });
     }
   }
 
   function handleSlugChange(value: string) {
     setSlugAutoSync(false);
-    productCreateForm.setValue('slug', slugify(value), { shouldValidate: true });
+    productCreateForm.setValue("slug", slugify(value), {
+      shouldValidate: true,
+    });
   }
 
   function handleEditingTitleChange(value: string) {
-    productEditForm.setValue('title', value, { shouldValidate: true });
+    productEditForm.setValue("title", value, { shouldValidate: true });
   }
 
   function handleEditingCategoryChange(value: string) {
-    productEditForm.setValue('category', value, { shouldValidate: true });
-    productEditForm.setValue('subCategorySlug', '', { shouldValidate: true });
+    productEditForm.setValue("category", value, { shouldValidate: true });
+    productEditForm.setValue("subCategorySlug", "", { shouldValidate: true });
   }
 
   function handleEditingProductImageSelect(file?: File) {
     if (!file) return;
 
-    if (editingProductImagePreview.startsWith('blob:')) {
+    if (editingProductImagePreview.startsWith("blob:")) {
       URL.revokeObjectURL(editingProductImagePreview);
     }
 
@@ -334,25 +434,33 @@ export function DashboardProductsManager({
     setEditingProductImagePreview(URL.createObjectURL(file));
   }
 
-  function handleEditingProductImageDrop(event: React.DragEvent<HTMLDivElement>) {
+  function handleEditingProductImageDrop(
+    event: React.DragEvent<HTMLDivElement>,
+  ) {
     event.preventDefault();
     handleEditingProductImageSelect(event.dataTransfer.files?.[0]);
   }
 
   function startEditingProduct(product: BackendProduct) {
     setEditingSlug(product.slug);
-    const brandId = typeof product.brand === 'string' ? product.brand : (product.brand._id ?? '');
-    const categoryId = typeof product.category === 'string' ? product.category : (product.category._id ?? '');
+    const brandId =
+      typeof product.brand === "string"
+        ? product.brand
+        : (product.brand._id ?? "");
+    const categoryId =
+      typeof product.category === "string"
+        ? product.category
+        : (product.category._id ?? "");
     productEditForm.reset({
       title: product.title,
       slug: product.slug,
       sku: product.sku,
       price: String(product.price),
-      oldPrice: product.oldPrice === undefined ? '' : String(product.oldPrice),
-      badge: product.badge ?? '',
+      oldPrice: product.oldPrice === undefined ? "" : String(product.oldPrice),
+      badge: product.badge ?? "",
       brand: brandId,
       category: categoryId,
-      subCategorySlug: product.subCategorySlug ?? '',
+      subCategorySlug: product.subCategorySlug ?? "",
       stock: String(product.stock),
       rating: String(product.rating),
       weightKg: String(product.weightKg ?? 1),
@@ -361,35 +469,35 @@ export function DashboardProductsManager({
       isActive: product.isActive,
     });
     setEditingProductImageFile(null);
-    setEditingProductImagePreview(product.image ?? '');
+    setEditingProductImagePreview(product.image ?? "");
   }
 
   function stopEditingProduct() {
     setEditingSlug(null);
     productEditForm.reset({
-      title: '',
-      slug: '',
-      sku: '',
-      price: '',
-      oldPrice: '',
-      badge: '',
-      brand: '',
-      category: '',
-      subCategorySlug: '',
-      stock: '',
-      rating: '5',
-      weightKg: '1',
+      title: "",
+      slug: "",
+      sku: "",
+      price: "",
+      oldPrice: "",
+      badge: "",
+      brand: "",
+      category: "",
+      subCategorySlug: "",
+      stock: "",
+      rating: "5",
+      weightKg: "1",
       isFeatured: false,
       isNoCOD: false,
       isActive: true,
     });
     setEditingProductImageFile(null);
-    setEditingProductImagePreview('');
+    setEditingProductImagePreview("");
   }
 
   function handleCategoryChange(value: string) {
-    productCreateForm.setValue('category', value, { shouldValidate: true });
-    productCreateForm.setValue('subCategorySlug', '', { shouldValidate: true });
+    productCreateForm.setValue("category", value, { shouldValidate: true });
+    productCreateForm.setValue("subCategorySlug", "", { shouldValidate: true });
   }
 
   return (
@@ -397,27 +505,42 @@ export function DashboardProductsManager({
       <Card className="shadow-sm">
         <CardHeader>
           <CardTitle>Create product</CardTitle>
-          <CardDescription>Add a new catalog item using backend CRUD.</CardDescription>
+          <CardDescription>
+            Add a new catalog item using backend CRUD.
+          </CardDescription>
         </CardHeader>
         <CardContent className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
           <div className="grid gap-3 md:grid-cols-2">
             <div className="grid gap-1.5 md:col-span-2">
               <DashboardInput
                 placeholder="Title"
-                {...productCreateForm.register('title', { onChange: e => handleTitleChange(e.target.value) })}
+                {...productCreateForm.register("title", {
+                  onChange: (e) => handleTitleChange(e.target.value),
+                })}
               />
-              <ErrorText message={productCreateForm.formState.errors.title?.message} />
+              <ErrorText
+                message={productCreateForm.formState.errors.title?.message}
+              />
             </div>
             <div className="grid gap-1.5">
               <DashboardInput
                 placeholder="Slug"
-                {...productCreateForm.register('slug', { onChange: e => handleSlugChange(e.target.value) })}
+                {...productCreateForm.register("slug", {
+                  onChange: (e) => handleSlugChange(e.target.value),
+                })}
               />
-              <ErrorText message={productCreateForm.formState.errors.slug?.message} />
+              <ErrorText
+                message={productCreateForm.formState.errors.slug?.message}
+              />
             </div>
             <div className="grid gap-1.5">
-              <DashboardInput placeholder="SKU" {...productCreateForm.register('sku')} />
-              <ErrorText message={productCreateForm.formState.errors.sku?.message} />
+              <DashboardInput
+                placeholder="SKU"
+                {...productCreateForm.register("sku")}
+              />
+              <ErrorText
+                message={productCreateForm.formState.errors.sku?.message}
+              />
             </div>
             <div className="grid gap-1.5">
               <DashboardInput
@@ -425,30 +548,32 @@ export function DashboardProductsManager({
                 type="number"
                 min={0}
                 step="0.01"
-                {...productCreateForm.register('price')}
+                {...productCreateForm.register("price")}
               />
-              <ErrorText message={productCreateForm.formState.errors.price?.message} />
+              <ErrorText
+                message={productCreateForm.formState.errors.price?.message}
+              />
             </div>
             <DashboardInput
               placeholder="Old price"
               type="number"
               min={0}
               step="0.01"
-              {...productCreateForm.register('oldPrice')}
+              {...productCreateForm.register("oldPrice")}
             />
             <DashboardInput
               placeholder="Badge. ex: Sale, New, Hot"
-              {...productCreateForm.register('badge')}
+              {...productCreateForm.register("badge")}
             />
             <div className="grid gap-1.5">
               <select
                 className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-                {...productCreateForm.register('category', {
-                  onChange: e => handleCategoryChange(e.target.value),
+                {...productCreateForm.register("category", {
+                  onChange: (e) => handleCategoryChange(e.target.value),
                 })}
               >
                 <option value="">Category</option>
-                {categories.flatMap(category =>
+                {categories.flatMap((category) =>
                   category._id
                     ? [
                         <option key={category._id} value={category._id}>
@@ -458,16 +583,18 @@ export function DashboardProductsManager({
                     : [],
                 )}
               </select>
-              <ErrorText message={productCreateForm.formState.errors.category?.message} />
+              <ErrorText
+                message={productCreateForm.formState.errors.category?.message}
+              />
             </div>
             <div className="grid gap-1.5">
               <select
                 className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-                {...productCreateForm.register('subCategorySlug')}
+                {...productCreateForm.register("subCategorySlug")}
                 disabled={!createCategory}
               >
                 <option value="">Sub-category</option>
-                {subCategoryOptions.map(subCategory => (
+                {subCategoryOptions.map((subCategory) => (
                   <option key={subCategory.slug} value={subCategory.slug}>
                     {subCategory.name}
                   </option>
@@ -477,16 +604,18 @@ export function DashboardProductsManager({
             <div className="grid gap-1.5">
               <select
                 className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-                {...productCreateForm.register('brand')}
+                {...productCreateForm.register("brand")}
               >
                 <option value="">Brand</option>
-                {brandOptions.map(option => (
+                {brandOptions.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
                   </option>
                 ))}
               </select>
-              <ErrorText message={productCreateForm.formState.errors.brand?.message} />
+              <ErrorText
+                message={productCreateForm.formState.errors.brand?.message}
+              />
             </div>
             <div className="grid gap-1.5">
               <DashboardInput
@@ -494,9 +623,11 @@ export function DashboardProductsManager({
                 type="number"
                 min={0}
                 step={1}
-                {...productCreateForm.register('stock')}
+                {...productCreateForm.register("stock")}
               />
-              <ErrorText message={productCreateForm.formState.errors.stock?.message} />
+              <ErrorText
+                message={productCreateForm.formState.errors.stock?.message}
+              />
             </div>
             <div className="grid gap-1.5">
               <DashboardInput
@@ -504,9 +635,11 @@ export function DashboardProductsManager({
                 type="number"
                 min={0}
                 step="0.1"
-                {...productCreateForm.register('rating')}
+                {...productCreateForm.register("rating")}
               />
-              <ErrorText message={productCreateForm.formState.errors.rating?.message} />
+              <ErrorText
+                message={productCreateForm.formState.errors.rating?.message}
+              />
             </div>
             <div className="grid gap-1.5">
               <DashboardInput
@@ -514,20 +647,31 @@ export function DashboardProductsManager({
                 type="number"
                 min={0.01}
                 step="0.01"
-                {...productCreateForm.register('weightKg')}
+                {...productCreateForm.register("weightKg")}
               />
-              <ErrorText message={productCreateForm.formState.errors.weightKg?.message} />
+              <ErrorText
+                message={productCreateForm.formState.errors.weightKg?.message}
+              />
             </div>
             <label className="flex items-center gap-2 self-start text-sm">
-              <input type="checkbox" {...productCreateForm.register('isFeatured')} />
+              <input
+                type="checkbox"
+                {...productCreateForm.register("isFeatured")}
+              />
               Featured
             </label>
             <label className="flex items-center gap-2 self-start text-sm">
-              <input type="checkbox" {...productCreateForm.register('isNoCOD')} />
+              <input
+                type="checkbox"
+                {...productCreateForm.register("isNoCOD")}
+              />
               No COD
             </label>
             <label className="flex items-center gap-2 self-start text-sm">
-              <input type="checkbox" {...productCreateForm.register('isActive')} />
+              <input
+                type="checkbox"
+                {...productCreateForm.register("isActive")}
+              />
               Active
             </label>
             <div className="md:col-span-2">
@@ -535,9 +679,9 @@ export function DashboardProductsManager({
                 type="button"
                 disabled={isPending || isCreating}
                 className="gap-2"
-                onClick={productCreateForm.handleSubmit(async values => {
+                onClick={productCreateForm.handleSubmit(async (values) => {
                   if (!productImageFile) {
-                    toast.error('Product image is required.');
+                    toast.error("Product image is required.");
                     return;
                   }
 
@@ -548,11 +692,14 @@ export function DashboardProductsManager({
                     sku: values.sku.trim(),
                     image: productImageFile,
                     price: Number(values.price),
-                    oldPrice: values.oldPrice?.trim() ? Number(values.oldPrice) : undefined,
+                    oldPrice: values.oldPrice?.trim()
+                      ? Number(values.oldPrice)
+                      : undefined,
                     badge: values.badge?.trim() || undefined,
                     brand: values.brand.trim(),
                     category: values.category.trim(),
-                    subCategorySlug: values.subCategorySlug?.trim() || undefined,
+                    subCategorySlug:
+                      values.subCategorySlug?.trim() || undefined,
                     stock: Number(values.stock),
                     rating: Number(values.rating),
                     weightKg: Number(values.weightKg),
@@ -563,33 +710,39 @@ export function DashboardProductsManager({
                   setIsCreating(false);
 
                   if (!result?.success)
-                    return refresh(result?.message ?? 'Failed to create product.', 'error');
+                    return refresh(
+                      result?.message ?? "Failed to create product.",
+                      "error",
+                    );
 
                   productCreateForm.reset({
-                    title: '',
-                    slug: '',
-                    sku: '',
-                    price: '',
-                    oldPrice: '',
-                    badge: '',
-                    brand: '',
-                    category: '',
-                    subCategorySlug: '',
-                    stock: '',
-                    rating: '5',
-                    weightKg: '1',
+                    title: "",
+                    slug: "",
+                    sku: "",
+                    price: "",
+                    oldPrice: "",
+                    badge: "",
+                    brand: "",
+                    category: "",
+                    subCategorySlug: "",
+                    stock: "",
+                    rating: "5",
+                    weightKg: "1",
                     isFeatured: false,
                     isNoCOD: false,
                     isActive: true,
                   });
                   setProductImageFile(null);
-                  setProductImagePreview('');
+                  setProductImagePreview("");
                   setSlugAutoSync(true);
-                  refresh(result.message ?? 'Product created successfully.', 'success');
+                  refresh(
+                    result.message ?? "Product created successfully.",
+                    "success",
+                  );
                 })}
               >
                 <Plus className="size-4" />
-                {isCreating ? 'Creating product...' : 'Create product'}
+                {isCreating ? "Creating product..." : "Create product"}
               </Button>
             </div>
           </div>
@@ -598,8 +751,8 @@ export function DashboardProductsManager({
               role="button"
               tabIndex={0}
               onClick={() => productImageInputRef.current?.click()}
-              onKeyDown={event => {
-                if (event.key === 'Enter' || event.key === ' ') {
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
                   event.preventDefault();
                   productImageInputRef.current?.click();
                 }
@@ -611,8 +764,12 @@ export function DashboardProductsManager({
                   <UploadCloud className="size-5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="text-sm font-semibold text-foreground">Product image</div>
-                  <p className="text-xs text-muted-foreground">Click or drop to upload.</p>
+                  <div className="text-sm font-semibold text-foreground">
+                    Product image
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Click or drop to upload.
+                  </p>
                   <div className="mt-2 aspect-square overflow-hidden rounded-xl border bg-muted">
                     {productImagePreview ? (
                       <Image
@@ -637,16 +794,16 @@ export function DashboardProductsManager({
               type="file"
               accept="image/*"
               className="sr-only"
-              onChange={event => {
+              onChange={(event) => {
                 const file = event.target.files?.[0];
                 if (file) {
-                  if (productImagePreview.startsWith('blob:')) {
+                  if (productImagePreview.startsWith("blob:")) {
                     URL.revokeObjectURL(productImagePreview);
                   }
                   setProductImageFile(file);
                   setProductImagePreview(URL.createObjectURL(file));
                 }
-                event.currentTarget.value = '';
+                event.currentTarget.value = "";
               }}
             />
           </div>
@@ -686,7 +843,7 @@ export function DashboardProductsManager({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {products.map(product => {
+              {products.map((product) => {
                 const isEditing = editingSlug === product.slug;
                 return (
                   <Fragment key={product.sku}>
@@ -709,14 +866,16 @@ export function DashboardProductsManager({
                             <div className="flex items-start gap-2">
                               <span className="shrink-0">Sub category:</span>
                               <span className="min-w-0 truncate text-foreground/80">
-                                {product.subCategorySlug?.trim() || '-'}
+                                {product.subCategorySlug?.trim() || "-"}
                               </span>
                             </div>
                             <div className="flex items-start gap-2">
                               <span className="shrink-0">Created at:</span>
                               <span
                                 className="min-w-0 truncate text-foreground/80"
-                                title={formatDashboardDate(product.createdAt, { time: true })}
+                                title={formatDashboardDate(product.createdAt, {
+                                  time: true,
+                                })}
                               >
                                 {formatDashboardDate(product.createdAt)}
                               </span>
@@ -725,7 +884,9 @@ export function DashboardProductsManager({
                               <span className="shrink-0">Updated at:</span>
                               <span
                                 className="min-w-0 truncate text-foreground/80"
-                                title={formatDashboardDate(product.updatedAt, { time: true })}
+                                title={formatDashboardDate(product.updatedAt, {
+                                  time: true,
+                                })}
                               >
                                 {formatDashboardDate(product.updatedAt)}
                               </span>
@@ -733,11 +894,16 @@ export function DashboardProductsManager({
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell className="min-w-0">{resolveProductRefLabel(product.brand)}</TableCell>
+                      <TableCell className="min-w-0">
+                        {resolveProductRefLabel(product.brand)}
+                      </TableCell>
                       <TableCell>{product.sku}</TableCell>
                       <TableCell className="min-w-0">
                         {product.badge ? (
-                          <Badge variant="outline" className="max-w-28 truncate">
+                          <Badge
+                            variant="outline"
+                            className="max-w-28 truncate"
+                          >
                             {product.badge}
                           </Badge>
                         ) : (
@@ -745,24 +911,34 @@ export function DashboardProductsManager({
                         )}
                       </TableCell>
                       <TableCell className="min-w-0">
-                        <Badge variant={product.isActive ? 'default' : 'secondary'}>
-                          {product.isActive ? 'Active' : 'Inactive'}
+                        <Badge
+                          variant={product.isActive ? "default" : "secondary"}
+                        >
+                          {product.isActive ? "Active" : "Inactive"}
                         </Badge>
                       </TableCell>
                       <TableCell className="min-w-0">
                         <Badge variant="secondary">{product.stock}</Badge>
                       </TableCell>
                       <TableCell className="min-w-0">
-                        <Badge variant={product.isFeatured ? 'default' : 'secondary'}>
-                          {product.isFeatured ? 'Featured' : 'No'}
+                        <Badge
+                          variant={product.isFeatured ? "default" : "secondary"}
+                        >
+                          {product.isFeatured ? "Featured" : "No"}
                         </Badge>
                       </TableCell>
                       <TableCell className="min-w-0">
-                        <Badge variant={product.isNoCOD ? 'destructive' : 'secondary'}>
-                          {product.isNoCOD ? 'Blocked' : 'Allowed'}
+                        <Badge
+                          variant={
+                            product.isNoCOD ? "destructive" : "secondary"
+                          }
+                        >
+                          {product.isNoCOD ? "Blocked" : "Allowed"}
                         </Badge>
                       </TableCell>
-                      <TableCell className="min-w-0">{(product.weightKg ?? 1).toFixed(2)} kg</TableCell>
+                      <TableCell className="min-w-0">
+                        {(product.weightKg ?? 1).toFixed(2)} kg
+                      </TableCell>
                       <TableCell className="min-w-0">{product.price}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
@@ -771,39 +947,61 @@ export function DashboardProductsManager({
                               <Button
                                 size="sm"
                                 disabled={isPending || isEditingSaving}
-                                onClick={productEditForm.handleSubmit(async values => {
-                                  setIsEditingSaving(true);
-                                  const result = await updateProduct(product.slug, {
-                                    title: values.title.trim(),
-                                    slug: values.slug.trim(),
-                                    sku: values.sku.trim(),
-                                    price: Number(values.price),
-                                    oldPrice: values.oldPrice?.trim() ? Number(values.oldPrice) : undefined,
-                                    badge: values.badge?.trim() || undefined,
-                                    brand: values.brand.trim(),
-                                    category: values.category.trim(),
-                                    subCategorySlug: values.subCategorySlug?.trim() ?? '',
-                                    stock: Number(values.stock),
-                                    rating: Number(values.rating),
-                                    weightKg: Number(values.weightKg),
-                                    isFeatured: values.isFeatured,
-                                    isNoCOD: values.isNoCOD,
-                                    isActive: values.isActive,
-                                    image: editingProductImageFile ?? undefined,
-                                  });
-                                  setIsEditingSaving(false);
+                                onClick={productEditForm.handleSubmit(
+                                  async (values) => {
+                                    setIsEditingSaving(true);
+                                    const result = await updateProduct(
+                                      product.slug,
+                                      {
+                                        title: values.title.trim(),
+                                        slug: values.slug.trim(),
+                                        sku: values.sku.trim(),
+                                        price: Number(values.price),
+                                        oldPrice: values.oldPrice?.trim()
+                                          ? Number(values.oldPrice)
+                                          : undefined,
+                                        badge:
+                                          values.badge?.trim() || undefined,
+                                        brand: values.brand.trim(),
+                                        category: values.category.trim(),
+                                        subCategorySlug:
+                                          values.subCategorySlug?.trim() ?? "",
+                                        stock: Number(values.stock),
+                                        rating: Number(values.rating),
+                                        weightKg: Number(values.weightKg),
+                                        isFeatured: values.isFeatured,
+                                        isNoCOD: values.isNoCOD,
+                                        isActive: values.isActive,
+                                        image:
+                                          editingProductImageFile ?? undefined,
+                                      },
+                                    );
+                                    setIsEditingSaving(false);
 
-                                  if (!result?.success) {
-                                    return refresh(result?.message ?? 'Failed to update product.', 'error');
-                                  }
+                                    if (!result?.success) {
+                                      return refresh(
+                                        result?.message ??
+                                          "Failed to update product.",
+                                        "error",
+                                      );
+                                    }
 
-                                  stopEditingProduct();
-                                  refresh(result.message ?? 'Product updated successfully.', 'success');
-                                })}
+                                    stopEditingProduct();
+                                    refresh(
+                                      result.message ??
+                                        "Product updated successfully.",
+                                      "success",
+                                    );
+                                  },
+                                )}
                               >
-                                {isEditingSaving ? 'Saving...' : 'Save'}
+                                {isEditingSaving ? "Saving..." : "Save"}
                               </Button>
-                              <Button size="sm" variant="outline" onClick={stopEditingProduct}>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={stopEditingProduct}
+                              >
                                 Cancel
                               </Button>
                             </>
@@ -823,7 +1021,10 @@ export function DashboardProductsManager({
                                 variant="outline"
                                 disabled={isPending}
                                 onClick={() =>
-                                  setPendingDeleteProduct({ slug: product.slug, title: product.title })
+                                  setPendingDeleteProduct({
+                                    slug: product.slug,
+                                    title: product.title,
+                                  })
                                 }
                               >
                                 <Trash2 className="size-4" />
@@ -841,11 +1042,17 @@ export function DashboardProductsManager({
                               <div className="grid gap-1.5 md:col-span-2">
                                 <DashboardInput
                                   placeholder="Title"
-                                  {...productEditForm.register('title', {
-                                    onChange: e => handleEditingTitleChange(e.target.value),
+                                  {...productEditForm.register("title", {
+                                    onChange: (e) =>
+                                      handleEditingTitleChange(e.target.value),
                                   })}
                                 />
-                                <ErrorText message={productEditForm.formState.errors.title?.message} />
+                                <ErrorText
+                                  message={
+                                    productEditForm.formState.errors.title
+                                      ?.message
+                                  }
+                                />
                               </div>
 
                               <div className="grid gap-1.5 md:col-span-2">
@@ -857,15 +1064,24 @@ export function DashboardProductsManager({
                                 </div>
                                 <DashboardInput
                                   placeholder="Slug"
-                                  {...productEditForm.register('slug', {
-                                    onChange: e => {
-                                      productEditForm.setValue('slug', slugify(e.target.value), {
-                                        shouldValidate: true,
-                                      });
+                                  {...productEditForm.register("slug", {
+                                    onChange: (e) => {
+                                      productEditForm.setValue(
+                                        "slug",
+                                        slugify(e.target.value),
+                                        {
+                                          shouldValidate: true,
+                                        },
+                                      );
                                     },
                                   })}
                                 />
-                                <ErrorText message={productEditForm.formState.errors.slug?.message} />
+                                <ErrorText
+                                  message={
+                                    productEditForm.formState.errors.slug
+                                      ?.message
+                                  }
+                                />
                               </div>
 
                               <div className="grid gap-1.5">
@@ -874,9 +1090,14 @@ export function DashboardProductsManager({
                                   type="number"
                                   min={0}
                                   step="0.01"
-                                  {...productEditForm.register('price')}
+                                  {...productEditForm.register("price")}
                                 />
-                                <ErrorText message={productEditForm.formState.errors.price?.message} />
+                                <ErrorText
+                                  message={
+                                    productEditForm.formState.errors.price
+                                      ?.message
+                                  }
+                                />
                               </div>
 
                               <div className="grid gap-1.5">
@@ -885,76 +1106,123 @@ export function DashboardProductsManager({
                                   type="number"
                                   min={0}
                                   step="0.01"
-                                  {...productEditForm.register('oldPrice')}
+                                  {...productEditForm.register("oldPrice")}
                                 />
-                                <ErrorText message={productEditForm.formState.errors.oldPrice?.message} />
+                                <ErrorText
+                                  message={
+                                    productEditForm.formState.errors.oldPrice
+                                      ?.message
+                                  }
+                                />
                               </div>
 
                               <div className="grid gap-1.5">
                                 <DashboardInput
                                   placeholder="Badge. ex: Sale, New, Hot"
-                                  {...productEditForm.register('badge')}
+                                  {...productEditForm.register("badge")}
                                 />
-                                <ErrorText message={productEditForm.formState.errors.badge?.message} />
+                                <ErrorText
+                                  message={
+                                    productEditForm.formState.errors.badge
+                                      ?.message
+                                  }
+                                />
                               </div>
 
                               <div className="grid gap-1.5">
-                                <DashboardInput placeholder="SKU" {...productEditForm.register('sku')} />
-                                <ErrorText message={productEditForm.formState.errors.sku?.message} />
+                                <DashboardInput
+                                  placeholder="SKU"
+                                  {...productEditForm.register("sku")}
+                                />
+                                <ErrorText
+                                  message={
+                                    productEditForm.formState.errors.sku
+                                      ?.message
+                                  }
+                                />
                               </div>
 
                               <div className="grid gap-1.5">
                                 <select
                                   className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-                                  {...productEditForm.register('category', {
-                                    onChange: e => handleEditingCategoryChange(e.target.value),
+                                  {...productEditForm.register("category", {
+                                    onChange: (e) =>
+                                      handleEditingCategoryChange(
+                                        e.target.value,
+                                      ),
                                   })}
                                 >
                                   <option value="">Category</option>
-                                  {categories.flatMap(category =>
+                                  {categories.flatMap((category) =>
                                     category._id
                                       ? [
-                                          <option key={category._id} value={category._id}>
+                                          <option
+                                            key={category._id}
+                                            value={category._id}
+                                          >
                                             {category.name}
                                           </option>,
                                         ]
                                       : [],
                                   )}
                                 </select>
-                                <ErrorText message={productEditForm.formState.errors.category?.message} />
-                              </div>
-
-                              <div className="grid gap-1.5">
-                                <select
-                                  className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-                                  {...productEditForm.register('subCategorySlug')}
-                                  disabled={!editingCategory}
-                                >
-                                  <option value="">Sub-category</option>
-                                  {editingSubCategoryOptions.map(subCategory => (
-                                    <option key={subCategory.slug} value={subCategory.slug}>
-                                      {subCategory.name}
-                                    </option>
-                                  ))}
-                                </select>
                                 <ErrorText
-                                  message={productEditForm.formState.errors.subCategorySlug?.message}
+                                  message={
+                                    productEditForm.formState.errors.category
+                                      ?.message
+                                  }
                                 />
                               </div>
 
                               <div className="grid gap-1.5">
                                 <select
                                   className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-                                  {...productEditForm.register('brand')}
+                                  {...productEditForm.register(
+                                    "subCategorySlug",
+                                  )}
+                                  disabled={!editingCategory}
+                                >
+                                  <option value="">Sub-category</option>
+                                  {editingSubCategoryOptions.map(
+                                    (subCategory) => (
+                                      <option
+                                        key={subCategory.slug}
+                                        value={subCategory.slug}
+                                      >
+                                        {subCategory.name}
+                                      </option>
+                                    ),
+                                  )}
+                                </select>
+                                <ErrorText
+                                  message={
+                                    productEditForm.formState.errors
+                                      .subCategorySlug?.message
+                                  }
+                                />
+                              </div>
+
+                              <div className="grid gap-1.5">
+                                <select
+                                  className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+                                  {...productEditForm.register("brand")}
                                 >
                                   <option value="">Brand</option>
-                                  {brandOptions.map(option => (
-                                    <option key={option.value} value={option.value}>
+                                  {brandOptions.map((option) => (
+                                    <option
+                                      key={option.value}
+                                      value={option.value}
+                                    >
                                       {option.label}
                                     </option>
                                   ))}
                                 </select>
-                                <ErrorText message={productEditForm.formState.errors.brand?.message} />
+                                <ErrorText
+                                  message={
+                                    productEditForm.formState.errors.brand
+                                      ?.message
+                                  }
+                                />
                               </div>
 
                               <div className="grid gap-1.5">
@@ -963,9 +1231,14 @@ export function DashboardProductsManager({
                                   type="number"
                                   min={0}
                                   step={1}
-                                  {...productEditForm.register('stock')}
+                                  {...productEditForm.register("stock")}
                                 />
-                                <ErrorText message={productEditForm.formState.errors.stock?.message} />
+                                <ErrorText
+                                  message={
+                                    productEditForm.formState.errors.stock
+                                      ?.message
+                                  }
+                                />
                               </div>
 
                               <div className="grid gap-1.5">
@@ -974,9 +1247,14 @@ export function DashboardProductsManager({
                                   type="number"
                                   min={0}
                                   step="0.1"
-                                  {...productEditForm.register('rating')}
+                                  {...productEditForm.register("rating")}
                                 />
-                                <ErrorText message={productEditForm.formState.errors.rating?.message} />
+                                <ErrorText
+                                  message={
+                                    productEditForm.formState.errors.rating
+                                      ?.message
+                                  }
+                                />
                               </div>
 
                               <div className="grid gap-1.5">
@@ -985,21 +1263,35 @@ export function DashboardProductsManager({
                                   type="number"
                                   min={0.01}
                                   step="0.01"
-                                  {...productEditForm.register('weightKg')}
+                                  {...productEditForm.register("weightKg")}
                                 />
-                                <ErrorText message={productEditForm.formState.errors.weightKg?.message} />
+                                <ErrorText
+                                  message={
+                                    productEditForm.formState.errors.weightKg
+                                      ?.message
+                                  }
+                                />
                               </div>
 
                               <label className="flex items-center gap-2 text-sm">
-                                <input type="checkbox" {...productEditForm.register('isFeatured')} />
+                                <input
+                                  type="checkbox"
+                                  {...productEditForm.register("isFeatured")}
+                                />
                                 Featured
                               </label>
                               <label className="flex items-center gap-2 text-sm">
-                                <input type="checkbox" {...productEditForm.register('isNoCOD')} />
+                                <input
+                                  type="checkbox"
+                                  {...productEditForm.register("isNoCOD")}
+                                />
                                 No COD
                               </label>
                               <label className="flex items-center gap-2 text-sm">
-                                <input type="checkbox" {...productEditForm.register('isActive')} />
+                                <input
+                                  type="checkbox"
+                                  {...productEditForm.register("isActive")}
+                                />
                                 Active
                               </label>
                             </div>
@@ -1011,13 +1303,16 @@ export function DashboardProductsManager({
                                 onClick={() => {
                                   editingProductImageInputRef.current?.click();
                                 }}
-                                onKeyDown={event => {
-                                  if (event.key === 'Enter' || event.key === ' ') {
+                                onKeyDown={(event) => {
+                                  if (
+                                    event.key === "Enter" ||
+                                    event.key === " "
+                                  ) {
                                     event.preventDefault();
                                     editingProductImageInputRef.current?.click();
                                   }
                                 }}
-                                onDragOver={event => event.preventDefault()}
+                                onDragOver={(event) => event.preventDefault()}
                                 onDrop={handleEditingProductImageDrop}
                                 className="rounded-2xl border-2 border-dashed border-border/70 bg-background/80 p-3 transition hover:border-primary/40"
                               >
@@ -1026,8 +1321,12 @@ export function DashboardProductsManager({
                                     <UploadCloud className="size-5" />
                                   </div>
                                   <div className="min-w-0 flex-1">
-                                    <div className="text-sm font-semibold text-foreground">Product image</div>
-                                    <p className="text-xs text-muted-foreground">Click or drop to replace.</p>
+                                    <div className="text-sm font-semibold text-foreground">
+                                      Product image
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">
+                                      Click or drop to replace.
+                                    </p>
                                     <div className="mt-2 aspect-square overflow-hidden rounded-xl border bg-muted">
                                       {editingProductImagePreview ? (
                                         <Image
@@ -1052,9 +1351,11 @@ export function DashboardProductsManager({
                                 type="file"
                                 accept="image/*"
                                 className="sr-only"
-                                onChange={event => {
-                                  handleEditingProductImageSelect(event.target.files?.[0]);
-                                  event.currentTarget.value = '';
+                                onChange={(event) => {
+                                  handleEditingProductImageSelect(
+                                    event.target.files?.[0],
+                                  );
+                                  event.currentTarget.value = "";
                                 }}
                               />
                             </div>
@@ -1073,8 +1374,10 @@ export function DashboardProductsManager({
                 page={paginationMeta.page}
                 limit={paginationMeta.limit}
                 total={paginationMeta.total}
-                onPageChange={nextPage => updateProductQuery({ page: nextPage })}
-                onLimitChange={l => {
+                onPageChange={(nextPage) =>
+                  updateProductQuery({ page: nextPage })
+                }
+                onLimitChange={(l) => {
                   updateProductQuery({ page: 1, limit: l });
                 }}
               />
@@ -1084,13 +1387,13 @@ export function DashboardProductsManager({
       </Card>
       <DeleteConfirmationDialog
         open={Boolean(pendingDeleteProduct)}
-        onOpenChange={open => {
+        onOpenChange={(open) => {
           if (!open) closeDeleteDialog();
         }}
         onConfirm={confirmDeleteProduct}
         isPending={isPending}
         title="Delete product?"
-        description={`This will permanently delete ${pendingDeleteProduct?.title || 'this product'} from the catalog.`}
+        description={`This will permanently delete ${pendingDeleteProduct?.title || "this product"} from the catalog.`}
         confirmLabel="Delete product"
       />
     </div>

@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { usePathname } from 'next/navigation';
-import { Header } from '@/components/Header';
-import type { Category } from '@/lib/storefront-types';
+import { usePathname } from "next/navigation";
+import { Header } from "@/components/Header";
+import type { Category } from "@/lib/storefront-types";
 
 type Props = {
   categories: Category[];

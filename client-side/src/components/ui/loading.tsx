@@ -22,7 +22,9 @@ const Loading = () => {
         <div className="mx-auto flex size-14 items-center justify-center rounded-full border border-primary/20 bg-primary/10">
           <div className="size-6 animate-spin rounded-full border-[3px] border-primary/20 border-t-primary" />
         </div>
-        <div className="mt-5 text-base font-bold text-secondary">Loading Malamal...</div>
+        <div className="mt-5 text-base font-bold text-secondary">
+          Loading Malamal...
+        </div>
         <p className="mt-2 text-sm leading-6 text-foreground/60">
           Please wait a moment while we prepare the page.
         </p>

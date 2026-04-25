@@ -201,79 +201,95 @@
 
 // export default multerUpload;
 
-import { v2 as cloudinary, ConfigOptions, UploadApiResponse } from 'cloudinary';
-import multer from 'multer';
-import config from '../config';
-import { Readable } from 'stream';
-import type { Express } from 'express';
+import { v2 as cloudinary, ConfigOptions, UploadApiResponse } from "cloudinary";
+import multer from "multer";
+import config from "../config";
+import { Readable } from "stream";
+import type { Express } from "express";
 
 export type MulterFile = Express.Multer.File;
 
-export const uploadFilesAndInjectUrls = async <T extends Record<string, unknown>>(
-    payload: T,
-    files: MulterFile[] = [],
+export const uploadFilesAndInjectUrls = async <
+  T extends Record<string, unknown>,
+>(
+  payload: T,
+  files: MulterFile[] = [],
 ): Promise<T> => {
-    const nextPayload = JSON.parse(JSON.stringify(payload)) as T;
-    const uploadedUrls: string[] = [];
+  const nextPayload = JSON.parse(JSON.stringify(payload)) as T;
+  const uploadedUrls: string[] = [];
 
-    const toPathSegments = (fieldname: string) =>
-        fieldname
-            .replace(/\[(\d+)\]/g, '.$1')
-            .split('.')
-            .map(segment => segment.trim())
-            .filter(Boolean);
+  const toPathSegments = (fieldname: string) =>
+    fieldname
+      .replace(/\[(\d+)\]/g, ".$1")
+      .split(".")
+      .map((segment) => segment.trim())
+      .filter(Boolean);
 
-    const setNestedValue = (target: Record<string, unknown>, segments: string[], value: string) => {
-        let current: Record<string, unknown> | unknown[] = target;
+  const setNestedValue = (
+    target: Record<string, unknown>,
+    segments: string[],
+    value: string,
+  ) => {
+    let current: Record<string, unknown> | unknown[] = target;
 
-        segments.forEach((segment, index) => {
-            const isLast = index === segments.length - 1;
-            const nextSegment = segments[index + 1];
-            const isIndex = /^\d+$/.test(segment);
+    segments.forEach((segment, index) => {
+      const isLast = index === segments.length - 1;
+      const nextSegment = segments[index + 1];
+      const isIndex = /^\d+$/.test(segment);
 
-            if (isLast) {
-                if (Array.isArray(current) && isIndex) {
-                    current[Number(segment)] = value;
-                    return;
-                }
-
-                (current as Record<string, unknown>)[segment] = value;
-                return;
-            }
-
-            const shouldBeArray = /^\d+$/.test(nextSegment || '');
-
-            if (Array.isArray(current) && isIndex) {
-                if (current[Number(segment)] == null) {
-                    current[Number(segment)] = shouldBeArray ? [] : {};
-                }
-
-                current = current[Number(segment)] as Record<string, unknown> | unknown[];
-                return;
-            }
-
-            const existingValue = (current as Record<string, unknown>)[segment];
-
-            if (existingValue == null || typeof existingValue !== 'object') {
-                (current as Record<string, unknown>)[segment] = shouldBeArray ? [] : {};
-            }
-
-            current = (current as Record<string, unknown>)[segment] as Record<string, unknown> | unknown[];
-        });
-    };
-
-    try {
-        for (const file of files) {
-            const { secure_url } = await sendImageToCloudinary(file);
-            uploadedUrls.push(secure_url);
-            setNestedValue(nextPayload as Record<string, unknown>, toPathSegments(file.fieldname), secure_url);
+      if (isLast) {
+        if (Array.isArray(current) && isIndex) {
+          current[Number(segment)] = value;
+          return;
         }
 
-        return nextPayload;
-    } catch (error) {
-        await Promise.all(uploadedUrls.map(url => deleteImageFromCloudinary(url)));
-        throw error;
+        (current as Record<string, unknown>)[segment] = value;
+        return;
+      }
+
+      const shouldBeArray = /^\d+$/.test(nextSegment || "");
+
+      if (Array.isArray(current) && isIndex) {
+        if (current[Number(segment)] == null) {
+          current[Number(segment)] = shouldBeArray ? [] : {};
+        }
+
+        current = current[Number(segment)] as
+          | Record<string, unknown>
+          | unknown[];
+        return;
+      }
+
+      const existingValue = (current as Record<string, unknown>)[segment];
+
+      if (existingValue == null || typeof existingValue !== "object") {
+        (current as Record<string, unknown>)[segment] = shouldBeArray ? [] : {};
+      }
+
+      current = (current as Record<string, unknown>)[segment] as
+        | Record<string, unknown>
+        | unknown[];
+    });
+  };
+
+  try {
+    for (const file of files) {
+      const { secure_url } = await sendImageToCloudinary(file);
+      uploadedUrls.push(secure_url);
+      setNestedValue(
+        nextPayload as Record<string, unknown>,
+        toPathSegments(file.fieldname),
+        secure_url,
+      );
     }
+
+    return nextPayload;
+  } catch (error) {
+    await Promise.all(
+      uploadedUrls.map((url) => deleteImageFromCloudinary(url)),
+    );
+    throw error;
+  }
 };
 
 /* ------------------------------------------------------- */
@@ -281,9 +297,9 @@ export const uploadFilesAndInjectUrls = async <T extends Record<string, unknown>
 /* ------------------------------------------------------- */
 
 const cloudinaryConfig: ConfigOptions = {
-    cloud_name: config.cloudinary.cloud_name,
-    api_key: config.cloudinary.api_key,
-    api_secret: config.cloudinary.api_secret,
+  cloud_name: config.cloudinary.cloud_name,
+  api_key: config.cloudinary.api_key,
+  api_secret: config.cloudinary.api_secret,
 };
 
 cloudinary.config(cloudinaryConfig);
@@ -294,57 +310,68 @@ cloudinary.config(cloudinaryConfig);
 
 // remove file extension (.png, .jpg etc) and normalize name
 const removeExtension = (filename: string): string => {
-    return filename.split('.').slice(0, -1).join('.').replace(/\s+/g, '-').toLowerCase();
+  return filename
+    .split(".")
+    .slice(0, -1)
+    .join(".")
+    .replace(/\s+/g, "-")
+    .toLowerCase();
 };
 
 // extract publicId (with folder) from cloudinary image url
 const getPublicIdFromUrl = (imageUrl: string): string => {
-    const url = new URL(imageUrl);
-    const parts = url.pathname.split('/');
-    const filename = parts.pop() as string;
-    const folderPath = parts.slice(-2).join('/'); // uploads/images
-    return `${folderPath}/${filename.split('.')[0]}`;
+  const url = new URL(imageUrl);
+  const parts = url.pathname.split("/");
+  const filename = parts.pop() as string;
+  const folderPath = parts.slice(-2).join("/"); // uploads/images
+  return `${folderPath}/${filename.split(".")[0]}`;
 };
 
 /* -------------------------------------------------------- */
 /*               Upload Image to Cloudinary                 */
 /* -------------------------------------------------------- */
 
-export const sendImageToCloudinary = (file: MulterFile): Promise<UploadApiResponse> => {
-    const uniqueImageName = `${Math.random()
-        .toString(36)
-        .substring(2)}-${Date.now()}-${file.fieldname}-${removeExtension(file.originalname)}`;
+export const sendImageToCloudinary = (
+  file: MulterFile,
+): Promise<UploadApiResponse> => {
+  const uniqueImageName = `${Math.random()
+    .toString(36)
+    .substring(
+      2,
+    )}-${Date.now()}-${file.fieldname}-${removeExtension(file.originalname)}`;
 
-    return new Promise((resolve, reject) => {
-        const uploadStream = cloudinary.uploader.upload_stream(
-            {
-                folder: config.cloudinary_folder_name,
-                public_id: uniqueImageName,
-            },
-            (error, result) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(result as UploadApiResponse);
-                }
-            },
-        );
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder: config.cloudinary_folder_name,
+        public_id: uniqueImageName,
+      },
+      (error, result) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result as UploadApiResponse);
+        }
+      },
+    );
 
-        const readableStream = new Readable();
-        readableStream.push(file.buffer);
-        readableStream.push(null);
-        readableStream.pipe(uploadStream);
-    });
+    const readableStream = new Readable();
+    readableStream.push(file.buffer);
+    readableStream.push(null);
+    readableStream.pipe(uploadStream);
+  });
 };
 
 /* -------------------------------------------------------- */
 /*              Delete Image from Cloudinary                */
 /* -------------------------------------------------------- */
 
-export const deleteImageFromCloudinary = async (imageUrl: string): Promise<void> => {
-    const publicId = getPublicIdFromUrl(imageUrl);
+export const deleteImageFromCloudinary = async (
+  imageUrl: string,
+): Promise<void> => {
+  const publicId = getPublicIdFromUrl(imageUrl);
 
-    await cloudinary.uploader.destroy(publicId);
+  await cloudinary.uploader.destroy(publicId);
 };
 
 /* ------------------------------------------------------- */
@@ -354,10 +381,10 @@ export const deleteImageFromCloudinary = async (imageUrl: string): Promise<void>
 const storage = multer.memoryStorage();
 
 const multerUpload = multer({
-    storage,
-    limits: {
-        fileSize: 5 * 1024 * 1024, // 5MB
-    },
+  storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB
+  },
 });
 
 export default multerUpload;

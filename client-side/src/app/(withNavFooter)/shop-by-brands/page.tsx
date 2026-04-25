@@ -1,10 +1,13 @@
-import Image from 'next/image';
-import Link from 'next/link';
-import { ArrowUpRight } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import { SeoScripts } from '@/components/SeoScripts';
-import { buildShopByBrandsSchemas, shopByBrandsMetadata } from '@/lib/seo';
-import { getActiveBrands, mapBackendBrandToStorefrontBrand } from '@/services/Brand';
+import Image from "next/image";
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { SeoScripts } from "@/components/SeoScripts";
+import { buildShopByBrandsSchemas, shopByBrandsMetadata } from "@/lib/seo";
+import {
+  getActiveBrands,
+  mapBackendBrandToStorefrontBrand,
+} from "@/services/Brand";
 
 export const metadata = shopByBrandsMetadata;
 export const revalidate = 300;
@@ -24,14 +27,17 @@ export default async function ShopByBrandsPage() {
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-secondary-foreground/65">
               Brand directory
             </p>
-            <h1 className="mt-4 text-3xl font-black sm:text-4xl">Shop By Brands</h1>
+            <h1 className="mt-4 text-3xl font-black sm:text-4xl">
+              Shop By Brands
+            </h1>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-secondary-foreground/78 sm:text-base">
-              Brand browsing page with the names and collections used across the store.
+              Brand browsing page with the names and collections used across the
+              store.
             </p>
           </Card>
 
           <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {brandItems.map(brand => (
+            {brandItems.map((brand) => (
               <Link
                 key={brand.name}
                 href={brand.href}

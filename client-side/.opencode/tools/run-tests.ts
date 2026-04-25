@@ -5,9 +5,9 @@
  * Automatically detects the package manager and test framework.
  */
 
-import { tool, type ToolDefinition } from "@opencode-ai/plugin/tool"
-import * as path from "path"
-import * as fs from "fs"
+import { tool, type ToolDefinition } from "@opencode-ai/plugin/tool";
+import * as path from "path";
+import * as fs from "fs";
 
 const runTestsTool: ToolDefinition = tool({
   description:
@@ -31,56 +31,56 @@ const runTestsTool: ToolDefinition = tool({
       .describe("Update Jest/Vitest snapshots (default: false)"),
   },
   async execute(args, context) {
-    const { pattern, coverage, watch, updateSnapshots } = args
-    const cwd = context.worktree || context.directory
+    const { pattern, coverage, watch, updateSnapshots } = args;
+    const cwd = context.worktree || context.directory;
 
     // Detect package manager
-    const packageManager = await detectPackageManager(cwd)
+    const packageManager = await detectPackageManager(cwd);
 
     // Detect test framework
-    const testFramework = await detectTestFramework(cwd)
+    const testFramework = await detectTestFramework(cwd);
 
     // Build command
-    const cmd: string[] = [packageManager]
+    const cmd: string[] = [packageManager];
 
     if (packageManager === "npm") {
-      cmd.push("run", "test")
+      cmd.push("run", "test");
     } else {
-      cmd.push("test")
+      cmd.push("test");
     }
 
     // Add options based on framework
-    const testArgs: string[] = []
+    const testArgs: string[] = [];
 
     if (coverage) {
-      testArgs.push("--coverage")
+      testArgs.push("--coverage");
     }
 
     if (watch) {
-      testArgs.push("--watch")
+      testArgs.push("--watch");
     }
 
     if (updateSnapshots) {
-      testArgs.push("-u")
+      testArgs.push("-u");
     }
 
     if (pattern) {
       if (testFramework === "jest" || testFramework === "vitest") {
-        testArgs.push("--testPathPattern", pattern)
+        testArgs.push("--testPathPattern", pattern);
       } else {
-        testArgs.push(pattern)
+        testArgs.push(pattern);
       }
     }
 
     // Add -- separator for npm
     if (testArgs.length > 0) {
       if (packageManager === "npm") {
-        cmd.push("--")
+        cmd.push("--");
       }
-      cmd.push(...testArgs)
+      cmd.push(...testArgs);
     }
 
-    const command = cmd.join(" ")
+    const command = cmd.join(" ");
 
     return JSON.stringify({
       command,
@@ -93,11 +93,11 @@ const runTestsTool: ToolDefinition = tool({
         updateSnapshots: updateSnapshots || false,
       },
       instructions: `Run this command to execute tests:\n\n${command}`,
-    })
+    });
   },
-})
+});
 
-export default runTestsTool
+export default runTestsTool;
 
 async function detectPackageManager(cwd: string): Promise<string> {
   const lockFiles: Record<string, string> = {
@@ -105,37 +105,37 @@ async function detectPackageManager(cwd: string): Promise<string> {
     "pnpm-lock.yaml": "pnpm",
     "yarn.lock": "yarn",
     "package-lock.json": "npm",
-  }
+  };
 
   for (const [lockFile, pm] of Object.entries(lockFiles)) {
     if (fs.existsSync(path.join(cwd, lockFile))) {
-      return pm
+      return pm;
     }
   }
 
-  return "npm"
+  return "npm";
 }
 
 async function detectTestFramework(cwd: string): Promise<string> {
-  const packageJsonPath = path.join(cwd, "package.json")
+  const packageJsonPath = path.join(cwd, "package.json");
 
   if (fs.existsSync(packageJsonPath)) {
     try {
-      const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"))
+      const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
       const deps = {
         ...packageJson.dependencies,
         ...packageJson.devDependencies,
-      }
+      };
 
-      if (deps.vitest) return "vitest"
-      if (deps.jest) return "jest"
-      if (deps.mocha) return "mocha"
-      if (deps.ava) return "ava"
-      if (deps.tap) return "tap"
+      if (deps.vitest) return "vitest";
+      if (deps.jest) return "jest";
+      if (deps.mocha) return "mocha";
+      if (deps.ava) return "ava";
+      if (deps.tap) return "tap";
     } catch {
       // Ignore parse errors
     }
   }
 
-  return "unknown"
+  return "unknown";
 }

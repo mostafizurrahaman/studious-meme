@@ -1,21 +1,21 @@
-import Image from 'next/image';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { ProductCard } from '@/components/ProductCard';
-import { AddToCartButton } from '@/components/cart/AddToCartButton';
-import { AddToCompareButton } from '@/components/compare/AddToCompareButton';
-import { AddToWishlistButton } from '@/components/wishlist/AddToWishlistButton';
-import { SeoScripts } from '@/components/SeoScripts';
-import { buildProductMetadata, buildProductSchemas } from '@/lib/seo';
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { ProductCard } from "@/components/ProductCard";
+import { AddToCartButton } from "@/components/cart/AddToCartButton";
+import { AddToCompareButton } from "@/components/compare/AddToCompareButton";
+import { AddToWishlistButton } from "@/components/wishlist/AddToWishlistButton";
+import { SeoScripts } from "@/components/SeoScripts";
+import { buildProductMetadata, buildProductSchemas } from "@/lib/seo";
 import {
   getActiveProductBySlug,
   getAllActiveProducts,
   getAllActiveProductsAcrossPages,
   mapBackendProductToStorefrontProduct,
-} from '@/services/Product';
+} from "@/services/Product";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -25,13 +25,15 @@ export const revalidate = 300;
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
-  const productsResult = await getAllActiveProductsAcrossPages({ limit: 10000 }).catch(() => null);
+  const productsResult = await getAllActiveProductsAcrossPages({
+    limit: 10000,
+  }).catch(() => null);
 
   return Array.isArray(productsResult?.data)
     ? productsResult.data
-        .map(product => product.slug)
+        .map((product) => product.slug)
         .filter((slug): slug is string => Boolean(slug))
-        .map(slug => ({ slug }))
+        .map((slug) => ({ slug }))
     : [];
 }
 
@@ -39,11 +41,13 @@ export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const productResult = await getActiveProductBySlug(slug).catch(() => null);
   const backendProduct = productResult?.data;
-  const product = backendProduct ? await mapBackendProductToStorefrontProduct(backendProduct) : null;
+  const product = backendProduct
+    ? await mapBackendProductToStorefrontProduct(backendProduct)
+    : null;
 
   if (!product) {
     return {
-      title: 'Product not found',
+      title: "Product not found",
       robots: { index: false, follow: false },
     };
   }
@@ -55,7 +59,9 @@ export default async function ProductPage({ params }: Props) {
   const { slug } = await params;
   const productResult = await getActiveProductBySlug(slug).catch(() => null);
   const backendProduct = productResult?.data;
-  const product = backendProduct ? await mapBackendProductToStorefrontProduct(backendProduct) : null;
+  const product = backendProduct
+    ? await mapBackendProductToStorefrontProduct(backendProduct)
+    : null;
 
   if (!product) notFound();
 
@@ -65,9 +71,11 @@ export default async function ProductPage({ params }: Props) {
     excludeSlug: product.slug,
   }).catch(() => null);
   const related = productsResult?.data?.length
-    ? await Promise.all(productsResult.data.map(mapBackendProductToStorefrontProduct))
+    ? await Promise.all(
+        productsResult.data.map(mapBackendProductToStorefrontProduct),
+      )
     : [];
-  
+
   // const shortDescription = `${product.title} is available with ${product.brand} branding, catalog pricing, and support for direct order or quotation requests.`;
   const longDescription = `${product.title} is listed with SKU ${product.sku} and ${product.stock}. Contact our sales team for delivery coordination, bulk pricing, and project procurement support.`;
 
@@ -79,11 +87,11 @@ export default async function ProductPage({ params }: Props) {
           <nav className="overflow-hidden text-ellipsis whitespace-nowrap text-[10px] font-semibold text-foreground/45 sm:text-xs">
             <Link href="/" className="hover:text-primary">
               Home
-            </Link>{' '}
-            /{' '}
+            </Link>{" "}
+            /{" "}
             <Link href="/shop" className="hover:text-primary">
               Shop
-            </Link>{' '}
+            </Link>{" "}
             / {product.title}
           </nav>
 
@@ -118,7 +126,9 @@ export default async function ProductPage({ params }: Props) {
               </div>
 
               <div className="flex items-end gap-2">
-                <div className="text-2xl font-black text-primary sm:text-4xl">{product.price}</div>
+                <div className="text-2xl font-black text-primary sm:text-4xl">
+                  {product.price}
+                </div>
                 {product.oldPrice ? (
                   <div className="pb-1 text-sm text-foreground/40 line-through sm:text-lg">
                     {product.oldPrice}
@@ -150,11 +160,14 @@ export default async function ProductPage({ params }: Props) {
 
               <Card className="mt-2 grid gap-2 border-0 bg-secondary p-3 text-xs text-secondary-foreground sm:mt-6 sm:grid-cols-3 sm:gap-3 sm:p-4 sm:text-sm">
                 {[
-                  ['Delivery', 'Across Bangladesh'],
-                  ['Support', 'Dedicated sales team'],
-                  ['Quotation', 'Bulk order ready'],
+                  ["Delivery", "Across Bangladesh"],
+                  ["Support", "Dedicated sales team"],
+                  ["Quotation", "Bulk order ready"],
                 ].map(([label, value]) => (
-                  <div key={label} className="rounded-2xl bg-white/10 px-3 py-2 sm:px-4 sm:py-3">
+                  <div
+                    key={label}
+                    className="rounded-2xl bg-white/10 px-3 py-2 sm:px-4 sm:py-3"
+                  >
                     <div className="text-[9px] uppercase tracking-[0.18em] text-secondary-foreground/65 sm:text-xs sm:tracking-[0.22em]">
                       {label}
                     </div>
@@ -166,8 +179,12 @@ export default async function ProductPage({ params }: Props) {
               </Card>
 
               <div className="hidden space-y-3 pt-1 lg:block">
-                <h2 className="text-base font-black text-secondary">Product highlights</h2>
-                <p className="text-sm leading-7 text-foreground/65">{longDescription}</p>
+                <h2 className="text-base font-black text-secondary">
+                  Product highlights
+                </h2>
+                <p className="text-sm leading-7 text-foreground/65">
+                  {longDescription}
+                </p>
                 {/* <div className="grid gap-2 text-sm text-foreground/70">
                   {['Heavy-duty webbing sling', 'Project and retail ready', 'Fast quotation support'].map(
                     item => (
@@ -184,33 +201,45 @@ export default async function ProductPage({ params }: Props) {
           <section className="mt-6 grid gap-4 lg:grid-cols-[1fr_300px]">
             <Card className="p-6 shadow-sm">
               <div className="flex flex-wrap gap-2 text-sm font-semibold">
-                {['Description', 'Specifications', 'Reviews'].map(tab => (
-                  <span key={tab} className="rounded-full bg-muted px-4 py-2 text-foreground/70">
+                {["Description", "Specifications", "Reviews"].map((tab) => (
+                  <span
+                    key={tab}
+                    className="rounded-full bg-muted px-4 py-2 text-foreground/70"
+                  >
                     {tab}
                   </span>
                 ))}
               </div>
               <div className="mt-6 grid gap-6 lg:grid-cols-2">
                 <div>
-                  <h2 className="text-xl font-black text-secondary">Description</h2>
+                  <h2 className="text-xl font-black text-secondary">
+                    Description
+                  </h2>
                   <p className="mt-3 text-sm leading-7 text-foreground/65">
-                    No backend product description is available for this item yet.
+                    No backend product description is available for this item
+                    yet.
                   </p>
                 </div>
                 <div>
-                  <h2 className="text-xl font-black text-secondary">Specifications</h2>
+                  <h2 className="text-xl font-black text-secondary">
+                    Specifications
+                  </h2>
                   <div className="mt-4 overflow-hidden rounded-2xl border border-border">
                     {[
-                      ['Brand', product.brand],
-                      ['SKU', product.sku],
-                      ['Availability', product.stock],
+                      ["Brand", product.brand],
+                      ["SKU", product.sku],
+                      ["Availability", product.stock],
                     ].map(([label, value]) => (
                       <div
                         key={label}
                         className="grid grid-cols-[180px_1fr] border-b border-border last:border-b-0"
                       >
-                        <div className="bg-muted px-4 py-3 font-semibold text-secondary">{label}</div>
-                        <div className="px-4 py-3 text-foreground/65">{value}</div>
+                        <div className="bg-muted px-4 py-3 font-semibold text-secondary">
+                          {label}
+                        </div>
+                        <div className="px-4 py-3 text-foreground/65">
+                          {value}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -221,8 +250,8 @@ export default async function ProductPage({ params }: Props) {
             <Card className="border-0 bg-secondary p-6 text-secondary-foreground shadow-sm">
               <h2 className="text-xl font-black">Need bulk pricing?</h2>
               <p className="mt-3 text-sm leading-7 text-secondary-foreground/78">
-                Send your quantity and delivery location to receive a quotation for project or retail
-                purchase.
+                Send your quantity and delivery location to receive a quotation
+                for project or retail purchase.
               </p>
               <Button
                 asChild
@@ -231,17 +260,25 @@ export default async function ProductPage({ params }: Props) {
                 <Link href="/quotation-request">Request quotation</Link>
               </Button>
               <div className="mt-6 space-y-3 text-sm text-secondary-foreground/80">
-                <div className="rounded-2xl bg-white/10 px-4 py-3">Bulk order support</div>
-                <div className="rounded-2xl bg-white/10 px-4 py-3">Corporate procurement</div>
-                <div className="rounded-2xl bg-white/10 px-4 py-3">Delivery coordination</div>
+                <div className="rounded-2xl bg-white/10 px-4 py-3">
+                  Bulk order support
+                </div>
+                <div className="rounded-2xl bg-white/10 px-4 py-3">
+                  Corporate procurement
+                </div>
+                <div className="rounded-2xl bg-white/10 px-4 py-3">
+                  Delivery coordination
+                </div>
               </div>
             </Card>
           </section>
 
           <Card className="mt-10 p-5 shadow-sm sm:p-6">
-            <h2 className="text-xl font-black text-secondary">Related products</h2>
+            <h2 className="text-xl font-black text-secondary">
+              Related products
+            </h2>
             <div className="mt-6 grid grid-cols-2 gap-3 xl:grid-cols-4 xl:gap-4">
-              {related.map(item => (
+              {related.map((item) => (
                 <ProductCard key={item.sku} product={item} />
               ))}
             </div>

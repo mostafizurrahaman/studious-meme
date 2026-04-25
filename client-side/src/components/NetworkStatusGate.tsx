@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useSyncExternalStore } from 'react';
-import { RefreshCcw, WifiOff } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import Link from "next/link";
+import { useSyncExternalStore } from "react";
+import { RefreshCcw, WifiOff } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 function subscribe(callback: () => void) {
-  window.addEventListener('online', callback);
-  window.addEventListener('offline', callback);
+  window.addEventListener("online", callback);
+  window.addEventListener("offline", callback);
 
   return () => {
-    window.removeEventListener('online', callback);
-    window.removeEventListener('offline', callback);
+    window.removeEventListener("online", callback);
+    window.removeEventListener("offline", callback);
   };
 }
 
@@ -38,7 +38,7 @@ export function NetworkStatusGate() {
   return (
     <div
       className={cn(
-        'fixed inset-0 z-[200] flex items-start justify-center overflow-y-auto overflow-x-hidden bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.15),transparent_28%),radial-gradient(circle_at_20%_80%,rgba(249,115,22,0.12),transparent_26%),linear-gradient(180deg,#07111f_0%,#020617_100%)] px-4 py-5 sm:items-center sm:px-6',
+        "fixed inset-0 z-[200] flex items-start justify-center overflow-y-auto overflow-x-hidden bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.15),transparent_28%),radial-gradient(circle_at_20%_80%,rgba(249,115,22,0.12),transparent_26%),linear-gradient(180deg,#07111f_0%,#020617_100%)] px-4 py-5 sm:items-center sm:px-6",
       )}
       role="alert"
       aria-live="assertive"
@@ -68,22 +68,25 @@ export function NetworkStatusGate() {
                     You&apos;re offline
                   </h1>
                   <p className="max-w-xl text-sm leading-7 text-white/70 sm:text-base">
-                    We need an internet connection to load live products, orders, dashboard data, and updates.
+                    We need an internet connection to load live products,
+                    orders, dashboard data, and updates.
                   </p>
                 </div>
               </div>
 
               <div className="grid gap-3 text-sm text-white/82 sm:grid-cols-3">
-                {['Check Wi-Fi or mobile data', 'Turn off airplane mode', 'Tap reload when connected'].map(
-                  item => (
-                    <div
-                      key={item}
-                      className="rounded-2xl border border-white/10 bg-white/6 px-3 py-3 shadow-[0_10px_30px_-24px_rgba(255,255,255,0.6)]"
-                    >
-                      {item}
-                    </div>
-                  ),
-                )}
+                {[
+                  "Check Wi-Fi or mobile data",
+                  "Turn off airplane mode",
+                  "Tap reload when connected",
+                ].map((item) => (
+                  <div
+                    key={item}
+                    className="rounded-2xl border border-white/10 bg-white/6 px-3 py-3 shadow-[0_10px_30px_-24px_rgba(255,255,255,0.6)]"
+                  >
+                    {item}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -108,7 +111,9 @@ export function NetworkStatusGate() {
                       <div className="absolute -right-1 -top-1 size-3 rounded-full bg-red-400 shadow-[0_0_0_6px_rgba(248,113,113,0.12)]" />
                     </div>
                     <div className="min-w-0">
-                      <div className="text-sm font-semibold text-white/85">Connection unavailable</div>
+                      <div className="text-sm font-semibold text-white/85">
+                        Connection unavailable
+                      </div>
                       <div className="mt-1 text-sm leading-6 text-white/60">
                         Malamal will come back once your network is restored.
                       </div>
@@ -121,11 +126,17 @@ export function NetworkStatusGate() {
                     <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-white/40">
                       What to do
                     </p>
-                    <p className="mt-2 text-sm text-white/72">Reconnect to Wi-Fi, hotspot, or mobile data.</p>
+                    <p className="mt-2 text-sm text-white/72">
+                      Reconnect to Wi-Fi, hotspot, or mobile data.
+                    </p>
                   </div>
                   <div className="rounded-2xl border border-white/10 bg-white/4 p-4">
-                    <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-white/40">Then</p>
-                    <p className="mt-2 text-sm text-white/72">Refresh the page to resume browsing.</p>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-white/40">
+                      Then
+                    </p>
+                    <p className="mt-2 text-sm text-white/72">
+                      Refresh the page to resume browsing.
+                    </p>
                   </div>
                 </div>
               </div>

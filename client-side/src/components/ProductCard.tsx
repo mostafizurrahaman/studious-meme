@@ -1,12 +1,12 @@
-import Image from 'next/image';
-import Link from 'next/link';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { AddToCartButton } from '@/components/cart/AddToCartButton';
-import { AddToCompareButton } from '@/components/compare/AddToCompareButton';
-import { AddToWishlistButton } from '@/components/wishlist/AddToWishlistButton';
-import type { Product } from '@/lib/storefront-types';
+import Image from "next/image";
+import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { AddToCartButton } from "@/components/cart/AddToCartButton";
+import { AddToCompareButton } from "@/components/compare/AddToCompareButton";
+import { AddToWishlistButton } from "@/components/wishlist/AddToWishlistButton";
+import type { Product } from "@/lib/storefront-types";
 
 type Props = {
   product: Product;
@@ -14,17 +14,24 @@ type Props = {
   trailingAction?: React.ReactNode;
 };
 
-export function ProductCard({ product, priority = false, trailingAction }: Props) {
+export function ProductCard({
+  product,
+  priority = false,
+  trailingAction,
+}: Props) {
   return (
     <Card className="group overflow-hidden border-border transition hover:-translate-y-0.5 hover:shadow-md">
       <div className="relative aspect-square bg-muted p-2">
-        <Link href={`/product/${product.slug}`} className="absolute inset-0 block">
+        <Link
+          href={`/product/${product.slug}`}
+          className="absolute inset-0 block"
+        >
           <Image
             src={product.image}
             alt={product.title}
             fill
             priority={priority}
-            loading={priority ? 'eager' : 'lazy'}
+            loading={priority ? "eager" : "lazy"}
             sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
             className="ui-image-card object-contain p-2 transition duration-300 group-hover:scale-105"
           />
@@ -73,7 +80,9 @@ export function ProductCard({ product, priority = false, trailingAction }: Props
         <div className="flex items-center gap-2 text-[11px] sm:text-[13px]">
           <span className="font-extrabold text-primary">{product.price}</span>
           {product.oldPrice ? (
-            <span className="text-foreground/45 line-through">{product.oldPrice}</span>
+            <span className="text-foreground/45 line-through">
+              {product.oldPrice}
+            </span>
           ) : null}
         </div>
         <div className="flex items-center justify-between text-[9px] text-foreground/60 sm:text-[11px]">
@@ -90,7 +99,9 @@ export function ProductCard({ product, priority = false, trailingAction }: Props
             >
               <Link href={`/product/${product.slug}`}>View</Link>
             </Button>
-            {trailingAction ? <div className="shrink-0">{trailingAction}</div> : null}
+            {trailingAction ? (
+              <div className="shrink-0">{trailingAction}</div>
+            ) : null}
           </div>
         </div>
       </CardContent>

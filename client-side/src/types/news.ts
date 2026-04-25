@@ -1,44 +1,44 @@
-import { TCategory } from './category';
+import { TCategory } from "./category";
 
 export type TNews = {
-    _id: string;
-    owner: string;
+  _id: string;
+  owner: string;
 
-    category: TCategory;
-    issueDate: Date;
+  category: TCategory;
+  issueDate: Date;
 
-    heading: string;
-    slug: string;
-    body: string;
+  heading: string;
+  slug: string;
+  body: string;
 
-    primaryPicture: string;
-    primaryPictureCaption: string;
+  primaryPicture: string;
+  primaryPictureCaption: string;
 
-    secondaryPicture?: string;
-    secondaryPictureCaption?: string;
+  secondaryPicture?: string;
+  secondaryPictureCaption?: string;
 
-    pictureAlignment: PictureAlignment;
-    reporter: string;
-    // video: string | null;
+  pictureAlignment: PictureAlignment;
+  reporter: string;
+  // video: string | null;
 
-    isBreakingNews: boolean;
-    isTopNews: boolean;
-    isTrendingNow: boolean;
-    isBottomSlider: boolean;
+  isBreakingNews: boolean;
+  isTopNews: boolean;
+  isTrendingNow: boolean;
+  isBottomSlider: boolean;
 
-    // metaTitle: string;
-    metaDescription: string;
-    metaKeywords: string[];
-    metaTags: string[];
+  // metaTitle: string;
+  metaDescription: string;
+  metaKeywords: string[];
+  metaTags: string[];
 
-    isActive: boolean;
+  isActive: boolean;
 
-    createdAt: Date;
-    updatedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export enum PictureAlignment {
-    Left = 'left',
-    Center = 'center',
-    Right = 'right',
+  Left = "left",
+  Center = "center",
+  Right = "right",
 }

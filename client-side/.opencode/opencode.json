@@ -19,9 +19,7 @@
     "skills/strategic-compact/SKILL.md",
     "skills/eval-harness/SKILL.md"
   ],
-  "plugin": [
-    "./plugins"
-  ],
+  "plugin": ["./plugins"],
   "agent": {
     "build": {
       "description": "Primary coding agent for development work",

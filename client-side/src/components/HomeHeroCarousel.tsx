@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 // import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 type HeroSlide = {
   title: string;
@@ -28,7 +28,7 @@ export function HomeHeroCarousel({ slides, features }: HomeHeroCarouselProps) {
     if (slides.length <= 1) return;
 
     const timer = window.setInterval(() => {
-      setHeroIndex(prev => (prev + 1) % slides.length);
+      setHeroIndex((prev) => (prev + 1) % slides.length);
     }, 5000);
 
     return () => window.clearInterval(timer);
@@ -39,9 +39,12 @@ export function HomeHeroCarousel({ slides, features }: HomeHeroCarouselProps) {
     return (
       <Card className="flex min-h-80 items-center justify-center p-8 text-center shadow-sm">
         <div>
-          <div className="text-xl font-black text-secondary">No active homepage banners</div>
+          <div className="text-xl font-black text-secondary">
+            No active homepage banners
+          </div>
           <p className="mt-2 text-sm text-foreground/60">
-            Publish homepage hero content from the dashboard to fill this section.
+            Publish homepage hero content from the dashboard to fill this
+            section.
           </p>
         </div>
       </Card>
@@ -49,13 +52,19 @@ export function HomeHeroCarousel({ slides, features }: HomeHeroCarouselProps) {
   }
 
   const topFeature = featureCards[1] ?? featureCards[0] ?? heroSlide;
-  const bottomFeatures = [featureCards[0], featureCards[2]].filter(Boolean) as HeroSlide[];
+  const bottomFeatures = [featureCards[0], featureCards[2]].filter(
+    Boolean,
+  ) as HeroSlide[];
 
   return (
     <Card className="overflow-hidden shadow-sm">
       <div className="grid h-full items-stretch gap-0 p-0 sm:gap-4 sm:p-6 lg:grid-cols-2 lg:p-6">
         <div className="ui-image-card relative h-full min-h-96 overflow-hidden rounded-3xl bg-background">
-          <Link href={heroSlide.href} aria-label={heroSlide.title} className="absolute inset-0 z-10">
+          <Link
+            href={heroSlide.href}
+            aria-label={heroSlide.title}
+            className="absolute inset-0 z-10"
+          >
             <Image
               src={heroSlide.image}
               alt={heroSlide.title}
@@ -72,7 +81,11 @@ export function HomeHeroCarousel({ slides, features }: HomeHeroCarouselProps) {
             <>
               <Button
                 type="button"
-                onClick={() => setHeroIndex(prev => (prev - 1 + slides.length) % slides.length)}
+                onClick={() =>
+                  setHeroIndex(
+                    (prev) => (prev - 1 + slides.length) % slides.length,
+                  )
+                }
                 aria-label="Previous banner"
                 variant="secondary"
                 size="icon"
@@ -82,7 +95,9 @@ export function HomeHeroCarousel({ slides, features }: HomeHeroCarouselProps) {
               </Button>
               <Button
                 type="button"
-                onClick={() => setHeroIndex(prev => (prev + 1) % slides.length)}
+                onClick={() =>
+                  setHeroIndex((prev) => (prev + 1) % slides.length)
+                }
                 aria-label="Next banner"
                 variant="secondary"
                 size="icon"
@@ -101,7 +116,7 @@ export function HomeHeroCarousel({ slides, features }: HomeHeroCarouselProps) {
                   type="button"
                   onClick={() => setHeroIndex(index)}
                   aria-label={`Go to banner ${index + 1}`}
-                  className={`h-2.5 rounded-full transition-all ${index === heroIndex ? 'w-7 bg-primary' : 'w-2.5 bg-border'}`}
+                  className={`h-2.5 rounded-full transition-all ${index === heroIndex ? "w-7 bg-primary" : "w-2.5 bg-border"}`}
                 />
               ))}
             </div>

@@ -1,128 +1,160 @@
-'use server';
+"use server";
 
-import { updateTag } from 'next/cache';
-import { requestBackendJson } from '@/lib/backend-api';
+import { updateTag } from "next/cache";
+import { requestBackendJson } from "@/lib/backend-api";
 import {
-    getValidAccessTokenForServerActions,
-    getValidAccessTokenForServerHandlerGet,
-} from '@/lib/getValidAccessToken';
+  getValidAccessTokenForServerActions,
+  getValidAccessTokenForServerHandlerGet,
+} from "@/lib/getValidAccessToken";
 
 type BackendEnvelope<T> = {
-    success?: boolean;
-    message?: string;
-    data?: T;
-    error?: string;
-    meta?: { page: number; limit: number; total: number; totalPages: number };
+  success?: boolean;
+  message?: string;
+  data?: T;
+  error?: string;
+  meta?: { page: number; limit: number; total: number; totalPages: number };
 };
 
 export type WishlistHistoryRecord = {
-    _id?: string;
-    user?: unknown;
-    product?: unknown;
-    productSnapshot?: {
-        title: string;
-        brand: string;
-        category: string;
-        categorySlug?: string;
-        image: string;
-        sku: string;
-        slug: string;
-        price: number;
-        stock: number;
-        weightKg?: number;
-        isNoCOD?: boolean;
+  _id?: string;
+  user?: unknown;
+  product?: unknown;
+  productSnapshot?: {
+    title: string;
+    brand: string;
+    category: string;
+    categorySlug?: string;
+    image: string;
+    sku: string;
+    slug: string;
+    price: number;
+    stock: number;
+    weightKg?: number;
+    isNoCOD?: boolean;
+  };
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export const addWishlistItem = async (
+  productId: string,
+): Promise<BackendEnvelope<WishlistHistoryRecord>> => {
+  const accessToken = await getValidAccessTokenForServerActions();
+
+  if (!accessToken) {
+    return {
+      success: false,
+      message: "Sign in to save wishlist items to your account.",
     };
-    createdAt?: string;
-    updatedAt?: string;
+  }
+
+  const result = await requestBackendJson<
+    BackendEnvelope<WishlistHistoryRecord>
+  >("/wishlist", {
+    method: "POST",
+    body: { productId },
+    token: accessToken,
+  });
+
+  updateTag("WISHLIST");
+  return result;
 };
 
-export const addWishlistItem = async (productId: string): Promise<BackendEnvelope<WishlistHistoryRecord>> => {
-    const accessToken = await getValidAccessTokenForServerActions();
+export const removeWishlistItem = async (
+  productId: string,
+): Promise<BackendEnvelope<null>> => {
+  const accessToken = await getValidAccessTokenForServerActions();
 
-    if (!accessToken) {
-        return { success: false, message: 'Sign in to save wishlist items to your account.' };
-    }
+  if (!accessToken) {
+    return {
+      success: false,
+      message: "Sign in to update wishlist items on your account.",
+    };
+  }
 
-    const result = await requestBackendJson<BackendEnvelope<WishlistHistoryRecord>>('/wishlist', {
-        method: 'POST',
-        body: { productId },
-        token: accessToken,
-    });
+  const result = await requestBackendJson<BackendEnvelope<null>>(
+    `/wishlist/${productId}`,
+    {
+      method: "DELETE",
+      token: accessToken,
+    },
+  );
 
-    updateTag('WISHLIST');
-    return result;
+  updateTag("WISHLIST");
+  return result;
 };
 
-export const removeWishlistItem = async (productId: string): Promise<BackendEnvelope<null>> => {
-    const accessToken = await getValidAccessTokenForServerActions();
+export const getMyWishlist = async (): Promise<
+  BackendEnvelope<WishlistHistoryRecord[]>
+> => {
+  const accessToken = await getValidAccessTokenForServerHandlerGet();
 
-    if (!accessToken) {
-        return { success: false, message: 'Sign in to update wishlist items on your account.' };
-    }
+  if (!accessToken) {
+    return { success: false, data: [] };
+  }
 
-    const result = await requestBackendJson<BackendEnvelope<null>>(`/wishlist/${productId}`, {
-        method: 'DELETE',
-        token: accessToken,
-    });
-
-    updateTag('WISHLIST');
-    return result;
-};
-
-export const getMyWishlist = async (): Promise<BackendEnvelope<WishlistHistoryRecord[]>> => {
-    const accessToken = await getValidAccessTokenForServerHandlerGet();
-
-    if (!accessToken) {
-        return { success: false, data: [] };
-    }
-
-    return requestBackendJson<BackendEnvelope<WishlistHistoryRecord[]>>('/wishlist', {
-        method: 'GET',
-        token: accessToken,
-        next: { tags: ['WISHLIST'] },
-    });
+  return requestBackendJson<BackendEnvelope<WishlistHistoryRecord[]>>(
+    "/wishlist",
+    {
+      method: "GET",
+      token: accessToken,
+      next: { tags: ["WISHLIST"] },
+    },
+  );
 };
 
 type HistoryListParams = {
-    page?: number;
-    limit?: number;
+  page?: number;
+  limit?: number;
 };
 
 const buildHistoryQuery = (params: HistoryListParams = {}) => {
-    const searchParams = new URLSearchParams();
+  const searchParams = new URLSearchParams();
 
-    if (params.page) searchParams.set('page', String(params.page));
-    if (params.limit) searchParams.set('limit', String(params.limit));
+  if (params.page) searchParams.set("page", String(params.page));
+  if (params.limit) searchParams.set("limit", String(params.limit));
 
-    const query = searchParams.toString();
-    return query ? `?${query}` : '';
+  const query = searchParams.toString();
+  return query ? `?${query}` : "";
 };
 
 export const getAllWishlist = async (
-    params: HistoryListParams = {},
+  params: HistoryListParams = {},
 ): Promise<BackendEnvelope<WishlistHistoryRecord[]>> => {
-    const accessToken = await getValidAccessTokenForServerHandlerGet();
+  const accessToken = await getValidAccessTokenForServerHandlerGet();
 
-    return requestBackendJson<BackendEnvelope<WishlistHistoryRecord[]>>(`/wishlist/admin${buildHistoryQuery(params)}`, {
-        method: 'GET',
-        token: accessToken ?? undefined,
-        next: { tags: ['WISHLIST'] },
-    });
+  return requestBackendJson<BackendEnvelope<WishlistHistoryRecord[]>>(
+    `/wishlist/admin${buildHistoryQuery(params)}`,
+    {
+      method: "GET",
+      token: accessToken ?? undefined,
+      next: { tags: ["WISHLIST"] },
+    },
+  );
 };
 
 export type WishlistInsightSummary = {
-    total: number;
-    categorySummary: Array<{ category: string; count: number; userCount: number }>;
-    productSummary: Array<{ product: string; count: number; category: string }>;
-    userSummary: Array<{ user: string; count: number }>;
+  total: number;
+  categorySummary: Array<{
+    category: string;
+    count: number;
+    userCount: number;
+  }>;
+  productSummary: Array<{ product: string; count: number; category: string }>;
+  userSummary: Array<{ user: string; count: number }>;
 };
 
-export const getWishlistInsights = async (): Promise<BackendEnvelope<WishlistInsightSummary>> => {
-    const accessToken = await getValidAccessTokenForServerHandlerGet();
+export const getWishlistInsights = async (): Promise<
+  BackendEnvelope<WishlistInsightSummary>
+> => {
+  const accessToken = await getValidAccessTokenForServerHandlerGet();
 
-    return requestBackendJson<BackendEnvelope<WishlistInsightSummary>>('/wishlist/admin/summary', {
-        method: 'GET',
-        token: accessToken ?? undefined,
-        next: { tags: ['WISHLIST'] },
-    });
+  return requestBackendJson<BackendEnvelope<WishlistInsightSummary>>(
+    "/wishlist/admin/summary",
+    {
+      method: "GET",
+      token: accessToken ?? undefined,
+      next: { tags: ["WISHLIST"] },
+    },
+  );
 };

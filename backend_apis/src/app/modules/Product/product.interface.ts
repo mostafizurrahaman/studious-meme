@@ -1,22 +1,22 @@
-import { Types } from 'mongoose';
+import { Types } from "mongoose";
 
 export interface IProduct {
-    title: string;
-    slug: string;
-    sku: string;
-    image: string;
-    price: number;
-    oldPrice?: number;
-    badge?: string;
-    brand: Types.ObjectId;
-    category: Types.ObjectId;
-    subCategorySlug?: string;
-    weightKg: number;
-    stock: number;
-    rating: number;
-    isFeatured: boolean;
-    isNoCOD: boolean;
-    isActive: boolean;
-    createdAt?: Date;
-    updatedAt?: Date;
+  title: string;
+  slug: string;
+  sku: string;
+  image: string;
+  price: number;
+  oldPrice?: number;
+  badge?: string;
+  brand: Types.ObjectId;
+  category: Types.ObjectId;
+  subCategorySlug?: string;
+  weightKg: number;
+  stock: number;
+  rating: number;
+  isFeatured: boolean;
+  isNoCOD: boolean;
+  isActive: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

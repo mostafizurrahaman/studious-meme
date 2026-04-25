@@ -1,11 +1,17 @@
-import { ArrowUpRight } from 'lucide-react';
-import Link from 'next/link';
-import { SeoScripts } from '@/components/SeoScripts';
-import { Card } from '@/components/ui/card';
-import { getCategoryAccentClassName, getCategoryAccentStyle } from '@/lib/category-accent';
-import { buildMainCategoriesSchemas, mainCategoriesMetadata } from '@/lib/seo';
-import { getActiveCategories } from '@/services/Category';
-import { mapBackendCategoryToStorefrontCategory, type BackendCategory } from '@/services/Category/mappers';
+import { ArrowUpRight } from "lucide-react";
+import Link from "next/link";
+import { SeoScripts } from "@/components/SeoScripts";
+import { Card } from "@/components/ui/card";
+import {
+  getCategoryAccentClassName,
+  getCategoryAccentStyle,
+} from "@/lib/category-accent";
+import { buildMainCategoriesSchemas, mainCategoriesMetadata } from "@/lib/seo";
+import { getActiveCategories } from "@/services/Category";
+import {
+  mapBackendCategoryToStorefrontCategory,
+  type BackendCategory,
+} from "@/services/Category/mappers";
 
 export const metadata = mainCategoriesMetadata;
 export const revalidate = 300;
@@ -13,7 +19,9 @@ export const revalidate = 300;
 export default async function MainCategoriesPage() {
   const categoriesResult = await getActiveCategories().catch(() => null);
   const backendCategories = Array.isArray(categoriesResult?.data)
-    ? categoriesResult.data.map(item => mapBackendCategoryToStorefrontCategory(item as BackendCategory))
+    ? categoriesResult.data.map((item) =>
+        mapBackendCategoryToStorefrontCategory(item as BackendCategory),
+      )
     : [];
 
   // const spotlightCards = backendCategories.slice(0, 6).map(category => ({
@@ -24,12 +32,15 @@ export default async function MainCategoriesPage() {
   // }));
 
   const categoryStats = [
-    { label: 'Active categories', value: backendCategories.length },
+    { label: "Active categories", value: backendCategories.length },
     {
-      label: 'Sub categories',
-      value: backendCategories.reduce((total, category) => total + (category.subCategories?.length ?? 0), 0),
+      label: "Sub categories",
+      value: backendCategories.reduce(
+        (total, category) => total + (category.subCategories?.length ?? 0),
+        0,
+      ),
     },
-    { label: 'Browse focus', value: 'Curated' },
+    { label: "Browse focus", value: "Curated" },
   ];
 
   return (
@@ -41,15 +52,19 @@ export default async function MainCategoriesPage() {
             <span className="pointer-events-none absolute -right-20 -top-24 size-56 rounded-full bg-primary/10 blur-3xl" />
             <span className="pointer-events-none absolute -bottom-24 left-1/3 size-56 rounded-full bg-secondary/10 blur-3xl" />
             <div className="relative">
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">Main categories</p>
-              <h1 className="mt-4 text-3xl font-black text-secondary sm:text-4xl">All Categories</h1>
+              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">
+                Main categories
+              </p>
+              <h1 className="mt-4 text-3xl font-black text-secondary sm:text-4xl">
+                All Categories
+              </h1>
               <p className="mt-3 max-w-3xl text-sm leading-7 text-foreground/65 sm:text-base">
-                The category hub brings together the full storefront structure with cards, spotlights and
-                quick links.
+                The category hub brings together the full storefront structure
+                with cards, spotlights and quick links.
               </p>
 
               <div className="mt-6 grid gap-3 sm:grid-cols-3">
-                {categoryStats.map(stat => (
+                {categoryStats.map((stat) => (
                   <div
                     key={stat.label}
                     className="rounded-2xl border border-border/70 bg-background/85 px-4 py-4 shadow-sm backdrop-blur-sm"
@@ -57,7 +72,9 @@ export default async function MainCategoriesPage() {
                     <div className="text-xs font-semibold uppercase tracking-[0.24em] text-foreground/45">
                       {stat.label}
                     </div>
-                    <div className="mt-2 text-2xl font-black text-secondary">{stat.value}</div>
+                    <div className="mt-2 text-2xl font-black text-secondary">
+                      {stat.value}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -65,7 +82,7 @@ export default async function MainCategoriesPage() {
           </Card>
 
           <section className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {backendCategories.map(category => (
+            {backendCategories.map((category) => (
               <Link
                 key={category.name}
                 href={category.href}
@@ -97,7 +114,7 @@ export default async function MainCategoriesPage() {
                     </span>
                   </div>
                   <p className="relative mt-3 text-sm leading-7 text-foreground/65">
-                    {category.description || 'Browse category products'}
+                    {category.description || "Browse category products"}
                   </p>
                   <div className="relative mt-5 flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2 text-xs font-semibold text-foreground/55 transition-colors duration-300 group-hover:text-primary">

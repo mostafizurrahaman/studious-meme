@@ -1,10 +1,16 @@
-import { Card, CardHeader } from '@/components/ui/card';
-import { SeoScripts } from '@/components/SeoScripts';
-import { ShopPageClient } from '@/components/ShopPageClient';
-import { buildShopSchemas, shopMetadata } from '@/lib/seo';
-import { getActiveCategories } from '@/services/Category';
-import { mapBackendCategoryToStorefrontCategory, type BackendCategory } from '@/services/Category/mappers';
-import { getAllActiveProducts, mapBackendProductToStorefrontProduct } from '@/services/Product';
+import { Card, CardHeader } from "@/components/ui/card";
+import { SeoScripts } from "@/components/SeoScripts";
+import { ShopPageClient } from "@/components/ShopPageClient";
+import { buildShopSchemas, shopMetadata } from "@/lib/seo";
+import { getActiveCategories } from "@/services/Category";
+import {
+  mapBackendCategoryToStorefrontCategory,
+  type BackendCategory,
+} from "@/services/Category/mappers";
+import {
+  getAllActiveProducts,
+  mapBackendProductToStorefrontProduct,
+} from "@/services/Product";
 
 export const metadata = shopMetadata;
 export const revalidate = 300;
@@ -25,8 +31,11 @@ const DEFAULT_SHOP_LIMIT = 24;
 
 export default async function ShopPage({ searchParams }: Props) {
   const query = await searchParams;
-  const page = Math.max(Number(query.page ?? '1') || 1, 1);
-  const limit = Math.max(Number(query.limit ?? String(DEFAULT_SHOP_LIMIT)) || DEFAULT_SHOP_LIMIT, 1);
+  const page = Math.max(Number(query.page ?? "1") || 1, 1);
+  const limit = Math.max(
+    Number(query.limit ?? String(DEFAULT_SHOP_LIMIT)) || DEFAULT_SHOP_LIMIT,
+    1,
+  );
   const [productsResult, categoriesResult] = await Promise.all([
     getAllActiveProducts({
       page,
@@ -41,10 +50,14 @@ export default async function ShopPage({ searchParams }: Props) {
   ]);
 
   const products = productsResult?.data?.length
-    ? await Promise.all(productsResult.data.map(mapBackendProductToStorefrontProduct))
+    ? await Promise.all(
+        productsResult.data.map(mapBackendProductToStorefrontProduct),
+      )
     : [];
   const backendCategories = Array.isArray(categoriesResult?.data)
-    ? categoriesResult.data.map(item => mapBackendCategoryToStorefrontCategory(item as BackendCategory))
+    ? categoriesResult.data.map((item) =>
+        mapBackendCategoryToStorefrontCategory(item as BackendCategory),
+      )
     : [];
   const meta = {
     total: productsResult?.meta?.total ?? products.length,
@@ -53,10 +66,10 @@ export default async function ShopPage({ searchParams }: Props) {
     totalPages: productsResult?.meta?.totalPages ?? 1,
   };
   const stats = [
-    [String(meta.total), 'Products'],
-    [String(backendCategories.length), 'Categories'],
-    [String(meta.page), 'Current page'],
-    [String(meta.totalPages), 'Total pages'],
+    [String(meta.total), "Products"],
+    [String(backendCategories.length), "Categories"],
+    [String(meta.page), "Current page"],
+    [String(meta.totalPages), "Total pages"],
   ];
 
   return (
@@ -73,13 +86,16 @@ export default async function ShopPage({ searchParams }: Props) {
                 <div>
                   <h1 className="text-3xl font-black sm:text-4xl">Shop</h1>
                   <p className="mt-3 max-w-2xl text-sm leading-7 text-white/78 sm:text-base">
-                    Browse the storefront catalog with filters, categories and product cards across the full
-                    hardware range.
+                    Browse the storefront catalog with filters, categories and
+                    product cards across the full hardware range.
                   </p>
                 </div>
                 <div className="grid grid-cols-2 gap-3 text-center sm:grid-cols-4">
                   {stats.map(([value, label]) => (
-                    <div key={label} className="rounded-2xl bg-white/10 px-4 py-3">
+                    <div
+                      key={label}
+                      className="rounded-2xl bg-white/10 px-4 py-3"
+                    >
                       <div className="text-lg font-extrabold">{value}</div>
                       <div className="text-[11px] uppercase tracking-[0.24em] text-secondary-foreground/65">
                         {label}
@@ -91,7 +107,11 @@ export default async function ShopPage({ searchParams }: Props) {
             </CardHeader>
           </Card>
 
-          <ShopPageClient products={products} categories={backendCategories} meta={meta} />
+          <ShopPageClient
+            products={products}
+            categories={backendCategories}
+            meta={meta}
+          />
         </div>
       </main>
     </>

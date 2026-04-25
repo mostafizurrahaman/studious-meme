@@ -1,20 +1,20 @@
-import { Types } from 'mongoose';
+import { Types } from "mongoose";
 
 export interface IContact {
-    _id: Types.ObjectId;
+  _id: Types.ObjectId;
 
-    name: string;
-    company?: string;
-    email: string;
-    phone: string;
+  name: string;
+  company?: string;
+  email: string;
+  phone: string;
 
-    subject: string;
-    products: string;
-    brand?: string;
-    message: string;
+  subject: string;
+  products: string;
+  brand?: string;
+  message: string;
 
-    isReplied: boolean;
+  isReplied: boolean;
 
-    createdAt: Date;
-    updatedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }

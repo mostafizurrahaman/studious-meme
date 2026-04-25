@@ -1,8 +1,14 @@
-'use client';
+"use client";
 
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type TablePaginationProps = {
   page: number;
@@ -12,7 +18,13 @@ type TablePaginationProps = {
   onLimitChange?: (limit: number) => void;
 };
 
-export function TablePagination({ page, limit, total, onPageChange, onLimitChange }: TablePaginationProps) {
+export function TablePagination({
+  page,
+  limit,
+  total,
+  onPageChange,
+  onLimitChange,
+}: TablePaginationProps) {
   const totalPages = Math.ceil(total / limit) || 1;
   const start = total === 0 ? 0 : (page - 1) * limit + 1;
   const end = Math.min(page * limit, total);
@@ -26,7 +38,10 @@ export function TablePagination({ page, limit, total, onPageChange, onLimitChang
         {onLimitChange && (
           <div className="flex items-center gap-2">
             <span>Rows</span>
-            <Select value={String(limit)} onValueChange={value => onLimitChange(Number(value))}>
+            <Select
+              value={String(limit)}
+              onValueChange={(value) => onLimitChange(Number(value))}
+            >
               <SelectTrigger className="h-8 w-18">
                 <SelectValue />
               </SelectTrigger>

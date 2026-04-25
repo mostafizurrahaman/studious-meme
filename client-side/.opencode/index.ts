@@ -35,13 +35,13 @@
  */
 
 // Export the main plugin
-export { ECCHooksPlugin, default } from "./plugins/index.js"
+export { ECCHooksPlugin, default } from "./plugins/index.js";
 
 // Export individual components for selective use
-export * from "./plugins/index.js"
+export * from "./plugins/index.js";
 
 // Version export
-export const VERSION = "1.6.0"
+export const VERSION = "1.6.0";
 
 // Plugin metadata
 export const metadata = {
@@ -77,4 +77,4 @@ export const metadata = {
       "changed-files",
     ],
   },
-}
+};

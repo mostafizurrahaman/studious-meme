@@ -1,46 +1,46 @@
-import globals from 'globals';
-import pluginJs from '@eslint/js';
-import tseslint from 'typescript-eslint';
-import eslintConfigPrettier from 'eslint-config-prettier';
-import unusedImports from 'eslint-plugin-unused-imports';
+import globals from "globals";
+import pluginJs from "@eslint/js";
+import tseslint from "typescript-eslint";
+import eslintConfigPrettier from "eslint-config-prettier";
+import unusedImports from "eslint-plugin-unused-imports";
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
-    pluginJs.configs.recommended,
-    ...tseslint.configs.recommended,
-    eslintConfigPrettier,
-    {
-        ignores: ['node_modules', 'dist'],
+  pluginJs.configs.recommended,
+  ...tseslint.configs.recommended,
+  eslintConfigPrettier,
+  {
+    ignores: ["node_modules", "dist"],
+  },
+  {
+    files: ["**/*.{js,mjs,cjs,ts}"],
+    plugins: {
+      "unused-imports": unusedImports,
     },
-    {
-        files: ['**/*.{js,mjs,cjs,ts}'],
-        plugins: {
-            'unused-imports': unusedImports,
-        },
-        languageOptions: {
-            globals: { ...globals.browser, ...globals.node },
-        },
-        rules: {
-            // Unused imports rules
-            'unused-imports/no-unused-imports': 'error',
-            'unused-imports/no-unused-vars': [
-                'warn',
-                {
-                    vars: 'all',
-                    varsIgnorePattern: '^_',
-                    args: 'after-used',
-                    argsIgnorePattern: '^_',
-                },
-            ],
-            // General rules
-            'no-console': 'warn',
-            '@typescript-eslint/no-unused-vars': 'error',
-            'no-unused-vars': 'off',
-            'no-unused-expressions': 'error',
-            'prefer-const': 'error',
-            'no-undef': 'error',
-        },
+    languageOptions: {
+      globals: { ...globals.browser, ...globals.node },
     },
+    rules: {
+      // Unused imports rules
+      "unused-imports/no-unused-imports": "error",
+      "unused-imports/no-unused-vars": [
+        "warn",
+        {
+          vars: "all",
+          varsIgnorePattern: "^_",
+          args: "after-used",
+          argsIgnorePattern: "^_",
+        },
+      ],
+      // General rules
+      "no-console": "warn",
+      "@typescript-eslint/no-unused-vars": "error",
+      "no-unused-vars": "off",
+      "no-unused-expressions": "error",
+      "prefer-const": "error",
+      "no-undef": "error",
+    },
+  },
 ];
 
 // unused import auto remove command: pnpm eslint --ext .js,.ts,.jsx,.tsx . --fix OR pnpm eslint . --fix

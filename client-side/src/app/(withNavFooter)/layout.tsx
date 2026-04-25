@@ -1,12 +1,18 @@
-import { FloatingCategoryRail } from '@/components/FloatingCategoryRail';
-import { Footer } from '@/components/Footer';
-import { MobileToolbar } from '@/components/MobileToolbar';
-import { Container } from '@/components/Container';
-import { StorefrontHeader } from '@/components/StorefrontHeader';
-import { StorefrontFloatingContact } from '@/components/StorefrontFloatingContact';
-import { getActiveBrands, mapBackendBrandToStorefrontBrand } from '@/services/Brand';
-import { getActiveCategories } from '@/services/Category';
-import { mapBackendCategoryToStorefrontCategory, type BackendCategory } from '@/services/Category/mappers';
+import { FloatingCategoryRail } from "@/components/FloatingCategoryRail";
+import { Footer } from "@/components/Footer";
+import { MobileToolbar } from "@/components/MobileToolbar";
+import { Container } from "@/components/Container";
+import { StorefrontHeader } from "@/components/StorefrontHeader";
+import { StorefrontFloatingContact } from "@/components/StorefrontFloatingContact";
+import {
+  getActiveBrands,
+  mapBackendBrandToStorefrontBrand,
+} from "@/services/Brand";
+import { getActiveCategories } from "@/services/Category";
+import {
+  mapBackendCategoryToStorefrontCategory,
+  type BackendCategory,
+} from "@/services/Category/mappers";
 
 export const revalidate = 300;
 
@@ -18,12 +24,16 @@ const MainLayout = async ({ children }: { children: React.ReactNode }) => {
 
   const categories = Array.isArray(categoriesResult?.data)
     ? categoriesResult.data
-        .map(item => mapBackendCategoryToStorefrontCategory(item as BackendCategory))
+        .map((item) =>
+          mapBackendCategoryToStorefrontCategory(item as BackendCategory),
+        )
         .slice(0, 12)
     : [];
 
   const brands = brandsResult?.data?.length
-    ? await Promise.all(brandsResult.data.slice(0, 12).map(mapBackendBrandToStorefrontBrand))
+    ? await Promise.all(
+        brandsResult.data.slice(0, 12).map(mapBackendBrandToStorefrontBrand),
+      )
     : [];
 
   return (
@@ -31,7 +41,8 @@ const MainLayout = async ({ children }: { children: React.ReactNode }) => {
       <StorefrontHeader categories={categories} />
       <main
         style={{
-          paddingTop: 'var(--storefront-header-height, clamp(120px, 12vw, 160px))',
+          paddingTop:
+            "var(--storefront-header-height, clamp(120px, 12vw, 160px))",
         }}
       >
         <FloatingCategoryRail categories={categories} />

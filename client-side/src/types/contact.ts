@@ -1,9 +1,9 @@
 export type TContact = {
-    _id: string;
-    name: string;
-    email: string;
-    message: string;
-    isReplied: boolean;
+  _id: string;
+  name: string;
+  email: string;
+  message: string;
+  isReplied: boolean;
 
-    createdAt: Date;
+  createdAt: Date;
 };

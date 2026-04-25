@@ -1,29 +1,31 @@
-import { tool, type ToolDefinition } from "@opencode-ai/plugin/tool"
+import { tool, type ToolDefinition } from "@opencode-ai/plugin/tool";
 import {
   buildTree,
   getChangedPaths,
   hasChanges,
   type ChangeType,
   type TreeNode,
-} from "../plugins/lib/changed-files-store.js"
+} from "../plugins/lib/changed-files-store.js";
 
 const INDICATORS: Record<ChangeType, string> = {
   added: "+",
   modified: "~",
   deleted: "-",
-}
+};
 
 function renderTree(nodes: TreeNode[], indent: string): string {
-  const lines: string[] = []
+  const lines: string[] = [];
   for (const node of nodes) {
-    const indicator = node.changeType ? ` (${INDICATORS[node.changeType]})` : ""
-    const name = node.changeType ? `${node.name}${indicator}` : `${node.name}/`
-    lines.push(`${indent}${name}`)
+    const indicator = node.changeType
+      ? ` (${INDICATORS[node.changeType]})`
+      : "";
+    const name = node.changeType ? `${node.name}${indicator}` : `${node.name}/`;
+    lines.push(`${indent}${name}`);
     if (node.children.length > 0) {
-      lines.push(renderTree(node.children, `${indent}  `))
+      lines.push(renderTree(node.children, `${indent}  `));
     }
   }
-  return lines.join("\n")
+  return lines.join("\n");
 }
 
 const changedFilesTool: ToolDefinition = tool({
@@ -37,17 +39,25 @@ const changedFilesTool: ToolDefinition = tool({
     format: tool.schema
       .enum(["tree", "json"])
       .optional()
-      .describe("Output format: tree for terminal display, json for structured data (default: tree)"),
+      .describe(
+        "Output format: tree for terminal display, json for structured data (default: tree)",
+      ),
   },
   async execute(args) {
-    const filter = args.filter === "all" || !args.filter ? undefined : (args.filter as ChangeType)
-    const format = args.format ?? "tree"
+    const filter =
+      args.filter === "all" || !args.filter
+        ? undefined
+        : (args.filter as ChangeType);
+    const format = args.format ?? "tree";
 
     if (!hasChanges()) {
-      return JSON.stringify({ changed: false, message: "No files changed in this session" })
+      return JSON.stringify({
+        changed: false,
+        message: "No files changed in this session",
+      });
     }
 
-    const paths = getChangedPaths(filter)
+    const paths = getChangedPaths(filter);
 
     if (format === "json") {
       return JSON.stringify(
@@ -60,24 +70,24 @@ const changedFilesTool: ToolDefinition = tool({
             .map((p) => `git diff ${p.path}`),
         },
         null,
-        2
-      )
+        2,
+      );
     }
 
-    const tree = buildTree(filter)
-    const treeStr = renderTree(tree, "")
+    const tree = buildTree(filter);
+    const treeStr = renderTree(tree, "");
     const diffHint = paths
       .filter((p) => p.changeType !== "added")
       .slice(0, 5)
       .map((p) => `  git diff ${p.path}`)
-      .join("\n")
+      .join("\n");
 
-    let output = `Changed files (${paths.length}):\n\n${treeStr}`
+    let output = `Changed files (${paths.length}):\n\n${treeStr}`;
     if (diffHint) {
-      output += `\n\nTo view diff for a file:\n${diffHint}`
+      output += `\n\nTo view diff for a file:\n${diffHint}`;
     }
-    return output
+    return output;
   },
-})
+});
 
-export default changedFilesTool
+export default changedFilesTool;

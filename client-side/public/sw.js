@@ -388,18 +388,18 @@ const OFFLINE_HTML = `<!doctype html>
 </body>
 </html>`;
 
-self.addEventListener('install', event => {
+self.addEventListener("install", (event) => {
   event.waitUntil(self.skipWaiting());
 });
 
-self.addEventListener('activate', event => {
+self.addEventListener("activate", (event) => {
   event.waitUntil(self.clients.claim());
 });
 
-self.addEventListener('fetch', event => {
+self.addEventListener("fetch", (event) => {
   const { request } = event;
 
-  if (request.mode !== 'navigate') {
+  if (request.mode !== "navigate") {
     return;
   }
 
@@ -408,8 +408,8 @@ self.addEventListener('fetch', event => {
       () =>
         new Response(OFFLINE_HTML, {
           headers: {
-            'Content-Type': 'text/html; charset=utf-8',
-            'Cache-Control': 'no-store',
+            "Content-Type": "text/html; charset=utf-8",
+            "Cache-Control": "no-store",
           },
         }),
     ),

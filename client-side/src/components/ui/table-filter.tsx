@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { X } from 'lucide-react';
-import { useDebouncedCallback } from 'use-debounce';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { useState } from "react";
+import { X } from "lucide-react";
+import { useDebouncedCallback } from "use-debounce";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 type TableFilterProps = {
   value: string;
@@ -13,7 +13,12 @@ type TableFilterProps = {
   className?: string;
 };
 
-export function TableFilter({ value, onChange, placeholder = 'Search...', className }: TableFilterProps) {
+export function TableFilter({
+  value,
+  onChange,
+  placeholder = "Search...",
+  className,
+}: TableFilterProps) {
   const [inputValue, setInputValue] = useState(value);
   const debouncedChange = useDebouncedCallback(onChange, 300);
 
@@ -21,7 +26,7 @@ export function TableFilter({ value, onChange, placeholder = 'Search...', classN
     <div className={`flex gap-2 ${className}`}>
       <Input
         value={inputValue}
-        onChange={e => {
+        onChange={(e) => {
           const nextValue = e.target.value;
           setInputValue(nextValue);
           debouncedChange(nextValue);
@@ -35,8 +40,8 @@ export function TableFilter({ value, onChange, placeholder = 'Search...', classN
           variant="outline"
           size="icon"
           onClick={() => {
-            setInputValue('');
-            onChange('');
+            setInputValue("");
+            onChange("");
           }}
         >
           <X className="size-4" />

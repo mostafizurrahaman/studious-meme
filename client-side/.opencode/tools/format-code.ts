@@ -5,11 +5,11 @@
  * This avoids shell execution assumptions while still giving precise guidance.
  */
 
-import { tool, type ToolDefinition } from "@opencode-ai/plugin/tool"
-import * as path from "path"
-import * as fs from "fs"
+import { tool, type ToolDefinition } from "@opencode-ai/plugin/tool";
+import * as path from "path";
+import * as fs from "fs";
 
-type Formatter = "biome" | "prettier" | "black" | "gofmt" | "rustfmt"
+type Formatter = "biome" | "prettier" | "black" | "gofmt" | "rustfmt";
 
 const formatCodeTool: ToolDefinition = tool({
   description:
@@ -22,40 +22,56 @@ const formatCodeTool: ToolDefinition = tool({
       .describe("Optional formatter override"),
   },
   async execute(args, context) {
-    const cwd = context.worktree || context.directory
-    const ext = args.filePath.split(".").pop()?.toLowerCase() || ""
-    const detected = args.formatter || detectFormatter(cwd, ext)
+    const cwd = context.worktree || context.directory;
+    const ext = args.filePath.split(".").pop()?.toLowerCase() || "";
+    const detected = args.formatter || detectFormatter(cwd, ext);
 
     if (!detected) {
       return JSON.stringify({
         success: false,
         message: `No formatter detected for .${ext} files`,
-      })
+      });
     }
 
-    const command = buildFormatterCommand(detected, args.filePath)
+    const command = buildFormatterCommand(detected, args.filePath);
     return JSON.stringify({
       success: true,
       formatter: detected,
       command,
       instructions: `Run this command:\n\n${command}`,
-    })
+    });
   },
-})
+});
 
-export default formatCodeTool
+export default formatCodeTool;
 
 function detectFormatter(cwd: string, ext: string): Formatter | null {
-  if (["ts", "tsx", "js", "jsx", "json", "css", "scss", "md", "yaml", "yml"].includes(ext)) {
-    if (fs.existsSync(path.join(cwd, "biome.json")) || fs.existsSync(path.join(cwd, "biome.jsonc"))) {
-      return "biome"
+  if (
+    [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "css",
+      "scss",
+      "md",
+      "yaml",
+      "yml",
+    ].includes(ext)
+  ) {
+    if (
+      fs.existsSync(path.join(cwd, "biome.json")) ||
+      fs.existsSync(path.join(cwd, "biome.jsonc"))
+    ) {
+      return "biome";
     }
-    return "prettier"
+    return "prettier";
   }
-  if (["py", "pyi"].includes(ext)) return "black"
-  if (ext === "go") return "gofmt"
-  if (ext === "rs") return "rustfmt"
-  return null
+  if (["py", "pyi"].includes(ext)) return "black";
+  if (ext === "go") return "gofmt";
+  if (ext === "rs") return "rustfmt";
+  return null;
 }
 
 function buildFormatterCommand(formatter: Formatter, filePath: string): string {
@@ -65,6 +81,6 @@ function buildFormatterCommand(formatter: Formatter, filePath: string): string {
     black: `black ${filePath}`,
     gofmt: `gofmt -w ${filePath}`,
     rustfmt: `rustfmt ${filePath}`,
-  }
-  return commands[formatter]
+  };
+  return commands[formatter];
 }

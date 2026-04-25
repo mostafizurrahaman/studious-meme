@@ -13,17 +13,19 @@
  * - SessionEnd → session.deleted
  */
 
-import type { PluginInput } from "@opencode-ai/plugin"
-import * as fs from "fs"
-import * as path from "path"
+import type { PluginInput } from "@opencode-ai/plugin";
+import * as fs from "fs";
+import * as path from "path";
 import {
   initStore,
   recordChange,
   clearChanges,
-} from "./lib/changed-files-store.js"
-import changedFilesTool from "../tools/changed-files.js"
+} from "./lib/changed-files-store.js";
+import changedFilesTool from "../tools/changed-files.js";
 
-type ECCHooksPluginFn = (input: PluginInput) => Promise<Record<string, unknown>>
+type ECCHooksPluginFn = (
+  input: PluginInput,
+) => Promise<Record<string, unknown>>;
 
 export const ECCHooksPlugin: ECCHooksPluginFn = async ({
   client,
@@ -31,64 +33,73 @@ export const ECCHooksPlugin: ECCHooksPluginFn = async ({
   directory,
   worktree,
 }: PluginInput) => {
-  type HookProfile = "minimal" | "standard" | "strict"
+  type HookProfile = "minimal" | "standard" | "strict";
 
-  const worktreePath = worktree || directory
-  initStore(worktreePath)
+  const worktreePath = worktree || directory;
+  initStore(worktreePath);
 
-  const editedFiles = new Set<string>()
+  const editedFiles = new Set<string>();
 
   function resolvePath(p: string): string {
-    if (path.isAbsolute(p)) return p
-    return path.join(worktreePath, p)
+    if (path.isAbsolute(p)) return p;
+    return path.join(worktreePath, p);
   }
 
-  const pendingToolChanges = new Map<string, { path: string; type: "added" | "modified" }>()
-  let writeCounter = 0
+  const pendingToolChanges = new Map<
+    string,
+    { path: string; type: "added" | "modified" }
+  >();
+  let writeCounter = 0;
 
-  function getFilePath(args: Record<string, unknown> | undefined): string | null {
-    if (!args) return null
-    const p = (args.filePath ?? args.file_path ?? args.path) as string | undefined
-    return typeof p === "string" && p.trim() ? p : null
+  function getFilePath(
+    args: Record<string, unknown> | undefined,
+  ): string | null {
+    if (!args) return null;
+    const p = (args.filePath ?? args.file_path ?? args.path) as
+      | string
+      | undefined;
+    return typeof p === "string" && p.trim() ? p : null;
   }
 
   // Helper to call the SDK's log API with correct signature
   const log = (level: "debug" | "info" | "warn" | "error", message: string) =>
-    client.app.log({ body: { service: "ecc", level, message } })
+    client.app.log({ body: { service: "ecc", level, message } });
 
   const normalizeProfile = (value: string | undefined): HookProfile => {
-    if (value === "minimal" || value === "strict") return value
-    return "standard"
-  }
+    if (value === "minimal" || value === "strict") return value;
+    return "standard";
+  };
 
-  const currentProfile = normalizeProfile(process.env.ECC_HOOK_PROFILE)
+  const currentProfile = normalizeProfile(process.env.ECC_HOOK_PROFILE);
   const disabledHooks = new Set(
     (process.env.ECC_DISABLED_HOOKS || "")
       .split(",")
       .map((item) => item.trim())
-      .filter(Boolean)
-  )
+      .filter(Boolean),
+  );
 
   const profileOrder: Record<HookProfile, number> = {
     minimal: 0,
     standard: 1,
     strict: 2,
-  }
+  };
 
   const profileAllowed = (required: HookProfile | HookProfile[]): boolean => {
     if (Array.isArray(required)) {
-      return required.some((entry) => profileOrder[currentProfile] >= profileOrder[entry])
+      return required.some(
+        (entry) => profileOrder[currentProfile] >= profileOrder[entry],
+      );
     }
-    return profileOrder[currentProfile] >= profileOrder[required]
-  }
+    return profileOrder[currentProfile] >= profileOrder[required];
+  };
 
   const hookEnabled = (
     hookId: string,
-    requiredProfile: HookProfile | HookProfile[] = "standard"
+    requiredProfile: HookProfile | HookProfile[] = "standard",
   ): boolean => {
-    if (disabledHooks.has(hookId)) return false
-    return profileAllowed(requiredProfile)
-  }
+    if (disabledHooks.has(hookId)) return false;
+    return profileAllowed(requiredProfile);
+  };
 
   return {
     /**
@@ -99,29 +110,36 @@ export const ECCHooksPlugin: ECCHooksPluginFn = async ({
      * Action: Runs prettier --write on the file
      */
     "file.edited": async (event: { path: string }) => {
-      editedFiles.add(event.path)
-      recordChange(event.path, "modified")
+      editedFiles.add(event.path);
+      recordChange(event.path, "modified");
 
       // Auto-format JS/TS files
-      if (hookEnabled("post:edit:format", ["strict"]) && event.path.match(/\.(ts|tsx|js|jsx)$/)) {
+      if (
+        hookEnabled("post:edit:format", ["strict"]) &&
+        event.path.match(/\.(ts|tsx|js|jsx)$/)
+      ) {
         try {
-          await $`prettier --write ${event.path} 2>/dev/null`
-          log("info", `[ECC] Formatted: ${event.path}`)
+          await $`prettier --write ${event.path} 2>/dev/null`;
+          log("info", `[ECC] Formatted: ${event.path}`);
         } catch {
           // Prettier not installed or failed - silently continue
         }
       }
 
       // Console.log warning check
-      if (hookEnabled("post:edit:console-warn", ["standard", "strict"]) && event.path.match(/\.(ts|tsx|js|jsx)$/)) {
+      if (
+        hookEnabled("post:edit:console-warn", ["standard", "strict"]) &&
+        event.path.match(/\.(ts|tsx|js|jsx)$/)
+      ) {
         try {
-          const result = await $`grep -n "console\\.log" ${event.path} 2>/dev/null`.text()
+          const result =
+            await $`grep -n "console\\.log" ${event.path} 2>/dev/null`.text();
           if (result.trim()) {
-            const lines = result.trim().split("\n").length
+            const lines = result.trim().split("\n").length;
             log(
               "warn",
-              `[ECC] console.log found in ${event.path} (${lines} occurrence${lines > 1 ? "s" : ""})`
-            )
+              `[ECC] console.log found in ${event.path} (${lines} occurrence${lines > 1 ? "s" : ""})`,
+            );
           }
         } catch {
           // No console.log found (grep returns non-zero) - this is good
@@ -136,21 +154,23 @@ export const ECCHooksPlugin: ECCHooksPluginFn = async ({
      * Triggers: After edit tool completes on .ts/.tsx files
      * Action: Runs tsc --noEmit to check for type errors
      */
-    "tool.execute.after": async (
-      input: { tool: string; callID?: string; args?: { filePath?: string; file_path?: string; path?: string } }
-    ) => {
-      const filePath = getFilePath(input.args as Record<string, unknown>)
+    "tool.execute.after": async (input: {
+      tool: string;
+      callID?: string;
+      args?: { filePath?: string; file_path?: string; path?: string };
+    }) => {
+      const filePath = getFilePath(input.args as Record<string, unknown>);
       if (input.tool === "edit" && filePath) {
-        recordChange(filePath, "modified")
+        recordChange(filePath, "modified");
       }
       if (input.tool === "write" && filePath) {
-        const key = input.callID ?? `write-${++writeCounter}-${filePath}`
-        const pending = pendingToolChanges.get(key)
+        const key = input.callID ?? `write-${++writeCounter}-${filePath}`;
+        const pending = pendingToolChanges.get(key);
         if (pending) {
-          recordChange(pending.path, pending.type)
-          pendingToolChanges.delete(key)
+          recordChange(pending.path, pending.type);
+          pendingToolChanges.delete(key);
         } else {
-          recordChange(filePath, "modified")
+          recordChange(filePath, "modified");
         }
       }
 
@@ -161,15 +181,15 @@ export const ECCHooksPlugin: ECCHooksPluginFn = async ({
         input.args?.filePath?.match(/\.tsx?$/)
       ) {
         try {
-          await $`npx tsc --noEmit 2>&1`
-          log("info", "[ECC] TypeScript check passed")
+          await $`npx tsc --noEmit 2>&1`;
+          log("info", "[ECC] TypeScript check passed");
         } catch (error: unknown) {
-          const err = error as { stdout?: string }
-          log("warn", "[ECC] TypeScript errors detected:")
+          const err = error as { stdout?: string };
+          log("warn", "[ECC] TypeScript errors detected:");
           if (err.stdout) {
             // Log first few errors
-            const errors = err.stdout.split("\n").slice(0, 5)
-            errors.forEach((line: string) => log("warn", `  ${line}`))
+            const errors = err.stdout.split("\n").slice(0, 5);
+            errors.forEach((line: string) => log("warn", `  ${line}`));
           }
         }
       }
@@ -180,7 +200,7 @@ export const ECCHooksPlugin: ECCHooksPluginFn = async ({
         input.tool === "bash" &&
         input.args?.toString().includes("gh pr create")
       ) {
-        log("info", "[ECC] PR created - check GitHub Actions status")
+        log("info", "[ECC] PR created - check GitHub Actions status");
       }
     },
 
@@ -191,23 +211,25 @@ export const ECCHooksPlugin: ECCHooksPluginFn = async ({
      * Triggers: Before tool execution
      * Action: Warns about potential security issues
      */
-    "tool.execute.before": async (
-      input: { tool: string; callID?: string; args?: Record<string, unknown> }
-    ) => {
+    "tool.execute.before": async (input: {
+      tool: string;
+      callID?: string;
+      args?: Record<string, unknown>;
+    }) => {
       if (input.tool === "write") {
-        const filePath = getFilePath(input.args)
+        const filePath = getFilePath(input.args);
         if (filePath) {
-          const absPath = resolvePath(filePath)
-          let type: "added" | "modified" = "modified"
+          const absPath = resolvePath(filePath);
+          let type: "added" | "modified" = "modified";
           try {
             if (typeof fs.existsSync === "function") {
-              type = fs.existsSync(absPath) ? "modified" : "added"
+              type = fs.existsSync(absPath) ? "modified" : "added";
             }
           } catch {
-            type = "modified"
+            type = "modified";
           }
-          const key = input.callID ?? `write-${++writeCounter}-${filePath}`
-          pendingToolChanges.set(key, { path: filePath, type })
+          const key = input.callID ?? `write-${++writeCounter}-${filePath}`;
+          pendingToolChanges.set(key, { path: filePath, type });
         }
       }
 
@@ -219,8 +241,8 @@ export const ECCHooksPlugin: ECCHooksPluginFn = async ({
       ) {
         log(
           "info",
-          "[ECC] Remember to review changes before pushing: git diff origin/main...HEAD"
-        )
+          "[ECC] Remember to review changes before pushing: git diff origin/main...HEAD",
+        );
       }
 
       // Block creation of unnecessary documentation files
@@ -230,7 +252,7 @@ export const ECCHooksPlugin: ECCHooksPluginFn = async ({
         input.args?.filePath &&
         typeof input.args.filePath === "string"
       ) {
-        const filePath = input.args.filePath
+        const filePath = input.args.filePath;
         if (
           filePath.match(/\.(md|txt)$/i) &&
           !filePath.includes("README") &&
@@ -240,14 +262,17 @@ export const ECCHooksPlugin: ECCHooksPluginFn = async ({
         ) {
           log(
             "warn",
-            `[ECC] Creating ${filePath} - consider if this documentation is necessary`
-          )
+            `[ECC] Creating ${filePath} - consider if this documentation is necessary`,
+          );
         }
       }
 
       // Long-running command reminder
-      if (hookEnabled("pre:bash:tmux-reminder", "strict") && input.tool === "bash") {
-        const cmd = String(input.args?.command || input.args || "")
+      if (
+        hookEnabled("pre:bash:tmux-reminder", "strict") &&
+        input.tool === "bash"
+      ) {
+        const cmd = String(input.args?.command || input.args || "");
         if (
           cmd.match(/^(npm|pnpm|yarn|bun)\s+(install|build|test|run)/) ||
           cmd.match(/^cargo\s+(build|test|run)/) ||
@@ -255,8 +280,8 @@ export const ECCHooksPlugin: ECCHooksPluginFn = async ({
         ) {
           log(
             "info",
-            "[ECC] Long-running command detected - consider using background execution"
-          )
+            "[ECC] Long-running command detected - consider using background execution",
+          );
         }
       }
     },
@@ -269,15 +294,17 @@ export const ECCHooksPlugin: ECCHooksPluginFn = async ({
      * Action: Loads context and displays welcome message
      */
     "session.created": async () => {
-      if (!hookEnabled("session:start", ["minimal", "standard", "strict"])) return
+      if (!hookEnabled("session:start", ["minimal", "standard", "strict"]))
+        return;
 
-      log("info", `[ECC] Session started - profile=${currentProfile}`)
+      log("info", `[ECC] Session started - profile=${currentProfile}`);
 
       // Check for project-specific context files
       try {
-        const hasClaudeMd = await $`test -f ${worktree}/CLAUDE.md && echo "yes"`.text()
+        const hasClaudeMd =
+          await $`test -f ${worktree}/CLAUDE.md && echo "yes"`.text();
         if (hasClaudeMd.trim() === "yes") {
-          log("info", "[ECC] Found CLAUDE.md - loading project context")
+          log("info", "[ECC] Found CLAUDE.md - loading project context");
         }
       } catch {
         // No CLAUDE.md found
@@ -292,23 +319,31 @@ export const ECCHooksPlugin: ECCHooksPluginFn = async ({
      * Action: Runs console.log audit on all edited files
      */
     "session.idle": async () => {
-      if (!hookEnabled("stop:check-console-log", ["minimal", "standard", "strict"])) return
-      if (editedFiles.size === 0) return
+      if (
+        !hookEnabled("stop:check-console-log", [
+          "minimal",
+          "standard",
+          "strict",
+        ])
+      )
+        return;
+      if (editedFiles.size === 0) return;
 
-      log("info", "[ECC] Session idle - running console.log audit")
+      log("info", "[ECC] Session idle - running console.log audit");
 
-      let totalConsoleLogCount = 0
-      const filesWithConsoleLogs: string[] = []
+      let totalConsoleLogCount = 0;
+      const filesWithConsoleLogs: string[] = [];
 
       for (const file of editedFiles) {
-        if (!file.match(/\.(ts|tsx|js|jsx)$/)) continue
+        if (!file.match(/\.(ts|tsx|js|jsx)$/)) continue;
 
         try {
-          const result = await $`grep -c "console\\.log" ${file} 2>/dev/null`.text()
-          const count = parseInt(result.trim(), 10)
+          const result =
+            await $`grep -c "console\\.log" ${file} 2>/dev/null`.text();
+          const count = parseInt(result.trim(), 10);
           if (count > 0) {
-            totalConsoleLogCount += count
-            filesWithConsoleLogs.push(file)
+            totalConsoleLogCount += count;
+            filesWithConsoleLogs.push(file);
           }
         } catch {
           // No console.log found
@@ -318,25 +353,23 @@ export const ECCHooksPlugin: ECCHooksPluginFn = async ({
       if (totalConsoleLogCount > 0) {
         log(
           "warn",
-          `[ECC] Audit: ${totalConsoleLogCount} console.log statement(s) in ${filesWithConsoleLogs.length} file(s)`
-        )
-        filesWithConsoleLogs.forEach((f) =>
-          log("warn", `  - ${f}`)
-        )
-        log("warn", "[ECC] Remove console.log statements before committing")
+          `[ECC] Audit: ${totalConsoleLogCount} console.log statement(s) in ${filesWithConsoleLogs.length} file(s)`,
+        );
+        filesWithConsoleLogs.forEach((f) => log("warn", `  - ${f}`));
+        log("warn", "[ECC] Remove console.log statements before committing");
       } else {
-        log("info", "[ECC] Audit passed: No console.log statements found")
+        log("info", "[ECC] Audit passed: No console.log statements found");
       }
 
       // Desktop notification (macOS)
       try {
-        await $`osascript -e 'display notification "Task completed!" with title "OpenCode ECC"' 2>/dev/null`
+        await $`osascript -e 'display notification "Task completed!" with title "OpenCode ECC"' 2>/dev/null`;
       } catch {
         // Notification not supported or failed
       }
 
       // Clear tracked files for next task
-      editedFiles.clear()
+      editedFiles.clear();
     },
 
     /**
@@ -347,11 +380,12 @@ export const ECCHooksPlugin: ECCHooksPluginFn = async ({
      * Action: Final cleanup and state saving
      */
     "session.deleted": async () => {
-      if (!hookEnabled("session:end-marker", ["minimal", "standard", "strict"])) return
-      log("info", "[ECC] Session ended - cleaning up")
-      editedFiles.clear()
-      clearChanges()
-      pendingToolChanges.clear()
+      if (!hookEnabled("session:end-marker", ["minimal", "standard", "strict"]))
+        return;
+      log("info", "[ECC] Session ended - cleaning up");
+      editedFiles.clear();
+      clearChanges();
+      pendingToolChanges.clear();
     },
 
     /**
@@ -362,12 +396,13 @@ export const ECCHooksPlugin: ECCHooksPluginFn = async ({
      * Action: Updates tracking
      */
     "file.watcher.updated": async (event: { path: string; type: string }) => {
-      let changeType: "added" | "modified" | "deleted" = "modified"
-      if (event.type === "create" || event.type === "add") changeType = "added"
-      else if (event.type === "delete" || event.type === "remove") changeType = "deleted"
-      recordChange(event.path, changeType)
+      let changeType: "added" | "modified" | "deleted" = "modified";
+      if (event.type === "create" || event.type === "add") changeType = "added";
+      else if (event.type === "delete" || event.type === "remove")
+        changeType = "deleted";
+      recordChange(event.path, changeType);
       if (event.type === "change" && event.path.match(/\.(ts|tsx|js|jsx)$/)) {
-        editedFiles.add(event.path)
+        editedFiles.add(event.path);
       }
     },
 
@@ -378,11 +413,13 @@ export const ECCHooksPlugin: ECCHooksPluginFn = async ({
      * Triggers: When todo list is updated
      * Action: Logs progress
      */
-    "todo.updated": async (event: { todos: Array<{ text: string; done: boolean }> }) => {
-      const completed = event.todos.filter((t) => t.done).length
-      const total = event.todos.length
+    "todo.updated": async (event: {
+      todos: Array<{ text: string; done: boolean }>;
+    }) => {
+      const completed = event.todos.filter((t) => t.done).length;
+      const total = event.todos.length;
       if (total > 0) {
-        log("info", `[ECC] Progress: ${completed}/${total} tasks completed`)
+        log("info", `[ECC] Progress: ${completed}/${total} tasks completed`);
       }
     },
 
@@ -400,7 +437,7 @@ export const ECCHooksPlugin: ECCHooksPluginFn = async ({
         ECC_HOOK_PROFILE: currentProfile,
         ECC_DISABLED_HOOKS: process.env.ECC_DISABLED_HOOKS || "",
         PROJECT_ROOT: worktree || directory,
-      }
+      };
 
       // Detect package manager
       const lockfiles: Record<string, string> = {
@@ -408,12 +445,12 @@ export const ECCHooksPlugin: ECCHooksPluginFn = async ({
         "pnpm-lock.yaml": "pnpm",
         "yarn.lock": "yarn",
         "package-lock.json": "npm",
-      }
+      };
       for (const [lockfile, pm] of Object.entries(lockfiles)) {
         try {
-          await $`test -f ${worktree}/${lockfile}`
-          env.PACKAGE_MANAGER = pm
-          break
+          await $`test -f ${worktree}/${lockfile}`;
+          env.PACKAGE_MANAGER = pm;
+          break;
         } catch {
           // Not found, try next
         }
@@ -426,22 +463,22 @@ export const ECCHooksPlugin: ECCHooksPluginFn = async ({
         "pyproject.toml": "python",
         "Cargo.toml": "rust",
         "Package.swift": "swift",
-      }
-      const detected: string[] = []
+      };
+      const detected: string[] = [];
       for (const [file, lang] of Object.entries(langDetectors)) {
         try {
-          await $`test -f ${worktree}/${file}`
-          detected.push(lang)
+          await $`test -f ${worktree}/${file}`;
+          detected.push(lang);
         } catch {
           // Not found
         }
       }
       if (detected.length > 0) {
-        env.DETECTED_LANGUAGES = detected.join(",")
-        env.PRIMARY_LANGUAGE = detected[0]
+        env.DETECTED_LANGUAGES = detected.join(",");
+        env.PRIMARY_LANGUAGE = detected[0];
       }
 
-      return env
+      return env;
     },
 
     /**
@@ -465,21 +502,22 @@ export const ECCHooksPlugin: ECCHooksPluginFn = async ({
         "- Immutability: never mutate, always return new copies",
         "- Security: validate inputs, no hardcoded secrets",
         "",
-      ]
+      ];
 
       // Include recently edited files
       if (editedFiles.size > 0) {
-        contextBlock.push("## Recently Edited Files")
+        contextBlock.push("## Recently Edited Files");
         for (const f of editedFiles) {
-          contextBlock.push(`- ${f}`)
+          contextBlock.push(`- ${f}`);
         }
-        contextBlock.push("")
+        contextBlock.push("");
       }
 
       return {
         context: contextBlock.join("\n"),
-        compaction_prompt: "Focus on preserving: 1) Current task status and progress, 2) Key decisions made, 3) Files created/modified, 4) Remaining work items, 5) Any security concerns flagged. Discard: verbose tool outputs, intermediate exploration, redundant file listings.",
-      }
+        compaction_prompt:
+          "Focus on preserving: 1) Current task status and progress, 2) Key decisions made, 3) Files created/modified, 4) Remaining work items, 5) Any security concerns flagged. Discard: verbose tool outputs, intermediate exploration, redundant file listings.",
+      };
     },
 
     /**
@@ -490,33 +528,41 @@ export const ECCHooksPlugin: ECCHooksPluginFn = async ({
      * Action: Auto-approve reads, formatters, and test commands; log all for audit
      */
     "permission.ask": async (event: { tool: string; args: unknown }) => {
-      log("info", `[ECC] Permission requested for: ${event.tool}`)
+      log("info", `[ECC] Permission requested for: ${event.tool}`);
 
-      const cmd = String((event.args as Record<string, unknown>)?.command || event.args || "")
+      const cmd = String(
+        (event.args as Record<string, unknown>)?.command || event.args || "",
+      );
 
       // Auto-approve: read/search tools
       if (["read", "glob", "grep", "search", "list"].includes(event.tool)) {
-        return { approved: true, reason: "Read-only operation" }
+        return { approved: true, reason: "Read-only operation" };
       }
 
       // Auto-approve: formatters
-      if (event.tool === "bash" && /^(npx )?(prettier|biome|black|gofmt|rustfmt|swift-format)/.test(cmd)) {
-        return { approved: true, reason: "Formatter execution" }
+      if (
+        event.tool === "bash" &&
+        /^(npx )?(prettier|biome|black|gofmt|rustfmt|swift-format)/.test(cmd)
+      ) {
+        return { approved: true, reason: "Formatter execution" };
       }
 
       // Auto-approve: test execution
-      if (event.tool === "bash" && /^(npm test|npx vitest|npx jest|pytest|go test|cargo test)/.test(cmd)) {
-        return { approved: true, reason: "Test execution" }
+      if (
+        event.tool === "bash" &&
+        /^(npm test|npx vitest|npx jest|pytest|go test|cargo test)/.test(cmd)
+      ) {
+        return { approved: true, reason: "Test execution" };
       }
 
       // Everything else: let user decide
-      return { approved: undefined }
+      return { approved: undefined };
     },
 
     tool: {
       "changed-files": changedFilesTool,
     },
-  }
-}
+  };
+};
 
-export default ECCHooksPlugin
+export default ECCHooksPlugin;

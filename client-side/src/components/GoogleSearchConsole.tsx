@@ -1,11 +1,11 @@
-import { siteConfig } from '@/lib/seo';
+import { siteConfig } from "@/lib/seo";
 
 export function GoogleSearchConsole() {
-    const verification = siteConfig.googleVerification;
+  const verification = siteConfig.googleVerification;
 
-    if (!verification) {
-        return null;
-    }
+  if (!verification) {
+    return null;
+  }
 
-    return <meta name="google-site-verification" content={verification} />;
+  return <meta name="google-site-verification" content={verification} />;
 }
