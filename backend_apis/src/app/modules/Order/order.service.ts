@@ -3,7 +3,6 @@ import { AppError } from '../../utils';
 import { IUser } from '../User/user.interface';
 import { ProductModel } from '../Product/product.model';
 import { OrderModel } from './order.model';
-import { DELIVERY_AREA } from './order.constants';
 import {
     IOrderItemSnapshot,
     TOrderState,
@@ -11,8 +10,8 @@ import {
     TPaymentMethodInput,
     TPaymentStatus,
 } from './order.interface';
-import { calculateCodEligibility, calculateShippingCharge, deriveShippingZone, getTotalWeightKg, normalizePaymentMethod } from './order.utils';
-import { findCoupon } from './order.coupons';
+import { normalizePaymentMethod } from './order.utils';
+import { CouponService } from '../Coupon/coupon.service';
 
 type CreateOrderPayload = {
     items: Array<{ sku: string; quantity: number }>;
@@ -108,36 +107,20 @@ const buildOrderSnapshot = (product: ProductForCheckout, quantity: number): IOrd
     };
 };
 
-const calculateOrderTotals = (payload: CreateOrderPayload, items: IOrderItemSnapshot[]) => {
-    const subtotal = items.reduce((sum, item) => sum + item.lineTotal, 0);
-    const totalWeightKg = getTotalWeightKg(items.reduce((sum, item) => sum + item.weightKg * item.quantity, 0));
-    const shippingZone = deriveShippingZone(payload.customer.city, payload.customer.address);
-    const coupon = payload.couponCode ? findCoupon(payload.couponCode, subtotal) : null;
-    const discount = coupon?.kind === 'percent' ? (subtotal * coupon.value) / 100 : 0;
-    const shippingCharge =
-        coupon?.kind === 'shipping'
-            ? 0
-            : calculateShippingCharge({
-                  totalWeightKg,
-                  deliveryArea:
-                      shippingZone === 'inside_dhaka' ? DELIVERY_AREA.INSIDE_DHAKA : DELIVERY_AREA.OUTSIDE_DHAKA,
-              });
-    const codEligibility = calculateCodEligibility({
-        subtotal,
-        itemBlocksCod: items.some(item => item.isNoCOD),
+const calculateOrderTotals = (payload: CreateOrderPayload, items: IOrderItemSnapshot[]) =>
+    CouponService.calculateCouponCheckoutSummary({
+        couponCode: payload.couponCode,
+        items: items.map(item => ({
+            unitPrice: item.unitPrice,
+            quantity: item.quantity,
+            weightKg: item.weightKg,
+            isNoCOD: item.isNoCOD,
+        })),
+        city: payload.customer.city,
+        address: payload.customer.address,
     });
 
-    return {
-        subtotal,
-        discount,
-        totalWeightKg,
-        shippingZone,
-        shippingCharge,
-        codEligibility,
-        payableAmount: Math.max(subtotal - discount + shippingCharge, 0),
-    };
-};
-
+// 1. previewCheckoutFromDB
 const previewCheckoutFromDB = async (payload: CreateOrderPayload) => {
     const skuList = payload.items.map(item => item.sku);
     const products = (await ProductModel.find({ sku: { $in: skuList }, isActive: true })
@@ -171,7 +154,7 @@ const previewCheckoutFromDB = async (payload: CreateOrderPayload) => {
         return buildOrderSnapshot(product, item.quantity);
     });
 
-    const { subtotal, discount, totalWeightKg, shippingZone, shippingCharge, codEligibility, payableAmount } = calculateOrderTotals(
+    const { subtotal, discount, totalWeightKg, shippingZone, shippingCharge, codEligible, codReasons, codUnavailableReasons, payableAmount } = await calculateOrderTotals(
         payload,
         items,
     );
@@ -183,15 +166,16 @@ const previewCheckoutFromDB = async (payload: CreateOrderPayload) => {
         shippingZone,
         shippingCharge,
         totalWeightKg,
-        codEligible: codEligibility.eligible,
-        codAvailable: codEligibility.codAvailable,
-        codReasons: codEligibility.reasons,
-        codUnavailableReasons: codEligibility.codUnavailableReasons,
+        codEligible,
+        codAvailable: codEligible,
+        codReasons,
+        codUnavailableReasons,
         total: payableAmount,
         payableAmount,
     };
 };
 
+// 2. createOrderIntoDB
 const createOrderIntoDB = async (user: IUser, payload: CreateOrderPayload) => {
     const skuList = payload.items.map(item => item.sku);
     const products = (await ProductModel.find({ sku: { $in: skuList }, isActive: true })
@@ -233,7 +217,7 @@ const createOrderIntoDB = async (user: IUser, payload: CreateOrderPayload) => {
             updatedStocks.push({ sku: item.sku, quantity: item.quantity });
         }
 
-        const { subtotal, discount, totalWeightKg, shippingZone, shippingCharge, codEligibility, payableAmount } = calculateOrderTotals(
+        const { subtotal, discount, totalWeightKg, shippingZone, shippingCharge, codEligible, codReasons, payableAmount, coupon } = await calculateOrderTotals(
             payload,
             items,
         );
@@ -241,10 +225,10 @@ const createOrderIntoDB = async (user: IUser, payload: CreateOrderPayload) => {
         const total = payableAmount;
         const normalizedPaymentMethod = normalizePaymentMethod(payload.paymentMethod);
 
-        if (normalizedPaymentMethod === 'CASH_ON_DELIVERY' && !codEligibility.eligible) {
+        if (normalizedPaymentMethod === 'CASH_ON_DELIVERY' && !codEligible) {
             throw new AppError(
                 httpStatus.BAD_REQUEST,
-                codEligibility.reasons.includes('COD is not available for one or more products in your cart.')
+                codReasons.includes('COD is not available for one or more products in your cart.')
                     ? 'COD is not available for one or more products in your cart.'
                     : 'COD is not available for orders of 1000 BDT or below.',
             );
@@ -269,13 +253,13 @@ const createOrderIntoDB = async (user: IUser, payload: CreateOrderPayload) => {
             shippingZone,
             shippingCharge,
             totalWeightKg,
-            codEligible: codEligibility.eligible,
-            codReasons: codEligibility.reasons,
+            codEligible,
+            codReasons,
             total,
             totalAmount: total,
             payableAmount: total,
             currency: 'BDT',
-            couponCode: payload.couponCode || undefined,
+            couponCode: coupon?.code,
             paymentMethod: normalizedPaymentMethod,
             paymentGateway,
             paymentStatus,
@@ -295,10 +279,12 @@ const createOrderIntoDB = async (user: IUser, payload: CreateOrderPayload) => {
     }
 };
 
+// 3. getMyOrdersFromDB
 const getMyOrdersFromDB = async (user: IUser) => {
     return OrderModel.find({ user: user._id }).sort({ createdAt: -1 }).lean();
 };
 
+// 4. getSingleOrderForUserFromDB
 const getSingleOrderForUserFromDB = async (user: IUser, orderId: string) => {
     const order = await OrderModel.findOne({ orderId, user: user._id }).lean();
 
@@ -309,6 +295,7 @@ const getSingleOrderForUserFromDB = async (user: IUser, orderId: string) => {
     return order;
 };
 
+// 5. getAllOrdersForAdminFromDB
 const getAllOrdersForAdminFromDB = async (query: Record<string, unknown>) => {
     const page = Number(query.page) || 1;
     const limit = Number(query.limit) || 50;
@@ -341,6 +328,7 @@ const getAllOrdersForAdminFromDB = async (query: Record<string, unknown>) => {
     };
 };
 
+// 6. updateOrderStatusIntoDB
 const updateOrderStatusIntoDB = async (orderId: string, status: TOrderState) => {
     const order = await OrderModel.findOneAndUpdate(
         { orderId },
@@ -355,6 +343,7 @@ const updateOrderStatusIntoDB = async (orderId: string, status: TOrderState) => 
     return order;
 };
 
+// 7. getOrderByIdFromDB
 const getOrderByIdFromDB = async (orderId: string) => {
     const order = await OrderModel.findOne({ orderId }).lean();
 
@@ -365,6 +354,7 @@ const getOrderByIdFromDB = async (orderId: string) => {
     return order;
 };
 
+// 8. updateOrderPaymentIntoDB
 const updateOrderPaymentIntoDB = async (
     orderId: string,
     payload: Partial<{
@@ -400,8 +390,8 @@ const updateOrderPaymentIntoDB = async (
 };
 
 export const OrderService = {
-    createOrderIntoDB,
     previewCheckoutFromDB,
+    createOrderIntoDB,
     getMyOrdersFromDB,
     getSingleOrderForUserFromDB,
     getAllOrdersForAdminFromDB,

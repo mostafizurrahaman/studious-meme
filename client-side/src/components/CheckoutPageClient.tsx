@@ -28,6 +28,7 @@ export function CheckoutPageClient() {
     const hydrated = useCartStore(state => state.hydrated);
     const checkout = useCartStore(state => state.checkout);
     const appliedCoupon = useCartStore(state => state.appliedCoupon);
+    const couponVerification = useCartStore(state => state.couponVerification);
     const updateCheckout = useCartStore(state => state.updateCheckout);
     const clear = useCartStore(state => state.clear);
     const replaceItems = useCartStore(state => state.replaceItems);
@@ -41,7 +42,7 @@ export function CheckoutPageClient() {
         items,
         city: checkout.city,
         address: checkout.address,
-        couponCode: appliedCoupon?.code,
+        couponSummary: couponVerification,
     });
     const paymentValue = getCheckoutPaymentLabel(checkout.payment);
     const selectedPayment =

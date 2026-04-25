@@ -11,6 +11,7 @@ import { getAllCategories } from '@/services/Category';
 import { getAllOrdersForAdmin, getMyOrders } from '@/services/Order';
 import { getAllPaymentsForAdmin, getMyPayments } from '@/services/Payment';
 import { getAllProducts } from '@/services/Product';
+// import { getAllCoupons } from '@/services/Coupon/admin';
 
 import { getDashboardPathByRole } from '@/lib/auth/roles';
 import { getDashboardRoleConfig } from '@/lib/dashboard-navigation';
@@ -208,6 +209,7 @@ export async function RoleDashboardPage({ role }: { role: AuthRole }) {
     usersResult,
     ordersResult,
     paymentsResult,
+    // couponsResult,
     adminsResult,
   ] = await Promise.all([
     getAllCategories().catch(() => null),
@@ -216,6 +218,7 @@ export async function RoleDashboardPage({ role }: { role: AuthRole }) {
     getAllUsers().catch(() => null),
     getAllOrdersForAdmin().catch(() => null),
     getAllPaymentsForAdmin().catch(() => null),
+    // getAllCoupons({ limit: 1 }).catch(() => null),
     role === 'SUPER_ADMIN' ? getAllAdmins().catch(() => null) : Promise.resolve(null),
   ]);
 
@@ -250,6 +253,12 @@ export async function RoleDashboardPage({ role }: { role: AuthRole }) {
       value: String(countItems(paymentsResult)),
       description: 'Payment records and statuses',
     },
+    // TODO: add coupons back
+    // {
+    //   label: 'Coupons',
+    //   value: String(countItems(couponsResult)),
+    //   description: 'Discount codes configured in backend',
+    // },
     ...(role === 'SUPER_ADMIN'
       ? [
           {

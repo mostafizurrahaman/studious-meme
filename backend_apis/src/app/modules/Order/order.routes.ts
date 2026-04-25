@@ -13,6 +13,18 @@ import { OrderValidation } from './order.validation';
 
 const router = Router();
 
+// 1. previewCheckout
+router
+    .route('/checkout-preview')
+    .post(
+        auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN),
+        actionLimiter,
+        burstProtection('action', 10_000, 12),
+        validateRequest(OrderValidation.orderCheckoutPreviewSchema),
+        OrderController.previewCheckout,
+    );
+
+// 2. createOrder
 router
     .route('/checkout')
     .post(
@@ -24,32 +36,27 @@ router
         OrderController.createOrder,
     );
 
-router
-    .route('/checkout-preview')
-    .post(
-        auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN),
-        actionLimiter,
-        burstProtection('action', 10_000, 12),
-        validateRequest(OrderValidation.orderCheckoutPreviewSchema),
-        OrderController.previewCheckout,
-    );
-
+// 3. getMyOrders
 router
     .route('/my-orders')
     .get(auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN), actionLimiter, OrderController.getMyOrders);
 
+// 4. getMySingleOrder
 router
     .route('/my-orders/:orderId')
     .get(auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN), actionLimiter, OrderController.getMySingleOrder);
 
+// 5. getSingleOrder
 router
     .route('/orders/:orderId')
     .get(auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN), actionLimiter, OrderController.getSingleOrder);
 
+// 6. getAllOrdersForAdmin
 router
     .route('/admin/orders')
     .get(auth(ROLE.ADMIN, ROLE.SUPER_ADMIN), adminLimiter, OrderController.getAllOrdersForAdmin);
 
+// 7. updateOrderStatus
 router
     .route('/admin/orders/:orderId/status')
     .patch(

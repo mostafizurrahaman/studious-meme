@@ -132,6 +132,7 @@ export function DashboardUsersManager({
             <CardContent className="space-y-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <TableFilter
+                        key={searchTerm}
                         value={searchTerm}
                         onChange={value => updateQuery({ page: 1, searchTerm: value })}
                         placeholder="Search users..."

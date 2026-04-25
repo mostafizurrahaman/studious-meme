@@ -4,6 +4,7 @@ import { PaymentService } from './payment.service';
 
 const getSingleParam = (value: string | string[]) => (Array.isArray(value) ? value[0] : value);
 
+// 1. initiatePortPosPayment
 const initiatePortPosPayment = asyncHandler(async (req, res) => {
     const result = await PaymentService.initiatePortPosPayment(req.user, getSingleParam(req.params.orderId));
 
@@ -14,6 +15,7 @@ const initiatePortPosPayment = asyncHandler(async (req, res) => {
     });
 });
 
+// 2. portPosIpn
 const portPosIpn = asyncHandler(async (req, res) => {
     const result = await PaymentService.handlePortPosIpn({
         ...req.query,
@@ -27,6 +29,7 @@ const portPosIpn = asyncHandler(async (req, res) => {
     });
 });
 
+// 3. verifyPortPosPayment
 const verifyPortPosPayment = asyncHandler(async (req, res) => {
     const result = await PaymentService.verifyPortPosPayment(req.user, getSingleParam(req.params.orderId));
 
@@ -37,6 +40,7 @@ const verifyPortPosPayment = asyncHandler(async (req, res) => {
     });
 });
 
+// 4. refundPortPosPayment
 const refundPortPosPayment = asyncHandler(async (req, res) => {
     const result = await PaymentService.refundPayment(getSingleParam(req.params.orderId), req.body.amount);
 
@@ -47,6 +51,7 @@ const refundPortPosPayment = asyncHandler(async (req, res) => {
     });
 });
 
+// 5. getMyPayments
 const getMyPayments = asyncHandler(async (req, res) => {
     const result = await PaymentService.getMyPaymentsFromDB(req.user);
 
@@ -57,6 +62,7 @@ const getMyPayments = asyncHandler(async (req, res) => {
     });
 });
 
+// 6. getAllPaymentsForAdmin
 const getAllPaymentsForAdmin = asyncHandler(async (req, res) => {
     const result = await PaymentService.getAllPaymentsForAdminFromDB(req.query);
 

@@ -24,6 +24,8 @@ export function CartPageClient() {
     const hydrated = useCartStore(state => state.hydrated);
     const couponCode = useCartStore(state => state.couponCode);
     const appliedCoupon = useCartStore(state => state.appliedCoupon);
+    const couponVerification = useCartStore(state => state.couponVerification);
+    const isApplyingCoupon = useCartStore(state => state.isApplyingCoupon);
     const clear = useCartStore(state => state.clear);
     const checkout = useCartStore(state => state.checkout);
     const count = useCartStore(state => state.items.reduce((sum, item) => sum + item.quantity, 0));
@@ -35,14 +37,13 @@ export function CartPageClient() {
     const clearCoupon = useCartStore(state => state.clearCoupon);
     const updateCheckout = useCartStore(state => state.updateCheckout);
     const replaceItems = useCartStore(state => state.replaceItems);
-    const [couponMessage, setCouponMessage] = useState('');
     const [toast, setToast] = useState('');
 
     const fulfillment = calculateFulfillmentSummary({
         items,
         city: checkout.city,
         address: checkout.address,
-        couponCode: appliedCoupon?.code,
+        couponSummary: couponVerification,
     });
     const paymentValue = getCheckoutPaymentLabel(checkout.payment);
     const selectedPayment =
@@ -250,26 +251,24 @@ export function CartPageClient() {
                                 />
                                 <Button
                                     type="button"
+                                    disabled={isApplyingCoupon}
                                     onClick={() => {
-                                        const success = applyCoupon();
-                                        setCouponMessage(success ? 'Coupon applied' : 'Invalid coupon code');
-                                        setToast(
-                                            success
-                                                ? 'Coupon applied successfully.'
-                                                : 'Coupon code was not recognized.',
-                                        );
-                                        window.setTimeout(() => setToast(''), 2200);
+                                        void (async () => {
+                                            const result = await applyCoupon();
+                                            setToast(result.message);
+                                            window.setTimeout(() => setToast(''), 2200);
+                                        })();
                                     }}
                                     className="h-11 rounded-full px-5 text-sm font-bold shadow-sm"
                                 >
-                                    Apply coupon
+                                    {isApplyingCoupon ? 'Verifying...' : 'Apply coupon'}
                                 </Button>
                                 {appliedCoupon ? (
                                     <Button
                                         type="button"
                                         onClick={() => {
                                             clearCoupon();
-                                            setCouponMessage('');
+                                            setToast('');
                                         }}
                                         variant="outline"
                                         className="h-11 rounded-full border-border px-5 text-sm font-semibold text-foreground/70"
@@ -279,10 +278,9 @@ export function CartPageClient() {
                                 ) : null}
                             </div>
                             <div className="mt-3 text-sm text-foreground/55">
-                                {couponMessage ||
-                                    (appliedCoupon
-                                        ? `Applied ${appliedCoupon.code} · ${appliedCoupon.label}`
-                                        : 'Try SAVE10, MALAMAL5 or FREESHIP')}
+                                {appliedCoupon
+                                    ? `Applied ${appliedCoupon.code} · ${appliedCoupon.label}`
+                                    : couponVerification?.message || 'Enter a coupon code issued by the admin.'}
                             </div>
                         </Card>
                     </Card>

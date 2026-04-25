@@ -57,7 +57,7 @@ const NotFound = () => {
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                className="flex items-center justify-center gap-2 rounded-lg border border-border bg-background px-3 py-3 text-sm font-semibold transition hover:border-primary/35 hover:bg-primary hover:text-white md:justify-start"
+                                className="flex items-center justify-center gap-2 rounded-lg border border-border bg-background px-3 py-3 text-sm font-semibold transition hover:border-primary/35 hover:bg-primary hover:text-white! md:justify-start"
                             >
                                 <item.icon className="size-4" />
                                 {item.label}

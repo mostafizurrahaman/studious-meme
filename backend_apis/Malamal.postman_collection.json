@@ -945,6 +945,236 @@
             ]
         },
         {
+            "name": "Coupon",
+            "item": [
+                {
+                    "name": "Verify Coupon",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/coupon/verify",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "coupon",
+                                "verify"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"couponCode\": \"WELCOME10\",\n  \"city\": \"Dhaka\",\n  \"address\": \"House 12, Road 5, Dhaka\",\n  \"items\": [\n    {\n      \"unitPrice\": 12500,\n      \"quantity\": 2,\n      \"weightKg\": 2.4,\n      \"isNoCOD\": false\n    }\n  ]\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Coupon",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{adminAccessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/coupon/admin",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "coupon",
+                                "admin"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"code\": \"WELCOME10\",\n  \"label\": \"10% off\",\n  \"description\": \"Welcome offer for new and returning customers\",\n  \"discountType\": \"PERCENTAGE\",\n  \"discountValue\": 10,\n  \"minSubtotal\": 5000,\n  \"expiresAt\": \"2027-12-31T23:59:59+06:00\",\n  \"isActive\": true\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get All Coupons",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{adminAccessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/coupon/admin?page=1&limit=10&searchTerm=welcome&isActive=true&discountType=PERCENTAGE",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "coupon",
+                                "admin"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10"
+                                },
+                                {
+                                    "key": "searchTerm",
+                                    "value": "welcome"
+                                },
+                                {
+                                    "key": "isActive",
+                                    "value": "true"
+                                },
+                                {
+                                    "key": "discountType",
+                                    "value": "PERCENTAGE"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Coupon",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{adminAccessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/coupon/admin/:couponId",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "coupon",
+                                "admin",
+                                ":couponId"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Coupon",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{adminAccessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/coupon/admin/:couponId",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "coupon",
+                                "admin",
+                                ":couponId"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"label\": \"12% off\",\n  \"discountType\": \"PERCENTAGE\",\n  \"discountValue\": 12,\n  \"minSubtotal\": 6500,\n  \"expiresAt\": \"2028-12-31T23:59:59+06:00\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Coupon",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{adminAccessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/coupon/admin/:couponId",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "coupon",
+                                "admin",
+                                ":couponId"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Coupon Status",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{adminAccessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/coupon/admin/:couponId/status",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "coupon",
+                                "admin",
+                                ":couponId",
+                                "status"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"isActive\": false\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
             "name": "Comparison History",
             "item": [
                 {
@@ -2269,7 +2499,7 @@
                         },
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"items\": [\n    {\n      \"sku\": \"CDRILL-X1\",\n      \"quantity\": 2\n    }\n  ],\n  \"customer\": {\n    \"name\": \"John Doe\",\n    \"phone\": \"01700000000\",\n    \"email\": \"john@example.com\",\n    \"address\": \"House 12, Road 5, Dhaka\",\n    \"city\": \"Dhaka\",\n    \"note\": \"Call before delivery\"\n  },\n  \"couponCode\": \"SAVE10\",\n  \"paymentMethod\": \"PORTPOS\"\n}",
+                            "raw": "{\n  \"items\": [\n    {\n      \"sku\": \"CDRILL-X1\",\n      \"quantity\": 2\n    }\n  ],\n  \"customer\": {\n    \"name\": \"John Doe\",\n    \"phone\": \"01700000000\",\n    \"email\": \"john@example.com\",\n    \"address\": \"House 12, Road 5, Dhaka\",\n    \"city\": \"Dhaka\",\n    \"note\": \"Call before delivery\"\n  },\n  \"couponCode\": \"WELCOME10\",\n  \"paymentMethod\": \"PORTPOS\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -2302,7 +2532,7 @@
                         },
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"items\": [\n    {\n      \"sku\": \"CDRILL-X1\",\n      \"quantity\": 2\n    }\n  ],\n  \"customer\": {\n    \"name\": \"John Doe\",\n    \"phone\": \"01700000000\",\n    \"email\": \"john@example.com\",\n    \"address\": \"House 12, Road 5, Dhaka\",\n    \"city\": \"Dhaka\",\n    \"note\": \"Call before delivery\"\n  },\n  \"couponCode\": \"SAVE10\",\n  \"paymentMethod\": \"PORTPOS\"\n}",
+                            "raw": "{\n  \"items\": [\n    {\n      \"sku\": \"CDRILL-X1\",\n      \"quantity\": 2\n    }\n  ],\n  \"customer\": {\n    \"name\": \"John Doe\",\n    \"phone\": \"01700000000\",\n    \"email\": \"john@example.com\",\n    \"address\": \"House 12, Road 5, Dhaka\",\n    \"city\": \"Dhaka\",\n    \"note\": \"Call before delivery\"\n  },\n  \"couponCode\": \"WELCOME10\",\n  \"paymentMethod\": \"PORTPOS\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"

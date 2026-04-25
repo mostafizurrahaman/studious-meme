@@ -40,6 +40,7 @@ export function DashboardOrdersManager({
                         <TableRow>
                             <TableHead>Order</TableHead>
                             <TableHead>Customer</TableHead>
+                            <TableHead>Coupon</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead>Payment</TableHead>
                             <TableHead>Total</TableHead>
@@ -69,6 +70,15 @@ export function DashboardOrdersManager({
                                     <div className="text-xs text-muted-foreground">
                                         {order.customer.phone}
                                     </div>
+                                </TableCell>
+                                <TableCell>
+                                    {order.couponCode ? (
+                                        <Badge variant="outline" className="font-mono text-[11px]">
+                                            {order.couponCode}
+                                        </Badge>
+                                    ) : (
+                                        <span className="text-xs text-muted-foreground">No coupon</span>
+                                    )}
                                 </TableCell>
                                 <TableCell>
                                     <Badge variant="secondary">{order.status}</Badge>
@@ -113,7 +123,7 @@ export function DashboardOrdersManager({
                         ))}
                         {orders.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={8} className="h-24 text-center text-muted-foreground">
+                                <TableCell colSpan={9} className="h-24 text-center text-muted-foreground">
                                     No orders found.
                                 </TableCell>
                             </TableRow>

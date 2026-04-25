@@ -289,6 +289,8 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
     Products: ShoppingBag,
     Brands: BadgeCheck,
     Categories: Tags,
+    // TODO: add coupons back
+    // Coupons: Sparkles,
     Orders: ReceiptText,
     Payments: ReceiptText,
     Quotations: ReceiptText,
@@ -318,10 +320,18 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
       items: navItems.filter(item =>
         ['Admins', 'Hero Sections', 'Users', 'Products', 'Brands', 'Categories'].includes(item.label),
       ),
+      // TODO: add coupons back
+      // items: navItems.filter(item =>
+      //   ['Admins', 'Hero Sections', 'Users', 'Products', 'Brands', 'Categories', 'Coupons'].includes(
+      //     item.label,
+      //   ),
+      // ),
     },
     {
       label: 'Sales',
-      items: navItems.filter(item => ['Orders', 'Payments', 'Quotations', 'Wishlist', 'Compare', 'Cart'].includes(item.label)),
+      items: navItems.filter(item =>
+        ['Orders', 'Payments', 'Quotations', 'Wishlist', 'Compare', 'Cart'].includes(item.label),
+      ),
     },
     {
       label: 'Account',
@@ -404,11 +414,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
                             </span>
                           </SidebarMenuButton>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          align="start"
-                          side="right"
-                          className="w-52"
-                        >
+                        <DropdownMenuContent align="start" side="right" className="w-52">
                           {pageManagementItems.map(item => (
                             <DropdownMenuItem key={item.href} asChild>
                               <Link href={item.href}>{item.label}</Link>

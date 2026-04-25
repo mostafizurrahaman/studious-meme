@@ -6,6 +6,18 @@ import { OrderService } from './order.service';
 
 const getSingleParam = (value: string | string[]) => (Array.isArray(value) ? value[0] : value);
 
+// 1. previewCheckout
+const previewCheckout = asyncHandler(async (req, res) => {
+    const result = await OrderService.previewCheckoutFromDB(req.body);
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        message: 'Checkout preview generated successfully!',
+        data: result,
+    });
+});
+
+// 2. createOrder
 const createOrder = asyncHandler(async (req, res) => {
     const order = await OrderService.createOrderIntoDB(req.user, req.body);
 
@@ -33,16 +45,7 @@ const createOrder = asyncHandler(async (req, res) => {
     });
 });
 
-const previewCheckout = asyncHandler(async (req, res) => {
-    const result = await OrderService.previewCheckoutFromDB(req.body);
-
-    sendResponse(res, {
-        statusCode: httpStatus.OK,
-        message: 'Checkout preview generated successfully!',
-        data: result,
-    });
-});
-
+// 3. getMyOrders
 const getMyOrders = asyncHandler(async (req, res) => {
     const result = await OrderService.getMyOrdersFromDB(req.user);
 
@@ -53,6 +56,7 @@ const getMyOrders = asyncHandler(async (req, res) => {
     });
 });
 
+// 4. getMySingleOrder
 const getMySingleOrder = asyncHandler(async (req, res) => {
     const result = await OrderService.getSingleOrderForUserFromDB(
         req.user,
@@ -66,6 +70,7 @@ const getMySingleOrder = asyncHandler(async (req, res) => {
     });
 });
 
+// 5. getSingleOrder
 const getSingleOrder = asyncHandler(async (req, res) => {
     const orderId = getSingleParam(req.params.orderId);
 
@@ -81,6 +86,7 @@ const getSingleOrder = asyncHandler(async (req, res) => {
     });
 });
 
+// 6. getAllOrdersForAdmin
 const getAllOrdersForAdmin = asyncHandler(async (req, res) => {
     const result = await OrderService.getAllOrdersForAdminFromDB(req.query);
 
@@ -92,6 +98,7 @@ const getAllOrdersForAdmin = asyncHandler(async (req, res) => {
     });
 });
 
+// 7. updateOrderStatus
 const updateOrderStatus = asyncHandler(async (req, res) => {
     const result = await OrderService.updateOrderStatusIntoDB(
         getSingleParam(req.params.orderId),
@@ -106,8 +113,8 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 });
 
 export const OrderController = {
-    createOrder,
     previewCheckout,
+    createOrder,
     getMyOrders,
     getMySingleOrder,
     getSingleOrder,

@@ -68,7 +68,9 @@ export function DashboardBrandsManager({
   const [editingBrandImagePreview, setEditingBrandImagePreview] = useState('');
   const [editingBrandSlugSynced, setEditingBrandSlugSynced] = useState(true);
   const [isEditingDragging, setIsEditingDragging] = useState(false);
-  const [pendingDeleteBrand, setPendingDeleteBrand] = useState<Pick<BackendBrand, 'slug' | 'name'> | null>(null);
+  const [pendingDeleteBrand, setPendingDeleteBrand] = useState<Pick<BackendBrand, 'slug' | 'name'> | null>(
+    null,
+  );
   const imageInputRef = useRef<HTMLInputElement>(null);
   const editingImageInputRef = useRef<HTMLInputElement>(null);
 
@@ -344,6 +346,7 @@ export function DashboardBrandsManager({
             </CardDescription>
           </div>
           <TableFilter
+            key={searchTerm}
             value={searchTerm}
             onChange={value => updateQuery({ page: 1, searchTerm: value })}
             placeholder="Search brands..."

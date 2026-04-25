@@ -1,4 +1,4 @@
-import { findCoupon } from '@/lib/coupons';
+import type { CouponVerificationSummary } from '@/lib/coupons';
 
 export const COD_MIN_SUBTOTAL_BDT = 1000;
 
@@ -81,12 +81,12 @@ export function calculateFulfillmentSummary({
     items,
     city,
     address,
-    couponCode,
+    couponSummary,
 }: {
     items: FulfillmentItem[];
     city?: string;
     address?: string;
-    couponCode?: string;
+    couponSummary?: CouponVerificationSummary | null;
 }) {
     const subtotal = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
     const totalWeightKg = Number(
@@ -95,21 +95,36 @@ export function calculateFulfillmentSummary({
     const zone = deriveShippingZone(city, address);
     const shippingCharge = calculateShippingCharge({ totalWeightKg, zone });
     const cod = calculateCodEligibility(items, subtotal);
-    const coupon = couponCode?.trim() ? findCoupon(couponCode, subtotal) : null;
-    const discount = coupon?.kind === 'percent' ? (subtotal * coupon.value) / 100 : 0;
-    const effectiveShipping = coupon?.kind === 'shipping' ? 0 : shippingCharge;
-    const total = Math.max(subtotal - discount + effectiveShipping, 0);
+
+    if (couponSummary) {
+        return {
+            subtotal: couponSummary.subtotal,
+            discount: couponSummary.discount,
+            shippingCharge: couponSummary.shippingCharge,
+            baseShippingCharge: couponSummary.baseShippingCharge,
+            total: couponSummary.total,
+            totalWeightKg: couponSummary.totalWeightKg,
+            zone: couponSummary.shippingZone,
+            codEligible: couponSummary.codEligible,
+            codReasons: couponSummary.codReasons,
+            coupon: couponSummary.coupon,
+            couponMessage: couponSummary.message,
+            payableAmount: couponSummary.payableAmount,
+        };
+    }
 
     return {
         subtotal,
-        discount,
-        shippingCharge: effectiveShipping,
+        discount: 0,
+        shippingCharge,
         baseShippingCharge: shippingCharge,
-        total,
+        total: subtotal + shippingCharge,
         totalWeightKg,
         zone,
         codEligible: cod.eligible,
         codReasons: cod.reasons,
-        coupon,
+        coupon: null,
+        couponMessage: '',
+        payableAmount: subtotal + shippingCharge,
     };
 }

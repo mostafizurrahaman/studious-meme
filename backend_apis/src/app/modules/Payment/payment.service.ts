@@ -118,6 +118,7 @@ const buildPaymentRecordPayload = (order: PortPosOrderLean, transactionId: strin
     paymentUrl: order.gatewayUrl,
 });
 
+// 1. initiatePortPosPayment
 const initiatePortPosPayment = async (user: IUser, orderId: string): Promise<PortPosInitiationResult> => {
     requirePortPosConfig();
 
@@ -216,6 +217,7 @@ const initiatePortPosPayment = async (user: IUser, orderId: string): Promise<Por
     };
 };
 
+// helper: finalizePaymentFromGateway
 const finalizePaymentFromGateway = async (
     order: PortPosOrderLean,
     payment: PaymentRecordLike | null,
@@ -257,6 +259,7 @@ const finalizePaymentFromGateway = async (
     };
 };
 
+// 3. handlePortPosIpn
 const handlePortPosIpn = async (payload: GatewayPayload) => {
     requirePortPosConfig();
 
@@ -351,6 +354,7 @@ const handlePortPosIpn = async (payload: GatewayPayload) => {
     );
 };
 
+// 4. verifyPortPosPayment
 const verifyPortPosPayment = async (user: IUser, orderId: string) => {
     requirePortPosConfig();
 
@@ -451,6 +455,7 @@ const verifyPortPosPayment = async (user: IUser, orderId: string) => {
     };
 };
 
+// 5. refundPayment
 const refundPayment = async (orderId: string, amount?: number) => {
     requirePortPosConfig();
 
@@ -486,6 +491,7 @@ const refundPayment = async (orderId: string, amount?: number) => {
     return refundResponse;
 };
 
+// 6. getMyPaymentsFromDB
 const getMyPaymentsFromDB = async (user: IUser) => {
     return Payment.find({ user: user._id })
         .populate(
@@ -496,6 +502,7 @@ const getMyPaymentsFromDB = async (user: IUser) => {
         .lean();
 };
 
+// 7. getAllPaymentsForAdminFromDB
 const getAllPaymentsForAdminFromDB = async (query: Record<string, unknown>) => {
     const page = Number(query.page) || 1;
     const limit = Number(query.limit) || 50;

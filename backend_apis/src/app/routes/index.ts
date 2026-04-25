@@ -12,6 +12,7 @@ import { ProductRoutes } from '../modules/Product/product.routes';
 import { OrderRoutes } from '../modules/Order/order.routes';
 import { CartRoutes } from '../modules/Cart/cart.routes';
 import { WishlistHistoryRoutes } from '../modules/WishlistHistory/wishlistHistory.routes';
+import { CouponRoutes } from '../modules/Coupon/coupon.routes';
 
 const router = Router();
 
@@ -63,6 +64,10 @@ const moduleRoutes = [
     {
         path: '/payment',
         route: PaymentRoutes,
+    },
+    {
+        path: '/coupon',
+        route: CouponRoutes,
     },
     {
         path: '/contact',

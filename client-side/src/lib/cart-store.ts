@@ -4,8 +4,8 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import type { CartItem } from '@/lib/cart';
 import { toCartItem } from '@/lib/cart';
-import { coupons, isCouponActive } from '@/lib/coupons';
-import type { Coupon } from '@/lib/coupons';
+import type { Coupon, CouponVerificationSummary } from '@/lib/coupons';
+import { verifyCoupon } from '@/services/Coupon';
 import type { Product } from '@/lib/storefront-types';
 
 type CheckoutForm = {
@@ -34,11 +34,18 @@ export type OrderRecord = {
     status: OrderStatus;
 };
 
+type CouponApplyResult = {
+    success: boolean;
+    message: string;
+};
+
 type CartState = {
     items: CartItem[];
     hydrated: boolean;
     couponCode: string;
     appliedCoupon: Coupon | null;
+    couponVerification: CouponVerificationSummary | null;
+    isApplyingCoupon: boolean;
     checkout: CheckoutForm;
     orders: OrderRecord[];
     addProduct: (product: Product) => void;
@@ -47,7 +54,7 @@ type CartState = {
     remove: (sku: string) => void;
     clear: () => void;
     setCouponCode: (code: string) => void;
-    applyCoupon: () => boolean;
+    applyCoupon: () => Promise<CouponApplyResult>;
     clearCoupon: () => void;
     updateCheckout: <K extends keyof CheckoutForm>(key: K, value: CheckoutForm[K]) => void;
     addItems: (items: CartItem[]) => void;
@@ -67,13 +74,21 @@ const defaultCheckout: CheckoutForm = {
     payment: 'Cash on delivery',
 };
 
+const resetCouponState = {
+    appliedCoupon: null,
+    couponVerification: null,
+    isApplyingCoupon: false,
+};
+
 export const useCartStore = create<CartState>()(
     persist(
-        set => ({
+        (set, get) => ({
             items: [],
             hydrated: false,
             couponCode: '',
             appliedCoupon: null,
+            couponVerification: null,
+            isApplyingCoupon: false,
             checkout: defaultCheckout,
             orders: [],
             addProduct: product => {
@@ -86,10 +101,11 @@ export const useCartStore = create<CartState>()(
                             items: state.items.map(item =>
                                 item.sku === nextItem.sku ? { ...item, quantity: item.quantity + 1 } : item,
                             ),
+                            ...resetCouponState,
                         };
                     }
 
-                    return { items: [...state.items, nextItem] };
+                    return { items: [...state.items, nextItem], ...resetCouponState };
                 });
             },
             increase: sku =>
@@ -97,49 +113,147 @@ export const useCartStore = create<CartState>()(
                     items: state.items.map(item =>
                         item.sku === sku ? { ...item, quantity: item.quantity + 1 } : item,
                     ),
+                    ...resetCouponState,
                 })),
             decrease: sku =>
                 set(state => ({
                     items: state.items
                         .map(item => (item.sku === sku ? { ...item, quantity: item.quantity - 1 } : item))
                         .filter(item => item.quantity > 0),
+                    ...resetCouponState,
                 })),
-            remove: sku => set(state => ({ items: state.items.filter(item => item.sku !== sku) })),
-            clear: () => set({ items: [] }),
-            setCouponCode: code => set({ couponCode: code.toUpperCase() }),
-            applyCoupon: () => {
-                let result = false;
-
-                set(state => {
-                    const coupon = coupons[state.couponCode.trim().toUpperCase()];
-                    const subtotal = state.items.reduce(
-                        (sum, item) => sum + item.unitPrice * item.quantity,
-                        0,
-                    );
-
-                    if (!coupon || !isCouponActive(coupon, subtotal)) {
-                        return { appliedCoupon: null };
-                    }
-
-                    result = true;
-                    return { appliedCoupon: coupon };
+            remove: sku =>
+                set(state => ({
+                    items: state.items.filter(item => item.sku !== sku),
+                    ...resetCouponState,
+                })),
+            clear: () =>
+                set({
+                    items: [],
+                    couponCode: '',
+                    ...resetCouponState,
+                }),
+            setCouponCode: code =>
+                set({
+                    couponCode: code.toUpperCase(),
+                    ...resetCouponState,
+                }),
+            applyCoupon: async () => {
+                const state = get();
+                const couponCode = state.couponCode.trim();
+                const snapshot = JSON.stringify({
+                    couponCode,
+                    city: state.checkout.city,
+                    address: state.checkout.address,
+                    items: state.items.map(item => ({
+                        sku: item.sku,
+                        quantity: item.quantity,
+                        unitPrice: item.unitPrice,
+                        weightKg: item.weightKg,
+                        isNoCOD: item.isNoCOD,
+                    })),
                 });
 
-                return result;
+                if (!couponCode) {
+                    return { success: false, message: 'Enter a coupon code first.' };
+                }
+
+                if (state.items.length === 0) {
+                    return { success: false, message: 'Add items to cart before applying a coupon.' };
+                }
+
+                set({ isApplyingCoupon: true });
+
+                try {
+                    const result = await verifyCoupon({
+                        couponCode,
+                        items: state.items.map(item => ({
+                            unitPrice: item.unitPrice,
+                            quantity: item.quantity,
+                            weightKg: item.weightKg,
+                            isNoCOD: item.isNoCOD,
+                        })),
+                        city: state.checkout.city,
+                        address: state.checkout.address,
+                    });
+
+                    const verification = result?.data ?? null;
+                    const success = Boolean(verification?.isValid && verification.coupon);
+                    const currentSnapshot = JSON.stringify({
+                        couponCode: get().couponCode.trim(),
+                        city: get().checkout.city,
+                        address: get().checkout.address,
+                        items: get().items.map(item => ({
+                            sku: item.sku,
+                            quantity: item.quantity,
+                            unitPrice: item.unitPrice,
+                            weightKg: item.weightKg,
+                            isNoCOD: item.isNoCOD,
+                        })),
+                    });
+
+                    if (currentSnapshot !== snapshot) {
+                        set({
+                            appliedCoupon: null,
+                            couponVerification: null,
+                            isApplyingCoupon: false,
+                        });
+
+                        return {
+                            success: false,
+                            message: 'Cart details changed while verifying the coupon. Please try again.',
+                        };
+                    }
+
+                    set({
+                        appliedCoupon: success ? verification?.coupon ?? null : null,
+                        couponVerification: verification,
+                        isApplyingCoupon: false,
+                    });
+
+                    return {
+                        success,
+                        message:
+                            verification?.message ??
+                            result?.message ??
+                            (success ? 'Coupon applied successfully.' : 'Coupon code was not recognized.'),
+                    };
+                } catch {
+                    set({
+                        appliedCoupon: null,
+                        couponVerification: null,
+                        isApplyingCoupon: false,
+                    });
+
+                    return {
+                        success: false,
+                        message: 'Failed to verify coupon code. Please try again.',
+                    };
+                }
             },
-            clearCoupon: () => set({ couponCode: '', appliedCoupon: null }),
+            clearCoupon: () =>
+                set({
+                    couponCode: '',
+                    ...resetCouponState,
+                }),
             updateCheckout: (key, value) =>
                 set(state => ({
                     checkout: {
                         ...state.checkout,
                         [key]: value,
                     },
+                    ...(key === 'city' || key === 'address' ? resetCouponState : {}),
                 })),
             addItems: items =>
                 set(state => ({
                     items: [...state.items, ...items],
+                    ...resetCouponState,
                 })),
-            replaceItems: items => set({ items }),
+            replaceItems: items =>
+                set({
+                    items,
+                    ...resetCouponState,
+                }),
             addOrder: order =>
                 set(state => ({
                     orders: [order, ...state.orders],
@@ -159,7 +273,6 @@ export const useCartStore = create<CartState>()(
             partialize: state => ({
                 items: state.items,
                 couponCode: state.couponCode,
-                appliedCoupon: state.appliedCoupon,
                 checkout: state.checkout,
                 orders: state.orders,
             }),
