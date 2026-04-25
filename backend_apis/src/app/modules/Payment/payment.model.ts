@@ -17,20 +17,27 @@ const paymentSchema = new Schema<IPayment>(
         currency: { type: String, required: true, default: 'BDT' },
         status: {
             type: String,
-            enum: ['PENDING', 'SUCCEEDED', 'FAILED', 'CANCELED'],
-            default: 'PENDING',
+            enum: ['INITIATED', 'PAID', 'FAILED', 'CANCELLED', 'REFUNDED'],
+            default: 'INITIATED',
         },
-        provider: { type: String, enum: ['SSL_COMMERZ'], default: 'SSL_COMMERZ' },
+        gateway: { type: String, enum: ['PORTPOS'], default: 'PORTPOS' },
+        invoiceId: { type: String, unique: true, sparse: true },
         transactionId: { type: String, required: true, unique: true },
         gatewayUrl: { type: String },
-        sessionKey: { type: String },
-        bankTranId: { type: String },
-        valId: { type: String },
+        paymentUrl: { type: String },
+        rawInitResponse: { type: Schema.Types.Mixed },
+        rawIpnPayload: { type: Schema.Types.Mixed },
+        rawVerifyResponse: { type: Schema.Types.Mixed },
         gatewayPayload: { type: Schema.Types.Mixed },
+        paidAt: { type: Date },
+        failedAt: { type: Date },
     },
     { timestamps: true, versionKey: false },
 );
 
 paymentSchema.index({ user: 1, createdAt: -1 }, { name: 'payment_user_createdAt_idx' });
+paymentSchema.index({ order: 1, createdAt: -1 }, { name: 'payment_order_createdAt_idx' });
+paymentSchema.index({ status: 1, createdAt: -1 }, { name: 'payment_status_createdAt_idx' });
+paymentSchema.index({ invoiceId: 1 }, { unique: true, sparse: true, name: 'payment_invoiceId_idx' });
 
 export const Payment = model<IPayment>('Payment', paymentSchema);

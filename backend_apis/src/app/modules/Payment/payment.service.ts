@@ -1,23 +1,71 @@
 import httpStatus from 'http-status';
-import { fetch } from 'undici';
 import { AppError } from '../../utils';
 import config from '../../config';
 import { IUser } from '../User/user.interface';
 import { Payment } from './payment.model';
-import { OrderService } from '../Order/order.service';
 import { OrderModel } from '../Order/order.model';
+import { OrderService } from '../Order/order.service';
+import { PortPosService } from './portpos.service';
 
-type PaymentServiceResult = {
-    url?: string;
-    transactionId?: string;
-    data?: unknown[];
-    meta?: { page: number; limit: number; total: number; totalPages: number };
-    summary?: { totalAmount: number };
+type PortPosInitiationResult = {
+    orderId: string;
+    invoiceId: string;
+    paymentUrl: string;
+    transactionId: string;
 };
 
-const requireSslConfig = () => {
-    if (!config.sslcommerz.store_id || !config.sslcommerz.store_password) {
-        throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, 'SSLCommerz credentials are not configured.');
+type GatewayPayload = Record<string, unknown>;
+
+type PaymentRecordLike = {
+    _id: unknown;
+    invoiceId?: string;
+    transactionId: string;
+    gatewayUrl?: string;
+    paymentUrl?: string;
+    status: string;
+};
+
+type PortPosOrderLean = {
+    _id: unknown;
+    orderId: string;
+    user: unknown;
+    items: Array<{ title: string; sku: string; quantity: number; lineTotal: number }>;
+    customer: {
+        name: string;
+        phone: string;
+        email?: string;
+        address: string;
+        city: string;
+        note?: string;
+    };
+    subtotal: number;
+    discount: number;
+    delivery: number;
+    shippingZone: string;
+    shippingCharge: number;
+    totalWeightKg: number;
+    codEligible: boolean;
+    codReasons: string[];
+    total: number;
+    totalAmount?: number;
+    payableAmount?: number;
+    currency?: string;
+    paymentMethod: string;
+    paymentGateway?: string;
+    paymentStatus: string;
+    orderStatus?: string;
+    status?: string;
+    paymentId?: unknown;
+    invoiceId?: string;
+    transactionId?: string;
+    gatewayUrl?: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+};
+
+const requirePortPosConfig = () => {
+    if (!config.portpos.app_key || !config.portpos.secret_key) {
+        throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, 'PortPOS credentials are not configured.');
     }
 
     if (!config.urls.backend_public || !config.urls.frontend_app) {
@@ -25,209 +73,391 @@ const requireSslConfig = () => {
     }
 };
 
-const buildFrontendRedirect = (path: string) =>
-    `${String(config.urls.frontend_app).replace(/\/$/, '')}${path}`;
-const buildBackendCallback = (path: string) =>
-    `${String(config.urls.backend_public).replace(/\/$/, '')}${path}`;
+const normalizeAmount = (value: number | string | undefined) => {
+    const amount = Number(value ?? 0);
+    return Number.isFinite(amount) ? amount : 0;
+};
 
-const initiateSslCommerzPayment = async (user: IUser, orderId: string): Promise<PaymentServiceResult> => {
-    requireSslConfig();
+const isSuccessStatus = (status: string) => ['PAID', 'SUCCESS', 'VALID', 'VALIDATED', 'COMPLETED'].includes(status);
 
-    const order = await OrderModel.findOne({ orderId, user: user._id }).lean();
+const isFailureStatus = (status: string) => ['FAILED', 'FAIL', 'CANCELLED', 'CANCELED', 'VOID', 'EXPIRED'].includes(status);
+
+const getInvoiceIdFromPayload = (payload: GatewayPayload) => {
+    const candidate = payload.invoice_id ?? payload.invoice ?? payload.invoiceId ?? payload.reference;
+    return typeof candidate === 'string' ? candidate : '';
+};
+
+const getAmountFromPayload = (payload: GatewayPayload) => {
+    const candidate = payload.amount ?? (payload.order as { amount?: unknown } | undefined)?.amount;
+    return normalizeAmount(candidate as number | string | undefined);
+};
+
+const getStatusFromPayload = (payload: GatewayPayload) => {
+    const candidate = payload.status ?? (payload.billing as { gateway?: { status?: unknown } } | undefined)?.gateway?.status;
+    return typeof candidate === 'string' ? candidate.toUpperCase() : '';
+};
+
+const getReferenceFromPayload = (payload: GatewayPayload) => {
+    const candidate = payload.reference ?? (payload.order as { reference?: unknown } | undefined)?.reference;
+    return typeof candidate === 'string' ? candidate : '';
+};
+
+const buildPaymentRecordPayload = (order: PortPosOrderLean, transactionId: string) => ({
+    user: order.user,
+    order: order._id,
+    amount: normalizeAmount(order.payableAmount ?? order.totalAmount ?? order.total),
+    currency: order.currency ?? 'BDT',
+    status: 'INITIATED' as const,
+    gateway: 'PORTPOS' as const,
+    transactionId,
+    gatewayUrl: order.gatewayUrl,
+    paymentUrl: order.gatewayUrl,
+});
+
+const initiatePortPosPayment = async (user: IUser, orderId: string): Promise<PortPosInitiationResult> => {
+    requirePortPosConfig();
+
+    const order = (await OrderModel.findOne({ orderId, user: user._id }).lean()) as PortPosOrderLean | null;
 
     if (!order) {
         throw new AppError(httpStatus.NOT_FOUND, 'Order not found!');
     }
 
-    if (order.paymentMethod !== 'SSL_COMMERZ') {
-        throw new AppError(httpStatus.BAD_REQUEST, 'This order is not configured for SSLCommerz payment.');
+    if (order.paymentMethod !== 'PORTPOS') {
+        throw new AppError(httpStatus.BAD_REQUEST, 'This order is not configured for PortPOS payment.');
     }
 
     if (order.paymentStatus === 'PAID') {
         throw new AppError(httpStatus.BAD_REQUEST, 'This order is already paid.');
     }
 
-    const transactionId = order.transactionId ?? `TXN-${order.orderId}-${Date.now()}`;
-
-    const payload = new URLSearchParams({
-        store_id: String(config.sslcommerz.store_id),
-        store_passwd: String(config.sslcommerz.store_password),
-        total_amount: String(order.total),
-        currency: 'BDT',
-        tran_id: transactionId,
-        success_url: buildBackendCallback('/api/v1/payment/sslcommerz/success'),
-        fail_url: buildBackendCallback('/api/v1/payment/sslcommerz/fail'),
-        cancel_url: buildBackendCallback('/api/v1/payment/sslcommerz/cancel'),
-        ipn_url: buildBackendCallback('/api/v1/payment/sslcommerz/ipn'),
-        product_name: `Order ${order.orderId}`,
-        product_category: 'ecommerce',
-        product_profile: 'general',
-        cus_name: order.customer.name,
-        cus_email: order.customer.email || `${user.email}`,
-        cus_add1: order.customer.address,
-        cus_city: order.customer.city,
-        cus_country: 'Bangladesh',
-        cus_phone: order.customer.phone,
-        shipping_method: 'Courier',
-        num_of_item: String(order.items.length),
-        value_a: order.orderId,
-        value_b: String(user._id),
-    });
-
-    const response = await fetch(String(config.sslcommerz.init_api), {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: payload.toString(),
-    });
-
-    const result = (await response.json()) as {
-        GatewayPageURL?: string;
-        sessionkey?: string;
-        failedreason?: string;
-    };
-
-    if (!response.ok || !result.GatewayPageURL) {
-        throw new AppError(
-            httpStatus.BAD_GATEWAY,
-            result.failedreason || 'Failed to initialize SSLCommerz payment.',
-        );
+    const existingPayment = await Payment.findOne({ order: String(order._id) }).sort({ createdAt: -1 }).lean();
+    if (existingPayment && existingPayment.invoiceId && ['INITIATED', 'PAID'].includes(existingPayment.status)) {
+        return {
+            orderId,
+            invoiceId: existingPayment.invoiceId,
+            paymentUrl: existingPayment.paymentUrl || existingPayment.gatewayUrl || '',
+            transactionId: existingPayment.transactionId,
+        };
     }
 
-    await Payment.findOneAndUpdate(
+    const transactionId = order.transactionId ?? `PORTPOS-${order.orderId}-${Date.now()}`;
+
+    const paymentRecord = await Payment.findOneAndUpdate(
         { transactionId },
-        {
-            user: user._id,
-            order: order._id,
-            amount: order.total,
-            currency: 'BDT',
-            status: 'PENDING',
-            provider: 'SSL_COMMERZ',
-            transactionId,
-            gatewayUrl: result.GatewayPageURL,
-            sessionKey: result.sessionkey,
-        },
+        buildPaymentRecordPayload(order, transactionId),
         { upsert: true, returnDocument: 'after', runValidators: true },
     );
 
+    let createdInvoice;
+
+    try {
+        createdInvoice = await PortPosService.createInvoice(
+            {
+                ...order,
+                payableAmount: normalizeAmount(order.payableAmount ?? order.totalAmount ?? order.total),
+                currency: order.currency ?? 'BDT',
+            },
+            user,
+        );
+    } catch (error) {
+        await Payment.findByIdAndUpdate(paymentRecord?._id, {
+            status: 'FAILED',
+            failedAt: new Date(),
+            gatewayPayload: error instanceof Error ? { message: error.message } : undefined,
+        });
+
+        throw error;
+    }
+
+    const updatedPayment = await Payment.findOneAndUpdate(
+        { _id: paymentRecord?._id },
+        {
+            invoiceId: createdInvoice.invoiceId,
+            paymentUrl: createdInvoice.paymentUrl,
+            gatewayUrl: createdInvoice.paymentUrl,
+            rawInitResponse: createdInvoice.rawResponse as Record<string, unknown>,
+            gatewayPayload: createdInvoice.rawResponse as Record<string, unknown>,
+        },
+        { returnDocument: 'after', runValidators: true },
+    );
+
+    const paymentIdentifier = updatedPayment?._id ?? paymentRecord?._id;
+
     await OrderService.updateOrderPaymentIntoDB(order.orderId, {
-        paymentStatus: 'PENDING',
+        ...(paymentIdentifier ? { paymentId: String(paymentIdentifier) } : {}),
+        invoiceId: createdInvoice.invoiceId,
+        paymentGateway: 'PORTPOS',
+        paymentStatus: 'UNPAID',
         transactionId,
-        gatewayUrl: result.GatewayPageURL,
+        gatewayUrl: createdInvoice.paymentUrl,
+        orderStatus: 'PENDING_PAYMENT',
+        status: 'PENDING_PAYMENT',
+        payableAmount: normalizeAmount(order.payableAmount ?? order.totalAmount ?? order.total),
+        totalAmount: normalizeAmount(order.payableAmount ?? order.totalAmount ?? order.total),
+        currency: order.currency ?? 'BDT',
     });
 
     return {
-        url: result.GatewayPageURL,
+        orderId,
+        invoiceId: createdInvoice.invoiceId,
+        paymentUrl: createdInvoice.paymentUrl,
         transactionId,
     };
 };
 
-const validateSslPayment = async (valId: string) => {
-    requireSslConfig();
+const finalizePaymentFromGateway = async (
+    order: PortPosOrderLean,
+    payment: PaymentRecordLike | null,
+    payload: GatewayPayload,
+    verifiedResponse: Record<string, unknown>,
+    finalStatus: 'PAID' | 'FAILED' | 'CANCELLED',
+) => {
+    const status = finalStatus === 'PAID' ? 'PAID' : finalStatus;
+    const orderStatus = finalStatus === 'PAID' ? 'CONFIRMED' : 'CANCELLED';
 
-    const validationUrl = new URL(String(config.sslcommerz.validation_api));
-    validationUrl.searchParams.set('val_id', valId);
-    validationUrl.searchParams.set('store_id', String(config.sslcommerz.store_id));
-    validationUrl.searchParams.set('store_passwd', String(config.sslcommerz.store_password));
-    validationUrl.searchParams.set('format', 'json');
-
-    const response = await fetch(validationUrl, { method: 'GET' });
-    const result = (await response.json()) as Record<string, unknown>;
-
-    if (!response.ok) {
-        throw new AppError(httpStatus.BAD_GATEWAY, 'Failed to validate SSLCommerz payment.');
-    }
-
-    return result;
-};
-
-const handleSslCommerzSuccess = async (payload: Record<string, unknown>) => {
-    const orderId = typeof payload.value_a === 'string' ? payload.value_a : '';
-    const transactionId = typeof payload.tran_id === 'string' ? payload.tran_id : '';
-    const valId = typeof payload.val_id === 'string' ? payload.val_id : '';
-
-    if (!orderId || !transactionId) {
-        throw new AppError(httpStatus.BAD_REQUEST, 'Invalid payment callback payload.');
-    }
-
-    const payment = await Payment.findOne({ transactionId });
-
-    if (!payment) {
-        throw new AppError(httpStatus.NOT_FOUND, 'Payment record not found.');
-    }
-
-    if (payment.status === 'SUCCEEDED') {
-        return buildFrontendRedirect(`/my-account/orders/${orderId}?payment=success`);
-    }
-
-    const validationPayload = valId ? await validateSslPayment(valId) : payload;
-
-    const validationStatus =
-        typeof validationPayload.status === 'string' ? validationPayload.status.toUpperCase() : '';
-    const validationAmount = Number(validationPayload.amount ?? payload.amount ?? 0);
-
-    if (validationStatus && !['VALID', 'VALIDATED'].includes(validationStatus)) {
-        throw new AppError(httpStatus.BAD_REQUEST, 'Payment validation status is not valid.');
-    }
-
-    if (Number.isFinite(validationAmount) && validationAmount > 0 && validationAmount !== payment.amount) {
-        throw new AppError(httpStatus.BAD_REQUEST, 'Payment amount mismatch detected.');
-    }
-
-    payment.status = 'SUCCEEDED';
-    payment.valId = valId || payment.valId;
-    payment.bankTranId = typeof payload.bank_tran_id === 'string' ? payload.bank_tran_id : payment.bankTranId;
-    payment.gatewayPayload = validationPayload;
-    await payment.save();
-
-    await OrderService.updateOrderPaymentIntoDB(orderId, {
-        paymentStatus: 'PAID',
-        status: 'PLACED',
-        transactionId,
-    });
-
-    return buildFrontendRedirect(`/my-account/orders/${orderId}?payment=success`);
-};
-
-const handleSslCommerzFailure = async (payload: Record<string, unknown>, status: 'FAILED' | 'CANCELED') => {
-    const orderId = typeof payload.value_a === 'string' ? payload.value_a : '';
-    const transactionId = typeof payload.tran_id === 'string' ? payload.tran_id : '';
-
-    if (transactionId) {
-        const existingPayment = await Payment.findOne({ transactionId });
-
-        if (existingPayment?.status === 'SUCCEEDED') {
-            return buildFrontendRedirect(`/my-account/orders/${orderId}?payment=success`);
-        }
-
-        await Payment.findOneAndUpdate(
-            { transactionId },
-            {
-                status,
-                gatewayPayload: payload,
-            },
-        );
-    }
-
-    if (orderId) {
-        await OrderService.updateOrderPaymentIntoDB(orderId, {
-            paymentStatus: status === 'FAILED' ? 'FAILED' : 'CANCELLED',
-            status: 'CANCELLED',
+    if (payment) {
+        await Payment.findByIdAndUpdate(payment._id, {
+            status,
+            rawIpnPayload: payload,
+            rawVerifyResponse: verifiedResponse,
+            gatewayPayload: verifiedResponse,
+            paidAt: finalStatus === 'PAID' ? new Date() : undefined,
+            failedAt: finalStatus === 'PAID' ? undefined : new Date(),
+            invoiceId: getInvoiceIdFromPayload(payload) || payment.invoiceId,
+            gatewayUrl: payment.gatewayUrl,
         });
     }
 
-    const query = new URLSearchParams({
-        payment: status.toLowerCase(),
-        ...(orderId ? { orderId } : {}),
+    await OrderService.updateOrderPaymentIntoDB(order.orderId, {
+        paymentStatus: finalStatus,
+        orderStatus,
+        status: orderStatus,
+        paymentGateway: 'PORTPOS',
+        invoiceId: getInvoiceIdFromPayload(payload) || payment?.invoiceId || order.invoiceId,
+        ...(payment?._id || order.paymentId ? { paymentId: String(payment?._id ?? order.paymentId) } : {}),
+        transactionId: payment?.transactionId || order.transactionId || '',
     });
 
-    return buildFrontendRedirect(`/checkout?${query.toString()}`);
+    return {
+        orderId: order.orderId,
+        invoiceId: getInvoiceIdFromPayload(payload) || payment?.invoiceId || order.invoiceId || '',
+        paymentStatus: finalStatus,
+        orderStatus,
+    };
+};
+
+const handlePortPosIpn = async (payload: GatewayPayload) => {
+    requirePortPosConfig();
+
+    const invoiceId = getInvoiceIdFromPayload(payload);
+    const amount = getAmountFromPayload(payload);
+    const reference = getReferenceFromPayload(payload);
+
+    if (!invoiceId || !amount) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'Invalid PortPOS IPN payload.');
+    }
+
+    const verifiedResponse = await PortPosService.validateIpn(invoiceId, amount);
+    const verifiedData = verifiedResponse.data;
+    const verifiedOrderAmount = normalizeAmount(verifiedData?.order?.amount);
+    const verifiedCurrency = String(verifiedData?.order?.currency ?? '').toUpperCase();
+    const verifiedStatus = getStatusFromPayload({
+        ...payload,
+        status: verifiedData?.order?.status ?? payload.status,
+    });
+    const orderId = reference || String(verifiedData?.reference ?? '');
+
+    if (!orderId) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'PortPOS IPN did not include an order reference.');
+    }
+
+    const order = (await OrderModel.findOne({ orderId }).lean()) as PortPosOrderLean | null;
+    if (!order) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Order not found!');
+    }
+
+    let payment = (await Payment.findOne({
+        $or: [{ invoiceId }, { transactionId: order.transactionId }, { order: String(order._id) }],
+    }).sort({ createdAt: -1 })) as PaymentRecordLike | null;
+
+    if (!payment) {
+        payment = (await Payment.findOneAndUpdate(
+            { invoiceId },
+            {
+                user: order.user,
+                order: order._id,
+                amount,
+                currency: 'BDT',
+                status: 'INITIATED',
+                gateway: 'PORTPOS',
+                transactionId: order.transactionId || `PORTPOS-${order.orderId}`,
+                invoiceId,
+                rawIpnPayload: payload,
+                rawVerifyResponse: verifiedResponse,
+                gatewayPayload: verifiedResponse,
+            },
+            { upsert: true, returnDocument: 'after', runValidators: true },
+        )) as PaymentRecordLike | null;
+    }
+
+    if (payment?.status === 'PAID' || order.paymentStatus === 'PAID') {
+        return {
+            orderId: order.orderId,
+            invoiceId: payment?.invoiceId || invoiceId,
+            paymentStatus: 'PAID' as const,
+            orderStatus: order.orderStatus || order.status || 'CONFIRMED',
+        };
+    }
+
+    if (verifiedCurrency && verifiedCurrency !== 'BDT') {
+        throw new AppError(httpStatus.BAD_REQUEST, 'PortPOS currency mismatch detected.');
+    }
+
+    if (verifiedOrderAmount && verifiedOrderAmount !== amount) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'PortPOS amount mismatch detected.');
+    }
+
+    if (verifiedStatus && !isSuccessStatus(verifiedStatus) && !isFailureStatus(verifiedStatus)) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'PortPOS payment status is not valid.');
+    }
+
+    if (isSuccessStatus(verifiedStatus)) {
+        return finalizePaymentFromGateway(order, payment, payload, verifiedResponse as Record<string, unknown>, 'PAID');
+    }
+
+    return finalizePaymentFromGateway(
+        order,
+        payment,
+        payload,
+        verifiedResponse as Record<string, unknown>,
+        isFailureStatus(verifiedStatus) ? 'FAILED' : 'CANCELLED',
+    );
+};
+
+const verifyPortPosPayment = async (user: IUser, orderId: string) => {
+    requirePortPosConfig();
+
+    const order = (await OrderModel.findOne({ orderId, user: user._id }).lean()) as PortPosOrderLean | null;
+
+    if (!order) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Order not found!');
+    }
+
+    let payment = (await Payment.findOne({
+        $or: [{ invoiceId: order.invoiceId }, { order: String(order._id) }],
+    }).sort({ createdAt: -1 })) as PaymentRecordLike | null;
+
+    if (!payment?.invoiceId && !order.invoiceId) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'PortPOS invoice not found for this order.');
+    }
+
+    const invoiceId = payment?.invoiceId || order.invoiceId || '';
+    const verifiedResponse = await PortPosService.verifyInvoice(invoiceId);
+    const verifiedData = verifiedResponse.data;
+    const verifiedAmount = normalizeAmount(verifiedData?.order?.amount);
+    const verifiedCurrency = String(verifiedData?.order?.currency ?? '').toUpperCase();
+    const verifiedStatus = String(verifiedData?.order?.status ?? verifiedData?.billing?.gateway?.status ?? '').toUpperCase();
+    const verifiedReference = String(verifiedData?.reference ?? '');
+
+    if (!payment && invoiceId) {
+        payment = (await Payment.findOneAndUpdate(
+            { invoiceId },
+            {
+                user: order.user,
+                order: order._id,
+                amount: normalizeAmount(order.payableAmount ?? order.totalAmount ?? order.total),
+                currency: order.currency ?? 'BDT',
+                status: 'INITIATED',
+                gateway: 'PORTPOS',
+                transactionId: order.transactionId || `PORTPOS-${order.orderId}`,
+                invoiceId,
+                rawVerifyResponse: verifiedResponse,
+                gatewayPayload: verifiedResponse,
+            },
+            { upsert: true, returnDocument: 'after', runValidators: true },
+        )) as PaymentRecordLike | null;
+    }
+
+    if (verifiedReference && verifiedReference !== order.orderId) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'PortPOS order reference mismatch detected.');
+    }
+
+    if (verifiedCurrency && verifiedCurrency !== 'BDT') {
+        throw new AppError(httpStatus.BAD_REQUEST, 'PortPOS currency mismatch detected.');
+    }
+
+    if (verifiedAmount && verifiedAmount !== normalizeAmount(order.payableAmount ?? order.totalAmount ?? order.total)) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'PortPOS amount mismatch detected.');
+    }
+
+    if (isSuccessStatus(verifiedStatus)) {
+        await finalizePaymentFromGateway(
+            order,
+            payment,
+            { invoice_id: invoiceId, reference: order.orderId, amount: verifiedAmount, status: verifiedStatus },
+            verifiedResponse as Record<string, unknown>,
+            'PAID',
+        );
+    } else if (isFailureStatus(verifiedStatus)) {
+        await finalizePaymentFromGateway(
+            order,
+            payment,
+            { invoice_id: invoiceId, reference: order.orderId, amount: verifiedAmount, status: verifiedStatus },
+            verifiedResponse as Record<string, unknown>,
+            'FAILED',
+        );
+    }
+
+    const freshOrder = await OrderModel.findOne({ orderId, user: user._id }).lean();
+
+    return {
+        orderId: order.orderId,
+        invoiceId,
+        paymentStatus: freshOrder?.paymentStatus ?? order.paymentStatus,
+        orderStatus: freshOrder?.orderStatus ?? freshOrder?.status ?? order.orderStatus ?? order.status,
+        verifiedStatus,
+    };
+};
+
+const refundPayment = async (orderId: string, amount?: number) => {
+    requirePortPosConfig();
+
+    const order = (await OrderModel.findOne({ orderId }).lean()) as PortPosOrderLean | null;
+    if (!order) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Order not found!');
+    }
+
+    const payment = (await Payment.findOne({
+        $or: [{ invoiceId: order.invoiceId }, { order: String(order._id) }],
+    }).sort({ createdAt: -1 })) as PaymentRecordLike | null;
+    if (!payment?.invoiceId) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'PortPOS invoice not found for this order.');
+    }
+
+    const refundResponse = await PortPosService.refundPayment(
+        payment.invoiceId,
+        amount || normalizeAmount(order.payableAmount ?? order.totalAmount ?? order.total),
+    );
+
+    await Payment.findByIdAndUpdate(payment._id, {
+        status: 'REFUNDED',
+        rawVerifyResponse: refundResponse as Record<string, unknown>,
+        gatewayPayload: refundResponse as Record<string, unknown>,
+    });
+
+    await OrderService.updateOrderPaymentIntoDB(order.orderId, {
+        paymentStatus: 'REFUNDED',
+        orderStatus: 'CANCELLED',
+        status: 'CANCELLED',
+    });
+
+    return refundResponse;
 };
 
 const getMyPaymentsFromDB = async (user: IUser) => {
     return Payment.find({ user: user._id })
-        .populate('order', 'orderId total status paymentStatus')
+        .populate('order', 'orderId total totalAmount payableAmount status orderStatus paymentStatus paymentGateway invoiceId transactionId')
         .sort({ createdAt: -1 })
         .lean();
 };
@@ -240,7 +470,7 @@ const getAllPaymentsForAdminFromDB = async (query: Record<string, unknown>) => {
     const [data, total, summary] = await Promise.all([
         Payment.find({})
             .populate('user', 'name email phone role')
-            .populate('order', 'orderId total status paymentStatus')
+            .populate('order', 'orderId total totalAmount payableAmount status orderStatus paymentStatus paymentGateway invoiceId transactionId')
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit)
@@ -264,9 +494,10 @@ const getAllPaymentsForAdminFromDB = async (query: Record<string, unknown>) => {
 };
 
 export const PaymentService = {
-    initiateSslCommerzPayment,
-    handleSslCommerzSuccess,
-    handleSslCommerzFailure,
+    initiatePortPosPayment,
+    handlePortPosIpn,
+    verifyPortPosPayment,
+    refundPayment,
     getMyPaymentsFromDB,
     getAllPaymentsForAdminFromDB,
 };

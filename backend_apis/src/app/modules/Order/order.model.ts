@@ -51,24 +51,39 @@ const orderSchema = new Schema<IOrder>(
         codEligible: { type: Boolean, required: true, default: false },
         codReasons: { type: [String], required: true, default: [] },
         total: { type: Number, required: true },
+        totalAmount: { type: Number, required: true, default: 0 },
+        payableAmount: { type: Number, required: true, default: 0 },
+        currency: { type: String, required: true, default: 'BDT' },
         couponCode: { type: String },
         paymentMethod: {
             type: String,
-            enum: ['CASH_ON_DELIVERY', 'SSL_COMMERZ'],
+            enum: ['CASH_ON_DELIVERY', 'PORTPOS'],
             required: true,
+        },
+        paymentGateway: {
+            type: String,
+            enum: ['CASH_ON_DELIVERY', 'PORTPOS'],
         },
         paymentStatus: {
             type: String,
-            enum: ['UNPAID', 'PENDING', 'PAID', 'FAILED', 'CANCELLED'],
+            enum: ['UNPAID', 'PENDING_PAYMENT', 'PAID', 'FAILED', 'CANCELLED', 'REFUNDED'],
             required: true,
             default: 'UNPAID',
         },
-        status: {
+        orderStatus: {
             type: String,
-            enum: ['PLACED', 'PROCESSING', 'DELIVERED', 'CANCELLED'],
+            enum: ['PLACED', 'PENDING_PAYMENT', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'],
             required: true,
             default: 'PLACED',
         },
+        status: {
+            type: String,
+            enum: ['PLACED', 'PENDING_PAYMENT', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'],
+            required: true,
+            default: 'PLACED',
+        },
+        paymentId: { type: Schema.Types.ObjectId, ref: 'Payment' },
+        invoiceId: { type: String, unique: true, sparse: true },
         transactionId: { type: String },
         gatewayUrl: { type: String },
     },
@@ -77,5 +92,6 @@ const orderSchema = new Schema<IOrder>(
 
 orderSchema.index({ user: 1, createdAt: -1 }, { name: 'order_user_createdAt_idx' });
 orderSchema.index({ status: 1, createdAt: -1 }, { name: 'order_status_createdAt_idx' });
+orderSchema.index({ invoiceId: 1 }, { unique: true, sparse: true, name: 'order_invoiceId_idx' });
 
 export const OrderModel = model<IOrder>('Order', orderSchema);

@@ -1,8 +1,24 @@
-import { COD_MIN_SUBTOTAL_BDT, COD_REASONS, SHIPPING_RULES, SHIPPING_ZONE, type TShippingZone } from './order.constants';
+import {
+    COD_MIN_SUBTOTAL_BDT,
+    COD_REASONS,
+    DELIVERY_AREA,
+    SHIPPING_RULES,
+    SHIPPING_ZONE,
+    type TDeliveryArea,
+    type TShippingZone,
+} from './order.constants';
 
 export type CodEligibilityInput = {
     subtotal: number;
     itemBlocksCod: boolean;
+};
+
+const normalizeDeliveryArea = (value?: TShippingZone | TDeliveryArea) => {
+    if (value === DELIVERY_AREA.INSIDE_DHAKA || value === SHIPPING_ZONE.INSIDE_DHAKA) {
+        return SHIPPING_ZONE.INSIDE_DHAKA;
+    }
+
+    return SHIPPING_ZONE.OUTSIDE_DHAKA;
 };
 
 export function normalizeText(value?: string) {
@@ -15,8 +31,16 @@ export function deriveShippingZone(city?: string, address?: string): TShippingZo
     return combined.includes('dhaka') ? SHIPPING_ZONE.INSIDE_DHAKA : SHIPPING_ZONE.OUTSIDE_DHAKA;
 }
 
-export function calculateShippingCharge({ totalWeightKg, zone }: { totalWeightKg: number; zone: TShippingZone }) {
-    const rules = SHIPPING_RULES[zone];
+export function calculateShippingCharge({
+    totalWeightKg,
+    deliveryArea,
+    zone,
+}: {
+    totalWeightKg: number;
+    deliveryArea?: TShippingZone | TDeliveryArea;
+    zone?: TShippingZone;
+}) {
+    const rules = SHIPPING_RULES[normalizeDeliveryArea(deliveryArea ?? zone)];
 
     if (!Number.isFinite(totalWeightKg) || totalWeightKg <= 0) {
         return 0;
@@ -44,7 +68,13 @@ export function calculateCodEligibility({ subtotal, itemBlocksCod }: CodEligibil
     return {
         eligible: reasons.length === 0,
         reasons,
+        codAvailable: reasons.length === 0,
+        codUnavailableReasons: reasons,
     };
+}
+
+export function normalizePaymentMethod(value: string) {
+    return value === 'COD' ? 'CASH_ON_DELIVERY' : value;
 }
 
 export function formatShippingZoneLabel(zone: TShippingZone) {

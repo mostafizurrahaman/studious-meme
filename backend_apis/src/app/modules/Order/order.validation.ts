@@ -17,11 +17,11 @@ const createOrderSchema = z.object({
             note: z.string().trim().optional(),
         }),
         couponCode: z.string().trim().optional(),
-        paymentMethod: z.enum(['CASH_ON_DELIVERY', 'SSL_COMMERZ'], {
+        paymentMethod: z.enum(['COD', 'CASH_ON_DELIVERY', 'PORTPOS'], {
             error: 'Payment method is required!',
         }),
     }),
-    });
+});
 
 const orderCheckoutPreviewSchema = z.object({
     body: createOrderSchema.shape.body.pick({ items: true, customer: true, couponCode: true, paymentMethod: true }),
@@ -32,7 +32,7 @@ const updateOrderStatusSchema = z.object({
         orderId: z.string({ error: 'Order ID is required!' }).trim().min(1, { message: 'Order ID is required!' }),
     }),
     body: z.object({
-        status: z.enum(['PLACED', 'PROCESSING', 'DELIVERED', 'CANCELLED'], {
+        status: z.enum(['PLACED', 'PENDING_PAYMENT', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'], {
             error: 'Status is required!',
         }),
     }),

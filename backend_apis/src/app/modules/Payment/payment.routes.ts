@@ -1,33 +1,31 @@
 import { Router } from 'express';
-import { actionLimiter, adminLimiter, auth, burstProtection, duplicateSubmissionGuard, paymentLimiter, paymentWebhookGuard, publicLimiter } from '../../middlewares';
+import { actionLimiter, adminLimiter, auth, burstProtection, duplicateSubmissionGuard, paymentWebhookGuard, publicLimiter } from '../../middlewares';
 import { ROLE } from '../User/user.constant';
 import { PaymentController } from './payment.controller';
 
 const router = Router();
 
 router
-    .route('/sslcommerz/init/:orderId')
+    .route('/portpos/init/:orderId')
     .post(
         auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN),
-        paymentLimiter,
+        actionLimiter,
         burstProtection('payment', 10_000, 8),
         duplicateSubmissionGuard(),
-        PaymentController.initiateSslCommerzPayment,
+        PaymentController.initiatePortPosPayment,
     );
 
 router
-    .route('/sslcommerz/success')
-    .post(publicLimiter, PaymentController.sslCommerzSuccess)
-    .get(publicLimiter, PaymentController.sslCommerzSuccess);
-
-router.route('/sslcommerz/fail').post(publicLimiter, PaymentController.sslCommerzFail).get(publicLimiter, PaymentController.sslCommerzFail);
+    .route('/portpos/ipn')
+    .post(paymentWebhookGuard, PaymentController.portPosIpn);
 
 router
-    .route('/sslcommerz/cancel')
-    .post(publicLimiter, PaymentController.sslCommerzCancel)
-    .get(publicLimiter, PaymentController.sslCommerzCancel);
+    .route('/portpos/verify/:orderId')
+    .get(auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN), publicLimiter, PaymentController.verifyPortPosPayment);
 
-router.route('/sslcommerz/ipn').post(paymentWebhookGuard, PaymentController.sslCommerzSuccess);
+router
+    .route('/portpos/refund/:orderId')
+    .post(auth(ROLE.ADMIN, ROLE.SUPER_ADMIN), adminLimiter, PaymentController.refundPortPosPayment);
 
 router
     .route('/my-payments')

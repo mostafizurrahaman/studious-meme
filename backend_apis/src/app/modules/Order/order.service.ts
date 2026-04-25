@@ -3,8 +3,15 @@ import { AppError } from '../../utils';
 import { IUser } from '../User/user.interface';
 import { ProductModel } from '../Product/product.model';
 import { OrderModel } from './order.model';
-import { IOrderItemSnapshot, TOrderStatus, TPaymentMethod, TPaymentStatus } from './order.interface';
-import { calculateCodEligibility, calculateShippingCharge, deriveShippingZone, getTotalWeightKg } from './order.utils';
+import { DELIVERY_AREA } from './order.constants';
+import {
+    IOrderItemSnapshot,
+    TOrderState,
+    TPaymentGateway,
+    TPaymentMethodInput,
+    TPaymentStatus,
+} from './order.interface';
+import { calculateCodEligibility, calculateShippingCharge, deriveShippingZone, getTotalWeightKg, normalizePaymentMethod } from './order.utils';
 import { findCoupon } from './order.coupons';
 
 type CreateOrderPayload = {
@@ -18,7 +25,7 @@ type CreateOrderPayload = {
         note?: string;
     };
     couponCode?: string;
-    paymentMethod: TPaymentMethod;
+    paymentMethod: TPaymentMethodInput;
 };
 
 type ProductForCheckout = {
@@ -107,7 +114,14 @@ const calculateOrderTotals = (payload: CreateOrderPayload, items: IOrderItemSnap
     const shippingZone = deriveShippingZone(payload.customer.city, payload.customer.address);
     const coupon = payload.couponCode ? findCoupon(payload.couponCode, subtotal) : null;
     const discount = coupon?.kind === 'percent' ? (subtotal * coupon.value) / 100 : 0;
-    const shippingCharge = coupon?.kind === 'shipping' ? 0 : calculateShippingCharge({ totalWeightKg, zone: shippingZone });
+    const shippingCharge =
+        coupon?.kind === 'shipping'
+            ? 0
+            : calculateShippingCharge({
+                  totalWeightKg,
+                  deliveryArea:
+                      shippingZone === 'inside_dhaka' ? DELIVERY_AREA.INSIDE_DHAKA : DELIVERY_AREA.OUTSIDE_DHAKA,
+              });
     const codEligibility = calculateCodEligibility({
         subtotal,
         itemBlocksCod: items.some(item => item.isNoCOD),
@@ -120,6 +134,7 @@ const calculateOrderTotals = (payload: CreateOrderPayload, items: IOrderItemSnap
         shippingZone,
         shippingCharge,
         codEligibility,
+        payableAmount: Math.max(subtotal - discount + shippingCharge, 0),
     };
 };
 
@@ -156,7 +171,7 @@ const previewCheckoutFromDB = async (payload: CreateOrderPayload) => {
         return buildOrderSnapshot(product, item.quantity);
     });
 
-    const { subtotal, discount, totalWeightKg, shippingZone, shippingCharge, codEligibility } = calculateOrderTotals(
+    const { subtotal, discount, totalWeightKg, shippingZone, shippingCharge, codEligibility, payableAmount } = calculateOrderTotals(
         payload,
         items,
     );
@@ -169,8 +184,11 @@ const previewCheckoutFromDB = async (payload: CreateOrderPayload) => {
         shippingCharge,
         totalWeightKg,
         codEligible: codEligibility.eligible,
+        codAvailable: codEligibility.codAvailable,
         codReasons: codEligibility.reasons,
-        total: Math.max(subtotal - discount + shippingCharge, 0),
+        codUnavailableReasons: codEligibility.codUnavailableReasons,
+        total: payableAmount,
+        payableAmount,
     };
 };
 
@@ -215,19 +233,26 @@ const createOrderIntoDB = async (user: IUser, payload: CreateOrderPayload) => {
             updatedStocks.push({ sku: item.sku, quantity: item.quantity });
         }
 
-        const { subtotal, discount, totalWeightKg, shippingZone, shippingCharge, codEligibility } = calculateOrderTotals(
+        const { subtotal, discount, totalWeightKg, shippingZone, shippingCharge, codEligibility, payableAmount } = calculateOrderTotals(
             payload,
             items,
         );
         const delivery = shippingCharge;
-        const total = Math.max(subtotal - discount + shippingCharge, 0);
+        const total = payableAmount;
+        const normalizedPaymentMethod = normalizePaymentMethod(payload.paymentMethod);
 
-        if (payload.paymentMethod === 'CASH_ON_DELIVERY' && !codEligibility.eligible) {
-            throw new AppError(httpStatus.BAD_REQUEST, codEligibility.reasons.join(' '));
+        if (normalizedPaymentMethod === 'CASH_ON_DELIVERY' && !codEligibility.eligible) {
+            throw new AppError(
+                httpStatus.BAD_REQUEST,
+                codEligibility.reasons.includes('COD is not available for one or more products in your cart.')
+                    ? 'COD is not available for one or more products in your cart.'
+                    : 'COD is not available for orders of 1000 BDT or below.',
+            );
         }
 
-        const paymentStatus: TPaymentStatus = payload.paymentMethod === 'SSL_COMMERZ' ? 'PENDING' : 'UNPAID';
-        const status: TOrderStatus = 'PLACED';
+        const paymentStatus: TPaymentStatus = 'UNPAID';
+        const orderStatus: TOrderState = normalizedPaymentMethod === 'PORTPOS' ? 'PENDING_PAYMENT' : 'PLACED';
+        const paymentGateway: TPaymentGateway = normalizedPaymentMethod === 'PORTPOS' ? 'PORTPOS' : 'CASH_ON_DELIVERY';
 
         const order = await OrderModel.create({
             orderId: createOrderId(),
@@ -247,10 +272,15 @@ const createOrderIntoDB = async (user: IUser, payload: CreateOrderPayload) => {
             codEligible: codEligibility.eligible,
             codReasons: codEligibility.reasons,
             total,
+            totalAmount: total,
+            payableAmount: total,
+            currency: 'BDT',
             couponCode: payload.couponCode || undefined,
-            paymentMethod: payload.paymentMethod,
+            paymentMethod: normalizedPaymentMethod,
+            paymentGateway,
             paymentStatus,
-            status,
+            orderStatus,
+            status: orderStatus,
         });
 
         return order;
@@ -311,10 +341,10 @@ const getAllOrdersForAdminFromDB = async (query: Record<string, unknown>) => {
     };
 };
 
-const updateOrderStatusIntoDB = async (orderId: string, status: TOrderStatus) => {
+const updateOrderStatusIntoDB = async (orderId: string, status: TOrderState) => {
     const order = await OrderModel.findOneAndUpdate(
         { orderId },
-        { status },
+        { status, orderStatus: status },
         { returnDocument: 'after', runValidators: true },
     ).lean();
 
@@ -341,10 +371,23 @@ const updateOrderPaymentIntoDB = async (
         paymentStatus: TPaymentStatus;
         transactionId: string;
         gatewayUrl: string;
-        status: TOrderStatus;
+        paymentGateway: TPaymentGateway;
+        invoiceId: string;
+        paymentId: string;
+        totalAmount: number;
+        payableAmount: number;
+        currency: string;
+        status: TOrderState;
+        orderStatus: TOrderState;
     }>,
 ) => {
-    const order = await OrderModel.findOneAndUpdate({ orderId }, payload, {
+    const normalizedPayload = {
+        ...payload,
+        ...(payload.status ? { orderStatus: payload.status } : {}),
+        ...(payload.orderStatus ? { status: payload.orderStatus } : {}),
+    };
+
+    const order = await OrderModel.findOneAndUpdate({ orderId }, normalizedPayload, {
         returnDocument: 'after',
         runValidators: true,
     }).lean();

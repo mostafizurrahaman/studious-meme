@@ -66,13 +66,16 @@ export default {
         password: process.env.MONITOR_PASSWORD,
     },
 
-    sslcommerz: {
-        store_id: process.env.SSLCOMMERZ_STORE_ID,
-        store_password: process.env.SSLCOMMERZ_STORE_PASSWORD,
-        init_api: process.env.SSLCOMMERZ_PAYMENT_API ?? 'https://sandbox.sslcommerz.com/gwprocess/v4/api.php',
-        validation_api:
-            process.env.SSLCOMMERZ_VALIDATION_API ??
-            'https://sandbox.sslcommerz.com/validator/api/validationserverAPI.php',
+    portpos: {
+        app_key: process.env.PORTPOS_APP_KEY,
+        secret_key: process.env.PORTPOS_SECRET_KEY,
+        base_url: process.env.PORTPOS_BASE_URL ?? 'https://api-sandbox.portpos.com/payment/v2',
+        payment_url: process.env.PORTPOS_PAYMENT_URL ?? 'https://api-sandbox.portpos.com/payment/v2/invoice',
+        redirect_success_url: process.env.PORTPOS_REDIRECT_SUCCESS_URL,
+        redirect_fail_url: process.env.PORTPOS_REDIRECT_FAIL_URL,
+        redirect_cancel_url: process.env.PORTPOS_REDIRECT_CANCEL_URL,
+        ipn_url: process.env.PORTPOS_IPN_URL,
+        mode: process.env.PORTPOS_MODE ?? 'sandbox',
         webhook_ip_allowlist: process.env.PAYMENT_WEBHOOK_IP_ALLOWLIST,
     },
 

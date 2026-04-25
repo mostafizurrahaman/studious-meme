@@ -1,9 +1,12 @@
 import { Document, Types } from 'mongoose';
 import type { TShippingZone } from './order.constants';
 
-export type TOrderStatus = 'PLACED' | 'PROCESSING' | 'DELIVERED' | 'CANCELLED';
-export type TPaymentMethod = 'CASH_ON_DELIVERY' | 'SSL_COMMERZ';
-export type TPaymentStatus = 'UNPAID' | 'PENDING' | 'PAID' | 'FAILED' | 'CANCELLED';
+export type TPaymentMethod = 'CASH_ON_DELIVERY' | 'PORTPOS';
+export type TPaymentMethodInput = TPaymentMethod | 'COD';
+export type TPaymentGateway = 'CASH_ON_DELIVERY' | 'PORTPOS';
+export type TPaymentStatus = 'UNPAID' | 'PENDING_PAYMENT' | 'PAID' | 'FAILED' | 'CANCELLED' | 'REFUNDED';
+export type TOrderState = 'PLACED' | 'PENDING_PAYMENT' | 'CONFIRMED' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
+export type TOrderStatus = TOrderState;
 
 export interface IOrderItemSnapshot {
     product: Types.ObjectId;
@@ -43,10 +46,17 @@ export interface IOrder extends Document {
     codEligible: boolean;
     codReasons: string[];
     total: number;
+    totalAmount: number;
+    payableAmount: number;
+    currency: string;
     couponCode?: string;
     paymentMethod: TPaymentMethod;
+    paymentGateway?: TPaymentGateway;
     paymentStatus: TPaymentStatus;
-    status: TOrderStatus;
+    orderStatus: TOrderState;
+    status: TOrderState;
+    paymentId?: Types.ObjectId;
+    invoiceId?: string;
     transactionId?: string;
     gatewayUrl?: string;
     createdAt: Date;

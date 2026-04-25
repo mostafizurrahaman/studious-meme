@@ -1,16 +1,35 @@
 import httpStatus from 'http-status';
 import { asyncHandler, sendResponse } from '../../utils';
+import { ROLE } from '../User/user.constant';
+import { PaymentService } from '../Payment/payment.service';
 import { OrderService } from './order.service';
 
 const getSingleParam = (value: string | string[]) => (Array.isArray(value) ? value[0] : value);
 
 const createOrder = asyncHandler(async (req, res) => {
-    const result = await OrderService.createOrderIntoDB(req.user, req.body);
+    const order = await OrderService.createOrderIntoDB(req.user, req.body);
+
+    if (req.body.paymentMethod === 'PORTPOS') {
+        const payment = await PaymentService.initiatePortPosPayment(req.user, order.orderId);
+
+        sendResponse(res, {
+            statusCode: httpStatus.CREATED,
+            message: 'Payment initiated successfully!',
+            data: {
+                orderId: order.orderId,
+                invoiceId: payment.invoiceId,
+                paymentUrl: payment.paymentUrl,
+                transactionId: payment.transactionId,
+            },
+        });
+
+        return;
+    }
 
     sendResponse(res, {
         statusCode: httpStatus.CREATED,
         message: 'Order created successfully!',
-        data: result,
+        data: order,
     });
 });
 
@@ -39,6 +58,21 @@ const getMySingleOrder = asyncHandler(async (req, res) => {
         req.user,
         getSingleParam(req.params.orderId),
     );
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        message: 'Order fetched successfully!',
+        data: result,
+    });
+});
+
+const getSingleOrder = asyncHandler(async (req, res) => {
+    const orderId = getSingleParam(req.params.orderId);
+
+    const result =
+        req.user.role === ROLE.ADMIN || req.user.role === ROLE.SUPER_ADMIN
+            ? await OrderService.getOrderByIdFromDB(orderId)
+            : await OrderService.getSingleOrderForUserFromDB(req.user, orderId);
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
@@ -76,6 +110,7 @@ export const OrderController = {
     previewCheckout,
     getMyOrders,
     getMySingleOrder,
+    getSingleOrder,
     getAllOrdersForAdmin,
     updateOrderStatus,
 };

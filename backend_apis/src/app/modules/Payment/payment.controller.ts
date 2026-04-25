@@ -4,50 +4,47 @@ import { PaymentService } from './payment.service';
 
 const getSingleParam = (value: string | string[]) => (Array.isArray(value) ? value[0] : value);
 
-const initiateSslCommerzPayment = asyncHandler(async (req, res) => {
-    const result = await PaymentService.initiateSslCommerzPayment(
-        req.user,
-        getSingleParam(req.params.orderId),
-    );
+const initiatePortPosPayment = asyncHandler(async (req, res) => {
+    const result = await PaymentService.initiatePortPosPayment(req.user, getSingleParam(req.params.orderId));
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
-        message: 'SSLCommerz session created successfully!',
+        message: 'Payment initiated successfully!',
         data: result,
     });
 });
 
-const sslCommerzSuccess = asyncHandler(async (req, res) => {
-    const redirectUrl = await PaymentService.handleSslCommerzSuccess({
+const portPosIpn = asyncHandler(async (req, res) => {
+    const result = await PaymentService.handlePortPosIpn({
         ...req.query,
         ...req.body,
     });
 
-    res.redirect(redirectUrl);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        message: 'IPN processed successfully!',
+        data: result,
+    });
 });
 
-const sslCommerzFail = asyncHandler(async (req, res) => {
-    const redirectUrl = await PaymentService.handleSslCommerzFailure(
-        {
-            ...req.query,
-            ...req.body,
-        },
-        'FAILED',
-    );
+const verifyPortPosPayment = asyncHandler(async (req, res) => {
+    const result = await PaymentService.verifyPortPosPayment(req.user, getSingleParam(req.params.orderId));
 
-    res.redirect(redirectUrl);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        message: 'Payment status verified successfully!',
+        data: result,
+    });
 });
 
-const sslCommerzCancel = asyncHandler(async (req, res) => {
-    const redirectUrl = await PaymentService.handleSslCommerzFailure(
-        {
-            ...req.query,
-            ...req.body,
-        },
-        'CANCELED',
-    );
+const refundPortPosPayment = asyncHandler(async (req, res) => {
+    const result = await PaymentService.refundPayment(getSingleParam(req.params.orderId), req.body.amount);
 
-    res.redirect(redirectUrl);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        message: 'Payment refunded successfully!',
+        data: result,
+    });
 });
 
 const getMyPayments = asyncHandler(async (req, res) => {
@@ -73,10 +70,10 @@ const getAllPaymentsForAdmin = asyncHandler(async (req, res) => {
 });
 
 export const PaymentController = {
-    initiateSslCommerzPayment,
-    sslCommerzSuccess,
-    sslCommerzFail,
-    sslCommerzCancel,
+    initiatePortPosPayment,
+    portPosIpn,
+    verifyPortPosPayment,
+    refundPortPosPayment,
     getMyPayments,
     getAllPaymentsForAdmin,
 };

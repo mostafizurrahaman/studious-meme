@@ -1,4 +1,7 @@
 import { type NextFunction, type Request, type Response } from 'express';
+import httpStatus from 'http-status';
+import config from '../config';
+import { AppError } from '../utils';
 
 /*
 Temporary disable note:
@@ -34,7 +37,36 @@ export const burstProtection =
         return args[2]();
     };
 
-export const paymentWebhookGuard = (...args: [Request, Response, NextFunction]) => args[2]();
+const normalizeIp = (value: string) => value.replace(/^::ffff:/, '').trim();
+
+const getClientIp = (req: Request) => {
+    const forwarded = req.headers['x-forwarded-for'];
+    const headerIp = Array.isArray(forwarded) ? forwarded[0] : forwarded;
+
+    return normalizeIp((headerIp ? String(headerIp).split(',')[0] : req.ip || req.socket.remoteAddress || 'unknown'));
+};
+
+export const paymentWebhookGuard = (req: Request, _res: Response, next: NextFunction) => {
+    if (req.method !== 'POST') {
+        next(new AppError(httpStatus.METHOD_NOT_ALLOWED, 'Webhook method not allowed.'));
+        return;
+    }
+
+    const allowlist = config.portpos.webhook_ip_allowlist
+        ? config.portpos.webhook_ip_allowlist.split(',').map(ip => normalizeIp(ip))
+        : [];
+
+    if (allowlist.length > 0) {
+        const clientIp = getClientIp(req);
+
+        if (!allowlist.includes(clientIp)) {
+            next(new AppError(httpStatus.FORBIDDEN, 'Webhook source is not allowed.'));
+            return;
+        }
+    }
+
+    next();
+};
 
 // import { createHash } from 'crypto';
 // import { type NextFunction, type Request, type Response } from 'express';
@@ -280,28 +312,4 @@ export const paymentWebhookGuard = (...args: [Request, Response, NextFunction]) 
 //             next(error);
 //         }
 //     };
-// };
-
-// export const paymentWebhookGuard = (req: Request, _res: Response, next: NextFunction) => {
-//     const allowlist = config.sslcommerz.webhook_ip_allowlist
-//         ? config.sslcommerz.webhook_ip_allowlist
-//               .split(',')
-//               .map(item => stripQuotes(item.trim()))
-//               .filter(Boolean)
-//         : [];
-
-//     if (!allowlist.length) {
-//         next();
-//         return;
-//     }
-
-//     const forwardedFor = getHeaderValue(req.headers['x-forwarded-for']).split(',')[0]?.trim();
-//     const clientIp = normalizeIp(forwardedFor || req.ip || req.socket.remoteAddress || 'unknown');
-
-//     if (!allowlist.includes(clientIp)) {
-//         next(new AppError(httpStatus.FORBIDDEN, 'Webhook source is not allowed.'));
-//         return;
-//     }
-
-//     next();
 // };
