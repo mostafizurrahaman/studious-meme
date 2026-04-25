@@ -21,32 +21,16 @@ const moduleRoutes = [
         route: UserRoutes,
     },
     {
-        path: '/page',
-        route: PageRoutes,
-    },
-    {
         path: '/admin',
         route: AdminRoutes,
     },
     {
-        path: '/payment',
-        route: PaymentRoutes,
-    },
-    {
-        path: '/compare',
-        route: ComparisonHistoryRoutes,
-    },
-    {
-        path: '/wishlist',
-        route: WishlistHistoryRoutes,
-    },
-    {
-        path: '/contact',
-        route: ContactRoutes,
-    },
-    {
         path: '/hero',
         route: HeroSectionRoutes,
+    },
+    {
+        path: '/page',
+        route: PageRoutes,
     },
     {
         path: '/brand',
@@ -61,12 +45,28 @@ const moduleRoutes = [
         route: ProductRoutes,
     },
     {
-        path: '/order',
-        route: OrderRoutes,
+        path: '/compare',
+        route: ComparisonHistoryRoutes,
+    },
+    {
+        path: '/wishlist',
+        route: WishlistHistoryRoutes,
     },
     {
         path: '/cart',
         route: CartRoutes,
+    },
+    {
+        path: '/order',
+        route: OrderRoutes,
+    },
+    {
+        path: '/payment',
+        route: PaymentRoutes,
+    },
+    {
+        path: '/contact',
+        route: ContactRoutes,
     },
 ];
 
