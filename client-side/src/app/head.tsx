@@ -1,5 +1,5 @@
-import { GoogleSearchConsole } from '@/components/GoogleSearchConsole';
+import { GoogleSearchConsole } from "@/components/GoogleSearchConsole";
 
 export default function Head() {
-    return <GoogleSearchConsole />;
+  return <GoogleSearchConsole />;
 }

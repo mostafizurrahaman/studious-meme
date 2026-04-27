@@ -798,121 +798,129 @@
 // export default serverHomePage;
 
 /* eslint-disable no-console */
-import fs from 'fs';
-import path from 'path';
-import os from 'os';
-import osUtils from 'os-utils';
-import dotenv from 'dotenv';
-import config from '../config';
+import fs from "fs";
+import path from "path";
+import os from "os";
+import osUtils from "os-utils";
+import dotenv from "dotenv";
+import config from "../config";
 dotenv.config();
 
 // (4)
-const logsDir = path.join(process.cwd(), 'logs');
-const responseLogFilePath = path.join(logsDir, 'ResponseTime.log');
-const errorLogFilePath = path.join(logsDir, 'Error.log');
+const logsDir = path.join(process.cwd(), "logs");
+const responseLogFilePath = path.join(logsDir, "ResponseTime.log");
+const errorLogFilePath = path.join(logsDir, "Error.log");
 
 interface ErrorLogEntry {
-    timestamp: string;
-    method: string;
-    statusCode: string;
-    message: string;
-    errorPath: string;
-    stack: string;
+  timestamp: string;
+  method: string;
+  statusCode: string;
+  message: string;
+  errorPath: string;
+  stack: string;
 }
 
 interface ResponseLogEntry {
-    timestamp: string;
-    route: string;
-    method: string;
-    responseTime: number;
-    label: 'Low' | 'Medium' | 'High';
+  timestamp: string;
+  route: string;
+  method: string;
+  responseTime: number;
+  label: "Low" | "Medium" | "High";
 }
 
 function readLogFile(): {
-    errorLogs: ErrorLogEntry[];
-    responseTimeLogs: ResponseLogEntry[];
+  errorLogs: ErrorLogEntry[];
+  responseTimeLogs: ResponseLogEntry[];
 } {
-    const errorLogs: ErrorLogEntry[] = [];
-    const responseTimeLogs: ResponseLogEntry[] = [];
+  const errorLogs: ErrorLogEntry[] = [];
+  const responseTimeLogs: ResponseLogEntry[] = [];
 
-    try {
-        if (fs.existsSync(responseLogFilePath)) {
-            const responseLogData = fs.readFileSync(responseLogFilePath, 'utf8');
+  try {
+    if (fs.existsSync(responseLogFilePath)) {
+      const responseLogData = fs.readFileSync(responseLogFilePath, "utf8");
 
-            // Robustly handle multiple JSON objects on the same line or concatenated
-            const normalizedData = responseLogData.replace(/\}[\s]*\{/g, '}\n{');
+      // Robustly handle multiple JSON objects on the same line or concatenated
+      const normalizedData = responseLogData.replace(/\}[\s]*\{/g, "}\n{");
 
-            normalizedData.split('\n').forEach(entry => {
-                if (!entry.trim()) return;
+      normalizedData.split("\n").forEach((entry) => {
+        if (!entry.trim()) return;
 
-                try {
-                    const log = JSON.parse(entry);
-                    if (log.responseTime) {
-                        const responseTime = parseFloat(log.responseTime);
-                        const label = responseTime > 2000 ? 'High' : responseTime > 1000 ? 'Medium' : 'Low';
+        try {
+          const log = JSON.parse(entry);
+          if (log.responseTime) {
+            const responseTime = parseFloat(log.responseTime);
+            const label =
+              responseTime > 2000
+                ? "High"
+                : responseTime > 1000
+                  ? "Medium"
+                  : "Low";
 
-                        responseTimeLogs.push({
-                            timestamp: new Date(log.timestamp).toLocaleString(),
-                            route: log.url || 'N/A',
-                            method: log.method || 'N/A',
-                            responseTime,
-                            label,
-                        });
-                    }
-                } catch (err) {
-                    console.error('Error parsing response time log entry:', err);
-                }
+            responseTimeLogs.push({
+              timestamp: new Date(log.timestamp).toLocaleString(),
+              route: log.url || "N/A",
+              method: log.method || "N/A",
+              responseTime,
+              label,
             });
+          }
+        } catch (err) {
+          console.error("Error parsing response time log entry:", err);
         }
-    } catch (err) {
-        console.error('Error reading response time log file:', err);
+      });
     }
+  } catch (err) {
+    console.error("Error reading response time log file:", err);
+  }
 
-    try {
-        if (fs.existsSync(errorLogFilePath)) {
-            const errorLogData = fs.readFileSync(errorLogFilePath, 'utf8');
+  try {
+    if (fs.existsSync(errorLogFilePath)) {
+      const errorLogData = fs.readFileSync(errorLogFilePath, "utf8");
 
-            // Robustly handle multiple JSON objects on the same line or concatenated
-            const normalizedErrorData = errorLogData.replace(/\}[\s]*\{/g, '}\n{');
+      // Robustly handle multiple JSON objects on the same line or concatenated
+      const normalizedErrorData = errorLogData.replace(/\}[\s]*\{/g, "}\n{");
 
-            normalizedErrorData.split('\n').forEach(entry => {
-                if (!entry.trim()) return;
-                try {
-                    const log = JSON.parse(entry);
-                    if (log.level === 'error' && !(log.url && log.url.includes('/favicon.ico'))) {
-                        errorLogs.push({
-                            timestamp: new Date(log.timestamp).toLocaleString(),
-                            method: log.method || 'N/A',
-                            statusCode: log.status || 'N/A',
-                            message: log.message,
-                            errorPath: log.url || 'N/A',
-                            stack: log.stack || 'No stack trace available',
-                        });
-                    }
-                } catch (err) {
-                    console.error('Error parsing error log entry:', err);
-                }
+      normalizedErrorData.split("\n").forEach((entry) => {
+        if (!entry.trim()) return;
+        try {
+          const log = JSON.parse(entry);
+          if (
+            log.level === "error" &&
+            !(log.url && log.url.includes("/favicon.ico"))
+          ) {
+            errorLogs.push({
+              timestamp: new Date(log.timestamp).toLocaleString(),
+              method: log.method || "N/A",
+              statusCode: log.status || "N/A",
+              message: log.message,
+              errorPath: log.url || "N/A",
+              stack: log.stack || "No stack trace available",
             });
+          }
+        } catch (err) {
+          console.error("Error parsing error log entry:", err);
         }
-    } catch (err) {
-        console.error('Error reading error log file:', err);
+      });
     }
+  } catch (err) {
+    console.error("Error reading error log file:", err);
+  }
 
-    return {
-        errorLogs: errorLogs.reverse(),
-        responseTimeLogs: responseTimeLogs.reverse(),
-    };
+  return {
+    errorLogs: errorLogs.reverse(),
+    responseTimeLogs: responseTimeLogs.reverse(),
+  };
 }
 
 async function generateCpuUsageHtml(): Promise<string> {
-    return new Promise(resolve => {
-        osUtils.cpuUsage((usage: number) => {
-            const totalCores = os.cpus().length;
-            const cpuUsagePercentage = usage * 100;
-            const usedCores = Math.ceil((cpuUsagePercentage / 100) * totalCores);
-            const idleCores = totalCores - usedCores;
+  return new Promise((resolve) => {
+    osUtils.cpuUsage((usage: number) => {
+      const totalCores = os.cpus().length;
+      const cpuUsagePercentage = usage * 100;
+      const usedCores = Math.ceil((cpuUsagePercentage / 100) * totalCores);
+      const idleCores = totalCores - usedCores;
 
-            resolve(`
+      resolve(`
         <div id="cpu-usage">
           <div class="cpu-stats">
             <div class="mem-item">Total Cores: <span>${totalCores}</span></div>
@@ -925,16 +933,16 @@ async function generateCpuUsageHtml(): Promise<string> {
           </div>
         </div>
       `);
-        });
     });
+  });
 }
 
 function generateErrorLogTable(errorLogs: ErrorLogEntry[]): string {
-    if (errorLogs.length === 0) {
-        return '<p style="text-align: center; padding: 2rem;">No error logs available.</p>';
-    }
+  if (errorLogs.length === 0) {
+    return '<p style="text-align: center; padding: 2rem;">No error logs available.</p>';
+  }
 
-    let tableHtml = `
+  let tableHtml = `
     <table>
       <thead>
         <tr>
@@ -948,8 +956,8 @@ function generateErrorLogTable(errorLogs: ErrorLogEntry[]): string {
       <tbody>
   `;
 
-    errorLogs.forEach(log => {
-        tableHtml += `
+  errorLogs.forEach((log) => {
+    tableHtml += `
       <tr>
         <td>${log.timestamp}</td>
         <td>${log.method}</td>
@@ -958,18 +966,20 @@ function generateErrorLogTable(errorLogs: ErrorLogEntry[]): string {
         <td>${log.errorPath}</td>
       </tr>
     `;
-    });
+  });
 
-    tableHtml += '</tbody></table>';
-    return tableHtml;
+  tableHtml += "</tbody></table>";
+  return tableHtml;
 }
 
-function generateResponseTimeTable(responseTimeLogs: ResponseLogEntry[]): string {
-    if (responseTimeLogs.length === 0) {
-        return '<p style="text-align: center; padding: 2rem;">No response time logs available.</p>';
-    }
+function generateResponseTimeTable(
+  responseTimeLogs: ResponseLogEntry[],
+): string {
+  if (responseTimeLogs.length === 0) {
+    return '<p style="text-align: center; padding: 2rem;">No response time logs available.</p>';
+  }
 
-    let tableHtml = `
+  let tableHtml = `
     <table>
       <thead>
         <tr>
@@ -983,9 +993,9 @@ function generateResponseTimeTable(responseTimeLogs: ResponseLogEntry[]): string
       <tbody>
   `;
 
-    responseTimeLogs.forEach(log => {
-        const labelClass = `bg-${log.label.toLowerCase()}`;
-        tableHtml += `
+  responseTimeLogs.forEach((log) => {
+    const labelClass = `bg-${log.label.toLowerCase()}`;
+    tableHtml += `
       <tr>
         <td>${log.timestamp}</td>
         <td>${log.route}</td>
@@ -994,46 +1004,53 @@ function generateResponseTimeTable(responseTimeLogs: ResponseLogEntry[]): string
         <td><span class="badge ${labelClass}">${log.label}</span></td>
       </tr>
     `;
-    });
+  });
 
-    tableHtml += '</tbody></table>';
-    return tableHtml;
+  tableHtml += "</tbody></table>";
+  return tableHtml;
 }
 
 async function serverHomePage(): Promise<string> {
-    const { totalRequests, totalErrors, avgResponseTime, errorRate, memory, errorLogs, responseTimeLogs } =
-        getMonitorStats();
+  const {
+    totalRequests,
+    totalErrors,
+    avgResponseTime,
+    errorRate,
+    memory,
+    errorLogs,
+    responseTimeLogs,
+  } = getMonitorStats();
 
-    const errorLogTableHtml = generateErrorLogTable(errorLogs);
-    const responseTimeTableHtml = generateResponseTimeTable(responseTimeLogs);
-    // const errorLogTableHtml = '...';
-    // const responseTimeTableHtml = '...';
-    const cpuUsageHtml = await generateCpuUsageHtml();
+  const errorLogTableHtml = generateErrorLogTable(errorLogs);
+  const responseTimeTableHtml = generateResponseTimeTable(responseTimeLogs);
+  // const errorLogTableHtml = '...';
+  // const responseTimeTableHtml = '...';
+  const cpuUsageHtml = await generateCpuUsageHtml();
 
-    const monitorClientConfig = Buffer.from(
-        JSON.stringify({
-            monitorUserName: config.monitor.username || '',
-            monitorPassword: config.monitor.password || '',
-            superUserName: config.superAdmin.email || '',
-            superPassWord: config.superAdmin.password || '',
-            chartLabels: responseTimeLogs
-                .slice(0, 20)
-                .reverse()
-                .map(l => l.timestamp.split(', ')[1]),
-            chartData: responseTimeLogs
-                .slice(0, 20)
-                .reverse()
-                .map(l => l.responseTime),
-        }),
-    ).toString('base64');
+  const monitorClientConfig = Buffer.from(
+    JSON.stringify({
+      monitorUserName: config.monitor.username || "",
+      monitorPassword: config.monitor.password || "",
+      superUserName: config.superAdmin.email || "",
+      superPassWord: config.superAdmin.password || "",
+      chartLabels: responseTimeLogs
+        .slice(0, 20)
+        .reverse()
+        .map((l) => l.timestamp.split(", ")[1]),
+      chartData: responseTimeLogs
+        .slice(0, 20)
+        .reverse()
+        .map((l) => l.responseTime),
+    }),
+  ).toString("base64");
 
-    return `
+  return `
   <!DOCTYPE html>
   <html lang="en">
     <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>${config.preffered_website_name || 'Server'} Monitor v2.5.2</title>
+      <title>${config.preffered_website_name || "Server"} Monitor v2.5.2</title>
       <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
       <style>
@@ -1234,7 +1251,7 @@ async function serverHomePage(): Promise<string> {
 
       <div id="main-view" class="container">
         <header>
-          <div class="logo">${(config.preffered_website_name || 'BasBanGeet').toUpperCase()}<span> MONITOR</span></div>
+          <div class="logo">${(config.preffered_website_name || "BasBanGeet").toUpperCase()}<span> MONITOR</span></div>
           <div class="header-actions">
             <div style="display: flex; align-items: center; gap: 0.5rem; background: rgba(0,0,0,0.2); padding: 0.5rem 1rem; border-radius: 2rem;">
               <div class="pulse"></div>
@@ -1476,39 +1493,47 @@ async function serverHomePage(): Promise<string> {
 export default serverHomePage;
 
 export function getMonitorStats() {
-    const { errorLogs, responseTimeLogs } = readLogFile();
+  const { errorLogs, responseTimeLogs } = readLogFile();
 
-    const totalRequests = responseTimeLogs.length;
-    const totalErrors = errorLogs.length;
-    const avgResponseTime =
-        totalRequests > 0
-            ? (responseTimeLogs.reduce((acc, log) => acc + log.responseTime, 0) / totalRequests).toFixed(2)
-            : '0';
-    const errorRate =
-        totalRequests > 0 ? ((totalErrors / (totalRequests + totalErrors)) * 100).toFixed(2) : '0';
+  const totalRequests = responseTimeLogs.length;
+  const totalErrors = errorLogs.length;
+  const avgResponseTime =
+    totalRequests > 0
+      ? (
+          responseTimeLogs.reduce((acc, log) => acc + log.responseTime, 0) /
+          totalRequests
+        ).toFixed(2)
+      : "0";
+  const errorRate =
+    totalRequests > 0
+      ? ((totalErrors / (totalRequests + totalErrors)) * 100).toFixed(2)
+      : "0";
 
-    const memory = {
-        total: (os.totalmem() / 1024 / 1024 / 1024).toFixed(2),
-        free: (os.freemem() / 1024 / 1024 / 1024).toFixed(2),
-        used: ((os.totalmem() - os.freemem()) / 1024 / 1024 / 1024).toFixed(2),
-        usagePercentage: (((os.totalmem() - os.freemem()) / os.totalmem()) * 100).toFixed(2),
-    };
+  const memory = {
+    total: (os.totalmem() / 1024 / 1024 / 1024).toFixed(2),
+    free: (os.freemem() / 1024 / 1024 / 1024).toFixed(2),
+    used: ((os.totalmem() - os.freemem()) / 1024 / 1024 / 1024).toFixed(2),
+    usagePercentage: (
+      ((os.totalmem() - os.freemem()) / os.totalmem()) *
+      100
+    ).toFixed(2),
+  };
 
-    return {
-        totalRequests,
-        totalErrors,
-        avgResponseTime,
-        errorRate,
-        memory,
-        chartLabels: responseTimeLogs
-            .slice(0, 20)
-            .reverse()
-            .map(l => l.timestamp.split(', ')[1]),
-        chartData: responseTimeLogs
-            .slice(0, 20)
-            .reverse()
-            .map(l => l.responseTime),
-        errorLogs: errorLogs.slice(0, 50000), // Limit for real-time
-        responseTimeLogs: responseTimeLogs.slice(0, 50000), // Limit for real-time
-    };
+  return {
+    totalRequests,
+    totalErrors,
+    avgResponseTime,
+    errorRate,
+    memory,
+    chartLabels: responseTimeLogs
+      .slice(0, 20)
+      .reverse()
+      .map((l) => l.timestamp.split(", ")[1]),
+    chartData: responseTimeLogs
+      .slice(0, 20)
+      .reverse()
+      .map((l) => l.responseTime),
+    errorLogs: errorLogs.slice(0, 50000), // Limit for real-time
+    responseTimeLogs: responseTimeLogs.slice(0, 50000), // Limit for real-time
+  };
 }

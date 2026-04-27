@@ -1,85 +1,93 @@
-import httpStatus from 'http-status';
-import nodemailer from 'nodemailer';
-import config from '../config';
-import AppError from './AppError';
-import path from 'path';
+import httpStatus from "http-status";
+import nodemailer from "nodemailer";
+import config from "../config";
+import AppError from "./AppError";
+import path from "path";
 
 const sendOtpEmail = async ({
-    email,
-    otp,
-    name = 'User',
-    subject = 'Your OTP for Account Verification',
-    logoCid = 'malamal_logo',
-    customMessage = '',
-    attachments = [],
+  email,
+  otp,
+  name = "User",
+  subject = "Your OTP for Account Verification",
+  logoCid = "malamal_logo",
+  customMessage = "",
+  attachments = [],
 }: {
-    email: string;
-    otp: string;
-    name?: string;
-    subject?: string;
-    logoCid?: string;
-    customMessage?: string;
-    attachments?: { filename: string; path: string }[];
+  email: string;
+  otp: string;
+  name?: string;
+  subject?: string;
+  logoCid?: string;
+  customMessage?: string;
+  attachments?: { filename: string; path: string }[];
 }) => {
-    try {
-        // Create a transporter for sending emails
-        const transporter = nodemailer.createTransport({
-            // host: 'smtp.gmail.com',
-            // port: 587,
-            // secure: false, // true for 465, false for other ports
-            service: 'gmail',
-            auth: {
-                user: config.nodemailer.email,
-                pass: config.nodemailer.password,
-            },
-        });
+  try {
+    // Create a transporter for sending emails
+    const transporter = nodemailer.createTransport({
+      // host: 'smtp.gmail.com',
+      // port: 587,
+      // secure: false, // true for 465, false for other ports
+      service: "gmail",
+      auth: {
+        user: config.nodemailer.email,
+        pass: config.nodemailer.password,
+      },
+    });
 
-        // Generate the HTML content dynamically
-        const htmlTemplate = generateEmailHTML(otp, name, logoCid, customMessage);
+    // Generate the HTML content dynamically
+    const htmlTemplate = generateEmailHTML(otp, name, logoCid, customMessage);
 
-        // Email options: from, to, subject, and HTML body
-        const mailOptions = {
-            from: `${config.preffered_website_name} 📰 <${config.nodemailer.email}>`,
-            to: email,
-            subject: subject,
-            html: htmlTemplate,
-            attachments: [
-                ...attachments, // Attach any custom attachments
-                {
-                    filename: 'logo.png',
-                    path:
-                        config.NODE_ENV === 'production'
-                            ? 'https://res.cloudinary.com/dweesppci/image/upload/v1773643973/1773643973677-KHALED-SIDDIQUE.png' // ✅ works on Vercel
-                            : path.join(__dirname, 'assets', 'logo.png'), // ✅ works locally
-                    cid: logoCid, // Embed logo with CID
-                },
-            ],
+    // Email options: from, to, subject, and HTML body
+    const mailOptions = {
+      from: `${config.preffered_website_name} 📰 <${config.nodemailer.email}>`,
+      to: email,
+      subject: subject,
+      html: htmlTemplate,
+      attachments: [
+        ...attachments, // Attach any custom attachments
+        {
+          filename: "logo.png",
+          path:
+            config.NODE_ENV === "production"
+              ? "https://res.cloudinary.com/dweesppci/image/upload/v1773643973/1773643973677-KHALED-SIDDIQUE.png" // ✅ works on Vercel
+              : path.join(__dirname, "assets", "logo.png"), // ✅ works locally
+          cid: logoCid, // Embed logo with CID
+        },
+      ],
 
-            // attachments: [
-            //   ...attachments, // Attach any custom attachments
-            //   {
-            //     filename: 'logo.png',
-            //     path: path.join(__dirname, 'assets', 'logo.png'),
-            //     cid: logoCid, // Embed logo with CID
-            //   },
-            // ],
-        };
+      // attachments: [
+      //   ...attachments, // Attach any custom attachments
+      //   {
+      //     filename: 'logo.png',
+      //     path: path.join(__dirname, 'assets', 'logo.png'),
+      //     cid: logoCid, // Embed logo with CID
+      //   },
+      // ],
+    };
 
-        // Send the email using Nodemailer
-        await transporter.sendMail(mailOptions);
-    } catch (error) {
-        // Log the error and throw a custom error with a message
-        // eslint-disable-next-line no-console
-        console.log(error);
-        throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to send email');
-    }
+    // Send the email using Nodemailer
+    await transporter.sendMail(mailOptions);
+  } catch (error) {
+    // Log the error and throw a custom error with a message
+    // eslint-disable-next-line no-console
+    console.log(error);
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      "Failed to send email",
+    );
+  }
 };
 
 export default sendOtpEmail;
 
 // Utility function to generate the email HTML content dynamically
-const generateEmailHTML = (otp: string, name: string, logoCid: string, customMessage: string = '') => {
-    return `
+const generateEmailHTML = (
+  otp: string,
+  name: string,
+  logoCid: string,
+  customMessage: string = "",
+) => {
+  return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -172,17 +180,17 @@ const generateEmailHTML = (otp: string, name: string, logoCid: string, customMes
     </div>
 
     <p>Please enter this OTP to complete your email verification and start using ${
-        config.preffered_website_name
+      config.preffered_website_name
     }.</p>
     <p><strong>Note:</strong> This OTP will expire in 5 minutes. Be sure to enter it before it expires.</p>
 
     <!-- Optional Custom Message Section -->
-    ${customMessage ? `<p><strong>Additional Info:</strong> ${customMessage}</p>` : ''}
+    ${customMessage ? `<p><strong>Additional Info:</strong> ${customMessage}</p>` : ""}
 
     <!-- Footer -->
     <div class="footer">
       <p>Thank you for being a part of ${
-          config.preffered_website_name
+        config.preffered_website_name
       }. If you did not request this, please ignore this email.</p>
     </div>
   </div>

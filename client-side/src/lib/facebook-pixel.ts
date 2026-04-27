@@ -1,8 +1,11 @@
 export function getFacebookPixelId() {
-  return process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID?.trim() ?? '';
+  return process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID?.trim() ?? "";
 }
 
-type FacebookPixelEventParams = Record<string, string | number | boolean | undefined>;
+type FacebookPixelEventParams = Record<
+  string,
+  string | number | boolean | undefined
+>;
 
 declare global {
   interface Window {
@@ -16,21 +19,24 @@ export function isFacebookPixelEnabled() {
   return Boolean(getFacebookPixelId());
 }
 
-export function trackFacebookPixelEvent(eventName: string, params?: FacebookPixelEventParams) {
-  if (typeof window === 'undefined' || typeof window.fbq !== 'function') {
+export function trackFacebookPixelEvent(
+  eventName: string,
+  params?: FacebookPixelEventParams,
+) {
+  if (typeof window === "undefined" || typeof window.fbq !== "function") {
     return;
   }
 
   if (params && Object.keys(params).length > 0) {
-    window.fbq('track', eventName, params);
+    window.fbq("track", eventName, params);
     return;
   }
 
-  window.fbq('track', eventName);
+  window.fbq("track", eventName);
 }
 
 export function trackFacebookPageView() {
-  trackFacebookPixelEvent('PageView');
+  trackFacebookPixelEvent("PageView");
 }
 
 export function buildFacebookPixelInitScript(pixelId: string) {

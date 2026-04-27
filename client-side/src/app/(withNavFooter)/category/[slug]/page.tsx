@@ -1,14 +1,24 @@
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import { Suspense } from 'react';
-import { CategoryPageClient } from '@/components/CategoryPageClient';
-import { SeoScripts } from '@/components/SeoScripts';
-import { Card } from '@/components/ui/card';
-import { buildCategoryMetadata, buildCategorySchemas } from '@/lib/seo';
-import { getActiveBrands } from '@/services/Brand';
-import { getActiveCategories, getActiveCategoryBySlug } from '@/services/Category';
-import { mapBackendCategoryToCategoryPageEntry, type BackendCategory } from '@/services/Category/mappers';
-import { getProductsByCategorySlug, getProductsBySubCategorySlug, mapBackendProductToStorefrontProduct } from '@/services/Product';
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { Suspense } from "react";
+import { CategoryPageClient } from "@/components/CategoryPageClient";
+import { SeoScripts } from "@/components/SeoScripts";
+import { Card } from "@/components/ui/card";
+import { buildCategoryMetadata, buildCategorySchemas } from "@/lib/seo";
+import { getActiveBrands } from "@/services/Brand";
+import {
+  getActiveCategories,
+  getActiveCategoryBySlug,
+} from "@/services/Category";
+import {
+  mapBackendCategoryToCategoryPageEntry,
+  type BackendCategory,
+} from "@/services/Category/mappers";
+import {
+  getProductsByCategorySlug,
+  getProductsBySubCategorySlug,
+  mapBackendProductToStorefrontProduct,
+} from "@/services/Product";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -30,20 +40,22 @@ export async function generateStaticParams() {
 
   return Array.isArray(categoriesResult?.data)
     ? categoriesResult.data
-        .map(item => (item as BackendCategory).slug)
+        .map((item) => (item as BackendCategory).slug)
         .filter((slug): slug is string => Boolean(slug))
-        .map(slug => ({ slug }))
+        .map((slug) => ({ slug }))
     : [];
 }
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const backendCategory = await getActiveCategoryBySlug(slug).catch(() => null);
-  const category = backendCategory?.data ? mapBackendCategoryToCategoryPageEntry(backendCategory.data) : null;
+  const category = backendCategory?.data
+    ? mapBackendCategoryToCategoryPageEntry(backendCategory.data)
+    : null;
 
   if (!category) {
     return {
-      title: 'Category not found',
+      title: "Category not found",
       robots: { index: false, follow: false },
     };
   }
@@ -56,19 +68,29 @@ const DEFAULT_CATEGORY_LIMIT = 24;
 export default async function CategoryPage({ params, searchParams }: Props) {
   const { slug } = await params;
   const query = await searchParams;
-  const page = Math.max(Number(query.page ?? '1') || 1, 1);
-  const limit = Math.max(Number(query.limit ?? String(DEFAULT_CATEGORY_LIMIT)) || DEFAULT_CATEGORY_LIMIT, 1);
+  const page = Math.max(Number(query.page ?? "1") || 1, 1);
+  const limit = Math.max(
+    Number(query.limit ?? String(DEFAULT_CATEGORY_LIMIT)) ||
+      DEFAULT_CATEGORY_LIMIT,
+    1,
+  );
   const backendCategory = await getActiveCategoryBySlug(slug).catch(() => null);
-  const category = backendCategory?.data ? mapBackendCategoryToCategoryPageEntry(backendCategory.data) : null;
+  const category = backendCategory?.data
+    ? mapBackendCategoryToCategoryPageEntry(backendCategory.data)
+    : null;
 
   if (!category) {
     notFound();
   }
 
-  const title = 'name' in category ? category.name : category.title;
-  const subCategorySlug = query.subCategorySlug?.trim() ?? '';
+  const title = "name" in category ? category.name : category.title;
+  const subCategorySlug = query.subCategorySlug?.trim() ?? "";
   const selectedSubCategory =
-    'subCategories' in category ? category.subCategories?.find(item => item.slug === subCategorySlug) ?? null : null;
+    "subCategories" in category
+      ? (category.subCategories?.find(
+          (item) => item.slug === subCategorySlug,
+        ) ?? null)
+      : null;
   const [productsResult, brandsResult] = await Promise.all([
     subCategorySlug
       ? getProductsBySubCategorySlug(subCategorySlug, {
@@ -88,7 +110,9 @@ export default async function CategoryPage({ params, searchParams }: Props) {
     getActiveBrands().catch(() => null),
   ]);
   const products = productsResult?.data?.length
-    ? await Promise.all(productsResult.data.map(mapBackendProductToStorefrontProduct))
+    ? await Promise.all(
+        productsResult.data.map(mapBackendProductToStorefrontProduct),
+      )
     : [];
   const meta = {
     total: productsResult?.meta?.total ?? products.length,
@@ -96,14 +120,18 @@ export default async function CategoryPage({ params, searchParams }: Props) {
     page: productsResult?.meta?.page ?? page,
     totalPages: productsResult?.meta?.totalPages ?? 1,
   };
-  const brandFilters = brandsResult?.data?.map(brand => brand.name).filter(Boolean) ?? [];
+  const brandFilters =
+    brandsResult?.data?.map((brand) => brand.name).filter(Boolean) ?? [];
 
   return (
     <>
       <SeoScripts data={buildCategorySchemas(category, products)} />
       <main className="flex-1 bg-background pb-16">
         <div className="px-4 py-6 lg:px-6">
-          <nav aria-label="Breadcrumb" className="mb-4 text-sm text-foreground/55">
+          <nav
+            aria-label="Breadcrumb"
+            className="mb-4 text-sm text-foreground/55"
+          >
             <ol className="flex flex-wrap items-center gap-2">
               <li>
                 <Link href="/" className="cursor-pointer hover:text-primary">
@@ -112,7 +140,10 @@ export default async function CategoryPage({ params, searchParams }: Props) {
               </li>
               <li>/</li>
               <li>
-                <Link href="/main-categories" className="cursor-pointer hover:text-primary">
+                <Link
+                  href="/main-categories"
+                  className="cursor-pointer hover:text-primary"
+                >
                   Main Categories
                 </Link>
               </li>
@@ -120,7 +151,11 @@ export default async function CategoryPage({ params, searchParams }: Props) {
               <li className="font-semibold text-foreground/75">{title}</li>
             </ol>
           </nav>
-          <Suspense fallback={<Card className="p-6 shadow-sm">Loading category...</Card>}>
+          <Suspense
+            fallback={
+              <Card className="p-6 shadow-sm">Loading category...</Card>
+            }
+          >
             <CategoryPageClient
               category={category}
               products={products}
@@ -131,7 +166,10 @@ export default async function CategoryPage({ params, searchParams }: Props) {
           </Suspense>
           <Card className="mt-6 flex items-center justify-between p-4 text-sm shadow-sm">
             <span className="text-foreground/60">Need a broader view?</span>
-            <Link href="/main-categories" className="cursor-pointer font-semibold text-primary">
+            <Link
+              href="/main-categories"
+              className="cursor-pointer font-semibold text-primary"
+            >
               Back to categories
             </Link>
           </Card>

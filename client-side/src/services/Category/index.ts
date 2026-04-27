@@ -1,10 +1,10 @@
-'use server';
+"use server";
 
-import { updateTag } from 'next/cache';
-import { requestBackendJson } from '@/lib/backend-api';
-import { getValidAccessTokenForServerActions } from '@/lib/getValidAccessToken';
-import { slugify } from '@/lib/slug';
-import type { BackendCategory } from './mappers';
+import { updateTag } from "next/cache";
+import { requestBackendJson } from "@/lib/backend-api";
+import { getValidAccessTokenForServerActions } from "@/lib/getValidAccessToken";
+import { slugify } from "@/lib/slug";
+import type { BackendCategory } from "./mappers";
 
 type BackendEnvelope<T> = {
   success?: boolean;
@@ -25,18 +25,21 @@ type CategorySubCategoryPayload = {
 function toFormData(payload: Record<string, unknown>) {
   const formData = new FormData();
 
-  const { image, ...rest } = payload as { image?: File | string; [key: string]: unknown };
+  const { image, ...rest } = payload as {
+    image?: File | string;
+    [key: string]: unknown;
+  };
 
   formData.set(
-    'data',
+    "data",
     JSON.stringify({
       ...rest,
-      ...(typeof image === 'string' && image ? { image } : {}),
+      ...(typeof image === "string" && image ? { image } : {}),
     }),
   );
 
   if (image instanceof File) {
-    formData.append('image', image);
+    formData.append("image", image);
   }
 
   return formData;
@@ -52,58 +55,78 @@ type CategoryMutationPayload = {
 };
 
 export const getAllCategories = async (): Promise<BackendEnvelope<unknown>> => {
-  return requestBackendJson<BackendEnvelope<unknown>>('/category/categories', {
-    method: 'GET',
-    next: { tags: ['CATEGORIES'] },
+  return requestBackendJson<BackendEnvelope<unknown>>("/category/categories", {
+    method: "GET",
+    next: { tags: ["CATEGORIES"] },
   });
 };
 
-export const getActiveCategories = async (): Promise<BackendEnvelope<BackendCategory[]>> => {
-  return requestBackendJson<BackendEnvelope<BackendCategory[]>>('/category/categories/active', {
-    method: 'GET',
-    next: { tags: ['CATEGORIES'] },
+export const getActiveCategories = async (): Promise<
+  BackendEnvelope<BackendCategory[]>
+> => {
+  return requestBackendJson<BackendEnvelope<BackendCategory[]>>(
+    "/category/categories/active",
+    {
+      method: "GET",
+      next: { tags: ["CATEGORIES"] },
+    },
+  );
+};
+
+export const getAllCategoriesNameAndId = async (): Promise<
+  BackendEnvelope<unknown>
+> => {
+  return requestBackendJson<BackendEnvelope<unknown>>("/category/categories", {
+    method: "GET",
+    next: { tags: ["CATEGORIES"] },
   });
 };
 
-export const getAllCategoriesNameAndId = async (): Promise<BackendEnvelope<unknown>> => {
-  return requestBackendJson<BackendEnvelope<unknown>>('/category/categories', {
-    method: 'GET',
-    next: { tags: ['CATEGORIES'] },
-  });
-};
-
-export const getCategoryBySlug = async (slug: string): Promise<BackendEnvelope<BackendCategory>> => {
-  return requestBackendJson<BackendEnvelope<BackendCategory>>(`/category/categories/${slug}`, {
-    method: 'GET',
-    next: { tags: ['CATEGORIES'] },
-  });
+export const getCategoryBySlug = async (
+  slug: string,
+): Promise<BackendEnvelope<BackendCategory>> => {
+  return requestBackendJson<BackendEnvelope<BackendCategory>>(
+    `/category/categories/${slug}`,
+    {
+      method: "GET",
+      next: { tags: ["CATEGORIES"] },
+    },
+  );
 };
 
 export const getActiveCategoryBySlug = async (
   slug: string,
 ): Promise<BackendEnvelope<BackendCategory | null>> => {
-  return requestBackendJson<BackendEnvelope<BackendCategory | null>>(`/category/categories/active/${slug}`, {
-    method: 'GET',
-    next: { tags: ['CATEGORIES'] },
-  });
+  return requestBackendJson<BackendEnvelope<BackendCategory | null>>(
+    `/category/categories/active/${slug}`,
+    {
+      method: "GET",
+      next: { tags: ["CATEGORIES"] },
+    },
+  );
 };
 
-export const createCategory = async (payload: CategoryMutationPayload): Promise<BackendEnvelope<unknown>> => {
+export const createCategory = async (
+  payload: CategoryMutationPayload,
+): Promise<BackendEnvelope<unknown>> => {
   const accessToken = await getValidAccessTokenForServerActions();
-  const result = await requestBackendJson<BackendEnvelope<unknown>>('/category/categories', {
-    method: 'POST',
-    body: toFormData({
-      name: payload.name.trim(),
-      slug: slugify(payload.slug ?? payload.name),
-      image: payload.image,
-      description: payload.description,
-      accent: payload.accent,
-      isActive: payload.isActive,
-    }),
-    token: accessToken ?? undefined,
-  });
+  const result = await requestBackendJson<BackendEnvelope<unknown>>(
+    "/category/categories",
+    {
+      method: "POST",
+      body: toFormData({
+        name: payload.name.trim(),
+        slug: slugify(payload.slug ?? payload.name),
+        image: payload.image,
+        description: payload.description,
+        accent: payload.accent,
+        isActive: payload.isActive,
+      }),
+      token: accessToken ?? undefined,
+    },
+  );
 
-  updateTag('CATEGORIES');
+  updateTag("CATEGORIES");
   return result;
 };
 
@@ -112,31 +135,39 @@ export const updateCategory = async (
   payload: CategoryMutationPayload,
 ): Promise<BackendEnvelope<unknown>> => {
   const accessToken = await getValidAccessTokenForServerActions();
-  const result = await requestBackendJson<BackendEnvelope<unknown>>(`/category/categories/${id}`, {
-    method: 'PATCH',
-    body: toFormData({
-      name: payload.name.trim(),
-      slug: slugify(payload.slug ?? payload.name),
-      image: payload.image,
-      description: payload.description,
-      accent: payload.accent,
-      isActive: payload.isActive,
-    }),
-    token: accessToken ?? undefined,
-  });
+  const result = await requestBackendJson<BackendEnvelope<unknown>>(
+    `/category/categories/${id}`,
+    {
+      method: "PATCH",
+      body: toFormData({
+        name: payload.name.trim(),
+        slug: slugify(payload.slug ?? payload.name),
+        image: payload.image,
+        description: payload.description,
+        accent: payload.accent,
+        isActive: payload.isActive,
+      }),
+      token: accessToken ?? undefined,
+    },
+  );
 
-  updateTag('CATEGORIES');
+  updateTag("CATEGORIES");
   return result;
 };
 
-export const deleteCategory = async (id: string): Promise<BackendEnvelope<unknown>> => {
+export const deleteCategory = async (
+  id: string,
+): Promise<BackendEnvelope<unknown>> => {
   const accessToken = await getValidAccessTokenForServerActions();
-  const result = await requestBackendJson<BackendEnvelope<unknown>>(`/category/categories/${id}`, {
-    method: 'DELETE',
-    token: accessToken ?? undefined,
-  });
+  const result = await requestBackendJson<BackendEnvelope<unknown>>(
+    `/category/categories/${id}`,
+    {
+      method: "DELETE",
+      token: accessToken ?? undefined,
+    },
+  );
 
-  updateTag('CATEGORIES');
+  updateTag("CATEGORIES");
   return result;
 };
 
@@ -148,7 +179,7 @@ export const createCategorySubCategory = async (
   const result = await requestBackendJson<BackendEnvelope<unknown>>(
     `/category/categories/${categorySlug}/sub-categories`,
     {
-      method: 'POST',
+      method: "POST",
       body: toFormData({
         ...payload,
         slug: slugify(payload.slug),
@@ -157,7 +188,7 @@ export const createCategorySubCategory = async (
     },
   );
 
-  updateTag('CATEGORIES');
+  updateTag("CATEGORIES");
   return result;
 };
 
@@ -170,7 +201,7 @@ export const updateCategorySubCategory = async (
   const result = await requestBackendJson<BackendEnvelope<unknown>>(
     `/category/categories/${categorySlug}/sub-categories/${subCategorySlug}`,
     {
-      method: 'PATCH',
+      method: "PATCH",
       body: toFormData({
         ...payload,
         slug: payload.slug ? slugify(payload.slug) : payload.slug,
@@ -179,7 +210,7 @@ export const updateCategorySubCategory = async (
     },
   );
 
-  updateTag('CATEGORIES');
+  updateTag("CATEGORIES");
   return result;
 };
 
@@ -191,11 +222,11 @@ export const deleteCategorySubCategory = async (
   const result = await requestBackendJson<BackendEnvelope<unknown>>(
     `/category/categories/${categorySlug}/sub-categories/${subCategorySlug}`,
     {
-      method: 'DELETE',
+      method: "DELETE",
       token: accessToken ?? undefined,
     },
   );
 
-  updateTag('CATEGORIES');
+  updateTag("CATEGORIES");
   return result;
 };

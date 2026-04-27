@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { ImagePlus, Link2, X } from 'lucide-react';
-import Image from 'next/image';
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ImagePlus, Link2, X } from "lucide-react";
+import Image from "next/image";
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 type FileUploadProps = {
   value?: string | File | null;
@@ -15,14 +15,20 @@ type FileUploadProps = {
   disabled?: boolean;
 };
 
-export function FileUpload({ value, onChange, onBlur, placeholder = 'Paste image URL', disabled }: FileUploadProps) {
+export function FileUpload({
+  value,
+  onChange,
+  onBlur,
+  placeholder = "Paste image URL",
+  disabled,
+}: FileUploadProps) {
   const [isEditing, setIsEditing] = useState(!value);
-  const [url, setUrl] = useState(typeof value === 'string' ? value : '');
+  const [url, setUrl] = useState(typeof value === "string" ? value : "");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const previewUrl = useMemo(() => {
-    if (!value) return '';
-    if (typeof value === 'string') return value;
+    if (!value) return "";
+    if (typeof value === "string") return value;
 
     return URL.createObjectURL(value);
   }, [value]);
@@ -52,9 +58,9 @@ export function FileUpload({ value, onChange, onBlur, placeholder = 'Paste image
   const handleClear = () => {
     onChange(null);
     setIsEditing(true);
-    setUrl('');
+    setUrl("");
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   };
 
@@ -63,11 +69,19 @@ export function FileUpload({ value, onChange, onBlur, placeholder = 'Paste image
       <div className="space-y-2">
         <div className="overflow-hidden rounded-2xl border border-border bg-muted shadow-sm">
           <div className="relative aspect-video w-full">
-            <Image src={previewUrl} alt="Selected image preview" fill unoptimized className="object-cover" />
+            <Image
+              src={previewUrl}
+              alt="Selected image preview"
+              fill
+              unoptimized
+              className="object-cover"
+            />
           </div>
           <div className="flex items-center justify-between gap-2 border-t border-border px-3 py-2">
             <span className="truncate text-xs text-muted-foreground">
-              {typeof value === 'string' ? value : value?.name ?? 'Selected file'}
+              {typeof value === "string"
+                ? value
+                : (value?.name ?? "Selected file")}
             </span>
             <Button
               type="button"
@@ -99,20 +113,36 @@ export function FileUpload({ value, onChange, onBlur, placeholder = 'Paste image
 
   return (
     <div className="space-y-2">
-      <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileSelect} disabled={disabled} />
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleFileSelect}
+        disabled={disabled}
+      />
       <div className="flex gap-2">
         <Input
           value={url}
-          onChange={e => setUrl(e.target.value)}
+          onChange={(e) => setUrl(e.target.value)}
           onBlur={onBlur}
           placeholder={placeholder}
           disabled={disabled}
           className="flex-1"
         />
-        <Button type="button" onClick={handleUrlSubmit} disabled={disabled || !url}>
+        <Button
+          type="button"
+          onClick={handleUrlSubmit}
+          disabled={disabled || !url}
+        >
           <Link2 className="size-4" />
         </Button>
-        <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} disabled={disabled}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={disabled}
+        >
           <ImagePlus className="size-4" />
         </Button>
       </div>

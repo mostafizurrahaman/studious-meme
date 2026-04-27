@@ -1,21 +1,21 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
-import { usePathname } from 'next/navigation';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Container } from '@/components/Container';
-import { MiniCartDropdown } from '@/components/cart/MiniCartDropdown';
-import { UserDropdownMenu } from '@/components/account/UserDropdownMenu';
-import { useUser } from '@/context/UserContext';
-import { useCompareStore } from '@/lib/compare-store';
-import { useWishlistStore } from '@/lib/wishlist-store';
-import { getDashboardPath } from '@/lib/dashboard';
-import { siteConfig } from '@/lib/seo';
-import type { Category } from '@/lib/storefront-types';
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Container } from "@/components/Container";
+import { MiniCartDropdown } from "@/components/cart/MiniCartDropdown";
+import { UserDropdownMenu } from "@/components/account/UserDropdownMenu";
+import { useUser } from "@/context/UserContext";
+import { useCompareStore } from "@/lib/compare-store";
+import { useWishlistStore } from "@/lib/wishlist-store";
+import { getDashboardPath } from "@/lib/dashboard";
+import { siteConfig } from "@/lib/seo";
+import type { Category } from "@/lib/storefront-types";
 
 type Props = {
   categories: Category[];
@@ -27,18 +27,33 @@ export function Header({ categories }: Props) {
   const categoriesRef = useRef<HTMLDetailsElement>(null);
   const menuRef = useRef<HTMLDetailsElement>(null);
   const cartRef = useRef<HTMLDetailsElement>(null);
-  const compareCount = useCompareStore(state => state.items.length);
-  const wishlistCount = useWishlistStore(state => state.items.length);
-  const [mobileDrawerTab, setMobileDrawerTab] = useState<'categories' | 'menu'>('categories');
-  const [activeCategorySlug, setActiveCategorySlug] = useState(categories[0]?.slug ?? '');
+  const headerRef = useRef<HTMLElement>(null);
+  const lastScrollYRef = useRef(0);
+  const scrollTickRef = useRef(false);
+  const compareCount = useCompareStore((state) => state.items.length);
+  const wishlistCount = useWishlistStore((state) => state.items.length);
+  const [mobileDrawerTab, setMobileDrawerTab] = useState<"categories" | "menu">(
+    "categories",
+  );
+  const [activeCategorySlug, setActiveCategorySlug] = useState(
+    categories[0]?.slug ?? "",
+  );
+  const [isHidden, setIsHidden] = useState(false);
+  const [headerHeight, setHeaderHeight] = useState(0);
   const activeCategory =
-    categories.find(category => category.slug === activeCategorySlug) ?? categories[0] ?? null;
+    categories.find((category) => category.slug === activeCategorySlug) ??
+    categories[0] ??
+    null;
 
   useEffect(() => {
     const handlePointerDown = (event: PointerEvent) => {
       const target = event.target as Node | null;
 
-      if (categoriesRef.current && target && !categoriesRef.current.contains(target)) {
+      if (
+        categoriesRef.current &&
+        target &&
+        !categoriesRef.current.contains(target)
+      ) {
         categoriesRef.current.open = false;
       }
 
@@ -51,45 +66,129 @@ export function Header({ categories }: Props) {
       }
     };
 
-    document.addEventListener('pointerdown', handlePointerDown);
+    document.addEventListener("pointerdown", handlePointerDown);
 
-    return () => document.removeEventListener('pointerdown', handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
   }, []);
 
+  useEffect(() => {
+    const syncHeaderHeight = () => {
+      const nextHeight = Math.ceil(
+        headerRef.current?.getBoundingClientRect().height ?? 0,
+      );
+      document.documentElement.style.setProperty(
+        "--storefront-header-height",
+        `${nextHeight}px`,
+      );
+      setHeaderHeight((prev) => (prev === nextHeight ? prev : nextHeight));
+    };
+
+    window.requestAnimationFrame(syncHeaderHeight);
+
+    if (!headerRef.current || typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", syncHeaderHeight);
+
+      return () => window.removeEventListener("resize", syncHeaderHeight);
+    }
+
+    const observer = new ResizeObserver(() => {
+      window.requestAnimationFrame(syncHeaderHeight);
+    });
+
+    observer.observe(headerRef.current);
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const updateVisibility = () => {
+      const currentScrollY = window.scrollY;
+      const previousScrollY = lastScrollYRef.current;
+      const delta = currentScrollY - previousScrollY;
+      const nearTop = currentScrollY <= Math.max(24, headerHeight * 0.35);
+
+      if (nearTop) {
+        setIsHidden(false);
+      } else if (delta > 10) {
+        setIsHidden(true);
+      } else if (delta < -10) {
+        setIsHidden(false);
+      }
+
+      if (delta > 10 && !nearTop) {
+        if (categoriesRef.current) categoriesRef.current.open = false;
+        if (menuRef.current) menuRef.current.open = false;
+        if (cartRef.current) cartRef.current.open = false;
+      }
+
+      lastScrollYRef.current = currentScrollY;
+      scrollTickRef.current = false;
+    };
+
+    const onScroll = () => {
+      if (scrollTickRef.current) return;
+
+      scrollTickRef.current = true;
+      window.requestAnimationFrame(updateVisibility);
+    };
+
+    lastScrollYRef.current = window.scrollY;
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [headerHeight]);
+
   const isActive = (href: string) => {
-    if (href === '/') return pathname === '/';
-    if (href === '/shop') return pathname === '/shop' || pathname.startsWith('/product/');
-    if (href === '/main-categories')
-      return pathname === '/main-categories' || pathname.startsWith('/category/');
-    if (href === '/my-account') return pathname === '/my-account' || pathname.startsWith('/my-account/');
+    if (href === "/") return pathname === "/";
+    if (href === "/shop")
+      return pathname === "/shop" || pathname.startsWith("/product/");
+    if (href === "/main-categories")
+      return (
+        pathname === "/main-categories" || pathname.startsWith("/category/")
+      );
+    if (href === "/my-account")
+      return pathname === "/my-account" || pathname.startsWith("/my-account/");
     return pathname === href || pathname.startsWith(`${href}/`);
   };
 
   const navLinkClass = (href: string) =>
     `inline-flex items-center rounded-full px-3 py-1.5 transition ${
-      isActive(href) ? 'bg-primary text-white' : 'text-foreground hover:!bg-primary hover:!text-white'
+      isActive(href)
+        ? "bg-primary text-white"
+        : "text-foreground hover:!bg-primary hover:!text-white"
     }`;
 
   const drawerLinkClass = (href: string) =>
     `rounded-2xl border px-4 py-3 text-sm font-semibold transition ${
       isActive(href)
-        ? 'border-primary bg-primary text-white'
-        : 'border-border text-foreground hover:border-primary/30 hover:!bg-primary hover:!text-white'
+        ? "border-primary bg-primary text-white"
+        : "border-border text-foreground hover:border-primary/30 hover:!bg-primary hover:!text-white"
     }`;
 
   const activeStyle = (href: string) =>
-    isActive(href) ? { backgroundColor: 'var(--primary)', color: '#ffffff' } : undefined;
+    isActive(href)
+      ? { backgroundColor: "var(--primary)", color: "#ffffff" }
+      : undefined;
 
   const activeDrawerStyle = (href: string) =>
     isActive(href)
-      ? { backgroundColor: 'var(--primary)', borderColor: 'var(--primary)', color: '#ffffff' }
+      ? {
+          backgroundColor: "var(--primary)",
+          borderColor: "var(--primary)",
+          color: "#ffffff",
+        }
       : undefined;
 
   const activePillStyle = (href: string) =>
-    isActive(href) ? { backgroundColor: 'var(--primary)', color: '#ffffff' } : undefined;
+    isActive(href)
+      ? { backgroundColor: "var(--primary)", color: "#ffffff" }
+      : undefined;
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border bg-background text-foreground shadow-sm">
+    <header
+      ref={headerRef}
+      className={`fixed inset-x-0 top-0 z-40 w-full border-b border-border/50 bg-background/75 text-foreground shadow-[0_12px_40px_rgba(15,23,42,0.08)] backdrop-blur-xl supports-backdrop-filter:bg-background/60 motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out motion-reduce:transition-none ${isHidden ? "-translate-y-full" : "translate-y-0"}`}
+    >
       {/* 1st layer */}
       <Container>
         <div className="lg:hidden">
@@ -99,12 +198,16 @@ export function Header({ categories }: Props) {
                 <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background text-lg leading-none text-foreground">
                   ☰
                 </span>
-                    <Link href="/" className="flex justify-center" aria-label="Malamal Home">
-                      <Image
-                        src="/logo.png"
-                        alt={siteConfig.name}
-                        width={160}
-                        height={32}
+                <Link
+                  href="/"
+                  className="flex justify-center"
+                  aria-label="Malamal Home"
+                >
+                  <Image
+                    src="/logo.png"
+                    alt={siteConfig.name}
+                    width={160}
+                    height={32}
                     priority
                     className="h-7 w-34 object-contain sm:w-36"
                   />
@@ -117,28 +220,28 @@ export function Header({ categories }: Props) {
               <div className="grid grid-cols-2 border-b border-border text-sm font-bold uppercase tracking-[0.14em] text-foreground/45">
                 <button
                   type="button"
-                  onClick={() => setMobileDrawerTab('categories')}
-                  className={`border-b-2 px-4 py-3 text-left transition ${mobileDrawerTab === 'categories' ? 'border-primary text-foreground' : 'border-transparent'}`}
+                  onClick={() => setMobileDrawerTab("categories")}
+                  className={`border-b-2 px-4 py-3 text-left transition ${mobileDrawerTab === "categories" ? "border-primary text-foreground" : "border-transparent"}`}
                 >
                   Categories
                 </button>
                 <button
                   type="button"
-                  onClick={() => setMobileDrawerTab('menu')}
-                  className={`border-b-2 px-4 py-3 text-left transition ${mobileDrawerTab === 'menu' ? 'border-primary text-foreground' : 'border-transparent'}`}
+                  onClick={() => setMobileDrawerTab("menu")}
+                  className={`border-b-2 px-4 py-3 text-left transition ${mobileDrawerTab === "menu" ? "border-primary text-foreground" : "border-transparent"}`}
                 >
                   Menu
                 </button>
               </div>
 
               <div className="max-h-[70vh] overflow-y-auto">
-                {mobileDrawerTab === 'categories' ? (
+                {mobileDrawerTab === "categories" ? (
                   <div className="grid">
-                    {categories.map(category => (
+                    {categories.map((category) => (
                       <Link
                         key={category.name}
                         href={category.href}
-                        onClick={() => setMobileDrawerTab('categories')}
+                        onClick={() => setMobileDrawerTab("categories")}
                         className="border-b border-border px-4 py-4 text-sm font-semibold text-foreground transition hover:text-primary"
                       >
                         {category.name}
@@ -149,18 +252,25 @@ export function Header({ categories }: Props) {
                   <div className="grid">
                     {(
                       [
-                        ...(user ? [['Dashboard', getDashboardPath(user.role)] as const] : []),
-                        ['Hardware Store', '/main-categories'],
-                        ['Our Contacts', '/our-contacts'],
-                        ['Return Policy', '/return-policy'],
-                        ['Wishlist', '/wishlist'],
-                        ['Compare', '/compare'],
+                        ...(user
+                          ? [
+                              [
+                                "Dashboard",
+                                getDashboardPath(user.role),
+                              ] as const,
+                            ]
+                          : []),
+                        ["Hardware Store", "/main-categories"],
+                        ["Our Contacts", "/our-contacts"],
+                        ["Return Policy", "/return-policy"],
+                        ["Wishlist", "/wishlist"],
+                        ["Compare", "/compare"],
                       ] as const
                     ).map(([label, href], index) => (
                       <Link
                         key={label}
                         href={href}
-                        className={`border-b border-border px-4 py-4 text-sm font-semibold transition ${index === 0 || index === 2 ? 'text-primary' : 'text-foreground'} hover:text-primary`}
+                        className={`border-b border-border px-4 py-4 text-sm font-semibold transition ${index === 0 || index === 2 ? "text-primary" : "text-foreground"} hover:text-primary`}
                       >
                         {label}
                       </Link>
@@ -190,14 +300,18 @@ export function Header({ categories }: Props) {
         </div>
 
         <div className="hidden min-h-18 items-center gap-4 py-2.5 lg:flex lg:min-h-18 lg:py-3">
-          <Link href="/" className="flex shrink-0 items-center" aria-label="Malamal Home">
+          <Link
+            href="/"
+            className="flex shrink-0 items-center"
+            aria-label="Malamal Home"
+          >
             <Image
               src="/logo.png"
               alt={siteConfig.name}
               width={182}
               height={36}
               priority
-              className="h-8 w-32 object-contain sm:w-36  lg:w-44"
+              className="h-8 w-32 object-contain sm:w-36  lg:w-48"
             />
           </Link>
 
@@ -214,15 +328,19 @@ export function Header({ categories }: Props) {
                       Top categories
                     </div>
                     <div className="mt-4 grid gap-2">
-                      {categories.map(category => (
+                      {categories.map((category) => (
                         <Link
                           key={category.name}
                           href={category.href}
-                          onMouseEnter={() => setActiveCategorySlug(category.slug)}
+                          onMouseEnter={() =>
+                            setActiveCategorySlug(category.slug)
+                          }
                           onFocus={() => setActiveCategorySlug(category.slug)}
-                          className={`rounded-2xl border px-4 py-3 transition ${activeCategorySlug === category.slug ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30 hover:bg-primary/5'}`}
+                          className={`rounded-2xl border px-4 py-3 transition ${activeCategorySlug === category.slug ? "border-primary bg-primary/5" : "border-border hover:border-primary/30 hover:bg-primary/5"}`}
                         >
-                          <div className="text-sm font-bold text-foreground">{category.name}</div>
+                          <div className="text-sm font-bold text-foreground">
+                            {category.name}
+                          </div>
                           <div className="mt-1 text-xs font-normal text-foreground/55">
                             {category.description}
                           </div>
@@ -233,17 +351,21 @@ export function Header({ categories }: Props) {
                   <div>
                     <div className="flex items-center justify-between text-xs font-bold uppercase tracking-[0.28em] text-primary">
                       <span>Sub categories</span>
-                      <span className="text-foreground/45">{activeCategory?.name ?? 'Hover a category'}</span>
+                      <span className="text-foreground/45">
+                        {activeCategory?.name ?? "Hover a category"}
+                      </span>
                     </div>
                     <div className="mt-4 grid gap-2">
                       {activeCategory?.subCategories?.length ? (
-                        activeCategory.subCategories.map(subCategory => (
+                        activeCategory.subCategories.map((subCategory) => (
                           <Link
                             key={subCategory.slug}
                             href={`/category/${activeCategory.slug}?subCategorySlug=${subCategory.slug}`}
                             className="rounded-2xl border border-border px-4 py-3 transition hover:border-primary/30 hover:bg-primary/5"
                           >
-                            <div className="text-sm font-bold text-foreground">{subCategory.name}</div>
+                            <div className="text-sm font-bold text-foreground">
+                              {subCategory.name}
+                            </div>
                             {subCategory.description ? (
                               <div className="mt-1 text-xs font-normal text-foreground/55">
                                 {subCategory.description}
@@ -285,8 +407,8 @@ export function Header({ categories }: Props) {
           <div className="ml-auto hidden items-center gap-3 md:flex">
             {(
               [
-                ['Compare', '/compare', compareCount],
-                ['Wishlist', '/wishlist', wishlistCount],
+                ["Compare", "/compare", compareCount],
+                ["Wishlist", "/wishlist", wishlistCount],
               ] as const
             ).map(([label, href, count]) => (
               <Link
@@ -303,12 +425,12 @@ export function Header({ categories }: Props) {
                 ) : null}
               </Link>
             ))}
-            <MiniCartDropdown ref={cartRef} active={pathname === '/cart'} />
+            <MiniCartDropdown ref={cartRef} active={pathname === "/cart"} />
             {/* Quotation Request button */}
             <Link
               className="inline-flex h-10 items-center justify-center rounded-full border border-border px-3 text-xs font-semibold text-foreground transition hover:border-primary/30 hover:bg-primary! hover:text-white!"
               href="/quotation-request"
-              style={activePillStyle('/quotation-request')}
+              style={activePillStyle("/quotation-request")}
             >
               Quotation Request
             </Link>
@@ -324,47 +446,51 @@ export function Header({ categories }: Props) {
             {/* left part */}
             <div className="flex flex-wrap items-center gap-5">
               <Link
-                className={navLinkClass('/main-categories')}
+                className={navLinkClass("/main-categories")}
                 href="/main-categories"
-                style={activeStyle('/main-categories')}
+                style={activeStyle("/main-categories")}
               >
                 Categories
               </Link>
-              <Link className={navLinkClass('/shop')} href="/shop" style={activeStyle('/shop')}>
+              <Link
+                className={navLinkClass("/shop")}
+                href="/shop"
+                style={activeStyle("/shop")}
+              >
                 Shop
               </Link>
               <Link
-                className={navLinkClass('/promotions')}
+                className={navLinkClass("/promotions")}
                 href="/promotions"
-                style={activeStyle('/promotions')}
+                style={activeStyle("/promotions")}
               >
                 Promotions/Campaigns
               </Link>
               <Link
-                className={navLinkClass('/shop-by-brands')}
+                className={navLinkClass("/shop-by-brands")}
                 href="/shop-by-brands"
-                style={activeStyle('/shop-by-brands')}
+                style={activeStyle("/shop-by-brands")}
               >
                 Shop By Brands
               </Link>
               <Link
-                className={navLinkClass('/our-contacts')}
+                className={navLinkClass("/our-contacts")}
                 href="/our-contacts"
-                style={activeStyle('/our-contacts')}
+                style={activeStyle("/our-contacts")}
               >
                 Our Contacts
               </Link>
               <Link
-                className={navLinkClass('/return-policy')}
+                className={navLinkClass("/return-policy")}
                 href="/return-policy"
-                style={activeStyle('/return-policy')}
+                style={activeStyle("/return-policy")}
               >
                 Return Policy
               </Link>
               <Link
-                className={navLinkClass('/terms-and-conditions')}
+                className={navLinkClass("/terms-and-conditions")}
                 href="/terms-and-conditions"
-                style={activeStyle('/terms-and-conditions')}
+                style={activeStyle("/terms-and-conditions")}
               >
                 Terms & Conditions
               </Link>
@@ -373,8 +499,13 @@ export function Header({ categories }: Props) {
             {/* right part */}
             <div className="flex flex-wrap items-center gap-5">
               <div className="text-sm leading-tight text-right">
-                <div className="font-semibold text-foreground">Dedicated Support</div>
-                <a className="font-semibold text-secondary" href="tel:+8809638212121">
+                <div className="font-semibold text-foreground">
+                  Dedicated Support
+                </div>
+                <a
+                  className="font-semibold text-secondary"
+                  href="tel:+8809638212121"
+                >
                   +880 9638212121
                 </a>
               </div>
@@ -389,18 +520,18 @@ export function Header({ categories }: Props) {
               <div className="grid gap-3">
                 {(
                   [
-                    ['Shop', '/shop'],
-                    ['Promotions/Campaigns', '/promotions'],
-                    ['Main Categories', '/main-categories'],
-                    ['Shop By Brands', '/shop-by-brands'],
-                    ['Return Policy', '/return-policy'],
-                    ['Terms & Conditions', '/terms-and-conditions'],
-                    ['Quotation Request', '/quotation-request'],
-                    ['Our Contacts', '/our-contacts'],
-                    ['Compare', '/compare'],
-                    ['Wishlist', '/wishlist'],
-                    ['Cart', '/cart'],
-                    ['My account', '/my-account'],
+                    ["Shop", "/shop"],
+                    ["Promotions/Campaigns", "/promotions"],
+                    ["Main Categories", "/main-categories"],
+                    ["Shop By Brands", "/shop-by-brands"],
+                    ["Return Policy", "/return-policy"],
+                    ["Terms & Conditions", "/terms-and-conditions"],
+                    ["Quotation Request", "/quotation-request"],
+                    ["Our Contacts", "/our-contacts"],
+                    ["Compare", "/compare"],
+                    ["Wishlist", "/wishlist"],
+                    ["Cart", "/cart"],
+                    ["My account", "/my-account"],
                   ] as const
                 ).map(([label, href]) => (
                   <Link
@@ -414,9 +545,11 @@ export function Header({ categories }: Props) {
                 ))}
               </div>
               <div className="mt-4">
-                <div className="text-xs font-bold uppercase tracking-[0.28em] text-primary">Categories</div>
+                <div className="text-xs font-bold uppercase tracking-[0.28em] text-primary">
+                  Categories
+                </div>
                 <div className="mt-3 grid gap-2">
-                  {categories.map(category => (
+                  {categories.map((category) => (
                     <Link
                       key={category.name}
                       href={category.href}

@@ -34,10 +34,12 @@ Add to your `opencode.json`:
 ```
 
 This loads the ECC OpenCode plugin module from npm:
+
 - hook/event integrations
 - bundled custom tools exported by the plugin
 
 It does **not** auto-register the full ECC command/agent/instruction catalog in your project config. For the full OpenCode setup, either:
+
 - run OpenCode inside this repository, or
 - copy the relevant `.opencode/commands/`, `.opencode/prompts/`, `.opencode/instructions/`, and the `instructions`, `agent`, and `command` config entries into your own project
 
@@ -61,86 +63,86 @@ opencode
 
 ### Agents (12)
 
-| Agent | Description |
-|-------|-------------|
-| planner | Implementation planning |
-| architect | System design |
-| code-reviewer | Code review |
-| security-reviewer | Security analysis |
-| tdd-guide | Test-driven development |
-| build-error-resolver | Build error fixes |
-| e2e-runner | E2E testing |
-| doc-updater | Documentation |
-| refactor-cleaner | Dead code cleanup |
-| go-reviewer | Go code review |
-| go-build-resolver | Go build errors |
-| database-reviewer | Database optimization |
+| Agent                | Description             |
+| -------------------- | ----------------------- |
+| planner              | Implementation planning |
+| architect            | System design           |
+| code-reviewer        | Code review             |
+| security-reviewer    | Security analysis       |
+| tdd-guide            | Test-driven development |
+| build-error-resolver | Build error fixes       |
+| e2e-runner           | E2E testing             |
+| doc-updater          | Documentation           |
+| refactor-cleaner     | Dead code cleanup       |
+| go-reviewer          | Go code review          |
+| go-build-resolver    | Go build errors         |
+| database-reviewer    | Database optimization   |
 
 ### Commands (31)
 
-| Command | Description |
-|---------|-------------|
-| `/plan` | Create implementation plan |
-| `/tdd` | TDD workflow |
-| `/code-review` | Review code changes |
-| `/security` | Security review |
-| `/build-fix` | Fix build errors |
-| `/e2e` | E2E tests |
-| `/refactor-clean` | Remove dead code |
-| `/orchestrate` | Multi-agent workflow |
-| `/learn` | Extract patterns |
-| `/checkpoint` | Save progress |
-| `/verify` | Verification loop |
-| `/eval` | Evaluation |
-| `/update-docs` | Update docs |
-| `/update-codemaps` | Update codemaps |
-| `/test-coverage` | Coverage analysis |
-| `/setup-pm` | Package manager |
-| `/go-review` | Go code review |
-| `/go-test` | Go TDD |
-| `/go-build` | Go build fix |
-| `/skill-create` | Generate skills |
-| `/instinct-status` | View instincts |
-| `/instinct-import` | Import instincts |
-| `/instinct-export` | Export instincts |
-| `/evolve` | Cluster instincts |
-| `/promote` | Promote project instincts |
-| `/projects` | List known projects |
-| `/harness-audit` | Audit harness reliability and eval readiness |
-| `/loop-start` | Start controlled agentic loops |
-| `/loop-status` | Check loop state and checkpoints |
-| `/quality-gate` | Run quality gates on file/repo scope |
-| `/model-route` | Route tasks by model and budget |
+| Command            | Description                                  |
+| ------------------ | -------------------------------------------- |
+| `/plan`            | Create implementation plan                   |
+| `/tdd`             | TDD workflow                                 |
+| `/code-review`     | Review code changes                          |
+| `/security`        | Security review                              |
+| `/build-fix`       | Fix build errors                             |
+| `/e2e`             | E2E tests                                    |
+| `/refactor-clean`  | Remove dead code                             |
+| `/orchestrate`     | Multi-agent workflow                         |
+| `/learn`           | Extract patterns                             |
+| `/checkpoint`      | Save progress                                |
+| `/verify`          | Verification loop                            |
+| `/eval`            | Evaluation                                   |
+| `/update-docs`     | Update docs                                  |
+| `/update-codemaps` | Update codemaps                              |
+| `/test-coverage`   | Coverage analysis                            |
+| `/setup-pm`        | Package manager                              |
+| `/go-review`       | Go code review                               |
+| `/go-test`         | Go TDD                                       |
+| `/go-build`        | Go build fix                                 |
+| `/skill-create`    | Generate skills                              |
+| `/instinct-status` | View instincts                               |
+| `/instinct-import` | Import instincts                             |
+| `/instinct-export` | Export instincts                             |
+| `/evolve`          | Cluster instincts                            |
+| `/promote`         | Promote project instincts                    |
+| `/projects`        | List known projects                          |
+| `/harness-audit`   | Audit harness reliability and eval readiness |
+| `/loop-start`      | Start controlled agentic loops               |
+| `/loop-status`     | Check loop state and checkpoints             |
+| `/quality-gate`    | Run quality gates on file/repo scope         |
+| `/model-route`     | Route tasks by model and budget              |
 
 ### Plugin Hooks
 
-| Hook | Event | Purpose |
-|------|-------|---------|
-| Prettier | `file.edited` | Auto-format JS/TS |
-| TypeScript | `tool.execute.after` | Check for type errors |
-| console.log | `file.edited` | Warn about debug statements |
-| Notification | `session.idle` | Desktop notification |
-| Security | `tool.execute.before` | Check for secrets |
+| Hook         | Event                 | Purpose                     |
+| ------------ | --------------------- | --------------------------- |
+| Prettier     | `file.edited`         | Auto-format JS/TS           |
+| TypeScript   | `tool.execute.after`  | Check for type errors       |
+| console.log  | `file.edited`         | Warn about debug statements |
+| Notification | `session.idle`        | Desktop notification        |
+| Security     | `tool.execute.before` | Check for secrets           |
 
 ### Custom Tools
 
-| Tool | Description |
-|------|-------------|
-| run-tests | Run test suite with options |
-| check-coverage | Analyze test coverage |
+| Tool           | Description                 |
+| -------------- | --------------------------- |
+| run-tests      | Run test suite with options |
+| check-coverage | Analyze test coverage       |
 | security-audit | Security vulnerability scan |
 
 ## Hook Event Mapping
 
 OpenCode's plugin system maps to Claude Code hooks:
 
-| Claude Code | OpenCode |
-|-------------|----------|
-| PreToolUse | `tool.execute.before` |
-| PostToolUse | `tool.execute.after` |
-| Stop | `session.idle` |
-| SessionStart | `session.created` |
-| SessionEnd | `session.deleted` |
+| Claude Code  | OpenCode              |
+| ------------ | --------------------- |
+| PreToolUse   | `tool.execute.before` |
+| PostToolUse  | `tool.execute.after`  |
+| Stop         | `session.idle`        |
+| SessionStart | `session.created`     |
+| SessionEnd   | `session.deleted`     |
 
 OpenCode has 20+ additional events not available in Claude Code.
 
@@ -194,8 +196,12 @@ Full configuration in `opencode.json`:
     "skills/tdd-workflow/SKILL.md",
     "skills/security-review/SKILL.md"
   ],
-  "agent": { /* 12 agents */ },
-  "command": { /* 24 commands */ }
+  "agent": {
+    /* 12 agents */
+  },
+  "command": {
+    /* 24 commands */
+  }
 }
 ```
 

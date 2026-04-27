@@ -1,19 +1,19 @@
-import cookieParser from 'cookie-parser';
-import cors from 'cors';
-import express, { Application, Request, Response } from 'express';
-import morgan from 'morgan';
-import routes from './app/routes';
-import { globalErrorHandler, notFoundHandler } from './app/utils';
-import os from 'os';
-import path from 'path';
-import config from './app/config';
-import serverHomePage, { getMonitorStats } from './app/helpers/serverHomePage';
-import { globalLimiter } from './app/middlewares';
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import express, { Application, Request, Response } from "express";
+import morgan from "morgan";
+import routes from "./app/routes";
+import { globalErrorHandler, notFoundHandler } from "./app/utils";
+import os from "os";
+import path from "path";
+import config from "./app/config";
+import serverHomePage, { getMonitorStats } from "./app/helpers/serverHomePage";
+import { globalLimiter } from "./app/middlewares";
 // import { responseTimeLogger } from './app/middlewares/logger';
 
 const app: Application = express();
 
-app.set('trust proxy', 1);
+app.set("trust proxy", 1);
 
 // (3)
 // response time logger
@@ -21,10 +21,12 @@ app.set('trust proxy', 1);
 
 // CORS configuration
 app.use(
-    cors({
-        credentials: true,
-        origin: config.allowed_origins.length ? config.allowed_origins : ['http://localhost:3000'],
-    }),
+  cors({
+    credentials: true,
+    origin: config.allowed_origins.length
+      ? config.allowed_origins
+      : ["http://localhost:3000"],
+  }),
 );
 
 // all parsers
@@ -32,7 +34,7 @@ app.use(
 app.use(cookieParser());
 
 // logger
-app.use(morgan('dev'));
+app.use(morgan("dev"));
 
 // json parser
 app.use(express.json());
@@ -47,67 +49,74 @@ app.use(globalLimiter);
 // app.use('/public', express.static('public'));
 
 // for static files
-app.use('/public', express.static('public'));
+app.use("/public", express.static("public"));
 
 // favicon route
-app.get('/favicon.ico', (_req: Request, res: Response) => {
-    const faviconPath = path.join(process.cwd(), 'src', 'app', 'utils', 'assets', 'logo.svg');
-    res.sendFile(faviconPath, err => {
-        if (err) {
-            res.sendStatus(404);
-        }
-    });
+app.get("/favicon.ico", (_req: Request, res: Response) => {
+  const faviconPath = path.join(
+    process.cwd(),
+    "src",
+    "app",
+    "utils",
+    "assets",
+    "logo.svg",
+  );
+  res.sendFile(faviconPath, (err) => {
+    if (err) {
+      res.sendStatus(404);
+    }
+  });
 });
 
 // all main routes
-app.use('/api/v1', routes);
+app.use("/api/v1", routes);
 
 // Testing
-app.get('/', (req: Request, res: Response) => {
-    res.send({
-        success: true,
-        message: 'Server is running like a Rabit!',
-        time: new Date().toISOString(),
-    });
+app.get("/", (req: Request, res: Response) => {
+  res.send({
+    success: true,
+    message: "Server is running like a Rabit!",
+    time: new Date().toISOString(),
+  });
 });
 
-app.get('/info', (req: Request, res: Response) => {
-    const currentDateTime = new Date().toISOString();
-    const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    const serverHostname = os.hostname();
-    const serverPlatform = os.platform();
-    const serverUptime = os.uptime();
-    res.send({
-        success: true,
-        message: `Welcome to ${config.preffered_website_name} Server`,
-        version: '1.0.0',
-        clientDetails: {
-            ipAddress: clientIp,
-            accessedAt: currentDateTime,
-        },
-        serverDetails: {
-            hostname: serverHostname,
-            platform: serverPlatform,
-            uptime: `${Math.floor(serverUptime / 60 / 60)} hours ${Math.floor(
-                (serverUptime / 60) % 60,
-            )} minutes`,
-        },
-        developerContact: {
-            name: 'Khaled Siddique',
-            email: 'khaledssbd@gmail.com',
-            website: 'https://khaled-siddique.vercel.app',
-        },
-    });
+app.get("/info", (req: Request, res: Response) => {
+  const currentDateTime = new Date().toISOString();
+  const clientIp = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+  const serverHostname = os.hostname();
+  const serverPlatform = os.platform();
+  const serverUptime = os.uptime();
+  res.send({
+    success: true,
+    message: `Welcome to ${config.preffered_website_name} Server`,
+    version: "1.0.0",
+    clientDetails: {
+      ipAddress: clientIp,
+      accessedAt: currentDateTime,
+    },
+    serverDetails: {
+      hostname: serverHostname,
+      platform: serverPlatform,
+      uptime: `${Math.floor(serverUptime / 60 / 60)} hours ${Math.floor(
+        (serverUptime / 60) % 60,
+      )} minutes`,
+    },
+    developerContact: {
+      name: "Khaled Siddique",
+      email: "khaledssbd@gmail.com",
+      website: "https://khaled-siddique.vercel.app",
+    },
+  });
 });
 
-app.get('/monitor', async (req: Request, res: Response) => {
-    const htmlContent = await serverHomePage();
-    res.send(htmlContent);
+app.get("/monitor", async (req: Request, res: Response) => {
+  const htmlContent = await serverHomePage();
+  res.send(htmlContent);
 });
 
-app.get('/monitor/data', (req: Request, res: Response) => {
-    const data = getMonitorStats();
-    res.json(data);
+app.get("/monitor/data", (req: Request, res: Response) => {
+  const data = getMonitorStats();
+  res.json(data);
 });
 
 // global error handler

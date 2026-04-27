@@ -1,10 +1,10 @@
-'use server';
+"use server";
 
-import { updateTag } from 'next/cache';
-import { requestBackendJson } from '@/lib/backend-api';
-import { getValidAccessTokenForServerActions } from '@/lib/getValidAccessToken';
-import type { Brand as StorefrontBrand } from '@/lib/storefront-types';
-import { slugify } from '@/lib/slug';
+import { updateTag } from "next/cache";
+import { requestBackendJson } from "@/lib/backend-api";
+import { getValidAccessTokenForServerActions } from "@/lib/getValidAccessToken";
+import type { Brand as StorefrontBrand } from "@/lib/storefront-types";
+import { slugify } from "@/lib/slug";
 
 type BackendEnvelope<T> = {
   success?: boolean;
@@ -25,7 +25,9 @@ export type BackendBrand = {
   updatedAt?: string;
 };
 
-export async function mapBackendBrandToStorefrontBrand(brand: BackendBrand): Promise<StorefrontBrand> {
+export async function mapBackendBrandToStorefrontBrand(
+  brand: BackendBrand,
+): Promise<StorefrontBrand> {
   return {
     name: brand.name,
     slug: brand.slug,
@@ -45,20 +47,24 @@ export const getAllBrands = async (
 ): Promise<BackendEnvelope<BackendBrand[]>> => {
   const searchParams = new URLSearchParams();
 
-  if (params.page) searchParams.set('page', String(params.page));
-  if (params.limit) searchParams.set('limit', String(params.limit));
-  if (params.searchTerm?.trim()) searchParams.set('searchTerm', params.searchTerm.trim());
+  if (params.page) searchParams.set("page", String(params.page));
+  if (params.limit) searchParams.set("limit", String(params.limit));
+  if (params.searchTerm?.trim())
+    searchParams.set("searchTerm", params.searchTerm.trim());
 
   const query = searchParams.toString();
 
-  return requestBackendJson<BackendEnvelope<BackendBrand[]>>(`/brand/brands${query ? `?${query}` : ''}`, {
-    method: 'GET',
-    next: { tags: ['BRANDS'] },
-  });
+  return requestBackendJson<BackendEnvelope<BackendBrand[]>>(
+    `/brand/brands${query ? `?${query}` : ""}`,
+    {
+      method: "GET",
+      next: { tags: ["BRANDS"] },
+    },
+  );
 };
 
 export const getAllBrandsAcrossPages = async (
-  params: Omit<GetAllBrandsParams, 'page'> = {},
+  params: Omit<GetAllBrandsParams, "page"> = {},
 ): Promise<BackendEnvelope<BackendBrand[]>> => {
   const firstPage = await getAllBrands({ ...params, page: 1 });
   const brands = [...(firstPage.data ?? [])];
@@ -75,7 +81,7 @@ export const getAllBrandsAcrossPages = async (
     ),
   );
 
-  remainingResults.forEach(result => {
+  remainingResults.forEach((result) => {
     if (Array.isArray(result.data)) {
       brands.push(...result.data);
     }
@@ -94,25 +100,40 @@ export const getAllBrandsAcrossPages = async (
   };
 };
 
-export const getActiveBrands = async (): Promise<BackendEnvelope<BackendBrand[]>> => {
-  return requestBackendJson<BackendEnvelope<BackendBrand[]>>('/brand/brands/active', {
-    method: 'GET',
-    next: { tags: ['BRANDS'] },
-  });
+export const getActiveBrands = async (): Promise<
+  BackendEnvelope<BackendBrand[]>
+> => {
+  return requestBackendJson<BackendEnvelope<BackendBrand[]>>(
+    "/brand/brands/active",
+    {
+      method: "GET",
+      next: { tags: ["BRANDS"] },
+    },
+  );
 };
 
-export const getBrandBySlug = async (slug: string): Promise<BackendEnvelope<BackendBrand>> => {
-  return requestBackendJson<BackendEnvelope<BackendBrand>>(`/brand/brands/${slug}`, {
-    method: 'GET',
-    next: { tags: ['BRANDS'] },
-  });
+export const getBrandBySlug = async (
+  slug: string,
+): Promise<BackendEnvelope<BackendBrand>> => {
+  return requestBackendJson<BackendEnvelope<BackendBrand>>(
+    `/brand/brands/${slug}`,
+    {
+      method: "GET",
+      next: { tags: ["BRANDS"] },
+    },
+  );
 };
 
-export const getActiveBrandBySlug = async (slug: string): Promise<BackendEnvelope<BackendBrand | null>> => {
-  return requestBackendJson<BackendEnvelope<BackendBrand | null>>(`/brand/brands/active/${slug}`, {
-    method: 'GET',
-    next: { tags: ['BRANDS'] },
-  });
+export const getActiveBrandBySlug = async (
+  slug: string,
+): Promise<BackendEnvelope<BackendBrand | null>> => {
+  return requestBackendJson<BackendEnvelope<BackendBrand | null>>(
+    `/brand/brands/active/${slug}`,
+    {
+      method: "GET",
+      next: { tags: ["BRANDS"] },
+    },
+  );
 };
 
 type BrandMutationPayload = {
@@ -125,36 +146,44 @@ type BrandMutationPayload = {
 
 function toFormData(payload: Record<string, unknown>) {
   const formData = new FormData();
-  const { image, ...rest } = payload as { image?: File | string; [key: string]: unknown };
+  const { image, ...rest } = payload as {
+    image?: File | string;
+    [key: string]: unknown;
+  };
 
   formData.set(
-    'data',
+    "data",
     JSON.stringify({
       ...rest,
-      ...(typeof image === 'string' && image ? { image } : {}),
+      ...(typeof image === "string" && image ? { image } : {}),
     }),
   );
 
   if (image instanceof File) {
-    formData.append('image', image);
+    formData.append("image", image);
   }
 
   return formData;
 }
 
-export const createBrand = async (payload: BrandMutationPayload): Promise<BackendEnvelope<BackendBrand>> => {
+export const createBrand = async (
+  payload: BrandMutationPayload,
+): Promise<BackendEnvelope<BackendBrand>> => {
   const accessToken = await getValidAccessTokenForServerActions();
 
-  const result = await requestBackendJson<BackendEnvelope<BackendBrand>>('/brand/brands', {
-    method: 'POST',
-    body: toFormData({
-      ...payload,
-      slug: slugify(payload.slug),
-    }),
-    token: accessToken ?? undefined,
-  });
+  const result = await requestBackendJson<BackendEnvelope<BackendBrand>>(
+    "/brand/brands",
+    {
+      method: "POST",
+      body: toFormData({
+        ...payload,
+        slug: slugify(payload.slug),
+      }),
+      token: accessToken ?? undefined,
+    },
+  );
 
-  updateTag('BRANDS');
+  updateTag("BRANDS");
   return result;
 };
 
@@ -163,26 +192,34 @@ export const updateBrand = async (
   payload: Partial<BrandMutationPayload>,
 ): Promise<BackendEnvelope<BackendBrand>> => {
   const accessToken = await getValidAccessTokenForServerActions();
-  const result = await requestBackendJson<BackendEnvelope<BackendBrand>>(`/brand/brands/${slug}`, {
-    method: 'PATCH',
-    body: toFormData({
-      ...payload,
-      slug: payload.slug ? slugify(payload.slug) : payload.slug,
-    }),
-    token: accessToken ?? undefined,
-  });
+  const result = await requestBackendJson<BackendEnvelope<BackendBrand>>(
+    `/brand/brands/${slug}`,
+    {
+      method: "PATCH",
+      body: toFormData({
+        ...payload,
+        slug: payload.slug ? slugify(payload.slug) : payload.slug,
+      }),
+      token: accessToken ?? undefined,
+    },
+  );
 
-  updateTag('BRANDS');
+  updateTag("BRANDS");
   return result;
 };
 
-export const deleteBrand = async (slug: string): Promise<BackendEnvelope<BackendBrand>> => {
+export const deleteBrand = async (
+  slug: string,
+): Promise<BackendEnvelope<BackendBrand>> => {
   const accessToken = await getValidAccessTokenForServerActions();
-  const result = await requestBackendJson<BackendEnvelope<BackendBrand>>(`/brand/brands/${slug}`, {
-    method: 'DELETE',
-    token: accessToken ?? undefined,
-  });
+  const result = await requestBackendJson<BackendEnvelope<BackendBrand>>(
+    `/brand/brands/${slug}`,
+    {
+      method: "DELETE",
+      token: accessToken ?? undefined,
+    },
+  );
 
-  updateTag('BRANDS');
+  updateTag("BRANDS");
   return result;
 };
