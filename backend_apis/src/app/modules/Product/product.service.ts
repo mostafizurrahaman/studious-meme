@@ -1,11 +1,11 @@
-import httpStatus from "http-status";
-import { AppError } from "../../utils";
-import { deleteImageFromCloudinary, sendImageToCloudinary } from "../../lib";
-import { ProductModel } from "./product.model";
-import { IProduct } from "./product.interface";
-import { CategoryModel } from "../Category/category.model";
-import { MulterFile } from "../../lib/upload";
-import { BrandModel } from "../Brand/brand.model";
+import httpStatus from 'http-status';
+import { AppError } from '../../utils';
+import { deleteImageFromCloudinary, sendImageToCloudinary } from '../../lib';
+import { ProductModel } from './product.model';
+import { IProduct } from './product.interface';
+import { CategoryModel } from '../Category/category.model';
+import { MulterFile } from '../../lib/upload';
+import { BrandModel } from '../Brand/brand.model';
 
 type ProductSort = Record<string, 1 | -1>;
 
@@ -14,14 +14,14 @@ const MAX_PRODUCT_IMAGES = 5;
 
 const normalizeSlug = (value: string) =>
   value
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .trim()
-    .replace(/["'’]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-+|-+$/g, "");
+    .replace(/["'’]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '');
 
 const parsePositiveInteger = (value: unknown, fallback: number) => {
   const parsed = Number(value);
@@ -29,27 +29,25 @@ const parsePositiveInteger = (value: unknown, fallback: number) => {
   return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
 };
 
-const escapeRegExp = (value: string) =>
-  value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-const getString = (value: unknown) =>
-  typeof value === "string" ? value.trim() : "";
+const getString = (value: unknown) => (typeof value === 'string' ? value.trim() : '');
 
 const csv = (value: unknown) =>
   getString(value)
-    .split(",")
-    .map((item) => item.trim())
+    .split(',')
+    .map(item => item.trim())
     .filter(Boolean);
 
 const pickSort = (value: unknown): ProductSort => {
   switch (getString(value)) {
-    case "price-asc":
+    case 'price-asc':
       return { price: 1, createdAt: -1 };
-    case "price-desc":
+    case 'price-desc':
       return { price: -1, createdAt: -1 };
-    case "oldest":
+    case 'oldest':
       return { createdAt: 1 };
-    case "latest":
+    case 'latest':
     default:
       return { createdAt: -1 };
   }
@@ -68,17 +66,9 @@ const parseCustomPriceRange = (value: string) => {
   const parsedMax = rawMax ? Number(rawMax) : undefined;
 
   const min =
-    typeof parsedMin === "number" &&
-    Number.isFinite(parsedMin) &&
-    parsedMin >= 0
-      ? parsedMin
-      : undefined;
+    typeof parsedMin === 'number' && Number.isFinite(parsedMin) && parsedMin >= 0 ? parsedMin : undefined;
   const max =
-    typeof parsedMax === "number" &&
-    Number.isFinite(parsedMax) &&
-    parsedMax >= 0
-      ? parsedMax
-      : undefined;
+    typeof parsedMax === 'number' && Number.isFinite(parsedMax) && parsedMax >= 0 ? parsedMax : undefined;
 
   if (min === undefined && max === undefined) return null;
 
@@ -92,7 +82,7 @@ const parseCustomPriceRange = (value: string) => {
 const buildProductFilters = async (query: Record<string, unknown>) => {
   const filter: Record<string, unknown> = {};
   const and: Record<string, unknown>[] = [];
-  const includeInactive = query.includeInactive === "true";
+  const includeInactive = query.includeInactive === 'true';
   const searchTerm = getString(query.searchTerm);
   const categorySlug = getString(query.category || query.c);
   const subCategorySlug = getString(query.subCategorySlug || query.subCategory);
@@ -107,8 +97,8 @@ const buildProductFilters = async (query: Record<string, unknown>) => {
 
   if (searchTerm) {
     and.push({
-      $or: ["title", "sku", "slug", "badge"].map((field) => ({
-        [field]: { $regex: escapeRegExp(searchTerm), $options: "i" },
+      $or: ['title', 'sku', 'slug', 'badge'].map(field => ({
+        [field]: { $regex: escapeRegExp(searchTerm), $options: 'i' },
       })),
     });
   }
@@ -116,12 +106,9 @@ const buildProductFilters = async (query: Record<string, unknown>) => {
   if (categorySlug) {
     const category = await CategoryModel.findOne({
       ...(includeInactive ? {} : { isActive: true }),
-      $or: [
-        { slug: categorySlug },
-        { name: { $regex: `^${escapeRegExp(categorySlug)}$`, $options: "i" } },
-      ],
+      $or: [{ slug: categorySlug }, { name: { $regex: `^${escapeRegExp(categorySlug)}$`, $options: 'i' } }],
     })
-      .select("_id")
+      .select('_id')
       .lean();
     if (!category) {
       filter.category = null;
@@ -140,28 +127,26 @@ const buildProductFilters = async (query: Record<string, unknown>) => {
       $or: [
         { slug: { $in: brandValues } },
         { name: { $in: brandValues } },
-        ...brandValues.map((value) => ({
-          name: { $regex: `^${escapeRegExp(value)}$`, $options: "i" },
+        ...brandValues.map(value => ({
+          name: { $regex: `^${escapeRegExp(value)}$`, $options: 'i' },
         })),
       ],
     })
-      .select("_id")
+      .select('_id')
       .lean();
 
-    filter.brand = brands.length
-      ? { $in: brands.map((brand) => brand._id) }
-      : null;
+    filter.brand = brands.length ? { $in: brands.map(brand => brand._id) } : null;
   }
 
-  if (stock === "in-stock") {
+  if (stock === 'in-stock') {
     filter.stock = { $gt: 0 };
   }
 
-  if (price === "under-10000") {
+  if (price === 'under-10000') {
     filter.price = { $lt: 10000 };
-  } else if (price === "10000-50000") {
+  } else if (price === '10000-50000') {
     filter.price = { $gte: 10000, $lt: 50000 };
-  } else if (price === "50000-plus") {
+  } else if (price === '50000-plus') {
     filter.price = { $gte: 50000 };
   } else if (price) {
     const customRange = parseCustomPriceRange(price);
@@ -183,64 +168,56 @@ const buildProductFilters = async (query: Record<string, unknown>) => {
     }
   }
 
-  if (stock === "featured" || tag === "featured") {
+  if (stock === 'featured' || tag === 'featured') {
     and.push({
-      $or: [
-        { isFeatured: true },
-        { badge: { $regex: "featured", $options: "i" } },
-      ],
+      $or: [{ isFeatured: true }, { badge: { $regex: 'featured', $options: 'i' } }],
     });
   }
 
-  if (stock === "sale" || tag === "sale") {
+  if (stock === 'sale' || tag === 'sale') {
     and.push({
-      $or: [
-        { oldPrice: { $exists: true, $ne: null } },
-        { badge: { $regex: "sale|%", $options: "i" } },
-      ],
+      $or: [{ oldPrice: { $exists: true, $ne: null } }, { badge: { $regex: 'sale|%', $options: 'i' } }],
     });
   }
 
-  if (tag === "latest") {
+  if (tag === 'latest') {
     and.push({
       $or: [{ badge: { $exists: false } }, { badge: { $not: /old/i } }],
     });
   }
 
-  if (tag === "industrial" || tag === "home") {
+  if (tag === 'industrial' || tag === 'home') {
     const pattern =
-      tag === "industrial"
-        ? /tool|machine|industrial|welding|cutting/i
-        : /home|fan|cleaning|cooler/i;
+      tag === 'industrial' ? /tool|machine|industrial|welding|cutting/i : /home|fan|cleaning|cooler/i;
     if (!filter.category) {
       const categories = await CategoryModel.find({
         ...(includeInactive ? {} : { isActive: true }),
         name: pattern,
       })
-        .select("_id")
+        .select('_id')
         .lean();
-      filter.category = { $in: categories.map((category) => category._id) };
+      filter.category = { $in: categories.map(category => category._id) };
     }
   }
 
   if (!includeInactive) {
     const referenceFilters: Promise<unknown>[] = [];
 
-    if (!("category" in filter)) {
+    if (!('category' in filter)) {
       referenceFilters.push(
         CategoryModel.find({ isActive: true })
-          .distinct("_id")
-          .then((categoryIds) => {
+          .distinct('_id')
+          .then(categoryIds => {
             filter.category = { $in: categoryIds };
           }),
       );
     }
 
-    if (!("brand" in filter)) {
+    if (!('brand' in filter)) {
       referenceFilters.push(
         BrandModel.find({ isActive: true })
-          .distinct("_id")
-          .then((brandIds) => {
+          .distinct('_id')
+          .then(brandIds => {
             filter.brand = { $in: brandIds };
           }),
       );
@@ -265,9 +242,7 @@ const createProductIntoDB = async (
   payload: Partial<IProduct>,
   imageFiles?: MulterFile[] | { [fieldname: string]: MulterFile[] },
 ) => {
-  const files = Array.isArray(imageFiles)
-    ? imageFiles
-    : Object.values(imageFiles ?? {}).flat();
+  const files = Array.isArray(imageFiles) ? imageFiles : Object.values(imageFiles ?? {}).flat();
   const uploadedImages: string[] = [];
 
   try {
@@ -284,10 +259,7 @@ const createProductIntoDB = async (
           : [];
 
     if (images.length === 0) {
-      throw new AppError(
-        httpStatus.BAD_REQUEST,
-        "At least one product image is required!",
-      );
+      throw new AppError(httpStatus.BAD_REQUEST, 'At least one product image is required!');
     }
     if (images.length > MAX_PRODUCT_IMAGES) {
       throw new AppError(
@@ -298,13 +270,11 @@ const createProductIntoDB = async (
 
     return ProductModel.create({
       ...payload,
-      slug: normalizeSlug(String(payload.slug ?? payload.title ?? "")),
+      slug: normalizeSlug(String(payload.slug ?? payload.title ?? '')),
       images,
     });
   } catch (error) {
-    await Promise.all(
-      uploadedImages.map((url) => deleteImageFromCloudinary(url)),
-    );
+    await Promise.all(uploadedImages.map(url => deleteImageFromCloudinary(url)));
 
     throw error;
   }
@@ -320,8 +290,8 @@ const getAllProductsFromDB = async (query: Record<string, unknown>) => {
 
   const [data, total] = await Promise.all([
     ProductModel.find(filter)
-      .populate("brand")
-      .populate("category")
+      .populate('brand')
+      .populate('category')
       .sort(sort)
       .skip(skip)
       .limit(limit)
@@ -346,23 +316,19 @@ const getAllActiveProductsFromDB = async (query: Record<string, unknown>) =>
 
 // 4. getProductBySlugFromDB
 const getProductBySlugFromDB = async (slug: string) => {
-  const doc = await ProductModel.findOne({ slug })
-    .populate("brand")
-    .populate("category")
-    .lean();
-  if (!doc) throw new AppError(httpStatus.NOT_FOUND, "Product not found!");
+  const doc = await ProductModel.findOne({ slug }).populate('brand').populate('category').lean();
+  if (!doc) throw new AppError(httpStatus.NOT_FOUND, 'Product not found!');
   return doc;
 };
 
 // 5. getActiveProductBySlugFromDB
 const getActiveProductBySlugFromDB = async (slug: string) => {
   const doc = await ProductModel.findOne({ slug, isActive: true })
-    .populate({ path: "brand", match: { isActive: true } })
-    .populate({ path: "category", match: { isActive: true } })
+    .populate({ path: 'brand', match: { isActive: true } })
+    .populate({ path: 'category', match: { isActive: true } })
     .lean();
 
-  if (!doc || !doc.brand || !doc.category)
-    throw new AppError(httpStatus.NOT_FOUND, "Product not found!");
+  if (!doc || !doc.brand || !doc.category) throw new AppError(httpStatus.NOT_FOUND, 'Product not found!');
 
   return doc;
 };
@@ -373,15 +339,13 @@ const updateProductIntoDB = async (
   payload: Partial<IProduct>,
   imageFiles?: MulterFile[] | { [fieldname: string]: MulterFile[] },
 ) => {
-  const existingProduct = await ProductModel.findOne({ slug }).select("images");
+  const existingProduct = await ProductModel.findOne({ slug }).select('images');
 
   if (!existingProduct) {
-    throw new AppError(httpStatus.NOT_FOUND, "Product not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Product not found!');
   }
 
-  const files = Array.isArray(imageFiles)
-    ? imageFiles
-    : Object.values(imageFiles ?? {}).flat();
+  const files = Array.isArray(imageFiles) ? imageFiles : Object.values(imageFiles ?? {}).flat();
   const uploadedImages: string[] = [];
 
   try {
@@ -391,18 +355,13 @@ const updateProductIntoDB = async (
     }
 
     const existingImages = existingProduct.images;
-    const nextImages =
-      uploadedImages.length > 0
-        ? uploadedImages
-        : Array.isArray(payload.images)
-          ? payload.images
-          : existingImages;
+    const retainedImages = Array.isArray(payload.images) ? payload.images : existingImages;
+    const nextImages = Array.from(
+      new Set(uploadedImages.length > 0 ? [...retainedImages, ...uploadedImages] : retainedImages),
+    );
 
     if (nextImages.length === 0) {
-      throw new AppError(
-        httpStatus.BAD_REQUEST,
-        "At least one product image is required!",
-      );
+      throw new AppError(httpStatus.BAD_REQUEST, 'At least one product image is required!');
     }
     if (nextImages.length > MAX_PRODUCT_IMAGES) {
       throw new AppError(
@@ -418,29 +377,23 @@ const updateProductIntoDB = async (
         slug: payload.slug ? normalizeSlug(String(payload.slug)) : payload.slug,
         images: nextImages,
       },
-      { returnDocument: "after", runValidators: true },
+      { returnDocument: 'after', runValidators: true },
     );
 
     if (!updated) {
-      await Promise.all(
-        uploadedImages.map((url) => deleteImageFromCloudinary(url)),
-      );
-      throw new AppError(httpStatus.NOT_FOUND, "Product not found!");
+      await Promise.all(uploadedImages.map(url => deleteImageFromCloudinary(url)));
+      throw new AppError(httpStatus.NOT_FOUND, 'Product not found!');
     }
 
     if (uploadedImages.length > 0) {
       await Promise.all(
-        existingImages
-          .filter((url) => !nextImages.includes(url))
-          .map((url) => deleteImageFromCloudinary(url)),
+        existingImages.filter(url => !nextImages.includes(url)).map(url => deleteImageFromCloudinary(url)),
       );
     }
 
     return updated;
   } catch (error) {
-    await Promise.all(
-      uploadedImages.map((url) => deleteImageFromCloudinary(url)),
-    );
+    await Promise.all(uploadedImages.map(url => deleteImageFromCloudinary(url)));
 
     throw error;
   }
@@ -450,19 +403,16 @@ const updateProductIntoDB = async (
 const deleteProductFromDB = async (slug: string) => {
   const product = await ProductModel.findOneAndDelete({ slug });
   if (!product) {
-    throw new AppError(httpStatus.NOT_FOUND, "Product not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Product not found!');
   }
   return product;
 };
 
 // 6. getProductsByCategorySlugFromDB
-const getProductsByCategorySlugFromDB = async (
-  slug: string,
-  query: Record<string, unknown> = {},
-) => {
+const getProductsByCategorySlugFromDB = async (slug: string, query: Record<string, unknown> = {}) => {
   const category = await CategoryModel.findOne({ slug, isActive: true }).lean();
   if (!category) {
-    throw new AppError(httpStatus.NOT_FOUND, "Category not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Category not found!');
   }
   return getAllProductsFromDB({ ...query, c: slug });
 };
@@ -483,7 +433,7 @@ const getProductsBySubCategorySlugFromDB = async (
   }).lean();
 
   if (!category) {
-    throw new AppError(httpStatus.NOT_FOUND, "SubCategory not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'SubCategory not found!');
   }
 
   return getAllProductsFromDB({ ...query, subCategorySlug });
