@@ -1,13 +1,23 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowUpRight } from 'lucide-react';
+import {
+  ArrowUpRight,
+  Zap,
+  ShieldCheck,
+  DoorClosed,
+  BadgeCheck,
+  FileText,
+  LayoutGrid,
+  Navigation,
+  Gauge,
+} from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { getCategoryAccentClassName, getCategoryAccentStyle } from '@/lib/category-accent';
 import { ProductCard } from '@/components/ProductCard';
 import { SectionHeading } from '@/components/SectionHeading';
 import { HomeHeroCarousel } from '@/components/HomeHeroCarousel';
-import { siteConfig } from '@/lib/seo';
+import { HomeAboutSection } from '@/components/HomeAboutSection';
 import { mapBackendBrandToStorefrontBrand, type BackendBrand } from '@/services/Brand';
 import { mapBackendCategoryToStorefrontCategory, type BackendCategory } from '@/services/Category/mappers';
 import { mapBackendProductToStorefrontProduct, type BackendProduct } from '@/services/Product';
@@ -140,14 +150,19 @@ export async function HomePage({ heroContent }: HomePageProps) {
 
         <section className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {[
-            'FASTEST DELIVERY POSSIBLE',
-            'SECURE PAYMENT SYSTEM',
-            'CASH ON DELIVERY AT YOUR DOORS',
-            'AUTHENTICITY 100% GUARANTEED',
-          ].map(item => (
-            <div key={item} className="rounded-2xl border border-border bg-card p-4 text-center shadow-sm">
-              <div className="mb-2 mx-auto h-2.5 w-2.5 rounded-full bg-primary" />
-              <div className="text-[11px] font-extrabold tracking-[0.18em] text-secondary">{item}</div>
+            { label: 'FASTEST DELIVERY POSSIBLE', icon: Zap },
+            { label: 'SECURE PAYMENT SYSTEM', icon: ShieldCheck },
+            { label: 'CASH ON DELIVERY AT YOUR DOORS', icon: DoorClosed },
+            { label: 'AUTHENTICITY 100% GUARANTEED', icon: BadgeCheck },
+          ].map(({ label, icon: Icon }) => (
+            <div
+              key={label}
+              className="group relative flex items-center gap-4 rounded-2xl border border-border bg-card p-4 shadow-sm transition-colors hover:bg-accent"
+            >
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <Icon className="h-5 w-5" />
+              </div>
+              <div className="text-[11px] font-extrabold tracking-[0.18em] text-secondary">{label}</div>
             </div>
           ))}
         </section>
@@ -296,12 +311,12 @@ export async function HomePage({ heroContent }: HomePageProps) {
           </Card>
         )}
 
-        <Card className="mt-8 grid gap-6 border-0 bg-secondary p-6 text-secondary-foreground shadow-sm lg:grid-cols-[1.1fr_0.9fr] lg:p-8">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-secondary-foreground/65">
+        <Card className="mt-8 grid gap-8 border-0 bg-secondary p-6 text-secondary-foreground shadow-sm lg:grid-cols-[1fr_1.2fr] lg:p-8">
+          <div className="flex flex-col justify-center">
+            <p className="text-xs font-medium uppercase tracking-[0.3em] text-secondary-foreground/65">
               Built for the storefront workflow
             </p>
-            <h2 className="mt-4 text-3xl font-black leading-tight sm:text-4xl">
+            <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-4xl">
               Catalog, cart and checkout flows are all covered here.
             </h2>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-secondary-foreground/78 sm:text-base">
@@ -309,51 +324,30 @@ export async function HomePage({ heroContent }: HomePageProps) {
               the full shopping experience.
             </p>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2">
             {[
-              ['SEO content', 'Built for content-rich catalog pages'],
-              ['Product grids', 'Structured for live data'],
-              ['Navigation', 'Matches the existing shop flow'],
-              ['Performance', 'Minimal client-side code'],
-            ].map(([title, text]) => (
-              <div key={title} className="rounded-2xl bg-white/10 p-4">
-                <div className="font-semibold">{title}</div>
-                <div className="mt-1 text-sm text-secondary-foreground/75">{text}</div>
+              { title: 'SEO content', text: 'Built for content-rich catalog pages', icon: FileText },
+              { title: 'Product grids', text: 'Structured for live data', icon: LayoutGrid },
+              { title: 'Navigation', text: 'Matches the existing shop flow', icon: Navigation },
+              { title: 'Performance', text: 'Minimal client-side code', icon: Gauge },
+            ].map(({ title, text, icon: Icon }) => (
+              <div
+                key={title}
+                className="group flex items-start gap-4 rounded-2xl bg-white/5 p-5 transition-all hover:bg-white/15"
+              >
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/10 text-white transition-transform group-hover:scale-110">
+                  <Icon className="h-5 w-5" />
+                </div>
+                <div>
+                  <div className="font-bold text-white">{title}</div>
+                  <div className="mt-1 text-sm text-secondary-foreground/70">{text}</div>
+                </div>
               </div>
             ))}
           </div>
         </Card>
 
-        <Card className="mt-8 shadow-sm">
-          <CardContent className="p-6">
-            <h2 className="text-xl font-black text-secondary sm:text-2xl">
-              {siteConfig.name} hardware store overview
-            </h2>
-            <Separator className="my-5" />
-            <div className="grid gap-6 text-sm leading-7 text-foreground/70 lg:grid-cols-2">
-              <div className="space-y-4">
-                <p>
-                  {siteConfig.name} is positioned as a trusted online hardware and industrial supply store in
-                  Bangladesh, serving workshop, maintenance and project buyers with a broad catalog.
-                </p>
-                <p>
-                  This frontend keeps the storefront hierarchy, brand focus and product merchandising style
-                  while staying easy to connect to live data.
-                </p>
-              </div>
-              <div className="space-y-4">
-                <p>
-                  Product grids, account areas and quotation forms are laid out so the site can connect to
-                  live data without changing the structure.
-                </p>
-                <p>
-                  The current build intentionally keeps the homepage mostly server-rendered and lightweight
-                  for fast initial load.
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <HomeAboutSection />
       </div>
     </main>
   );

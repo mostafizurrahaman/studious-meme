@@ -16,6 +16,61 @@ export const siteConfig = {
   googleVerification: process.env.GOOGLE_SITE_VERIFICATION?.trim() || '',
 };
 
+type AboutSection = {
+  heading: string;
+  content: string;
+};
+
+export const siteAboutSections: AboutSection[] = [
+  {
+    heading: "Online Shopping - Bangladesh's Best Online Hardware Store",
+    content:
+      "Malamal.com.bd stands out as the Best Online Hardware Store in Bangladesh, catering to both B2B and B2C customers with a vast range of industrial products. Whether you're managing a workshop or setting up a large-scale industrial unit, our platform makes it easy to buy tools and hardware online near Dhaka and across the country.",
+  },
+  {
+    heading: 'Discover the Biggest Online Hardware Store in BD',
+    content:
+      'Recognized as the biggest online hardware store BD, Malamal.com.bd offers everything from Power Tools and Hand Tools to Safety Equipment, Construction Machinery, and more. Looking for online industrial hardware items price in Bangladesh? Our transparent pricing, updated regularly, ensures you get what you need at the lowest and most competitive prices.',
+  },
+  {
+    heading: 'Why Malamal.com.bd is the Best Place to Buy Hardware Online',
+    content:
+      'When it comes to finding the best place to buy hardware online, Malamal.com.bd checks all the boxes - trusted brands, a wide product range, and excellent service. We proudly feature premium products from brands like BOSCH, DEWALT, MAKITA, DONGCHENG, and more. Our customers benefit from regular promotions and special offers. For businesses and individuals seeking a discount hardware store online, our platform provides unbeatable value.',
+  },
+  {
+    heading: 'Cheap Online Hardware Store - Quality Meets Affordability',
+    content:
+      "Being a cheap online hardware store doesn't mean we compromise on quality. From affordable hand tools to high-end industrial machinery, we ensure every product meets quality standards. Whether you're buying for home use or large industrial needs, our prices and products make us the top choice.",
+  },
+  {
+    heading: 'Best Online Tools Shop in Bangladesh',
+    content:
+      'We are widely known as the Best Online Tools Shop in Bangladesh, with thousands of products available for sale at any given time. From screwdrivers to welding machines, our online catalog is updated frequently, giving customers access to the latest tools.',
+  },
+  {
+    heading: 'Fast Delivery, Trusted Service - Shop Near Dhaka',
+    content:
+      'Conveniently located near Dhaka, Malamal.com.bd offers fast delivery to all parts of the city and beyond. Customers in Tongi, Savar, Gazipur, Narayanganj, Comilla, and other regions benefit from reliable service and prompt shipping.',
+  },
+  {
+    heading: 'Secure Online Purchase with Easy Payment Options',
+    content:
+      'Make your online purchase stress-free with our variety of payment methods - COD, debit/credit cards, bank transfer, Bkash, and more. Our customer support team is always ready to assist, making your experience smooth and hassle-free.',
+  },
+  {
+    heading: 'Industrial Tools for Every Sector',
+    content:
+      'From light-duty tools for home use to heavy-duty industrial machines, Malamal.com.bd is the go-to destination for anyone in Bangladesh. Our tools and hardware meet the needs of industries like construction, electrical, plumbing, woodworking, and manufacturing.',
+  },
+  {
+    heading: 'Experience the Future of Hardware Shopping',
+    content:
+      "Whether you're a DIY enthusiast or a procurement manager, Malamal.com.bd is designed to give you a seamless experience. Explore our site today - the Best online hardware store in Bangladesh with price, variety, and service - all in one place.",
+  },
+];
+
+export const siteFullDescription = siteAboutSections.map(s => `${s.heading}\n${s.content}`).join('\n\n');
+
 export function absoluteUrl(path: string) {
   return new URL(path, siteConfig.url).toString();
 }
@@ -395,6 +450,7 @@ const organizationSchema = {
   url: siteConfig.url,
   email: siteConfig.email,
   telephone: siteConfig.phone,
+  description: siteConfig.description,
   address: {
     '@type': 'PostalAddress',
     streetAddress: siteConfig.address,
@@ -422,6 +478,19 @@ const organizationSchema = {
   ],
 };
 
+const aboutPageSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: siteAboutSections.map(section => ({
+    '@type': 'Question',
+    name: section.heading,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: section.content,
+    },
+  })),
+};
+
 const websiteSchema = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
@@ -429,7 +498,7 @@ const websiteSchema = {
   url: siteConfig.url,
 };
 
-export const siteSchemas = [organizationSchema, websiteSchema];
+export const siteSchemas = [organizationSchema, websiteSchema, aboutPageSchema];
 
 export function buildHomeSchemas(input?: {
   categories?: Category[];
