@@ -176,11 +176,11 @@ const signinIntoDB = async (payload: { email: string; password: string }) => {
     const user = await UserModel.isUserExistsByEmailWithPassword(payload.email);
 
     if (!user) {
-        throw new AppError(httpStatus.NOT_FOUND, 'Admin does not exist!');
+        throw new AppError(httpStatus.NOT_FOUND, 'User does not exist!');
     }
 
     if (!user.isActive) {
-        throw new AppError(httpStatus.BAD_REQUEST, 'Admin is not active!');
+        throw new AppError(httpStatus.BAD_REQUEST, 'User is not active!');
     }
 
     // no need this part as isDeleted is functioned to hide the soft deleted user
