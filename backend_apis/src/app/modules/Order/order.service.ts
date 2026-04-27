@@ -34,7 +34,7 @@ type ProductForCheckout = {
   slug: string;
   images: string[];
   price: number;
-  stock: number;
+  stock?: number | null;
   weightKg?: number;
   isNoCOD?: boolean;
   brand: unknown;
@@ -65,10 +65,30 @@ const parseWeight = (value: number | undefined) => {
   return weight;
 };
 
+const getAvailableStock = (value: number | null | undefined) =>
+  typeof value === "number" && Number.isFinite(value) ? value : null;
+
 const createOrderId = () =>
   `ORD-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
 
 const decrementProductStock = async (sku: string, quantity: number) => {
+  const currentProduct = await ProductModel.findOne({ sku, isActive: true })
+    .select("stock")
+    .lean();
+
+  if (!currentProduct) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `Not enough stock available for SKU ${sku}.`,
+    );
+  }
+
+  const availableStock = getAvailableStock(currentProduct.stock);
+
+  if (availableStock === null) {
+    return currentProduct;
+  }
+
   const updated = await ProductModel.findOneAndUpdate(
     { sku, isActive: true, stock: { $gte: quantity } },
     { $inc: { stock: -quantity } },
@@ -114,7 +134,7 @@ const buildOrderSnapshot = (
     title: product.title,
     slug: product.slug,
     sku: product.sku,
-    images: product.images,
+    image: product.images[0],
     brand: resolveName(product.brand),
     category: resolveName(product.category),
     unitPrice,
@@ -178,9 +198,9 @@ const previewCheckoutFromDB = async (payload: CreateOrderPayload) => {
       );
     }
 
-    const unitStock = Number(product.stock);
+    const unitStock = getAvailableStock(product.stock);
 
-    if (!Number.isFinite(unitStock) || unitStock < item.quantity) {
+    if (unitStock !== null && unitStock < item.quantity) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
         `Not enough stock available for SKU ${item.sku}.`,
@@ -258,12 +278,12 @@ const createOrderIntoDB = async (user: IUser, payload: CreateOrderPayload) => {
         );
       }
 
-      const unitStock = Number(product.stock);
+    const unitStock = getAvailableStock(product.stock);
 
-      if (!Number.isFinite(unitStock) || unitStock < item.quantity) {
-        throw new AppError(
-          httpStatus.BAD_REQUEST,
-          `Not enough stock available for SKU ${item.sku}.`,
+    if (unitStock !== null && unitStock < item.quantity) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        `Not enough stock available for SKU ${item.sku}.`,
         );
       }
 

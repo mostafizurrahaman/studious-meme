@@ -1,15 +1,15 @@
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { ProductCard } from "@/components/ProductCard";
-import { ProductDetailClient } from "@/components/product/ProductDetailClient";
-import { SeoScripts } from "@/components/SeoScripts";
-import { buildProductMetadata, buildProductSchemas } from "@/lib/seo";
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { ProductCard } from '@/components/ProductCard';
+import { ProductDetailClient } from '@/components/product/ProductDetailClient';
+import { SeoScripts } from '@/components/SeoScripts';
+import { buildProductMetadata, buildProductSchemas } from '@/lib/seo';
 import {
   getActiveProductBySlug,
   getAllActiveProducts,
   getAllActiveProductsAcrossPages,
   mapBackendProductToStorefrontProduct,
-} from "@/services/Product";
+} from '@/services/Product';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -25,23 +25,23 @@ export async function generateStaticParams() {
 
   return Array.isArray(productsResult?.data)
     ? productsResult.data
-        .map((product) => product.slug)
+        .map(product => product.slug)
         .filter((slug): slug is string => Boolean(slug))
-        .map((slug) => ({ slug }))
+        .map(slug => ({ slug }))
     : [];
 }
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
+
   const productResult = await getActiveProductBySlug(slug).catch(() => null);
   const backendProduct = productResult?.data;
-  const product = backendProduct
-    ? await mapBackendProductToStorefrontProduct(backendProduct)
-    : null;
+
+  const product = backendProduct ? await mapBackendProductToStorefrontProduct(backendProduct) : null;
 
   if (!product) {
     return {
-      title: "Product not found",
+      title: 'Product not found',
       robots: { index: false, follow: false },
     };
   }
@@ -51,11 +51,11 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function ProductPage({ params }: Props) {
   const { slug } = await params;
+
   const productResult = await getActiveProductBySlug(slug).catch(() => null);
   const backendProduct = productResult?.data;
-  const product = backendProduct
-    ? await mapBackendProductToStorefrontProduct(backendProduct)
-    : null;
+
+  const product = backendProduct ? await mapBackendProductToStorefrontProduct(backendProduct) : null;
 
   if (!product) notFound();
 
@@ -65,9 +65,7 @@ export default async function ProductPage({ params }: Props) {
     excludeSlug: product.slug,
   }).catch(() => null);
   const related = productsResult?.data?.length
-    ? await Promise.all(
-        productsResult.data.map(mapBackendProductToStorefrontProduct),
-      )
+    ? await Promise.all(productsResult.data.map(mapBackendProductToStorefrontProduct))
     : [];
 
   return (
@@ -78,11 +76,11 @@ export default async function ProductPage({ params }: Props) {
           <nav className="overflow-hidden text-ellipsis whitespace-nowrap text-xs font-medium text-foreground/55">
             <Link href="/" className="hover:text-primary">
               Home
-            </Link>{" "}
-            /{" "}
+            </Link>{' '}
+            /{' '}
             <Link href="/shop" className="hover:text-primary">
               Shop
-            </Link>{" "}
+            </Link>{' '}
             / {product.title}
           </nav>
 
@@ -91,11 +89,9 @@ export default async function ProductPage({ params }: Props) {
           </div>
 
           <section className="mt-8">
-            <h2 className="text-2xl font-bold text-secondary">
-              Related Products
-            </h2>
+            <h2 className="text-2xl font-bold text-secondary">Related Products</h2>
             <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5 xl:gap-4">
-              {related.map((item) => (
+              {related.map(item => (
                 <ProductCard key={item.sku} product={item} />
               ))}
             </div>

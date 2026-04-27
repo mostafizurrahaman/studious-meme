@@ -36,7 +36,7 @@ describe("compare helpers", () => {
       title: "Smart TV",
       slug: "smart-tv",
       href: "/shop",
-      image: "https://example.com/tv.jpg",
+      images: ["https://example.com/tv.jpg"],
       price: "45000",
       oldPrice: "52000",
       brand: "Malamal",
@@ -49,6 +49,27 @@ describe("compare helpers", () => {
       isNoCOD: false,
       weightKg: 11.5,
     });
+  });
+
+  it("treats missing compare stock as in stock", () => {
+    const product = comparisonHistoryRecordToProduct({
+      productSnapshot: {
+        title: "Bulk Item",
+        brand: "Malamal",
+        category: "Hardware",
+        image: "https://example.com/item.jpg",
+        sku: "BULK-001",
+        slug: "bulk-item",
+        price: 1000,
+        stock: null,
+        rating: 5,
+        isFeatured: false,
+        weightKg: 2,
+        isNoCOD: false,
+      },
+    } as never);
+
+    expect(product?.stock).toBe("In stock");
   });
 
   it("resolves compare history product ids from multiple shapes", () => {

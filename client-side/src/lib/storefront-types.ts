@@ -2,7 +2,7 @@ export type StorefrontProduct = {
   id?: string;
   title: string;
   slug: string;
-  href: "/shop";
+  href: '/shop';
   images: string[];
   features?: string;
   description?: string;
@@ -23,8 +23,8 @@ export type StorefrontProduct = {
 
 export type Product = StorefrontProduct;
 
-export function getProductPrimaryImage(product: Pick<Product, "images">) {
-  return product.images[0] ?? "/icon.png";
+export function getProductPrimaryImage(product: Pick<Product, 'images'>) {
+  return product.images[0] ?? '/icon.png';
 }
 
 export type StorefrontCategory = {

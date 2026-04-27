@@ -213,7 +213,12 @@ export const dashboardFormSchemas = {
     brand: requiredText("Brand"),
     category: requiredText("Category"),
     subCategorySlug: optionalText(),
-    stock: requiredNumber("Stock", { min: 0, integer: true }),
+    stock: z
+      .string()
+      .trim()
+      .refine((value) => value === "" || /^\d+$/.test(value), {
+        message: "Stock must be a valid non-negative whole number!",
+      }),
     rating: requiredNumber("Rating", { min: 0 }),
     isFeatured: z.boolean().default(false),
     isActive: z.boolean().default(true),

@@ -8,7 +8,7 @@ const orderItemSnapshotSchema = new Schema<IOrderItemSnapshot>(
     title: { type: String, required: true },
     slug: { type: String, required: true },
     sku: { type: String, required: true },
-    images: { type: [String], required: true },
+    image: { type: String, required: true },
     brand: { type: String, required: true },
     category: { type: String, required: true },
     unitPrice: { type: Number, required: true },

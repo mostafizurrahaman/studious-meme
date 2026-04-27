@@ -17,7 +17,7 @@ export type DashboardActivityProductSnapshot = {
   sku: string;
   slug?: string;
   price?: number;
-  stock?: number;
+  stock?: number | null;
   rating?: number;
   oldPrice?: number;
   isFeatured?: boolean;

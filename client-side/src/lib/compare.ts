@@ -1,4 +1,5 @@
 import type { Product } from "@/lib/storefront-types";
+import { formatStockLabel } from "./stock";
 import type { ComparisonHistoryRecord } from "@/services/ComparisonHistory";
 
 export const MAX_COMPARE_ITEMS = 4;
@@ -33,7 +34,7 @@ export function comparisonHistoryRecordToProduct(
       snapshot.oldPrice === undefined ? undefined : String(snapshot.oldPrice),
     brand: snapshot.brand,
     sku: snapshot.sku,
-    stock: snapshot.stock > 0 ? `${snapshot.stock} in stock` : "Out of stock",
+    stock: formatStockLabel(snapshot.stock),
     rating: String(snapshot.rating),
     category: snapshot.category,
     categorySlug: snapshot.categorySlug ?? undefined,

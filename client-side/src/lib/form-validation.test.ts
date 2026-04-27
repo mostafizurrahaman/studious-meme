@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { authFormSchemas } from "./form-validation";
+import { authFormSchemas, dashboardFormSchemas } from "./form-validation";
 
 describe("form validation schemas", () => {
   it("validates forgot password flow fields", () => {
@@ -25,5 +25,23 @@ describe("form validation schemas", () => {
     });
 
     expect(result.success).toBe(false);
+  });
+
+  it("accepts stock values on dashboard products", () => {
+    expect(
+      dashboardFormSchemas.product.safeParse({
+        title: "Test",
+        slug: "test",
+        sku: "SKU-1",
+        price: "100",
+        oldPrice: "",
+        brand: "Brand",
+        category: "Category",
+        stock: "12",
+        rating: "5",
+        isFeatured: false,
+        isActive: true,
+      }).success,
+    ).toBe(true);
   });
 });

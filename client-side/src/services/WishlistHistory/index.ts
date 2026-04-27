@@ -28,7 +28,7 @@ export type WishlistHistoryRecord = {
     sku: string;
     slug: string;
     price: number;
-    stock: number;
+    stock?: number | null;
     weightKg?: number;
     isNoCOD?: boolean;
   };

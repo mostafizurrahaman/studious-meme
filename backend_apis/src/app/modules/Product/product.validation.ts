@@ -46,10 +46,13 @@ const productBaseSchema = z.object({
   weightKg: z.coerce
     .number({ error: "Weight is required!" })
     .min(0.01, { message: "Weight must be greater than 0!" }),
-  stock: z.coerce
-    .number({ error: "Stock is required!" })
-    .int()
-    .min(0, { message: "Stock is required!" }),
+  stock: z.preprocess(
+    (value) => (value === "" ? null : value),
+    z.union([
+      z.coerce.number().int().min(0, { message: "Stock must be at least 0!" }),
+      z.null(),
+    ]).optional(),
+  ),
   rating: z.coerce
     .number({ error: "Rating is required!" })
     .min(0, { message: "Rating is required!" }),

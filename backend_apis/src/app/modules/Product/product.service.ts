@@ -139,7 +139,13 @@ const buildProductFilters = async (query: Record<string, unknown>) => {
   }
 
   if (stock === 'in-stock') {
-    filter.stock = { $gt: 0 };
+    and.push({
+      $or: [
+        { stock: { $gt: 0 } },
+        { stock: { $exists: false } },
+        { stock: null },
+      ],
+    });
   }
 
   if (price === 'under-10000') {

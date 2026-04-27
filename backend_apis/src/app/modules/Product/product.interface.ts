@@ -14,7 +14,7 @@ export interface IProduct {
   category: Types.ObjectId;
   subCategorySlug?: string;
   weightKg: number;
-  stock: number;
+  stock?: number | null;
   rating: number;
   isFeatured: boolean;
   isNoCOD: boolean;

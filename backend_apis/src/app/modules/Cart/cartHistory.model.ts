@@ -12,11 +12,11 @@ type CartHistoryDoc = {
     brand: string;
     category: string;
     categorySlug?: string;
-    images: string[];
+    image: string;
     sku: string;
     slug: string;
     price: number;
-    stock: number;
+    stock?: number | null;
     weightKg?: number;
     isNoCOD?: boolean;
   };
@@ -40,11 +40,11 @@ const cartHistorySchema = new Schema<CartHistoryDoc>(
       brand: { type: String },
       category: { type: String },
       categorySlug: { type: String },
-      images: { type: [String] },
+       image: { type: String },
       sku: { type: String },
       slug: { type: String },
       price: { type: Number },
-      stock: { type: Number },
+       stock: { type: Number },
       weightKg: { type: Number },
       isNoCOD: { type: Boolean },
     },

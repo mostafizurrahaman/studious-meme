@@ -24,11 +24,11 @@ export type BackendCartItem = {
     brand: string;
     category: string;
     categorySlug?: string;
-    images: string[];
+    image: string;
     sku: string;
     slug: string;
     price: number;
-    stock: number;
+    stock?: number | null;
     weightKg?: number;
     isNoCOD?: boolean;
   };
@@ -61,11 +61,11 @@ export type CartHistoryRecord = {
     brand: string;
     category: string;
     categorySlug?: string;
-    images: string[];
+    image: string;
     sku: string;
     slug: string;
     price: number;
-    stock: number;
+    stock?: number | null;
     weightKg?: number;
     isNoCOD?: boolean;
   };

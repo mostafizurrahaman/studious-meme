@@ -21,10 +21,14 @@ import Image from 'next/image';
 import { makeZodResolver } from '@/lib/form-validation';
 import { DeleteConfirmationDialog } from '@/components/dashboard/DeleteConfirmationDialog';
 import { DashboardRichTextEditor } from '@/components/dashboard/DashboardRichTextEditor';
+import { formatStockLabel } from '@/lib/stock';
 
 type Option = { value: string; label: string };
 const MAX_PRODUCT_IMAGES = 5;
 const imagePreviewRotations = ['-18deg', '-8deg', '4deg', '14deg', '24deg'];
+const stockFieldSchema = z.string().trim().refine(value => value === '' || /^\d+$/.test(value), {
+  message: 'Stock must be a valid non-negative whole number!',
+});
 
 function richTextHasContent(value?: string) {
   return Boolean(
@@ -74,7 +78,7 @@ const productEditSchema = z.object({
 
   subCategorySlug: z.string().trim().optional(),
 
-  stock: z.string({ error: 'Stock is required!' }).trim().min(1, { message: 'Stock is required!' }),
+  stock: stockFieldSchema,
 
   rating: z.string({ error: 'Rating is required!' }).trim().min(1, { message: 'Rating is required!' }),
 
@@ -117,7 +121,7 @@ const productCreateSchema = z.object({
 
   subCategorySlug: z.string().trim().optional(),
 
-  stock: z.string({ error: 'Stock is required!' }).trim().min(1, { message: 'Stock is required!' }),
+  stock: stockFieldSchema,
 
   rating: z.string({ error: 'Rating is required!' }).trim().min(1, { message: 'Rating is required!' }),
 
@@ -474,7 +478,7 @@ export function DashboardProductsManager({
       brand: brandId,
       category: categoryId,
       subCategorySlug: product.subCategorySlug ?? '',
-      stock: String(product.stock),
+      stock: product.stock == null ? '' : String(product.stock),
       rating: String(product.rating),
       weightKg: String(product.weightKg ?? 1),
       isFeatured: product.isFeatured,
@@ -617,12 +621,13 @@ export function DashboardProductsManager({
             </div>
             <div className="grid gap-1.5">
               <DashboardInput
-                placeholder="Stock quantity"
+                placeholder="Stock count (optional)"
                 type="number"
                 min={0}
                 step={1}
                 {...productCreateForm.register('stock')}
               />
+              <p className="text-xs text-muted-foreground">Leave blank to keep it always in stock.</p>
               <ErrorText message={productCreateForm.formState.errors.stock?.message} />
             </div>
             <div className="grid gap-1.5">
@@ -709,7 +714,7 @@ export function DashboardProductsManager({
                     brand: values.brand.trim(),
                     category: values.category.trim(),
                     subCategorySlug: values.subCategorySlug?.trim() || undefined,
-                    stock: Number(values.stock),
+                    stock: values.stock.trim() ? Number(values.stock) : null,
                     rating: Number(values.rating),
                     weightKg: Number(values.weightKg),
                     isFeatured: values.isFeatured,
@@ -970,7 +975,7 @@ export function DashboardProductsManager({
                         </Badge>
                       </TableCell>
                       <TableCell className="min-w-0">
-                        <Badge variant="secondary">{product.stock}</Badge>
+                        <Badge variant="secondary">{formatStockLabel(product.stock)}</Badge>
                       </TableCell>
                       <TableCell className="min-w-0">
                         <Badge variant={product.isFeatured ? 'default' : 'secondary'}>
@@ -1005,7 +1010,7 @@ export function DashboardProductsManager({
                                     brand: values.brand.trim(),
                                     category: values.category.trim(),
                                     subCategorySlug: values.subCategorySlug?.trim() ?? '',
-                                    stock: Number(values.stock),
+                                    stock: values.stock.trim() ? Number(values.stock) : null,
                                     rating: Number(values.rating),
                                     weightKg: Number(values.weightKg),
                                     isFeatured: values.isFeatured,
@@ -1184,12 +1189,15 @@ export function DashboardProductsManager({
 
                               <div className="grid gap-1.5">
                                 <DashboardInput
-                                  placeholder="Stock quantity"
+                                  placeholder="Stock count (optional)"
                                   type="number"
                                   min={0}
                                   step={1}
                                   {...productEditForm.register('stock')}
                                 />
+                                <p className="text-xs text-muted-foreground">
+                                  Leave blank to keep it always in stock.
+                                </p>
                                 <ErrorText message={productEditForm.formState.errors.stock?.message} />
                               </div>
 
