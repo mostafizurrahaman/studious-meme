@@ -12,7 +12,20 @@ const productSchema = new Schema<IProduct>(
       unique: true,
     },
     sku: { type: String, required: [true, "SKU is required!"], unique: true },
-    image: { type: String, required: true },
+    images: {
+      type: [String],
+      required: [true, "At least one product image is required!"],
+      validate: {
+        validator: (value: string[]) =>
+          Array.isArray(value) && value.length > 0 && value.length <= 5,
+        message: "Product images must be between 1 and 5 items!",
+      },
+    },
+    features: { type: String, required: [true, "Features are required!"] },
+    description: {
+      type: String,
+      required: [true, "Description is required!"],
+    },
     price: { type: Number, required: true, min: 0 },
     oldPrice: { type: Number, min: 0 },
     badge: { type: String },

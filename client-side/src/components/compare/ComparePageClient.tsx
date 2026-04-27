@@ -6,7 +6,7 @@ import Link from "next/link";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import type { Product } from "@/lib/storefront-types";
+import { getProductPrimaryImage, type Product } from "@/lib/storefront-types";
 import { useCompareStore } from "@/lib/compare-store";
 import {
   MAX_COMPARE_ITEMS,
@@ -122,7 +122,7 @@ export function ComparePageClient({ authenticated, initialProducts }: Props) {
                   <CardContent className="flex h-full flex-col p-4">
                     <div className="relative aspect-square overflow-hidden rounded-2xl bg-muted">
                       <Image
-                        src={product.image}
+                        src={getProductPrimaryImage(product)}
                         alt={product.title}
                         fill
                         className="object-contain p-3"

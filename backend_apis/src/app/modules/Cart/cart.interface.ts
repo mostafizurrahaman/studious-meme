@@ -1,11 +1,11 @@
-import { Document, Types } from "mongoose";
+import { Document, Types } from 'mongoose';
 
 export interface ICartItemSnapshot {
   title: string;
   brand: string;
   category: string;
   categorySlug?: string;
-  image: string;
+  images: string[];
   sku: string;
   slug: string;
   price: number;

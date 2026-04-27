@@ -1,18 +1,18 @@
-import { model, Schema, Types } from "mongoose";
+import { model, Schema, Types } from 'mongoose';
 
 const HISTORY_TTL_SECONDS = 60 * 60 * 24 * 30;
 
 type CartHistoryDoc = {
   user: Types.ObjectId;
   product?: Types.ObjectId;
-  action: "add" | "update" | "remove" | "clear";
+  action: 'add' | 'update' | 'remove' | 'clear';
   quantity?: number;
   productSnapshot?: {
     title: string;
     brand: string;
     category: string;
     categorySlug?: string;
-    image: string;
+    images: string[];
     sku: string;
     slug: string;
     price: number;
@@ -27,11 +27,11 @@ type CartHistoryDoc = {
 
 const cartHistorySchema = new Schema<CartHistoryDoc>(
   {
-    user: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    product: { type: Schema.Types.ObjectId, ref: "Product" },
+    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    product: { type: Schema.Types.ObjectId, ref: 'Product' },
     action: {
       type: String,
-      enum: ["add", "update", "remove", "clear"],
+      enum: ['add', 'update', 'remove', 'clear'],
       required: true,
     },
     quantity: { type: Number },
@@ -40,7 +40,7 @@ const cartHistorySchema = new Schema<CartHistoryDoc>(
       brand: { type: String },
       category: { type: String },
       categorySlug: { type: String },
-      image: { type: String },
+      images: { type: [String] },
       sku: { type: String },
       slug: { type: String },
       price: { type: Number },
@@ -57,20 +57,13 @@ const cartHistorySchema = new Schema<CartHistoryDoc>(
   { timestamps: true, versionKey: false },
 );
 
+cartHistorySchema.index({ expireAt: 1 }, { expireAfterSeconds: 0, name: 'cartHistory_ttl_idx' });
+
+cartHistorySchema.index({ user: 1, createdAt: -1 }, { name: 'cartHistory_user_createdAt_idx' });
+
 cartHistorySchema.index(
-  { expireAt: 1 },
-  { expireAfterSeconds: 0, name: "cartHistory_ttl_idx" },
-);
-cartHistorySchema.index(
-  { user: 1, createdAt: -1 },
-  { name: "cartHistory_user_createdAt_idx" },
-);
-cartHistorySchema.index(
-  { "productSnapshot.category": 1, createdAt: -1 },
-  { name: "cartHistory_category_createdAt_idx" },
+  { 'productSnapshot.category': 1, createdAt: -1 },
+  { name: 'cartHistory_category_createdAt_idx' },
 );
 
-export const CartHistoryModel = model<CartHistoryDoc>(
-  "CartHistory",
-  cartHistorySchema,
-);
+export const CartHistoryModel = model<CartHistoryDoc>('CartHistory', cartHistorySchema);

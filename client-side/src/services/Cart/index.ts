@@ -24,7 +24,7 @@ export type BackendCartItem = {
     brand: string;
     category: string;
     categorySlug?: string;
-    image: string;
+    images: string[];
     sku: string;
     slug: string;
     price: number;
@@ -61,7 +61,7 @@ export type CartHistoryRecord = {
     brand: string;
     category: string;
     categorySlug?: string;
-    image: string;
+    images: string[];
     sku: string;
     slug: string;
     price: number;

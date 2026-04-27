@@ -1,13 +1,13 @@
-import { model, Schema } from "mongoose";
-import { ICart } from "./cart.interface";
+import { model, Schema } from 'mongoose';
+import { ICart, ICartItem, ICartItemSnapshot } from './cart.interface';
 
-const cartItemSnapshotSchema = new Schema(
+const cartItemSnapshotSchema = new Schema<ICartItemSnapshot>(
   {
     title: { type: String, required: true },
     brand: { type: String, required: true },
     category: { type: String, required: true },
     categorySlug: { type: String },
-    image: { type: String, required: true },
+    images: { type: [String], required: true },
     sku: { type: String, required: true },
     slug: { type: String, required: true },
     price: { type: Number, required: true },
@@ -18,9 +18,9 @@ const cartItemSnapshotSchema = new Schema(
   { _id: false },
 );
 
-const cartItemSchema = new Schema(
+const cartItemSchema = new Schema<ICartItem>(
   {
-    product: { type: Schema.Types.ObjectId, ref: "Product", required: true },
+    product: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
     quantity: { type: Number, required: true, min: 1 },
     priceSnapshot: { type: Number, required: true },
     productSnapshot: { type: cartItemSnapshotSchema, required: true },
@@ -32,7 +32,7 @@ const cartSchema = new Schema<ICart>(
   {
     user: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: true,
       unique: true,
     },
@@ -43,10 +43,7 @@ const cartSchema = new Schema<ICart>(
   { timestamps: true, versionKey: false },
 );
 
-cartSchema.index({ user: 1 }, { unique: true, name: "cart_user_unique_idx" });
-cartSchema.index(
-  { user: 1, updatedAt: -1 },
-  { name: "cart_user_updatedAt_idx" },
-);
+cartSchema.index({ user: 1 }, { unique: true, name: 'cart_user_unique_idx' });
+cartSchema.index({ user: 1, updatedAt: -1 }, { name: 'cart_user_updatedAt_idx' });
 
-export const CartModel = model<ICart>("Cart", cartSchema);
+export const CartModel = model<ICart>('Cart', cartSchema);

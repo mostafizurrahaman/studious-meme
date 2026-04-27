@@ -29,7 +29,9 @@ export type BackendProduct = {
   title: string;
   slug: string;
   sku: string;
-  image: string;
+  images: string[];
+  features: string;
+  description: string;
   price: number;
   oldPrice?: number;
   badge?: string;
@@ -70,7 +72,9 @@ export async function mapBackendProductToStorefrontProduct(
     title: product.title,
     slug: product.slug,
     href: "/shop",
-    image: product.image,
+    images: product.images ?? [],
+    features: product.features ?? "",
+    description: product.description ?? "",
     price: String(product.price),
     oldPrice:
       product.oldPrice === undefined ? undefined : String(product.oldPrice),
@@ -286,7 +290,9 @@ type ProductMutationPayload = {
   title: string;
   slug: string;
   sku: string;
-  image?: File | string;
+  images?: Array<File | string>;
+  features: string;
+  description: string;
   price: number;
   oldPrice?: number;
   badge?: string;
@@ -304,22 +310,27 @@ type ProductMutationPayload = {
 function toFormData(payload: Record<string, unknown>) {
   const formData = new FormData();
 
-  const { image, ...rest } = payload as {
-    image?: File | string;
+  const { images, ...rest } = payload as {
+    images?: Array<File | string>;
     [key: string]: unknown;
   };
+  const imageUrls = (images ?? []).filter(
+    (item): item is string => typeof item === "string" && Boolean(item),
+  );
 
   formData.set(
     "data",
     JSON.stringify({
       ...rest,
-      ...(typeof image === "string" && image ? { image } : {}),
+      ...(imageUrls.length > 0 ? { images: imageUrls } : {}),
     }),
   );
 
-  if (image instanceof File) {
-    formData.append("image", image);
-  }
+  (images ?? []).forEach((item) => {
+    if (item instanceof File) {
+      formData.append("images", item);
+    }
+  });
 
   return formData;
 }

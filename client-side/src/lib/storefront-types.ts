@@ -3,7 +3,9 @@ export type StorefrontProduct = {
   title: string;
   slug: string;
   href: "/shop";
-  image: string;
+  images: string[];
+  features?: string;
+  description?: string;
   price: string;
   oldPrice?: string;
   badge?: string;
@@ -20,6 +22,10 @@ export type StorefrontProduct = {
 };
 
 export type Product = StorefrontProduct;
+
+export function getProductPrimaryImage(product: Pick<Product, "images">) {
+  return product.images[0] ?? "/icon.png";
+}
 
 export type StorefrontCategory = {
   name: string;

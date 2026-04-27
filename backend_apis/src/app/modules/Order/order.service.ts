@@ -32,7 +32,7 @@ type ProductForCheckout = {
   sku: string;
   title: string;
   slug: string;
-  image: string;
+  images: string[];
   price: number;
   stock: number;
   weightKg?: number;
@@ -114,7 +114,7 @@ const buildOrderSnapshot = (
     title: product.title,
     slug: product.slug,
     sku: product.sku,
-    image: product.image,
+    images: product.images,
     brand: resolveName(product.brand),
     category: resolveName(product.category),
     unitPrice,

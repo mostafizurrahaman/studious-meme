@@ -20,7 +20,7 @@ router
     auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
     adminLimiter,
     burstProtection("admin", 10_000, 15),
-    multerUpload.single("image"),
+    multerUpload.array("images", 5),
     validateRequestFromFormData(ProductValidation.productCreateSchema),
     ProductController.createProduct,
   )
@@ -42,7 +42,7 @@ router
     auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
     adminLimiter,
     burstProtection("admin", 10_000, 15),
-    multerUpload.single("image"),
+    multerUpload.array("images", 5),
     validateRequestFromFormData(ProductValidation.productUpdateSchema),
     ProductController.updateProduct,
   )

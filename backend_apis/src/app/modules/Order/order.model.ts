@@ -1,14 +1,14 @@
-import { Schema, model } from "mongoose";
-import { IOrder } from "./order.interface";
-import { SHIPPING_ZONE } from "./order.constants";
+import { Schema, model } from 'mongoose';
+import { IOrder, IOrderCustomerInfo, IOrderItemSnapshot } from './order.interface';
+import { SHIPPING_ZONE } from './order.constants';
 
-const orderItemSnapshotSchema = new Schema(
+const orderItemSnapshotSchema = new Schema<IOrderItemSnapshot>(
   {
-    product: { type: Schema.Types.ObjectId, ref: "Product", required: true },
+    product: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
     title: { type: String, required: true },
     slug: { type: String, required: true },
     sku: { type: String, required: true },
-    image: { type: String, required: true },
+    images: { type: [String], required: true },
     brand: { type: String, required: true },
     category: { type: String, required: true },
     unitPrice: { type: Number, required: true },
@@ -20,7 +20,7 @@ const orderItemSnapshotSchema = new Schema(
   { _id: false },
 );
 
-const orderCustomerSchema = new Schema(
+const orderCustomerSchema = new Schema<IOrderCustomerInfo>(
   {
     name: { type: String, required: true },
     phone: { type: String, required: true },
@@ -35,7 +35,7 @@ const orderCustomerSchema = new Schema(
 const orderSchema = new Schema<IOrder>(
   {
     orderId: { type: String, required: true, unique: true },
-    user: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     items: { type: [orderItemSnapshotSchema], required: true },
     customer: { type: orderCustomerSchema, required: true },
     subtotal: { type: Number, required: true },
@@ -53,59 +53,36 @@ const orderSchema = new Schema<IOrder>(
     total: { type: Number, required: true },
     totalAmount: { type: Number, required: true, default: 0 },
     payableAmount: { type: Number, required: true, default: 0 },
-    currency: { type: String, required: true, default: "BDT" },
+    currency: { type: String, required: true, default: 'BDT' },
     couponCode: { type: String },
     paymentMethod: {
       type: String,
-      enum: ["CASH_ON_DELIVERY", "PORTPOS"],
+      enum: ['CASH_ON_DELIVERY', 'PORTPOS'],
       required: true,
     },
     paymentGateway: {
       type: String,
-      enum: ["CASH_ON_DELIVERY", "PORTPOS"],
+      enum: ['CASH_ON_DELIVERY', 'PORTPOS'],
     },
     paymentStatus: {
       type: String,
-      enum: [
-        "UNPAID",
-        "PENDING_PAYMENT",
-        "PAID",
-        "FAILED",
-        "CANCELLED",
-        "REFUNDED",
-      ],
+      enum: ['UNPAID', 'PENDING_PAYMENT', 'PAID', 'FAILED', 'CANCELLED', 'REFUNDED'],
       required: true,
-      default: "UNPAID",
+      default: 'UNPAID',
     },
     orderStatus: {
       type: String,
-      enum: [
-        "PLACED",
-        "PENDING_PAYMENT",
-        "CONFIRMED",
-        "PROCESSING",
-        "SHIPPED",
-        "DELIVERED",
-        "CANCELLED",
-      ],
+      enum: ['PLACED', 'PENDING_PAYMENT', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'],
       required: true,
-      default: "PLACED",
+      default: 'PLACED',
     },
     status: {
       type: String,
-      enum: [
-        "PLACED",
-        "PENDING_PAYMENT",
-        "CONFIRMED",
-        "PROCESSING",
-        "SHIPPED",
-        "DELIVERED",
-        "CANCELLED",
-      ],
+      enum: ['PLACED', 'PENDING_PAYMENT', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'],
       required: true,
-      default: "PLACED",
+      default: 'PLACED',
     },
-    paymentId: { type: Schema.Types.ObjectId, ref: "Payment" },
+    paymentId: { type: Schema.Types.ObjectId, ref: 'Payment' },
     invoiceId: { type: String, unique: true, sparse: true },
     transactionId: { type: String },
     gatewayUrl: { type: String },
@@ -113,17 +90,8 @@ const orderSchema = new Schema<IOrder>(
   { timestamps: true, versionKey: false },
 );
 
-orderSchema.index(
-  { user: 1, createdAt: -1 },
-  { name: "order_user_createdAt_idx" },
-);
-orderSchema.index(
-  { status: 1, createdAt: -1 },
-  { name: "order_status_createdAt_idx" },
-);
-orderSchema.index(
-  { invoiceId: 1 },
-  { unique: true, sparse: true, name: "order_invoiceId_idx" },
-);
+orderSchema.index({ user: 1, createdAt: -1 }, { name: 'order_user_createdAt_idx' });
+orderSchema.index({ status: 1, createdAt: -1 }, { name: 'order_status_createdAt_idx' });
+orderSchema.index({ invoiceId: 1 }, { unique: true, sparse: true, name: 'order_invoiceId_idx' });
 
-export const OrderModel = model<IOrder>("Order", orderSchema);
+export const OrderModel = model<IOrder>('Order', orderSchema);

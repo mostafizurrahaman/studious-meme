@@ -49,6 +49,7 @@ type CartState = {
   checkout: CheckoutForm;
   orders: OrderRecord[];
   addProduct: (product: Product) => void;
+  addProductQuantity: (product: Product, quantity: number) => void;
   increase: (sku: string) => void;
   decrease: (sku: string) => void;
   remove: (sku: string) => void;
@@ -106,6 +107,29 @@ export const useCartStore = create<CartState>()(
               items: state.items.map((item) =>
                 item.sku === nextItem.sku
                   ? { ...item, quantity: item.quantity + 1 }
+                  : item,
+              ),
+              ...resetCouponState,
+            };
+          }
+
+          return { items: [...state.items, nextItem], ...resetCouponState };
+        });
+      },
+      addProductQuantity: (product, quantity) => {
+        const safeQuantity =
+          Number.isInteger(quantity) && quantity > 0 ? quantity : 1;
+        const nextItem = { ...toCartItem(product), quantity: safeQuantity };
+
+        set((state) => {
+          const existing = state.items.find(
+            (item) => item.sku === nextItem.sku,
+          );
+          if (existing) {
+            return {
+              items: state.items.map((item) =>
+                item.sku === nextItem.sku
+                  ? { ...item, quantity: item.quantity + safeQuantity }
                   : item,
               ),
               ...resetCouponState,

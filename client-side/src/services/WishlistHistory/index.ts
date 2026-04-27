@@ -24,7 +24,7 @@ export type WishlistHistoryRecord = {
     brand: string;
     category: string;
     categorySlug?: string;
-    image: string;
+    images: string[];
     sku: string;
     slug: string;
     price: number;

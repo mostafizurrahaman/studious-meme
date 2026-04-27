@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { AddToCompareButton } from "@/components/compare/AddToCompareButton";
 import { AddToWishlistButton } from "@/components/wishlist/AddToWishlistButton";
-import type { Product } from "@/lib/storefront-types";
+import { getProductPrimaryImage, type Product } from "@/lib/storefront-types";
 
 type Props = {
   product: Product;
@@ -19,6 +19,8 @@ export function ProductCard({
   priority = false,
   trailingAction,
 }: Props) {
+  const primaryImage = getProductPrimaryImage(product);
+
   return (
     <Card className="group overflow-hidden border-border transition hover:-translate-y-0.5 hover:shadow-md">
       <div className="relative aspect-square bg-muted p-2">
@@ -27,7 +29,7 @@ export function ProductCard({
           className="absolute inset-0 block"
         >
           <Image
-            src={product.image}
+            src={primaryImage}
             alt={product.title}
             fill
             priority={priority}

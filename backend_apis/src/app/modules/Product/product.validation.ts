@@ -14,7 +14,18 @@ const productBaseSchema = z.object({
     .string({ error: "SKU is required!" })
     .trim()
     .min(1, { message: "SKU is required!" }),
-  image: z.string().optional(),
+  images: z
+    .array(z.string().trim().min(1))
+    .max(5, { message: "You can upload up to 5 product images!" })
+    .optional(),
+  features: z
+    .string({ error: "Features are required!" })
+    .trim()
+    .min(1, { message: "Features are required!" }),
+  description: z
+    .string({ error: "Description is required!" })
+    .trim()
+    .min(1, { message: "Description is required!" }),
   price: z.coerce
     .number({ error: "Price is required!" })
     .min(0, { message: "Price is required!" }),

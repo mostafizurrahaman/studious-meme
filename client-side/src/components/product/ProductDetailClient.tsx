@@ -1,0 +1,353 @@
+'use client';
+
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useMemo, useState } from 'react';
+import { CheckCircle2, MessageCircle, Minus, PackageCheck, Plus, Send, Share, Truck } from 'lucide-react';
+import PaymentOptionSvg from '@/assets/Payment-Option.svg';
+import { Button } from '@/components/ui/button';
+import { AddToCompareButton } from '@/components/compare/AddToCompareButton';
+import { AddToWishlistButton } from '@/components/wishlist/AddToWishlistButton';
+import { useCartStore } from '@/lib/cart-store';
+import { cn } from '@/lib/utils';
+import { getProductPrimaryImage, type Product } from '@/lib/storefront-types';
+import { addCartItem } from '@/services/Cart';
+
+function FacebookIcon({ className }: { className?: string }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M18.77 7.46H14.5v-1.42c0-.66.1-1 1.15-1h3v-3.97H11.3c-1.45 0-1.77.86-1.77 1.77V8.5H8.15v3.5h3v8.15h3.5v-8.15h2.75l.27-3.54z" />
+    </svg>
+  );
+}
+
+function TwitterIcon({ className }: { className?: string }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+    </svg>
+  );
+}
+
+function LinkedinIcon({ className }: { className?: string }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.621 4.267 6.03v6.711zM5.337 7.433c-1.144 0-2.064-.926-2.064-2.084 0-1.16.92-2.084 2.064-2.084 1.14 0 2.063.924 2.063 2.084 0 1.158-.922 2.084-2.063 2.084zm1.602 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.752v20.495C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.752C24 .774 23.2 0 22.222 0h.003z" />
+    </svg>
+  );
+}
+
+function PinterestIcon({ className }: { className?: string }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+      <text x="12" y="19" textAnchor="middle" fontSize="26" fontWeight="bold" fill="#6b7280">
+        P
+      </text>
+    </svg>
+  );
+}
+
+type ProductDetailClientProps = {
+  product: Product;
+};
+
+const WHATSAPP_URL = 'https://wa.me/8801972525821';
+const sharePlatforms = [
+  {
+    name: 'Facebook',
+    Icon: FacebookIcon,
+    buildHref: (url: string) => `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+  },
+  {
+    name: 'X',
+    Icon: TwitterIcon,
+    buildHref: (url: string) => `https://x.com/share?url=${url}`,
+  },
+  {
+    name: 'Pinterest',
+    Icon: PinterestIcon,
+    buildHref: (url: string, media: string, title: string) =>
+      `https://pinterest.com/pin/create/button/?url=${url}&media=${media}&description=${encodeURIComponent(title)}`,
+  },
+  {
+    name: 'LinkedIn',
+    Icon: LinkedinIcon,
+    buildHref: (url: string) => `https://www.linkedin.com/shareArticle?mini=true&url=${url}`,
+  },
+  {
+    name: 'WhatsApp',
+    Icon: MessageCircle,
+    buildHref: (url: string) => `https://api.whatsapp.com/send?text=${encodeURIComponent(url)}`,
+  },
+  {
+    name: 'Telegram',
+    Icon: Send,
+    buildHref: (url: string) => `https://telegram.me/share/url?url=${url}`,
+  },
+] as const;
+
+function sanitizeProductHtml(value: string) {
+  return value
+    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
+    .replace(/\son\w+="[^"]*"/gi, '')
+    .replace(/\son\w+='[^']*'/gi, '')
+    .replace(/\shref=["']javascript:[^"']*["']/gi, '');
+}
+
+function formatTaka(value: string) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return `Tk. ${value}`;
+  return `Tk. ${numeric.toLocaleString('en-BD', { maximumFractionDigits: 2 })}`;
+}
+
+export function ProductDetailClient({ product }: ProductDetailClientProps) {
+  const router = useRouter();
+  const addProductQuantity = useCartStore(state => state.addProductQuantity);
+  const images = useMemo(
+    () => (product.images.length > 0 ? product.images : [getProductPrimaryImage(product)]),
+    [product],
+  );
+  const [selectedImage, setSelectedImage] = useState(images[0]);
+  const [zoomPosition, setZoomPosition] = useState('50% 50%');
+  const [isZooming, setIsZooming] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+  const description = sanitizeProductHtml(product.description?.trim() ?? '');
+  const features = sanitizeProductHtml(product.features?.trim() ?? '');
+  const productUrl = `https://malamal.com.bd/product/${product.slug}/`;
+  const encodedProductUrl = encodeURIComponent(productUrl);
+  const primaryImage = getProductPrimaryImage(product);
+  const shareMedia = primaryImage.startsWith('http') ? primaryImage : `https://malamal.com.bd${primaryImage}`;
+
+  function handleZoomMove(event: React.MouseEvent<HTMLDivElement>) {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width) * 100;
+    const y = ((event.clientY - rect.top) / rect.height) * 100;
+    setZoomPosition(`${x}% ${y}%`);
+    setIsZooming(true);
+  }
+
+  function addQuantityToCart(redirect = false) {
+    addProductQuantity(product, quantity);
+    if (product.id) {
+      void addCartItem(product.id, quantity).catch(() => null);
+    }
+    // toast.success('Product added to cart.');
+    if (redirect) router.push('/checkout');
+  }
+
+  return (
+    <div className="space-y-8">
+      <section className="grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] xl:grid-cols-[620px_minmax(0,1fr)]">
+        <div className={cn('grid gap-3', images.length > 1 ? 'sm:grid-cols-[86px_minmax(0,1fr)]' : '')}>
+          {images.length > 1 ? (
+            <div className="order-2 flex gap-2 overflow-x-auto sm:order-1 sm:flex-col sm:overflow-visible">
+              {images.map((image, index) => (
+                <button
+                  key={`${image}-${index}`}
+                  type="button"
+                  onClick={() => setSelectedImage(image)}
+                  className={cn(
+                    'relative size-18 shrink-0 overflow-hidden rounded-lg sm:size-20',
+                    selectedImage === image && 'ring-2 ring-primary/20',
+                  )}
+                >
+                  <Image
+                    src={image}
+                    alt={`${product.title} thumbnail ${index + 1}`}
+                    fill
+                    sizes="80px"
+                    className="object-cover rounded-lg"
+                  />
+                </button>
+              ))}
+            </div>
+          ) : null}
+
+          <div className="order-1 sm:order-2">
+            <div
+              className="relative aspect-[4/3] overflow-hidden rounded-lg lg:aspect-[1.05/1]"
+              onMouseMove={handleZoomMove}
+              onMouseEnter={() => setIsZooming(true)}
+              onMouseLeave={() => setIsZooming(false)}
+            >
+              <Image
+                src={selectedImage}
+                alt={product.title}
+                fill
+                priority
+                sizes="(max-width: 1024px) 100vw, 620px"
+                className={cn(
+                  'object-contain transition-opacity rounded-lg',
+                  isZooming ? 'opacity-0' : 'opacity-100',
+                )}
+              />
+              <div
+                className={cn(
+                  'absolute inset-0 overflow-hidden rounded-lg bg-no-repeat transition-opacity',
+                  isZooming ? 'opacity-100' : 'opacity-0',
+                )}
+                style={{
+                  backgroundImage: `url(${selectedImage})`,
+                  backgroundSize: '190%',
+                  backgroundPosition: zoomPosition,
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <h1 className="text-xl font-medium leading-tight text-secondary sm:text-2xl lg:text-[28px]">
+            {product.title}
+          </h1>
+          <div className="text-xs text-muted-foreground">
+            <span className="font-bold">SKU: </span>
+            {product.sku}
+          </div>
+          <div className="flex flex-wrap items-end gap-2">
+            {product.oldPrice ? (
+              <span className="text-lg font-semibold text-muted-foreground line-through">
+                {formatTaka(product.oldPrice)}
+              </span>
+            ) : null}
+            <span className="text-2xl font-black text-primary sm:text-3xl">{formatTaka(product.price)}</span>
+          </div>
+          {features ? (
+            <div
+              className="overflow-hidden text-sm leading-6 text-foreground/75 [&_li]:ml-5 [&_ol]:list-decimal [&_p]:mb-2 [&_ul]:list-disc"
+              dangerouslySetInnerHTML={{ __html: features }}
+            />
+          ) : (
+            <p className="text-sm leading-6 text-foreground/70">
+              {product.title} is available for direct order with dedicated sales support.
+            </p>
+          )}
+          <Button asChild variant="link" className="h-auto p-0 font-bold text-green-600!">
+            <Link href={WHATSAPP_URL} target="_blank">
+              <Send className="size-4" />
+              Order on WhatsApp
+            </Link>
+          </Button>
+
+          <div className="grid gap-2 sm:grid-cols-[auto_1fr_1fr]">
+            <div className="grid h-11 grid-cols-3 overflow-hidden rounded-md border">
+              <button
+                type="button"
+                className="flex w-10 items-center justify-center border-r"
+                onClick={() => setQuantity(current => Math.max(1, current - 1))}
+              >
+                <Minus className="size-4" />
+              </button>
+              <span className="flex w-10 items-center justify-center text-sm">{quantity}</span>
+              <button
+                type="button"
+                className="flex w-10 items-center justify-center border-l"
+                onClick={() => setQuantity(current => current + 1)}
+              >
+                <Plus className="size-4" />
+              </button>
+            </div>
+            <Button
+              className="h-11 rounded-md bg-secondary font-bold"
+              onClick={() => addQuantityToCart(false)}
+            >
+              Add To Cart
+            </Button>
+            <Button className="h-11 rounded-md font-bold" onClick={() => addQuantityToCart(true)}>
+              Buy Now
+            </Button>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-3 border-y py-3">
+            <div className="flex gap-2">
+              <AddToCompareButton product={product} compact className="h-9 w-auto rounded-md px-3 text-xs" />
+              <AddToWishlistButton product={product} compact className="h-9 w-auto rounded-md px-3 text-xs" />
+            </div>
+            <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+              <Share className="size-4" />
+              {sharePlatforms.map(platform => {
+                const Icon = platform.Icon;
+                return (
+                  <Button
+                    key={platform.name}
+                    asChild
+                    variant="ghost"
+                    size="icon"
+                    className="size-8"
+                    title={platform.name}
+                  >
+                    <Link
+                      href={platform.buildHref(
+                        encodedProductUrl,
+                        encodeURIComponent(shareMedia),
+                        product.title,
+                      )}
+                      target="_blank"
+                    >
+                      <Icon className="size-4" />
+                    </Link>
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="rounded-md border p-4">
+            <div className="grid gap-4 text-sm">
+              <div className="grid grid-cols-[auto_1fr_auto] gap-3">
+                <PackageCheck className="mt-0.5 size-5 text-primary" />
+                <div>
+                  <div className="font-bold">Pick up from the Malamal Warehouse</div>
+                  <div className="text-muted-foreground">To pick up today</div>
+                </div>
+                <div className="font-bold">Free</div>
+              </div>
+              <div className="grid grid-cols-[auto_1fr_auto] gap-3">
+                <Truck className="mt-0.5 size-5 text-primary" />
+                <div>
+                  <div className="font-bold">Courier / Agent delivery</div>
+                  <div className="text-muted-foreground">
+                    Delivery agent will deliver to the specified address.
+                  </div>
+                </div>
+                <div className="font-bold">2-3 Days</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="mr-2 text-sm font-bold">Payment Methods:</span>
+            <Image
+              src={PaymentOptionSvg}
+              alt="Payment Methods"
+              width={314}
+              height={37}
+              className="h-auto w-full max-w-80"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section className="rounded-md bg-card p-5 shadow-sm">
+        <h2 className="text-xl font-bold text-secondary">Description</h2>
+        <div
+          className="mt-4 text-sm leading-7 text-foreground/70 [&_a]:font-semibold [&_a]:text-primary [&_h2]:mt-6 [&_h2]:text-xl [&_h2]:font-black [&_h3]:mt-5 [&_h3]:text-lg [&_h3]:font-bold [&_li]:ml-5 [&_ol]:list-decimal [&_p]:mb-3 [&_ul]:list-disc"
+          dangerouslySetInnerHTML={{
+            __html:
+              description ||
+              `<p>${product.title} is listed with SKU ${product.sku} and ${product.stock}.</p>`,
+          }}
+        />
+      </section>
+
+      <section className="rounded-md bg-card p-5 shadow-sm">
+        <h2 className="text-xl font-bold text-secondary">Customer Reviews</h2>
+        <div className="mt-5 flex items-center gap-2 text-sm text-muted-foreground">
+          <CheckCircle2 className="size-4" />
+          There are no reviews yet.
+        </div>
+      </section>
+    </div>
+  );
+}

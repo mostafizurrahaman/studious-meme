@@ -37,7 +37,7 @@ const getProductSnapshot = async (productId: string) => {
       category: (product.category as unknown as { name: string }).name,
       categorySlug: (product.category as unknown as { slug?: string }).slug,
       subCategorySlug: product.subCategorySlug ?? "",
-      image: product.image,
+      images: product.images,
       sku: product.sku,
       slug: product.slug,
       price: product.price,

@@ -1,4 +1,4 @@
-import type { Product } from "@/lib/storefront-types";
+import { getProductPrimaryImage, type Product } from "@/lib/storefront-types";
 
 export type CartItem = {
   productId?: string;
@@ -32,7 +32,7 @@ export function toCartItem(product: Product): CartItem {
     sku: product.sku,
     title: product.title,
     href: product.href,
-    image: product.image,
+    image: getProductPrimaryImage(product),
     brand: product.brand,
     unitPrice: parseMoney(product.price),
     unitPriceLabel: product.price,

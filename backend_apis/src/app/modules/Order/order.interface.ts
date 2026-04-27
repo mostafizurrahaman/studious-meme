@@ -26,7 +26,7 @@ export interface IOrderItemSnapshot {
   title: string;
   slug: string;
   sku: string;
-  image: string;
+  images: string[];
   brand: string;
   category: string;
   unitPrice: number;

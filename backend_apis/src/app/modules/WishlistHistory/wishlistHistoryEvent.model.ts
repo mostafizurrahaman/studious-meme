@@ -1,4 +1,4 @@
-import { model, Schema, Types } from "mongoose";
+import { model, Schema, Types } from 'mongoose';
 
 const HISTORY_TTL_SECONDS = 60 * 60 * 24 * 30;
 
@@ -10,7 +10,7 @@ type WishlistHistoryEventDoc = {
     brand: string;
     category: string;
     categorySlug?: string;
-    image: string;
+    images: string[];
     sku: string;
     slug: string;
     price: number;
@@ -18,7 +18,7 @@ type WishlistHistoryEventDoc = {
     weightKg?: number;
     isNoCOD?: boolean;
   };
-  action: "add" | "remove";
+  action: 'add' | 'remove';
   expireAt: Date;
   createdAt?: Date;
   updatedAt?: Date;
@@ -26,14 +26,14 @@ type WishlistHistoryEventDoc = {
 
 const wishlistHistoryEventSchema = new Schema<WishlistHistoryEventDoc>(
   {
-    user: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    product: { type: Schema.Types.ObjectId, ref: "Product", required: true },
+    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    product: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
     productSnapshot: {
       title: { type: String, required: true },
       brand: { type: String, required: true },
       category: { type: String, required: true },
       categorySlug: { type: String },
-      image: { type: String, required: true },
+      images: { type: [String], required: true },
       sku: { type: String, required: true },
       slug: { type: String, required: true },
       price: { type: Number, required: true },
@@ -41,7 +41,7 @@ const wishlistHistoryEventSchema = new Schema<WishlistHistoryEventDoc>(
       weightKg: { type: Number },
       isNoCOD: { type: Boolean },
     },
-    action: { type: String, enum: ["add", "remove"], required: true },
+    action: { type: String, enum: ['add', 'remove'], required: true },
     expireAt: {
       type: Date,
       required: true,
@@ -53,18 +53,20 @@ const wishlistHistoryEventSchema = new Schema<WishlistHistoryEventDoc>(
 
 wishlistHistoryEventSchema.index(
   { expireAt: 1 },
-  { expireAfterSeconds: 0, name: "wishlistHistoryEvent_ttl_idx" },
+  { expireAfterSeconds: 0, name: 'wishlistHistoryEvent_ttl_idx' },
 );
+
 wishlistHistoryEventSchema.index(
   { user: 1, createdAt: -1 },
-  { name: "wishlistHistoryEvent_user_createdAt_idx" },
+  { name: 'wishlistHistoryEvent_user_createdAt_idx' },
 );
+
 wishlistHistoryEventSchema.index(
-  { "productSnapshot.category": 1, createdAt: -1 },
-  { name: "wishlistHistoryEvent_category_createdAt_idx" },
+  { 'productSnapshot.category': 1, createdAt: -1 },
+  { name: 'wishlistHistoryEvent_category_createdAt_idx' },
 );
 
 export const WishlistHistoryEventModel = model<WishlistHistoryEventDoc>(
-  "WishlistHistoryEvent",
+  'WishlistHistoryEvent',
   wishlistHistoryEventSchema,
 );

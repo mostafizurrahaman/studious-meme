@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { parseMoney } from "@/lib/cart";
-import type { Brand, Category, Product } from "@/lib/storefront-types";
+import {
+  getProductPrimaryImage,
+  type Brand,
+  type Category,
+  type Product,
+} from "@/lib/storefront-types";
 
 export const siteConfig = {
   name: "Malamal.com.bd",
@@ -268,13 +273,15 @@ export function buildProductMetadata(product: {
   sku: string;
   slug: string;
   price: string;
-  image: string;
+  images: string[];
 }) {
+  const image = getProductPrimaryImage(product);
+
   return buildMetadata({
     title: product.title,
     description: `Buy ${product.title} from ${product.brand} on ${siteConfig.name}. SKU ${product.sku} with catalog pricing and quotation support.`,
     path: `/product/${product.slug}`,
-    image: product.image,
+    image,
   });
 }
 
@@ -445,7 +452,7 @@ export function buildHomeSchemas(input?: {
     ...products.slice(0, 10).map((product) => ({
       name: product.title,
       url: `/product/${product.slug}`,
-      image: product.image,
+      image: getProductPrimaryImage(product),
     })),
     ...brandItems.slice(0, 8).map((brand) => ({
       name: brand.name,
@@ -509,7 +516,7 @@ export function buildShopSchemas(products: Product[], categories: Category[]) {
       products.slice(0, 50).map((product) => ({
         name: product.title,
         url: `/product/${product.slug}`,
-        image: product.image,
+        image: getProductPrimaryImage(product),
       })),
     ),
     buildCollectionSchema(
@@ -576,7 +583,7 @@ export function buildCategorySchemas(
       products.map((product) => ({
         name: product.title,
         url: `/product/${product.slug}`,
-        image: product.image,
+        image: getProductPrimaryImage(product),
       })),
     ),
   ];
@@ -639,7 +646,7 @@ export function buildPromotionsSchemas(products: Product[]) {
       items.slice(0, 50).map((product) => ({
         name: product.title,
         url: `/product/${product.slug}`,
-        image: product.image,
+        image: getProductPrimaryImage(product),
       })),
     ),
   ];
@@ -760,7 +767,7 @@ export function buildProductSchemas(product: {
   slug: string;
   brand: string;
   sku: string;
-  image: string;
+  images: string[];
   price: string;
   oldPrice?: string;
   stock: string;
@@ -769,6 +776,7 @@ export function buildProductSchemas(product: {
   categorySlug?: string;
 }) {
   const url = absoluteUrl(`/product/${product.slug}`);
+  const image = getProductPrimaryImage(product);
   const currentPrice = parseMoney(product.price);
   const categoryUrl = product.categorySlug?.trim()
     ? absoluteUrl(`/category/${product.categorySlug}`)
@@ -822,7 +830,7 @@ export function buildProductSchemas(product: {
       "@context": "https://schema.org",
       "@type": "Product",
       name: product.title,
-      image: [absoluteUrl(product.image)],
+      image: [absoluteUrl(image)],
       sku: product.sku,
       brand: {
         "@type": "Brand",

@@ -5,7 +5,7 @@ import { getParam } from "../../lib/getParam";
 
 // 1. createProduct
 const createProduct = asyncHandler(async (req, res) => {
-  const result = await ProductService.createProductIntoDB(req.body, req.file);
+  const result = await ProductService.createProductIntoDB(req.body, req.files);
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -69,7 +69,7 @@ const updateProduct = asyncHandler(async (req, res) => {
   const result = await ProductService.updateProductIntoDB(
     getParam(req.params.slug),
     req.body,
-    req.file,
+    req.files,
   );
 
   if (!result) throw new AppError(httpStatus.NOT_FOUND, "Product not found!");

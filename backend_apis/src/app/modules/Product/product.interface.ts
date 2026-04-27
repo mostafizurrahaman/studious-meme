@@ -4,7 +4,9 @@ export interface IProduct {
   title: string;
   slug: string;
   sku: string;
-  image: string;
+  images: string[];
+  features: string;
+  description: string;
   price: number;
   oldPrice?: number;
   badge?: string;

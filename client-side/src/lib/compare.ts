@@ -27,7 +27,7 @@ export function comparisonHistoryRecordToProduct(
     title: snapshot.title,
     slug: snapshot.slug,
     href: "/shop",
-    image: snapshot.image,
+    images: [snapshot.image],
     price: String(snapshot.price),
     oldPrice:
       snapshot.oldPrice === undefined ? undefined : String(snapshot.oldPrice),

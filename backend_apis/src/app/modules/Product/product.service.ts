@@ -10,6 +10,7 @@ import { BrandModel } from "../Brand/brand.model";
 type ProductSort = Record<string, 1 | -1>;
 
 const DEFAULT_PRODUCTS_LIMIT = 100;
+const MAX_PRODUCT_IMAGES = 5;
 
 const normalizeSlug = (value: string) =>
   value
@@ -262,25 +263,48 @@ const buildProductFilters = async (query: Record<string, unknown>) => {
 // 1. createProductIntoDB
 const createProductIntoDB = async (
   payload: Partial<IProduct>,
-  imageFile?: MulterFile,
+  imageFiles?: MulterFile[] | { [fieldname: string]: MulterFile[] },
 ) => {
-  let uploadedImage: string | undefined;
+  const files = Array.isArray(imageFiles)
+    ? imageFiles
+    : Object.values(imageFiles ?? {}).flat();
+  const uploadedImages: string[] = [];
 
   try {
-    if (imageFile) {
+    for (const imageFile of files) {
       const { secure_url } = await sendImageToCloudinary(imageFile);
-      uploadedImage = secure_url;
+      uploadedImages.push(secure_url);
+    }
+
+    const images =
+      uploadedImages.length > 0
+        ? uploadedImages
+        : Array.isArray(payload.images) && payload.images.length > 0
+          ? payload.images
+          : [];
+
+    if (images.length === 0) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "At least one product image is required!",
+      );
+    }
+    if (images.length > MAX_PRODUCT_IMAGES) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        `You can upload up to ${MAX_PRODUCT_IMAGES} product images!`,
+      );
     }
 
     return ProductModel.create({
       ...payload,
       slug: normalizeSlug(String(payload.slug ?? payload.title ?? "")),
-      image: uploadedImage ?? payload.image,
+      images,
     });
   } catch (error) {
-    if (uploadedImage) {
-      await deleteImageFromCloudinary(uploadedImage);
-    }
+    await Promise.all(
+      uploadedImages.map((url) => deleteImageFromCloudinary(url)),
+    );
 
     throw error;
   }
@@ -347,20 +371,44 @@ const getActiveProductBySlugFromDB = async (slug: string) => {
 const updateProductIntoDB = async (
   slug: string,
   payload: Partial<IProduct>,
-  imageFile?: MulterFile,
+  imageFiles?: MulterFile[] | { [fieldname: string]: MulterFile[] },
 ) => {
-  const existingProduct = await ProductModel.findOne({ slug }).select("image");
+  const existingProduct = await ProductModel.findOne({ slug }).select("images");
 
   if (!existingProduct) {
     throw new AppError(httpStatus.NOT_FOUND, "Product not found!");
   }
 
-  let uploadedImage: string | undefined;
+  const files = Array.isArray(imageFiles)
+    ? imageFiles
+    : Object.values(imageFiles ?? {}).flat();
+  const uploadedImages: string[] = [];
 
   try {
-    if (imageFile) {
+    for (const imageFile of files) {
       const { secure_url } = await sendImageToCloudinary(imageFile);
-      uploadedImage = secure_url;
+      uploadedImages.push(secure_url);
+    }
+
+    const existingImages = existingProduct.images;
+    const nextImages =
+      uploadedImages.length > 0
+        ? uploadedImages
+        : Array.isArray(payload.images)
+          ? payload.images
+          : existingImages;
+
+    if (nextImages.length === 0) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "At least one product image is required!",
+      );
+    }
+    if (nextImages.length > MAX_PRODUCT_IMAGES) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        `You can upload up to ${MAX_PRODUCT_IMAGES} product images!`,
+      );
     }
 
     const updated = await ProductModel.findOneAndUpdate(
@@ -368,31 +416,31 @@ const updateProductIntoDB = async (
       {
         ...payload,
         slug: payload.slug ? normalizeSlug(String(payload.slug)) : payload.slug,
-        ...(uploadedImage ? { image: uploadedImage } : {}),
+        images: nextImages,
       },
       { returnDocument: "after", runValidators: true },
     );
 
     if (!updated) {
-      if (uploadedImage) {
-        await deleteImageFromCloudinary(uploadedImage);
-      }
+      await Promise.all(
+        uploadedImages.map((url) => deleteImageFromCloudinary(url)),
+      );
       throw new AppError(httpStatus.NOT_FOUND, "Product not found!");
     }
 
-    if (
-      uploadedImage &&
-      existingProduct.image &&
-      existingProduct.image !== uploadedImage
-    ) {
-      await deleteImageFromCloudinary(existingProduct.image);
+    if (uploadedImages.length > 0) {
+      await Promise.all(
+        existingImages
+          .filter((url) => !nextImages.includes(url))
+          .map((url) => deleteImageFromCloudinary(url)),
+      );
     }
 
     return updated;
   } catch (error) {
-    if (uploadedImage) {
-      await deleteImageFromCloudinary(uploadedImage);
-    }
+    await Promise.all(
+      uploadedImages.map((url) => deleteImageFromCloudinary(url)),
+    );
 
     throw error;
   }

@@ -5,7 +5,7 @@ type WishlistProductSnapshot = {
   brand: string;
   category: string;
   categorySlug?: string;
-  image: string;
+  images: string[];
   sku: string;
   slug: string;
   price: number;
@@ -27,7 +27,7 @@ const wishlistProductSnapshotSchema = new Schema<WishlistProductSnapshot>(
     title: { type: String, required: true },
     brand: { type: String, required: true },
     category: { type: String, required: true },
-    image: { type: String, required: true },
+    images: { type: [String], required: true },
     sku: { type: String, required: true },
     slug: { type: String, required: true },
     price: { type: Number, required: true },
