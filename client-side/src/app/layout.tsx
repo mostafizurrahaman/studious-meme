@@ -12,6 +12,7 @@ import { siteMetadata, siteSchemas } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 import { Toaster } from "sonner";
 import UserProvider from "@/context/UserContext";
+import { MicrosoftClarity } from "@/components/MicrosoftClarity";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -40,6 +41,7 @@ export default function RootLayout({
         inter.variable,
       )}
     >
+      {process.env.NODE_ENV === "production" && <MicrosoftClarity />}
       <body className="storefront-layout min-h-full flex flex-col bg-background text-foreground">
         <GoogleAnalytics />
         <GoogleTagManager />

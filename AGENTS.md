@@ -2,8 +2,9 @@
 
 ## Project
 
-Monorepo with a Next.js 16.2.3 storefront/dashboard in `client-side/` and an Express/Mongo backend in `backend_apis/`.
-Primary frontend stack: Next.js App Router, React 19, TypeScript, Tailwind, Radix/shadcn UI, Zustand.
+Monorepo with a Next.js 16.2.4 storefront/dashboard in `client-side/` and an Express/Mongo backend in
+`backend_apis/`. Primary frontend stack: Next.js App Router, React 19, TypeScript, Tailwind, Radix/shadcn UI,
+Zustand.
 
 ## Main Agent
 
