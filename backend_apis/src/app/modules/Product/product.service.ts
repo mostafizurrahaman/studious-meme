@@ -140,11 +140,7 @@ const buildProductFilters = async (query: Record<string, unknown>) => {
 
   if (stock === 'in-stock') {
     and.push({
-      $or: [
-        { stock: { $gt: 0 } },
-        { stock: { $exists: false } },
-        { stock: null },
-      ],
+      $or: [{ stock: { $gt: 0 } }, { stock: { $exists: false } }, { stock: null }],
     });
   }
 
@@ -445,6 +441,74 @@ const getProductsBySubCategorySlugFromDB = async (
   return getAllProductsFromDB({ ...query, subCategorySlug });
 };
 
+// 8. searchProducts
+const searchProducts = async (searchTerm: string, limit = 10) => {
+  if (!searchTerm || searchTerm.trim().length < 2) {
+    return { products: [], suggestions: [] };
+  }
+
+  const term = searchTerm.trim().toLowerCase();
+  const regex = new RegExp(term, 'i');
+
+  // Search across multiple fields
+  const products = await ProductModel.aggregate([
+    {
+      $match: {
+        isActive: true,
+        $or: [
+          { title: regex },
+          { slug: regex },
+          { sku: regex },
+          { features: regex },
+          { description: regex },
+          { badge: regex },
+        ],
+      },
+    },
+    {
+      $limit: limit,
+    },
+    {
+      $project: {
+        title: 1,
+        slug: 1,
+        price: 1,
+        images: 1,
+        badge: 1,
+        _id: 0,
+      },
+    },
+  ]);
+
+  // Get unique title suggestions using aggregation
+  const suggestions = await ProductModel.aggregate([
+    {
+      $match: {
+        isActive: true,
+        $or: [{ title: regex }, { slug: regex }, { sku: regex }],
+      },
+    },
+    {
+      $group: {
+        _id: '$title',
+        slug: { $first: '$slug' },
+      },
+    },
+    {
+      $limit: limit,
+    },
+    {
+      $project: {
+        _id: 0,
+        title: '$_id',
+        slug: 1,
+      },
+    },
+  ]);
+
+  return { products, suggestions };
+};
+
 // // 7. getProductsBySubCategorySlugFromDB
 // const getProductsBySubCategorySlugFromDB = async (subCategorySlug: string) => {
 //     // find category that contains this subcategory
@@ -481,4 +545,5 @@ export const ProductService = {
   deleteProductFromDB,
   getProductsByCategorySlugFromDB,
   getProductsBySubCategorySlugFromDB,
+  searchProducts,
 };

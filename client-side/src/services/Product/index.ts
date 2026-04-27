@@ -357,3 +357,28 @@ export const deleteProduct = async (slug: string): Promise<BackendEnvelope<Backe
   updateTag('PRODUCTS');
   return result;
 };
+
+export type SearchResult = {
+  products: {
+    title: string;
+    slug: string;
+    price: number;
+    images: string[];
+    badge?: string;
+  }[];
+  suggestions: {
+    title: string;
+    slug: string;
+  }[];
+};
+
+export const searchProducts = async (searchTerm: string, limit = 10): Promise<SearchResult> => {
+  const params = new URLSearchParams({
+    query: searchTerm,
+    limit: String(limit),
+  });
+
+  const result = await requestBackendJson<BackendEnvelope<SearchResult>>(`/product/search?${params}`);
+
+  return result.data ?? { products: [], suggestions: [] };
+};

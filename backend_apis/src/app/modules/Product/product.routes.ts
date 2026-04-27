@@ -61,4 +61,7 @@ router
   .route("/products/by-sub-category/:subCategorySlug")
   .get(publicLimiter, ProductController.getProductsBySubCategorySlug);
 
+// 5. search products with keyword suggestions
+router.route("/search").get(publicLimiter, ProductController.searchProducts);
+
 export const ProductRoutes = router;

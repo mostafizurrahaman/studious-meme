@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Container } from "@/components/Container";
+import { SearchBox } from "@/components/SearchBox";
 import { MiniCartDropdown } from "@/components/cart/MiniCartDropdown";
 import { UserDropdownMenu } from "@/components/account/UserDropdownMenu";
 import { useUser } from "@/context/UserContext";
@@ -387,20 +388,7 @@ export function Header({ categories }: Props) {
 
           {/* search input */}
           <div className="hidden flex-1 items-center lg:flex">
-            <div className="flex w-full overflow-hidden rounded-full border border-border bg-background shadow-sm">
-              <Input
-                className="h-11 w-full rounded-none border-0 bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground/60 shadow-none focus-visible:ring-0"
-                placeholder="Search…"
-                aria-label="Search"
-              />
-              <Button
-                type="button"
-                variant="secondary"
-                className="h-11 rounded-none px-2 text-sm font-semibold"
-              >
-                Search
-              </Button>
-            </div>
+            <SearchBox />
           </div>
 
           {/* compare and wishlist button with Quotation Request button */}
