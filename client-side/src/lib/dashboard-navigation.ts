@@ -64,6 +64,11 @@ function getAdminNavigationItems(role: AuthRole): DashboardNavigationItem[] {
       href: `${base}/products`,
       description: "Manage product catalog",
     },
+    {
+      label: "Product Questions",
+      href: `${base}/product-questions`,
+      description: "Review and answer product questions",
+    },
     { label: "Brands", href: `${base}/brands`, description: "Manage brands" },
     {
       label: "Categories",
@@ -132,6 +137,11 @@ function getSuperAdminNavigationItems(
       label: "Products",
       href: `${base}/products`,
       description: "Manage product catalog",
+    },
+    {
+      label: "Product Questions",
+      href: `${base}/product-questions`,
+      description: "Review and answer product questions",
     },
     { label: "Brands", href: `${base}/brands`, description: "Manage brands" },
     {

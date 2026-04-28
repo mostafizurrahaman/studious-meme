@@ -1,36 +1,23 @@
-import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { formatDashboardDate } from "@/lib/formatDate";
-import type { BackendPayment } from "@/services/Payment";
-import Link from "next/link";
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { formatDashboardDate } from '@/lib/formatDate';
+import type { BackendPayment } from '@/services/Payment';
+import Link from 'next/link';
 
-function getStatusVariant(status: BackendPayment["status"]) {
+function getStatusVariant(status: BackendPayment['status']) {
   switch (status) {
-    case "SUCCEEDED":
-      return "default";
-    case "FAILED":
-      return "destructive";
-    case "CANCELED":
-      return "secondary";
-    case "PENDING":
-      return "outline";
+    case 'SUCCEEDED':
+      return 'default';
+    case 'FAILED':
+      return 'destructive';
+    case 'CANCELED':
+      return 'secondary';
+    case 'PENDING':
+      return 'outline';
     default:
-      return "secondary";
+      return 'secondary';
   }
 }
 
@@ -83,25 +70,19 @@ export function DashboardPaymentsManager({
                 </TableCell>
               </TableRow>
             ) : null}
-            {payments.map((item) => {
-              const orderId =
-                typeof item.order === "object"
-                  ? item.order.orderId
-                  : item.order;
+            {payments.map(item => {
+              const orderId = typeof item.order === 'object' ? item.order.orderId : item.order;
               return (
                 <TableRow key={item._id}>
-                  <TableCell className="font-medium">
-                    {item.transactionId}
-                  </TableCell>
+                  <TableCell className="font-medium">{item.transactionId}</TableCell>
                   <TableCell>{orderId}</TableCell>
                   <TableCell>Tk. {item.amount}</TableCell>
                   <TableCell>
-                    <Badge variant={getStatusVariant(item.status)}>
-                      {item.status}
-                    </Badge>
+                    <Badge variant={getStatusVariant(item.status)}>{item.status}</Badge>
                   </TableCell>
                   <TableCell>
                     <span
+                      className="cursor-help"
                       title={formatDashboardDate(item.createdAt, {
                         time: true,
                       })}
@@ -120,14 +101,12 @@ export function DashboardPaymentsManager({
               <span>
                 Page {paginationMeta.page} of {paginationMeta.totalPages}
               </span>
-              {[25, 50, 100].map((limit) => (
+              {[25, 50, 100].map(limit => (
                 <Link
                   key={limit}
                   href={pageHref(1, limit)}
                   className={`rounded-md border px-2 py-1 text-xs ${
-                    paginationMeta.limit === limit
-                      ? "bg-primary text-primary-foreground"
-                      : ""
+                    paginationMeta.limit === limit ? 'bg-primary text-primary-foreground' : ''
                   }`}
                 >
                   {limit}
@@ -135,15 +114,8 @@ export function DashboardPaymentsManager({
               ))}
             </div>
             <div className="flex gap-2">
-              <Button
-                asChild
-                variant="outline"
-                size="sm"
-                disabled={paginationMeta.page <= 1}
-              >
-                <Link href={pageHref(Math.max(1, paginationMeta.page - 1))}>
-                  Prev
-                </Link>
+              <Button asChild variant="outline" size="sm" disabled={paginationMeta.page <= 1}>
+                <Link href={pageHref(Math.max(1, paginationMeta.page - 1))}>Prev</Link>
               </Button>
               <Button
                 asChild
@@ -151,14 +123,7 @@ export function DashboardPaymentsManager({
                 size="sm"
                 disabled={paginationMeta.page >= paginationMeta.totalPages}
               >
-                <Link
-                  href={pageHref(
-                    Math.min(
-                      paginationMeta.totalPages,
-                      paginationMeta.page + 1,
-                    ),
-                  )}
-                >
+                <Link href={pageHref(Math.min(paginationMeta.totalPages, paginationMeta.page + 1))}>
                   Next
                 </Link>
               </Button>

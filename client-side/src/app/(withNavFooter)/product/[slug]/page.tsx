@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ProductCard } from '@/components/ProductCard';
 import { ProductDetailClient } from '@/components/product/ProductDetailClient';
+import { ProductQuestionsSection } from '@/components/product/ProductQuestionsSection';
 import { SeoScripts } from '@/components/SeoScripts';
 import { buildProductMetadata, buildProductSchemas } from '@/lib/seo';
 import {
@@ -10,6 +11,7 @@ import {
   getAllActiveProductsAcrossPages,
   mapBackendProductToStorefrontProduct,
 } from '@/services/Product';
+import { getAnsweredProductQuestionsByProduct } from '@/services/ProductQuestion';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -57,7 +59,7 @@ export default async function ProductPage({ params }: Props) {
 
   const product = backendProduct ? await mapBackendProductToStorefrontProduct(backendProduct) : null;
 
-  if (!product) notFound();
+  if (!backendProduct || !product) notFound();
 
   const productsResult = await getAllActiveProducts({
     limit: 5,
@@ -67,6 +69,28 @@ export default async function ProductPage({ params }: Props) {
   const related = productsResult?.data?.length
     ? await Promise.all(productsResult.data.map(mapBackendProductToStorefrontProduct))
     : [];
+
+  const productId = backendProduct._id ?? product.id;
+
+  if (!productId) {
+    notFound();
+  }
+
+  const productQuestionsResult = productId
+    ? await getAnsweredProductQuestionsByProduct(productId, {
+        page: 1,
+        limit: 5,
+      }).catch(() => null)
+    : null;
+  const answeredQuestions = productQuestionsResult?.data ?? [];
+  const answeredQuestionsMeta = {
+    page: productQuestionsResult?.meta?.page ?? 1,
+    limit: productQuestionsResult?.meta?.limit ?? 5,
+    total: productQuestionsResult?.meta?.total ?? answeredQuestions.length,
+    totalPages:
+      productQuestionsResult?.meta?.totalPages ??
+      (Math.ceil(answeredQuestions.length / 5) || 1),
+  };
 
   return (
     <>
@@ -86,6 +110,14 @@ export default async function ProductPage({ params }: Props) {
 
           <div className="mt-3 rounded-md bg-background p-3 shadow-sm sm:p-4">
             <ProductDetailClient product={product} />
+          </div>
+
+          <div className="mt-8">
+            <ProductQuestionsSection
+              productId={productId}
+              initialQuestions={answeredQuestions}
+              paginationMeta={answeredQuestionsMeta}
+            />
           </div>
 
           <section className="mt-8">

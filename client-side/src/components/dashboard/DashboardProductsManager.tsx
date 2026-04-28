@@ -26,9 +26,12 @@ import { formatStockLabel } from '@/lib/stock';
 type Option = { value: string; label: string };
 const MAX_PRODUCT_IMAGES = 5;
 const imagePreviewRotations = ['-18deg', '-8deg', '4deg', '14deg', '24deg'];
-const stockFieldSchema = z.string().trim().refine(value => value === '' || /^\d+$/.test(value), {
-  message: 'Stock must be a valid non-negative whole number!',
-});
+const stockFieldSchema = z
+  .string()
+  .trim()
+  .refine(value => value === '' || /^\d+$/.test(value), {
+    message: 'Stock must be a valid non-negative whole number!',
+  });
 
 function richTextHasContent(value?: string) {
   return Boolean(
@@ -936,7 +939,7 @@ export function DashboardProductsManager({
                             <div className="flex items-start gap-2">
                               <span className="shrink-0">Created at:</span>
                               <span
-                                className="min-w-0 truncate text-foreground/80"
+                                className="cursor-help min-w-0 truncate text-foreground/80"
                                 title={formatDashboardDate(product.createdAt, {
                                   time: true,
                                 })}
@@ -947,7 +950,7 @@ export function DashboardProductsManager({
                             <div className="flex items-start gap-2">
                               <span className="shrink-0">Updated at:</span>
                               <span
-                                className="min-w-0 truncate text-foreground/80"
+                                className="cursor-help min-w-0 truncate text-foreground/80"
                                 title={formatDashboardDate(product.updatedAt, {
                                   time: true,
                                 })}

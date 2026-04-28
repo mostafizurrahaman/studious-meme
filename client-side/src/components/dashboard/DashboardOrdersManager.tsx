@@ -1,23 +1,10 @@
-import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { formatDashboardDate } from "@/lib/formatDate";
-import type { BackendOrder } from "@/services/Order";
+import Link from 'next/link';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { formatDashboardDate } from '@/lib/formatDate';
+import type { BackendOrder } from '@/services/Order';
 
 export function DashboardOrdersManager({
   orders,
@@ -69,17 +56,15 @@ export function DashboardOrdersManager({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {orders.map((order) => (
+            {orders.map(order => (
               <TableRow key={order.orderId}>
                 <TableCell>
-                  <Link
-                    href={`${detailBaseHref}/${order.orderId}`}
-                    className="font-medium hover:underline"
-                  >
+                  <Link href={`${detailBaseHref}/${order.orderId}`} className="font-medium hover:underline">
                     {order.orderId}
                   </Link>
                   <div className="text-xs text-muted-foreground">
                     <span
+                      className="cursor-help"
                       title={formatDashboardDate(order.createdAt, {
                         time: true,
                       })}
@@ -90,9 +75,7 @@ export function DashboardOrdersManager({
                 </TableCell>
                 <TableCell>
                   <div>{order.customer.name}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {order.customer.phone}
-                  </div>
+                  <div className="text-xs text-muted-foreground">{order.customer.phone}</div>
                 </TableCell>
                 <TableCell>
                   {order.couponCode ? (
@@ -100,9 +83,7 @@ export function DashboardOrdersManager({
                       {order.couponCode}
                     </Badge>
                   ) : (
-                    <span className="text-xs text-muted-foreground">
-                      No coupon
-                    </span>
+                    <span className="text-xs text-muted-foreground">No coupon</span>
                   )}
                 </TableCell>
                 <TableCell>
@@ -110,43 +91,32 @@ export function DashboardOrdersManager({
                 </TableCell>
                 <TableCell>
                   <div>{order.paymentMethod}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {order.paymentStatus}
-                  </div>
+                  <div className="text-xs text-muted-foreground">{order.paymentStatus}</div>
                 </TableCell>
                 <TableCell>Tk. {order.total.toFixed(2)}</TableCell>
                 <TableCell>
-                  <span
-                    title={formatDashboardDate(order.createdAt, { time: true })}
-                  >
+                  <span className="cursor-help" title={formatDashboardDate(order.createdAt, { time: true })}>
                     {formatDashboardDate(order.createdAt)}
                   </span>
                 </TableCell>
                 <TableCell>
-                  <span
-                    title={formatDashboardDate(order.updatedAt, { time: true })}
-                  >
+                  <span className="cursor-help" title={formatDashboardDate(order.updatedAt, { time: true })}>
                     {formatDashboardDate(order.updatedAt)}
                   </span>
                 </TableCell>
                 <TableCell className="text-right">
-                  <form
-                    action={updateStatus}
-                    className="flex justify-end gap-2"
-                  >
+                  <form action={updateStatus} className="flex justify-end gap-2">
                     <input type="hidden" name="orderId" value={order.orderId} />
                     <select
                       name="status"
                       defaultValue={order.status}
                       className="h-9 rounded-md border border-input bg-background px-3 text-sm"
                     >
-                      {["PLACED", "PROCESSING", "DELIVERED", "CANCELLED"].map(
-                        (status) => (
-                          <option key={status} value={status}>
-                            {status}
-                          </option>
-                        ),
-                      )}
+                      {['PLACED', 'PROCESSING', 'DELIVERED', 'CANCELLED'].map(status => (
+                        <option key={status} value={status}>
+                          {status}
+                        </option>
+                      ))}
                     </select>
                     <Button size="sm" type="submit">
                       Update
@@ -157,10 +127,7 @@ export function DashboardOrdersManager({
             ))}
             {orders.length === 0 ? (
               <TableRow>
-                <TableCell
-                  colSpan={9}
-                  className="h-24 text-center text-muted-foreground"
-                >
+                <TableCell colSpan={9} className="h-24 text-center text-muted-foreground">
                   No orders found.
                 </TableCell>
               </TableRow>
@@ -173,14 +140,12 @@ export function DashboardOrdersManager({
               <span>
                 Page {paginationMeta.page} of {paginationMeta.totalPages}
               </span>
-              {[25, 50, 100].map((limit) => (
+              {[25, 50, 100].map(limit => (
                 <Link
                   key={limit}
                   href={pageHref(1, limit)}
                   className={`rounded-md border px-2 py-1 text-xs ${
-                    paginationMeta.limit === limit
-                      ? "bg-primary text-primary-foreground"
-                      : ""
+                    paginationMeta.limit === limit ? 'bg-primary text-primary-foreground' : ''
                   }`}
                 >
                   {limit}
@@ -188,15 +153,8 @@ export function DashboardOrdersManager({
               ))}
             </div>
             <div className="flex gap-2">
-              <Button
-                asChild
-                variant="outline"
-                size="sm"
-                disabled={paginationMeta.page <= 1}
-              >
-                <Link href={pageHref(Math.max(1, paginationMeta.page - 1))}>
-                  Prev
-                </Link>
+              <Button asChild variant="outline" size="sm" disabled={paginationMeta.page <= 1}>
+                <Link href={pageHref(Math.max(1, paginationMeta.page - 1))}>Prev</Link>
               </Button>
               <Button
                 asChild
@@ -204,14 +162,7 @@ export function DashboardOrdersManager({
                 size="sm"
                 disabled={paginationMeta.page >= paginationMeta.totalPages}
               >
-                <Link
-                  href={pageHref(
-                    Math.min(
-                      paginationMeta.totalPages,
-                      paginationMeta.page + 1,
-                    ),
-                  )}
-                >
+                <Link href={pageHref(Math.min(paginationMeta.totalPages, paginationMeta.page + 1))}>
                   Next
                 </Link>
               </Button>

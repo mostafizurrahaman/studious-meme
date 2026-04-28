@@ -13,6 +13,8 @@ import { OrderRoutes } from "../modules/Order/order.routes";
 import { CartRoutes } from "../modules/Cart/cart.routes";
 import { WishlistHistoryRoutes } from "../modules/WishlistHistory/wishlistHistory.routes";
 import { CouponRoutes } from "../modules/Coupon/coupon.routes";
+import { ProductQuestionRoutes } from "../modules/ProductQuestion/productQuestion.routes";
+import { ProductQuestionAdminRoutes } from "../modules/ProductQuestion/productQuestion.admin.routes";
 
 const router = Router();
 
@@ -44,6 +46,14 @@ const moduleRoutes = [
   {
     path: "/product",
     route: ProductRoutes,
+  },
+  {
+    path: "/product-questions",
+    route: ProductQuestionRoutes,
+  },
+  {
+    path: "/admin/product-questions",
+    route: ProductQuestionAdminRoutes,
   },
   {
     path: "/compare",
