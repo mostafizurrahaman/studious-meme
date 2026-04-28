@@ -42,6 +42,38 @@ function richTextHasContent(value?: string) {
   );
 }
 
+function isSupportedYouTubeUrl(value: string) {
+  const YOUTUBE_VIDEO_ID_PATTERN = /^[a-zA-Z0-9_-]{11}$/;
+
+  try {
+    const url = new URL(value);
+    const hostname = url.hostname.replace(/^www\./i, '').toLowerCase();
+    const pathname = url.pathname.replace(/\/+$/, '');
+
+    if (hostname === 'youtu.be') {
+      return YOUTUBE_VIDEO_ID_PATTERN.test(pathname.split('/').filter(Boolean)[0] ?? '');
+    }
+
+    if (hostname === 'youtube.com' || hostname === 'm.youtube.com') {
+      if (pathname === '/watch') {
+        return YOUTUBE_VIDEO_ID_PATTERN.test(url.searchParams.get('v') ?? '');
+      }
+
+      if (pathname.startsWith('/embed/')) {
+        return YOUTUBE_VIDEO_ID_PATTERN.test(pathname.split('/').filter(Boolean)[1] ?? '');
+      }
+
+      if (pathname.startsWith('/shorts/')) {
+        return YOUTUBE_VIDEO_ID_PATTERN.test(pathname.split('/').filter(Boolean)[1] ?? '');
+      }
+    }
+
+    return false;
+  } catch {
+    return false;
+  }
+}
+
 type DashboardProductsManagerProps = {
   products: BackendProduct[];
   paginationMeta: {
@@ -74,6 +106,14 @@ const productEditSchema = z.object({
   oldPrice: z.string().trim().optional(),
 
   badge: z.string().trim().optional(),
+
+  youtubeVideoUrl: z
+    .string()
+    .trim()
+    .refine(value => value === '' || isSupportedYouTubeUrl(value), {
+      message: 'Please enter a valid YouTube URL!',
+    })
+    .optional(),
 
   brand: z.string({ error: 'Brand is required!' }).trim().min(1, { message: 'Brand is required!' }),
 
@@ -117,6 +157,14 @@ const productCreateSchema = z.object({
   oldPrice: z.string().trim().optional(),
 
   badge: z.string().trim().optional(),
+
+  youtubeVideoUrl: z
+    .string()
+    .trim()
+    .refine(value => value === '' || isSupportedYouTubeUrl(value), {
+      message: 'Please enter a valid YouTube URL!',
+    })
+    .optional(),
 
   brand: z.string({ error: 'Brand is required!' }).trim().min(1, { message: 'Brand is required!' }),
 
@@ -199,6 +247,7 @@ export function DashboardProductsManager({
       price: '',
       oldPrice: '',
       badge: '',
+      youtubeVideoUrl: '',
       brand: '',
       category: '',
       subCategorySlug: '',
@@ -252,6 +301,7 @@ export function DashboardProductsManager({
       price: '0',
       oldPrice: '',
       badge: '',
+      youtubeVideoUrl: '',
       brand: '',
       category: '',
       subCategorySlug: '',
@@ -478,6 +528,7 @@ export function DashboardProductsManager({
       price: String(product.price),
       oldPrice: product.oldPrice === undefined ? '' : String(product.oldPrice),
       badge: product.badge ?? '',
+      youtubeVideoUrl: product.youtubeVideoUrl ?? '',
       brand: brandId,
       category: categoryId,
       subCategorySlug: product.subCategorySlug ?? '',
@@ -503,6 +554,7 @@ export function DashboardProductsManager({
       price: '',
       oldPrice: '',
       badge: '',
+      youtubeVideoUrl: '',
       brand: '',
       category: '',
       subCategorySlug: '',
@@ -574,6 +626,14 @@ export function DashboardProductsManager({
               placeholder="Badge. ex: Sale, New, Hot"
               {...productCreateForm.register('badge')}
             />
+            <div className="grid gap-1.5 md:col-span-2">
+              <DashboardInput
+                placeholder="YouTube video URL"
+                {...productCreateForm.register('youtubeVideoUrl')}
+              />
+              <p className="text-xs text-muted-foreground">Paste a YouTube video link</p>
+              <ErrorText message={productCreateForm.formState.errors.youtubeVideoUrl?.message} />
+            </div>
             <div className="grid gap-1.5">
               <select
                 className="h-10 rounded-md border border-input bg-background px-3 text-sm"
@@ -714,6 +774,7 @@ export function DashboardProductsManager({
                     price: Number(values.price),
                     oldPrice: values.oldPrice?.trim() ? Number(values.oldPrice) : undefined,
                     badge: values.badge?.trim() || undefined,
+                    youtubeVideoUrl: values.youtubeVideoUrl?.trim() ?? '',
                     brand: values.brand.trim(),
                     category: values.category.trim(),
                     subCategorySlug: values.subCategorySlug?.trim() || undefined,
@@ -1010,6 +1071,7 @@ export function DashboardProductsManager({
                                     price: Number(values.price),
                                     oldPrice: values.oldPrice?.trim() ? Number(values.oldPrice) : undefined,
                                     badge: values.badge?.trim() || undefined,
+                                    youtubeVideoUrl: values.youtubeVideoUrl?.trim() ?? '',
                                     brand: values.brand.trim(),
                                     category: values.category.trim(),
                                     subCategorySlug: values.subCategorySlug?.trim() ?? '',
@@ -1129,6 +1191,17 @@ export function DashboardProductsManager({
                                   {...productEditForm.register('badge')}
                                 />
                                 <ErrorText message={productEditForm.formState.errors.badge?.message} />
+                              </div>
+
+                              <div className="grid gap-1.5 md:col-span-2">
+                                <DashboardInput
+                                  placeholder="YouTube video URL"
+                                  {...productEditForm.register('youtubeVideoUrl')}
+                                />
+                                <p className="text-xs text-muted-foreground">Paste a YouTube video link</p>
+                                <ErrorText
+                                  message={productEditForm.formState.errors.youtubeVideoUrl?.message}
+                                />
                               </div>
 
                               <div className="grid gap-1.5">

@@ -9,6 +9,8 @@ export type StorefrontProduct = {
   price: string;
   oldPrice?: string;
   badge?: string;
+  youtubeVideoUrl?: string;
+  youtubeVideoId?: string;
   brand: string;
   sku: string;
   stock: string;

@@ -818,6 +818,8 @@ export function buildProductSchemas(product: {
   rating: string;
   category: string;
   categorySlug?: string;
+  youtubeVideoId?: string;
+  youtubeVideoUrl?: string;
 }) {
   const url = absoluteUrl(`/product/${product.slug}`);
   const image = getProductPrimaryImage(product);
@@ -838,6 +840,22 @@ export function buildProductSchemas(product: {
           itemCondition: 'https://schema.org/NewCondition',
         }
       : undefined;
+
+  const videoObject = product.youtubeVideoId?.trim()
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'VideoObject',
+        name: product.title,
+        description: product.description
+          ? product.description
+          : `${product.title} available from ${product.brand} on ${siteConfig.name}.`,
+        thumbnailUrl: [absoluteUrl(image)],
+        embedUrl: `https://www.youtube.com/embed/${product.youtubeVideoId.trim()}`,
+        contentUrl:
+          product.youtubeVideoUrl?.trim() ||
+          `https://www.youtube.com/watch?v=${product.youtubeVideoId.trim()}`,
+      }
+    : undefined;
 
   return [
     {
@@ -885,6 +903,7 @@ export function buildProductSchemas(product: {
       },
       offers: offer,
     },
+    ...(videoObject ? [videoObject] : []),
   ];
 }
 

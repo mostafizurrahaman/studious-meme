@@ -1,4 +1,4 @@
-import { Types } from "mongoose";
+import { Types } from 'mongoose';
 
 export interface IProduct {
   title: string;
@@ -10,6 +10,8 @@ export interface IProduct {
   price: number;
   oldPrice?: number;
   badge?: string;
+  youtubeVideoUrl?: string;
+  youtubeVideoId?: string;
   brand: Types.ObjectId;
   category: Types.ObjectId;
   subCategorySlug?: string;

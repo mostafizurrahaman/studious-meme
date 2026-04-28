@@ -101,6 +101,49 @@ function formatTaka(value: string) {
   return `Tk. ${numeric.toLocaleString('en-BD', { maximumFractionDigits: 2 })}`;
 }
 
+const YOUTUBE_VIDEO_ID_PATTERN = /^[a-zA-Z0-9_-]{11}$/;
+
+function resolveYouTubeVideoId(product: Product) {
+  if (product.youtubeVideoId?.trim()) {
+    return product.youtubeVideoId.trim();
+  }
+
+  const url = product.youtubeVideoUrl?.trim();
+  if (!url) return '';
+
+  try {
+    const parsed = new URL(url);
+    const hostname = parsed.hostname.replace(/^www\./i, '').toLowerCase();
+    const pathname = parsed.pathname.replace(/\/+$/, '');
+
+    if (hostname === 'youtu.be') {
+      const id = pathname.split('/').filter(Boolean)[0] ?? '';
+      return YOUTUBE_VIDEO_ID_PATTERN.test(id) ? id : '';
+    }
+
+    if (hostname === 'youtube.com' || hostname === 'm.youtube.com') {
+      if (pathname === '/watch') {
+        const id = parsed.searchParams.get('v') ?? '';
+        return YOUTUBE_VIDEO_ID_PATTERN.test(id) ? id : '';
+      }
+
+      if (pathname.startsWith('/embed/')) {
+        const id = pathname.split('/').filter(Boolean)[1] ?? '';
+        return YOUTUBE_VIDEO_ID_PATTERN.test(id) ? id : '';
+      }
+
+      if (pathname.startsWith('/shorts/')) {
+        const id = pathname.split('/').filter(Boolean)[1] ?? '';
+        return YOUTUBE_VIDEO_ID_PATTERN.test(id) ? id : '';
+      }
+    }
+  } catch {
+    return '';
+  }
+
+  return '';
+}
+
 export function ProductDetailClient({ product }: ProductDetailClientProps) {
   const router = useRouter();
   const addProductQuantity = useCartStore(state => state.addProductQuantity);
@@ -114,6 +157,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   const [quantity, setQuantity] = useState(1);
   const description = sanitizeProductHtml(product.description?.trim() ?? '');
   const features = sanitizeProductHtml(product.features?.trim() ?? '');
+  const youtubeVideoId = resolveYouTubeVideoId(product);
   const productUrl = `https://malamal.com.bd/product/${product.slug}/`;
   const encodedProductUrl = encodeURIComponent(productUrl);
   const primaryImage = getProductPrimaryImage(product);
@@ -340,6 +384,23 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
           }}
         />
       </section>
+
+      {youtubeVideoId ? (
+        <section className="rounded-md bg-card p-5 shadow-sm">
+          <h2 className="text-xl font-medium text-secondary">Product Video</h2>
+          <div className="mt-4 aspect-video overflow-hidden rounded-lg border bg-black">
+            <iframe
+              className="h-full w-full"
+              src={`https://www.youtube-nocookie.com/embed/${youtubeVideoId}`}
+              title={`${product.title} video`}
+              loading="lazy"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            />
+          </div>
+        </section>
+      ) : null}
 
       <section className="rounded-md bg-card p-5 shadow-sm">
         <h2 className="text-xl font-medium text-secondary">Customer Reviews</h2>

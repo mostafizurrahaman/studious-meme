@@ -23,6 +23,49 @@ const normalizeSlug = (value: string) =>
     .replace(/-+/g, '-')
     .replace(/^-+|-+$/g, '');
 
+const normalizeYouTubeVideoUrl = (value: unknown) => {
+  if (typeof value !== 'string') return undefined;
+
+  const trimmed = value.trim();
+  return trimmed === '' ? undefined : trimmed;
+};
+
+const YOUTUBE_VIDEO_ID_PATTERN = /^[a-zA-Z0-9_-]{11}$/;
+
+const extractYouTubeVideoId = (value: string) => {
+  try {
+    const url = new URL(value);
+    const hostname = url.hostname.replace(/^www\./i, '').toLowerCase();
+    const pathname = url.pathname.replace(/\/+$/, '');
+
+    if (hostname === 'youtu.be') {
+      const id = pathname.split('/').filter(Boolean)[0] ?? '';
+      return YOUTUBE_VIDEO_ID_PATTERN.test(id) ? id : undefined;
+    }
+
+    if (hostname === 'youtube.com' || hostname === 'm.youtube.com') {
+      if (pathname === '/watch') {
+        const id = url.searchParams.get('v') ?? '';
+        return YOUTUBE_VIDEO_ID_PATTERN.test(id) ? id : undefined;
+      }
+
+      if (pathname.startsWith('/embed/')) {
+        const id = pathname.split('/').filter(Boolean)[1] || '';
+        return YOUTUBE_VIDEO_ID_PATTERN.test(id) ? id : undefined;
+      }
+
+      if (pathname.startsWith('/shorts/')) {
+        const id = pathname.split('/').filter(Boolean)[1] || '';
+        return YOUTUBE_VIDEO_ID_PATTERN.test(id) ? id : undefined;
+      }
+    }
+  } catch {
+    return undefined;
+  }
+
+  return undefined;
+};
+
 const parsePositiveInteger = (value: unknown, fallback: number) => {
   const parsed = Number(value);
 
@@ -270,10 +313,14 @@ const createProductIntoDB = async (
       );
     }
 
+    const youtubeVideoUrl = normalizeYouTubeVideoUrl(payload.youtubeVideoUrl);
+    const youtubeVideoId = youtubeVideoUrl ? extractYouTubeVideoId(youtubeVideoUrl) : undefined;
+
     return ProductModel.create({
       ...payload,
       slug: normalizeSlug(String(payload.slug ?? payload.title ?? '')),
       images,
+      ...(youtubeVideoUrl ? { youtubeVideoUrl, youtubeVideoId } : {}),
     });
   } catch (error) {
     await Promise.all(uploadedImages.map(url => deleteImageFromCloudinary(url)));
@@ -361,6 +408,11 @@ const updateProductIntoDB = async (
     const nextImages = Array.from(
       new Set(uploadedImages.length > 0 ? [...retainedImages, ...uploadedImages] : retainedImages),
     );
+    const shouldUpdateYoutubeVideoUrl = Object.prototype.hasOwnProperty.call(payload, 'youtubeVideoUrl');
+    const youtubeVideoUrl = shouldUpdateYoutubeVideoUrl
+      ? normalizeYouTubeVideoUrl(payload.youtubeVideoUrl)
+      : undefined;
+    const youtubeVideoId = youtubeVideoUrl ? extractYouTubeVideoId(youtubeVideoUrl) : undefined;
 
     if (nextImages.length === 0) {
       throw new AppError(httpStatus.BAD_REQUEST, 'At least one product image is required!');
@@ -372,15 +424,29 @@ const updateProductIntoDB = async (
       );
     }
 
-    const updated = await ProductModel.findOneAndUpdate(
-      { slug },
-      {
-        ...payload,
-        slug: payload.slug ? normalizeSlug(String(payload.slug)) : payload.slug,
-        images: nextImages,
-      },
-      { returnDocument: 'after', runValidators: true },
-    );
+    const updateSet: Record<string, unknown> = {
+      ...payload,
+      slug: payload.slug ? normalizeSlug(String(payload.slug)) : payload.slug,
+      images: nextImages,
+    };
+
+    const updateQuery: Record<string, unknown> = { $set: updateSet };
+
+    if (shouldUpdateYoutubeVideoUrl) {
+      if (youtubeVideoUrl) {
+        updateSet.youtubeVideoUrl = youtubeVideoUrl;
+        updateSet.youtubeVideoId = youtubeVideoId;
+      } else {
+        delete updateSet.youtubeVideoUrl;
+        delete updateSet.youtubeVideoId;
+        updateQuery.$unset = { youtubeVideoUrl: '', youtubeVideoId: '' };
+      }
+    }
+
+    const updated = await ProductModel.findOneAndUpdate({ slug }, updateQuery, {
+      returnDocument: 'after',
+      runValidators: true,
+    });
 
     if (!updated) {
       await Promise.all(uploadedImages.map(url => deleteImageFromCloudinary(url)));
