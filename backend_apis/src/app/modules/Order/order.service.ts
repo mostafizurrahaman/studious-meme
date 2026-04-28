@@ -36,6 +36,7 @@ type ProductForCheckout = {
   price: number;
   stock?: number | null;
   weightKg?: number;
+  sellingUnit?: string;
   isNoCOD?: boolean;
   brand: unknown;
   category: unknown;
@@ -67,6 +68,15 @@ const parseWeight = (value: number | undefined) => {
 
 const getAvailableStock = (value: number | null | undefined) =>
   typeof value === "number" && Number.isFinite(value) ? value : null;
+
+const resolveSellingUnit = (value: unknown) => {
+  if (typeof value !== "string") {
+    return "pcs";
+  }
+
+  const trimmed = value.trim();
+  return trimmed === "" ? "pcs" : trimmed;
+};
 
 const createOrderId = () =>
   `ORD-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
@@ -138,6 +148,7 @@ const buildOrderSnapshot = (
     brand: resolveName(product.brand),
     category: resolveName(product.category),
     unitPrice,
+    sellingUnit: resolveSellingUnit(product.sellingUnit),
     weightKg,
     isNoCOD: Boolean(product.isNoCOD),
     quantity,

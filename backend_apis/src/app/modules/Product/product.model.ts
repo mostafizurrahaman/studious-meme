@@ -44,6 +44,7 @@ const productSchema = new Schema<IProduct>(
     },
     subCategorySlug: { type: String, index: true },
     weightKg: { type: Number, required: true, min: 0.01, default: 1 },
+    sellingUnit: { type: String, trim: true, default: 'pcs' },
     stock: { type: Number, min: 0, default: null },
     rating: { type: Number, required: true, min: 0 },
     isFeatured: { type: Boolean, default: false, index: true },

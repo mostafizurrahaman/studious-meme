@@ -19,18 +19,19 @@ export type WishlistHistoryRecord = {
   _id?: string;
   user?: unknown;
   product?: unknown;
-  productSnapshot?: {
-    title: string;
-    brand: string;
-    category: string;
-    categorySlug?: string;
-    images: string[];
-    sku: string;
-    slug: string;
-    price: number;
-    stock?: number | null;
-    weightKg?: number;
-    isNoCOD?: boolean;
+    productSnapshot?: {
+      title: string;
+      brand: string;
+      category: string;
+      categorySlug?: string;
+      images: string[];
+      sku: string;
+      slug: string;
+      price: number;
+      sellingUnit?: string;
+      stock?: number | null;
+      weightKg?: number;
+      isNoCOD?: boolean;
   };
   createdAt?: string;
   updatedAt?: string;

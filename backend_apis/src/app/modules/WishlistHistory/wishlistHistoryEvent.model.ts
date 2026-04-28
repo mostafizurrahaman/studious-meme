@@ -14,6 +14,7 @@ type WishlistHistoryEventDoc = {
     sku: string;
     slug: string;
     price: number;
+    sellingUnit?: string;
     stock?: number | null;
     weightKg?: number;
     isNoCOD?: boolean;
@@ -37,7 +38,8 @@ const wishlistHistoryEventSchema = new Schema<WishlistHistoryEventDoc>(
       sku: { type: String, required: true },
       slug: { type: String, required: true },
       price: { type: Number, required: true },
-       stock: { type: Number },
+      sellingUnit: { type: String },
+      stock: { type: Number },
       weightKg: { type: Number },
       isNoCOD: { type: Boolean },
     },

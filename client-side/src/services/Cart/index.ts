@@ -19,18 +19,19 @@ export type BackendCartItem = {
   product?: unknown;
   quantity: number;
   priceSnapshot: number;
-  productSnapshot: {
-    title: string;
-    brand: string;
-    category: string;
-    categorySlug?: string;
-    image: string;
-    sku: string;
-    slug: string;
-    price: number;
-    stock?: number | null;
-    weightKg?: number;
-    isNoCOD?: boolean;
+    productSnapshot: {
+      title: string;
+      brand: string;
+      category: string;
+      categorySlug?: string;
+      image: string;
+      sku: string;
+      slug: string;
+      price: number;
+      sellingUnit?: string;
+      stock?: number | null;
+      weightKg?: number;
+      isNoCOD?: boolean;
   };
 };
 
@@ -56,18 +57,19 @@ export type CartHistoryRecord = {
       }
     | string;
   product?: { _id?: string } | string | null;
-  productSnapshot?: {
-    title: string;
-    brand: string;
-    category: string;
-    categorySlug?: string;
-    image: string;
-    sku: string;
-    slug: string;
-    price: number;
-    stock?: number | null;
-    weightKg?: number;
-    isNoCOD?: boolean;
+    productSnapshot?: {
+      title: string;
+      brand: string;
+      category: string;
+      categorySlug?: string;
+      image: string;
+      sku: string;
+      slug: string;
+      price: number;
+      sellingUnit?: string;
+      stock?: number | null;
+      weightKg?: number;
+      isNoCOD?: boolean;
   };
   action?: "add" | "update" | "remove" | "clear";
   quantity?: number;

@@ -13,6 +13,7 @@ type CartItem = {
   unitPrice: number;
   unitPriceLabel: string;
   oldPriceLabel?: string;
+  sellingUnit?: string;
   quantity: number;
 };
 

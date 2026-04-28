@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { AddToCompareButton } from '@/components/compare/AddToCompareButton';
 import { AddToWishlistButton } from '@/components/wishlist/AddToWishlistButton';
 import { useCartStore } from '@/lib/cart-store';
+import { formatMoney, formatPriceLabelWithUnit } from '@/lib/cart';
 import { cn } from '@/lib/utils';
 import { getProductPrimaryImage, type Product } from '@/lib/storefront-types';
 import { addCartItem } from '@/services/Cart';
@@ -93,12 +94,6 @@ function sanitizeProductHtml(value: string) {
     .replace(/\son\w+="[^"]*"/gi, '')
     .replace(/\son\w+='[^']*'/gi, '')
     .replace(/\shref=["']javascript:[^"']*["']/gi, '');
-}
-
-function formatTaka(value: string) {
-  const numeric = Number(value);
-  if (!Number.isFinite(numeric)) return `Tk. ${value}`;
-  return `Tk. ${numeric.toLocaleString('en-BD', { maximumFractionDigits: 2 })}`;
 }
 
 const YOUTUBE_VIDEO_ID_PATTERN = /^[a-zA-Z0-9_-]{11}$/;
@@ -252,10 +247,12 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
           <div className="flex flex-wrap items-end gap-2">
             {product.oldPrice ? (
               <span className="text-lg font-semibold text-muted-foreground line-through">
-                {formatTaka(product.oldPrice)}
+                {formatMoney(Number(product.oldPrice))}
               </span>
             ) : null}
-            <span className="text-2xl font-black text-primary sm:text-3xl">{formatTaka(product.price)}</span>
+            <span className="text-2xl font-black text-primary sm:text-3xl">
+              {formatPriceLabelWithUnit(product.price, product.sellingUnit)}
+            </span>
           </div>
           {features ? (
             <div

@@ -22,6 +22,7 @@ import { makeZodResolver } from '@/lib/form-validation';
 import { DeleteConfirmationDialog } from '@/components/dashboard/DeleteConfirmationDialog';
 import { DashboardRichTextEditor } from '@/components/dashboard/DashboardRichTextEditor';
 import { formatStockLabel } from '@/lib/stock';
+import { formatPriceLabelWithUnit } from '@/lib/cart';
 
 type Option = { value: string; label: string };
 const MAX_PRODUCT_IMAGES = 5;
@@ -32,6 +33,13 @@ const stockFieldSchema = z
   .refine(value => value === '' || /^\d+$/.test(value), {
     message: 'Stock must be a valid non-negative whole number!',
   });
+
+const normalizeOptionalText = (value: unknown) => {
+  if (typeof value !== 'string') return value;
+
+  const trimmed = value.trim();
+  return trimmed === '' ? undefined : trimmed;
+};
 
 function richTextHasContent(value?: string) {
   return Boolean(
@@ -133,6 +141,11 @@ const productEditSchema = z.object({
       message: 'Weight must be greater than 0!',
     }),
 
+  sellingUnit: z.preprocess(
+    normalizeOptionalText,
+    z.string().min(1, { message: 'Selling unit is required!' }).max(64, { message: 'Selling unit is too long!' }).optional(),
+  ),
+
   isFeatured: z.boolean().default(false),
   isNoCOD: z.boolean().default(false),
   isActive: z.boolean().default(true),
@@ -183,6 +196,11 @@ const productCreateSchema = z.object({
     .refine(value => Number(value) > 0, {
       message: 'Weight must be greater than 0!',
     }),
+
+  sellingUnit: z.preprocess(
+    normalizeOptionalText,
+    z.string().min(1, { message: 'Selling unit is required!' }).max(64, { message: 'Selling unit is too long!' }).optional(),
+  ),
 
   isFeatured: z.boolean().default(false),
   isNoCOD: z.boolean().default(false),
@@ -254,6 +272,7 @@ export function DashboardProductsManager({
       stock: '',
       rating: '5',
       weightKg: '1',
+      sellingUnit: '',
       isFeatured: false,
       isNoCOD: false,
       isActive: true,
@@ -535,6 +554,7 @@ export function DashboardProductsManager({
       stock: product.stock == null ? '' : String(product.stock),
       rating: String(product.rating),
       weightKg: String(product.weightKg ?? 1),
+      sellingUnit: product.sellingUnit ?? '',
       isFeatured: product.isFeatured,
       isNoCOD: product.isNoCOD,
       isActive: product.isActive,
@@ -561,6 +581,7 @@ export function DashboardProductsManager({
       stock: '',
       rating: '5',
       weightKg: '1',
+      sellingUnit: '',
       isFeatured: false,
       isNoCOD: false,
       isActive: true,
@@ -713,6 +734,14 @@ export function DashboardProductsManager({
               />
               <ErrorText message={productCreateForm.formState.errors.weightKg?.message} />
             </div>
+            <div className="grid gap-1.5">
+              <DashboardInput
+                placeholder="Selling unit (optional, e.g. pcs)"
+                {...productCreateForm.register('sellingUnit')}
+              />
+              <p className="text-xs text-muted-foreground">Defaults to pcs when left blank.</p>
+              <ErrorText message={productCreateForm.formState.errors.sellingUnit?.message} />
+            </div>
             <label className="flex items-center gap-2 self-start text-sm">
               <input type="checkbox" {...productCreateForm.register('isFeatured')} />
               Featured
@@ -781,6 +810,7 @@ export function DashboardProductsManager({
                     stock: values.stock.trim() ? Number(values.stock) : null,
                     rating: Number(values.rating),
                     weightKg: Number(values.weightKg),
+                    sellingUnit: values.sellingUnit?.trim() || undefined,
                     isFeatured: values.isFeatured,
                     isNoCOD: values.isNoCOD,
                     isActive: values.isActive,
@@ -805,6 +835,7 @@ export function DashboardProductsManager({
                     stock: '',
                     rating: '5',
                     weightKg: '1',
+                    sellingUnit: '',
                     isFeatured: false,
                     isNoCOD: false,
                     isActive: true,
@@ -998,6 +1029,12 @@ export function DashboardProductsManager({
                               </span>
                             </div>
                             <div className="flex items-start gap-2">
+                              <span className="shrink-0">Selling unit:</span>
+                              <span className="min-w-0 truncate text-foreground/80">
+                                {product.sellingUnit?.trim() || 'pcs'}
+                              </span>
+                            </div>
+                            <div className="flex items-start gap-2">
                               <span className="shrink-0">Created at:</span>
                               <span
                                 className="cursor-help min-w-0 truncate text-foreground/80"
@@ -1052,7 +1089,9 @@ export function DashboardProductsManager({
                         </Badge>
                       </TableCell>
                       <TableCell className="min-w-0">{(product.weightKg ?? 1).toFixed(2)} kg</TableCell>
-                      <TableCell className="min-w-0">{product.price}</TableCell>
+                      <TableCell className="min-w-0">
+                        {formatPriceLabelWithUnit(product.price, product.sellingUnit)}
+                      </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
                           {isEditing ? (
@@ -1078,6 +1117,7 @@ export function DashboardProductsManager({
                                     stock: values.stock.trim() ? Number(values.stock) : null,
                                     rating: Number(values.rating),
                                     weightKg: Number(values.weightKg),
+                                    sellingUnit: values.sellingUnit?.trim() || undefined,
                                     isFeatured: values.isFeatured,
                                     isNoCOD: values.isNoCOD,
                                     isActive: values.isActive,
@@ -1297,6 +1337,17 @@ export function DashboardProductsManager({
                                   {...productEditForm.register('weightKg')}
                                 />
                                 <ErrorText message={productEditForm.formState.errors.weightKg?.message} />
+                              </div>
+
+                              <div className="grid gap-1.5">
+                                <DashboardInput
+                                  placeholder="Selling unit (optional, e.g. pcs)"
+                                  {...productEditForm.register('sellingUnit')}
+                                />
+                                <p className="text-xs text-muted-foreground">
+                                  Defaults to pcs when left blank.
+                                </p>
+                                <ErrorText message={productEditForm.formState.errors.sellingUnit?.message} />
                               </div>
 
                               <label className="flex items-center gap-2 text-sm">

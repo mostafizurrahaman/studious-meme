@@ -6,20 +6,21 @@ type CartHistoryDoc = {
   user: Types.ObjectId;
   product?: Types.ObjectId;
   action: 'add' | 'update' | 'remove' | 'clear';
-  quantity?: number;
-  productSnapshot?: {
-    title: string;
-    brand: string;
-    category: string;
-    categorySlug?: string;
-    image: string;
-    sku: string;
-    slug: string;
-    price: number;
-    stock?: number | null;
-    weightKg?: number;
-    isNoCOD?: boolean;
-  };
+    quantity?: number;
+    productSnapshot?: {
+      title: string;
+      brand: string;
+      category: string;
+      categorySlug?: string;
+      image: string;
+      sku: string;
+      slug: string;
+      price: number;
+      sellingUnit?: string;
+      stock?: number | null;
+      weightKg?: number;
+      isNoCOD?: boolean;
+    };
   expireAt: Date;
   createdAt?: Date;
   updatedAt?: Date;
@@ -40,11 +41,12 @@ const cartHistorySchema = new Schema<CartHistoryDoc>(
       brand: { type: String },
       category: { type: String },
       categorySlug: { type: String },
-       image: { type: String },
+      image: { type: String },
       sku: { type: String },
       slug: { type: String },
       price: { type: Number },
-       stock: { type: Number },
+      sellingUnit: { type: String },
+      stock: { type: Number },
       weightKg: { type: Number },
       isNoCOD: { type: Boolean },
     },

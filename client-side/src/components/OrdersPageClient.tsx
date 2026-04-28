@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { formatMoney, type CartItem } from "@/lib/cart";
+import { formatMoney, formatPriceLabelWithUnit, type CartItem } from "@/lib/cart";
 import { formatDashboardDate } from "@/lib/formatDate";
 import { useCartStore } from "@/lib/cart-store";
 import type { BackendOrder } from "@/services/Order";
@@ -25,7 +25,8 @@ export function OrdersPageClient({
       image: item.image,
       brand: item.brand,
       unitPrice: item.unitPrice,
-      unitPriceLabel: formatMoney(item.unitPrice),
+      unitPriceLabel: formatPriceLabelWithUnit(item.unitPrice, item.sellingUnit),
+      sellingUnit: item.sellingUnit,
       quantity: item.quantity,
       weightKg: item.weightKg ?? 1,
       isNoCOD: Boolean(item.isNoCOD),

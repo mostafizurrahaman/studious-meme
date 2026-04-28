@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { AddToCartButton } from '@/components/cart/AddToCartButton';
 import { AddToCompareButton } from '@/components/compare/AddToCompareButton';
 import { AddToWishlistButton } from '@/components/wishlist/AddToWishlistButton';
+import { formatMoney, formatPriceLabelWithUnit } from '@/lib/cart';
 import { getProductPrimaryImage, type Product } from '@/lib/storefront-types';
 
 type Props = {
@@ -73,9 +74,9 @@ export function ProductCard({ product, priority = false, trailingAction }: Props
           <span className="text-foreground/50">({product.rating})</span>
         </div>
         <div className="flex items-center gap-2 text-[11px] sm:text-[13px]">
-          <span className="font-extrabold text-primary">{product.price}</span>
+          <span className="font-extrabold text-primary">{formatPriceLabelWithUnit(product.price, product.sellingUnit)}</span>
           {product.oldPrice ? (
-            <span className="text-foreground/45 line-through">{product.oldPrice}</span>
+            <span className="text-foreground/45 line-through">{formatMoney(Number(product.oldPrice))}</span>
           ) : null}
         </div>
         <div className="flex items-center justify-between text-[9px] text-foreground/60 sm:text-[11px]">

@@ -12,6 +12,7 @@ const orderItemSnapshotSchema = new Schema<IOrderItemSnapshot>(
     brand: { type: String, required: true },
     category: { type: String, required: true },
     unitPrice: { type: Number, required: true },
+    sellingUnit: { type: String },
     weightKg: { type: Number, required: true, min: 0.01 },
     isNoCOD: { type: Boolean, required: true, default: false },
     quantity: { type: Number, required: true },

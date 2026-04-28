@@ -1,4 +1,5 @@
 import type { Product } from "@/lib/storefront-types";
+import { formatPriceLabelWithUnit } from "@/lib/cart";
 import { formatStockLabel } from "./stock";
 import type { ComparisonHistoryRecord } from "@/services/ComparisonHistory";
 
@@ -40,6 +41,7 @@ export function comparisonHistoryRecordToProduct(
     categorySlug: snapshot.categorySlug ?? undefined,
     isFeatured: snapshot.isFeatured,
     isNoCOD: snapshot.isNoCOD,
+    sellingUnit: snapshot.sellingUnit,
     weightKg: typeof snapshot.weightKg === "number" ? snapshot.weightKg : 1,
   };
 }
@@ -103,10 +105,17 @@ export function buildCompareSpecRows(products: Product[]): CompareSpecRow[] {
   return [
     { label: "Brand", values: products.map((product) => product.brand) },
     { label: "Category", values: products.map((product) => product.category) },
-    { label: "Price", values: products.map((product) => product.price) },
+    {
+      label: "Price",
+      values: products.map((product) =>
+        formatPriceLabelWithUnit(product.price, product.sellingUnit),
+      ),
+    },
     {
       label: "Old price",
-      values: products.map((product) => product.oldPrice ?? "—"),
+      values: products.map((product) =>
+        product.oldPrice ? formatPriceLabelWithUnit(product.oldPrice, product.sellingUnit) : "—",
+      ),
     },
     { label: "Stock", values: products.map((product) => product.stock) },
     { label: "Rating", values: products.map((product) => product.rating) },
@@ -133,6 +142,7 @@ export function compareProductsSignature(products: Product[]): string {
         product.oldPrice ?? "",
         product.stock,
         product.rating,
+        product.sellingUnit ?? "",
       ].join("|"),
     )
     .join("::");

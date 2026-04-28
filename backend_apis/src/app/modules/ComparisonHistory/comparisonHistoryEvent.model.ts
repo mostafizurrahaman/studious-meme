@@ -15,6 +15,7 @@ type ComparisonHistoryEventDoc = {
     sku: string;
     slug: string;
     price: number;
+    sellingUnit?: string;
     stock?: number | null;
     rating: number;
     oldPrice?: number;
@@ -42,7 +43,8 @@ const comparisonHistoryEventSchema = new Schema<ComparisonHistoryEventDoc>(
       sku: { type: String, required: true },
       slug: { type: String, required: true },
       price: { type: Number, required: true },
-       stock: { type: Number },
+      sellingUnit: { type: String },
+      stock: { type: Number },
       rating: { type: Number, required: true },
       oldPrice: { type: Number },
       isFeatured: { type: Boolean, required: true },

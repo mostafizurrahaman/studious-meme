@@ -10,7 +10,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { formatMoney } from "@/lib/cart";
+import { formatMoney, formatPriceLabelWithUnit } from "@/lib/cart";
 import { useCartStore } from "@/lib/cart-store";
 import {
   CASH_ON_DELIVERY_LABEL,
@@ -82,12 +82,13 @@ export function CheckoutPageClient() {
             image: item.productSnapshot.image,
             brand: item.productSnapshot.brand,
             unitPrice: item.priceSnapshot,
-            unitPriceLabel: `Tk. ${item.priceSnapshot.toLocaleString("en-US", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}`,
+            unitPriceLabel: formatPriceLabelWithUnit(
+              item.priceSnapshot,
+              item.productSnapshot.sellingUnit,
+            ),
             oldPriceLabel: undefined,
             quantity: item.quantity,
+            sellingUnit: item.productSnapshot.sellingUnit,
             weightKg: item.productSnapshot.weightKg ?? 1,
             isNoCOD: Boolean(item.productSnapshot.isNoCOD),
           })),

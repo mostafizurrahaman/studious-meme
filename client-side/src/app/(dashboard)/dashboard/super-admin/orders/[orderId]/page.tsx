@@ -37,7 +37,7 @@ export default async function SuperAdminOrderDetailPage({ params }: Props) {
           <CardTitle>Order {orderId}</CardTitle>
           <CardDescription>
             {order
-              ? `${order.items.length} items · Tk.${order.total}`
+              ? `${order.items.length} items · ৳ ${order.total}`
               : "Not found"}
           </CardDescription>
         </div>

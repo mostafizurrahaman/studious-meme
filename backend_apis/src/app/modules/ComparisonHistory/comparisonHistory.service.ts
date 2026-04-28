@@ -41,6 +41,7 @@ const getProductSnapshot = async (productId: string) => {
       sku: product.sku,
       slug: product.slug,
       price: product.price,
+      sellingUnit: typeof product.sellingUnit === 'string' && product.sellingUnit.trim() ? product.sellingUnit.trim() : 'pcs',
       stock: product.stock,
       rating: product.rating,
       oldPrice: product.oldPrice,

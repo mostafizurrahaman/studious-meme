@@ -9,6 +9,7 @@ export interface ICartItemSnapshot {
   sku: string;
   slug: string;
   price: number;
+  sellingUnit?: string;
   stock?: number | null;
   weightKg?: number;
   isNoCOD?: boolean;

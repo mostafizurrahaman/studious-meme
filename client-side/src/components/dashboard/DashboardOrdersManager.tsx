@@ -93,7 +93,7 @@ export function DashboardOrdersManager({
                   <div>{order.paymentMethod}</div>
                   <div className="text-xs text-muted-foreground">{order.paymentStatus}</div>
                 </TableCell>
-                <TableCell>Tk. {order.total.toFixed(2)}</TableCell>
+                <TableCell>৳ {order.total.toFixed(2)}</TableCell>
                 <TableCell>
                   <span className="cursor-help" title={formatDashboardDate(order.createdAt, { time: true })}>
                     {formatDashboardDate(order.createdAt)}

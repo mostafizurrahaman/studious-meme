@@ -59,7 +59,7 @@ const couponDiscountOptions: Array<{
   {
     value: "DISCOUNT_AMOUNT",
     label: "Fixed amount",
-    description: "Subtract a fixed BDT amount",
+    description: "Subtract a fixed ৳ amount",
   },
   {
     value: "FREE_SHIPPING",

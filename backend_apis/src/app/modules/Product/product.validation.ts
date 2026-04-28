@@ -9,6 +9,13 @@ const normalizeYouTubeUrl = (value: unknown) => {
   return trimmed === '' ? undefined : trimmed;
 };
 
+const normalizeOptionalText = (value: unknown) => {
+  if (typeof value !== 'string') return value;
+
+  const trimmed = value.trim();
+  return trimmed === '' ? undefined : trimmed;
+};
+
 const isSupportedYouTubeUrl = (value: string) => {
   try {
     const url = new URL(value);
@@ -73,6 +80,10 @@ const productBaseSchema = z.object({
   weightKg: z.coerce
     .number({ error: 'Weight is required!' })
     .min(0.01, { message: 'Weight must be greater than 0!' }),
+  sellingUnit: z.preprocess(
+    normalizeOptionalText,
+    z.string().min(1, { message: 'Selling unit is required!' }).max(64, { message: 'Selling unit is too long!' }).optional(),
+  ),
   stock: z.preprocess(
     value => (value === '' ? null : value),
     z.union([z.coerce.number().int().min(0, { message: 'Stock must be at least 0!' }), z.null()]).optional(),

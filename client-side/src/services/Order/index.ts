@@ -22,6 +22,7 @@ export type BackendOrderItem = {
   brand: string;
   category: string;
   unitPrice: number;
+  sellingUnit?: string;
   weightKg: number;
   isNoCOD: boolean;
   quantity: number;

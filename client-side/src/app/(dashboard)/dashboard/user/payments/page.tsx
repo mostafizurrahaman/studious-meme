@@ -64,7 +64,7 @@ export default async function UserPaymentsPage() {
                     {item.transactionId}
                   </TableCell>
                   <TableCell>{orderId}</TableCell>
-                  <TableCell>Tk. {item.amount}</TableCell>
+                  <TableCell>৳ {item.amount}</TableCell>
                   <TableCell>{item.status}</TableCell>
                   <TableCell>
                     <span

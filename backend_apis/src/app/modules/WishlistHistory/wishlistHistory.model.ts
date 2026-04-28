@@ -9,6 +9,7 @@ type WishlistProductSnapshot = {
   sku: string;
   slug: string;
   price: number;
+  sellingUnit?: string;
   stock?: number | null;
   weightKg?: number;
   isNoCOD?: boolean;
@@ -31,6 +32,7 @@ const wishlistProductSnapshotSchema = new Schema<WishlistProductSnapshot>(
     sku: { type: String, required: true },
     slug: { type: String, required: true },
     price: { type: Number, required: true },
+    sellingUnit: { type: String },
     stock: { type: Number },
   },
   { _id: false },

@@ -43,7 +43,7 @@ function parsePriceRange(value: string) {
 }
 
 function formatPrice(value: number) {
-  return `Tk. ${value.toLocaleString('en-US')}`;
+  return `৳ ${value.toLocaleString('en-BD')}`;
 }
 
 function roundRangeCeiling(value: number) {
@@ -248,9 +248,9 @@ export function ShopPageClient({ products, categories, meta }: Props) {
             <div className="font-semibold text-foreground">Price range</div>
             <div className="mt-2 grid gap-2">
               {[
-                ['under-10000', 'Under Tk. 10k'],
-                ['10000-50000', 'Tk. 10k-50k'],
-                ['50000-plus', 'Tk. 50k+'],
+    ['under-10000', 'Under ৳ 10k'],
+    ['10000-50000', '৳ 10k-50k'],
+    ['50000-plus', '৳ 50k+'],
               ].map(([value, label]) => (
                 <button
                   key={value}

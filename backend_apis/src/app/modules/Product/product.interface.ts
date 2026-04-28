@@ -18,6 +18,7 @@ export interface IProduct {
   weightKg: number;
   stock?: number | null;
   rating: number;
+  sellingUnit?: string;
   isFeatured: boolean;
   isNoCOD: boolean;
   isActive: boolean;

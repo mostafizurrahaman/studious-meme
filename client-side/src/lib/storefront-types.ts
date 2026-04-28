@@ -9,6 +9,7 @@ export type StorefrontProduct = {
   price: string;
   oldPrice?: string;
   badge?: string;
+  sellingUnit?: string;
   youtubeVideoUrl?: string;
   youtubeVideoId?: string;
   brand: string;

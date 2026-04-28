@@ -129,9 +129,9 @@ export function CategoryPageClient({
           ) : null}
           {[
             ["s", "in-stock", "In stock", activeStock],
-            ["p", "under-10000", "Under Tk. 10k", activePrice],
-            ["p", "10000-50000", "Tk. 10k-50k", activePrice],
-            ["p", "50000-plus", "Tk. 50k+", activePrice],
+            ["p", "under-10000", "Under ৳ 10k", activePrice],
+            ["p", "10000-50000", "৳ 10k-50k", activePrice],
+            ["p", "50000-plus", "৳ 50k+", activePrice],
           ].map(([key, value, label, active]) => (
             <Button
               key={`${key}-${value}`}

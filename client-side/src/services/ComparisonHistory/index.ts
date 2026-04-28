@@ -19,19 +19,20 @@ export type ComparisonHistoryRecord = {
   _id?: string;
   user?: unknown;
   product?: unknown;
-  productSnapshot?: {
-    title: string;
-    brand: string;
-    category: string;
-    categorySlug?: string;
-    subCategorySlug?: string;
-    image: string;
-    sku: string;
-    slug: string;
-    price: number;
-    stock?: number | null;
-    rating: number;
-    oldPrice?: number;
+    productSnapshot?: {
+      title: string;
+      brand: string;
+      category: string;
+      categorySlug?: string;
+      subCategorySlug?: string;
+      image: string;
+      sku: string;
+      slug: string;
+      price: number;
+      sellingUnit?: string;
+      stock?: number | null;
+      rating: number;
+      oldPrice?: number;
     isFeatured: boolean;
     weightKg?: number;
     isNoCOD?: boolean;

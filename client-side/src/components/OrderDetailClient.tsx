@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { formatMoney, type CartItem } from "@/lib/cart";
+import { formatMoney, formatPriceLabelWithUnit, type CartItem } from "@/lib/cart";
 import { formatDashboardDate } from "@/lib/formatDate";
 import { useCartStore } from "@/lib/cart-store";
 import { siteConfig } from "@/lib/seo";
@@ -53,7 +53,8 @@ export function OrderDetailClient({
     image: item.image,
     brand: item.brand,
     unitPrice: item.unitPrice,
-    unitPriceLabel: formatMoney(item.unitPrice),
+    unitPriceLabel: formatPriceLabelWithUnit(item.unitPrice, item.sellingUnit),
+    sellingUnit: item.sellingUnit,
     quantity: item.quantity,
     weightKg: item.weightKg ?? 1,
     isNoCOD: Boolean(item.isNoCOD),
@@ -217,7 +218,7 @@ export function OrderDetailClient({
                   <div className="font-semibold text-foreground">
                     {item.title}
                   </div>
-                  <div className="mt-1 text-sm text-foreground/55">
+                    <div className="mt-1 text-sm text-foreground/55">
                     SKU {item.sku} · Qty {item.quantity}
                   </div>
                   <div className="mt-2 text-sm font-bold text-primary">

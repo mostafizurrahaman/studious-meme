@@ -76,7 +76,7 @@ export function DashboardPaymentsManager({
                 <TableRow key={item._id}>
                   <TableCell className="font-medium">{item.transactionId}</TableCell>
                   <TableCell>{orderId}</TableCell>
-                  <TableCell>Tk. {item.amount}</TableCell>
+                  <TableCell>৳ {item.amount}</TableCell>
                   <TableCell>
                     <Badge variant={getStatusVariant(item.status)}>{item.status}</Badge>
                   </TableCell>

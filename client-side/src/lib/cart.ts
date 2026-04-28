@@ -11,6 +11,7 @@ export type CartItem = {
   unitPriceLabel: string;
   oldPriceLabel?: string;
   quantity: number;
+  sellingUnit?: string;
   weightKg: number;
   isNoCOD: boolean;
 };
@@ -20,10 +21,31 @@ export function parseMoney(value: string) {
 }
 
 export function formatMoney(value: number) {
-  return `Tk. ${value.toLocaleString("en-US", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
+  return `৳ ${value.toLocaleString("en-BD")}`;
+}
+
+export function formatPrice(amount: number) {
+  return formatMoney(amount);
+}
+
+export function resolveSellingUnitLabel(value?: string) {
+  const normalized = value?.trim();
+  return normalized || "pcs";
+}
+
+export function formatPriceLabelWithUnit(value: string | number, sellingUnit?: string) {
+  const label =
+    typeof value === "number"
+      ? formatMoney(value)
+      : Number.isFinite(Number(value))
+        ? formatMoney(Number(value))
+        : value;
+
+  return `${label} / ${resolveSellingUnitLabel(sellingUnit)}`;
+}
+
+export function formatPriceWithUnit(value: string | number, sellingUnit?: string) {
+  return formatPriceLabelWithUnit(value, sellingUnit);
 }
 
 export function toCartItem(product: Product): CartItem {
@@ -35,9 +57,12 @@ export function toCartItem(product: Product): CartItem {
     image: getProductPrimaryImage(product),
     brand: product.brand,
     unitPrice: parseMoney(product.price),
-    unitPriceLabel: product.price,
-    oldPriceLabel: product.oldPrice,
+    unitPriceLabel: formatPriceLabelWithUnit(product.price, product.sellingUnit),
+    oldPriceLabel: product.oldPrice
+      ? formatMoney(parseMoney(product.oldPrice))
+      : undefined,
     quantity: 1,
+    sellingUnit: product.sellingUnit,
     weightKg: typeof product.weightKg === "number" ? product.weightKg : 1,
     isNoCOD: Boolean(product.isNoCOD),
   };

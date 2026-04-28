@@ -34,6 +34,7 @@ export type BackendProduct = {
   price: number;
   oldPrice?: number;
   badge?: string;
+  sellingUnit?: string;
   youtubeVideoUrl?: string;
   youtubeVideoId?: string;
   brand: BackendProductRef;
@@ -79,6 +80,7 @@ export async function mapBackendProductToStorefrontProduct(
     price: String(product.price),
     oldPrice: product.oldPrice === undefined ? undefined : String(product.oldPrice),
     badge: product.badge,
+    sellingUnit: product.sellingUnit,
     youtubeVideoUrl: product.youtubeVideoUrl,
     youtubeVideoId: product.youtubeVideoId,
     brand: resolveName(product.brand),
@@ -277,6 +279,7 @@ type ProductMutationPayload = {
   price: number;
   oldPrice?: number;
   badge?: string;
+  sellingUnit?: string;
   youtubeVideoUrl?: string;
   brand: string;
   category: string;
@@ -368,6 +371,7 @@ export type SearchResult = {
     title: string;
     slug: string;
     price: number;
+    sellingUnit?: string;
     images: string[];
     badge?: string;
   }[];

@@ -30,6 +30,13 @@ const normalizeYouTubeVideoUrl = (value: unknown) => {
   return trimmed === '' ? undefined : trimmed;
 };
 
+const normalizeSellingUnit = (value: unknown) => {
+  if (typeof value !== 'string') return undefined;
+
+  const trimmed = value.trim();
+  return trimmed === '' ? undefined : trimmed;
+};
+
 const YOUTUBE_VIDEO_ID_PATTERN = /^[a-zA-Z0-9_-]{11}$/;
 
 const extractYouTubeVideoId = (value: string) => {
@@ -315,11 +322,20 @@ const createProductIntoDB = async (
 
     const youtubeVideoUrl = normalizeYouTubeVideoUrl(payload.youtubeVideoUrl);
     const youtubeVideoId = youtubeVideoUrl ? extractYouTubeVideoId(youtubeVideoUrl) : undefined;
+    const sellingUnit = normalizeSellingUnit(payload.sellingUnit);
+    const createPayload: Record<string, unknown> = { ...payload };
+
+    if (sellingUnit) {
+      createPayload.sellingUnit = sellingUnit;
+    } else {
+      delete createPayload.sellingUnit;
+    }
 
     return ProductModel.create({
-      ...payload,
+      ...createPayload,
       slug: normalizeSlug(String(payload.slug ?? payload.title ?? '')),
       images,
+      ...(sellingUnit ? { sellingUnit } : {}),
       ...(youtubeVideoUrl ? { youtubeVideoUrl, youtubeVideoId } : {}),
     });
   } catch (error) {
@@ -409,6 +425,7 @@ const updateProductIntoDB = async (
       new Set(uploadedImages.length > 0 ? [...retainedImages, ...uploadedImages] : retainedImages),
     );
     const shouldUpdateYoutubeVideoUrl = Object.prototype.hasOwnProperty.call(payload, 'youtubeVideoUrl');
+    const shouldUpdateSellingUnit = Object.prototype.hasOwnProperty.call(payload, 'sellingUnit');
     const youtubeVideoUrl = shouldUpdateYoutubeVideoUrl
       ? normalizeYouTubeVideoUrl(payload.youtubeVideoUrl)
       : undefined;
@@ -429,6 +446,10 @@ const updateProductIntoDB = async (
       slug: payload.slug ? normalizeSlug(String(payload.slug)) : payload.slug,
       images: nextImages,
     };
+
+    if (shouldUpdateSellingUnit) {
+      updateSet.sellingUnit = normalizeSellingUnit(payload.sellingUnit) ?? 'pcs';
+    }
 
     const updateQuery: Record<string, unknown> = { $set: updateSet };
 
@@ -541,6 +562,7 @@ const searchProducts = async (searchTerm: string, limit = 10) => {
         price: 1,
         images: 1,
         badge: 1,
+        sellingUnit: 1,
         _id: 0,
       },
     },

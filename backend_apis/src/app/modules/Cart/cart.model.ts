@@ -11,6 +11,7 @@ const cartItemSnapshotSchema = new Schema<ICartItemSnapshot>(
     sku: { type: String, required: true },
     slug: { type: String, required: true },
     price: { type: Number, required: true },
+    sellingUnit: { type: String },
     stock: { type: Number },
     weightKg: { type: Number },
     isNoCOD: { type: Boolean },

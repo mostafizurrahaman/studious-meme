@@ -6,6 +6,7 @@ import Link from "next/link";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { formatMoney, formatPriceLabelWithUnit } from "@/lib/cart";
 import { getProductPrimaryImage, type Product } from "@/lib/storefront-types";
 import { useCompareStore } from "@/lib/compare-store";
 import {
@@ -137,11 +138,11 @@ export function ComparePageClient({ authenticated, initialProducts }: Props) {
                       </div>
                       <div className="flex items-end gap-2">
                         <div className="text-lg font-black text-primary">
-                          {product.price}
+                          {formatPriceLabelWithUnit(product.price, product.sellingUnit)}
                         </div>
                         {product.oldPrice ? (
                           <div className="pb-0.5 text-sm text-foreground/40 line-through">
-                            {product.oldPrice}
+                            {formatMoney(Number(product.oldPrice))}
                           </div>
                         ) : null}
                       </div>

@@ -68,7 +68,7 @@ function safeNumber(value: unknown): number {
 }
 
 function formatMoney(value: number): string {
-  return `Tk. ${value.toLocaleString("en-BD", { maximumFractionDigits: 2 })}`;
+  return `৳ ${value.toLocaleString("en-BD")}`;
 }
 
 function renderFeatureList(items: string[]) {
