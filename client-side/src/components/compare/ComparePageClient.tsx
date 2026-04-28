@@ -173,7 +173,7 @@ export function ComparePageClient({ authenticated, initialProducts }: Props) {
                           Weight
                         </span>
                         <span className="text-right">
-                          {product.weightKg ?? 1} kg
+                          {product.weightKg} kg
                         </span>
                       </div>
                       <div className="flex items-center justify-between gap-3">

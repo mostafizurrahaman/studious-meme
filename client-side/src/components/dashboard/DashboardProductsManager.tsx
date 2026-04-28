@@ -398,6 +398,9 @@ function ProductFormSections({
               step="0.01"
               {...form.register('weightKg')}
             />
+            <p className="text-xs text-muted-foreground">
+              Required for shipping calculation.
+            </p>
             <div className="min-h-4" aria-hidden="true" />
             <ErrorText message={form.formState.errors.weightKg?.message} />
           </div>
@@ -554,7 +557,7 @@ export function DashboardProductsManager({
       subCategorySlug: '',
       stock: '',
       rating: '5',
-      weightKg: '1',
+      weightKg: '',
       sellingUnit: DEFAULT_SELLING_UNIT,
       isFeatured: false,
       isNoCOD: false,
@@ -609,7 +612,7 @@ export function DashboardProductsManager({
       subCategorySlug: '',
       stock: '0',
       rating: '5',
-      weightKg: '1',
+      weightKg: '',
       sellingUnit: DEFAULT_SELLING_UNIT,
       isFeatured: false,
       isNoCOD: false,
@@ -865,7 +868,7 @@ export function DashboardProductsManager({
       subCategorySlug: product.subCategorySlug ?? '',
       stock: product.stock == null ? '' : String(product.stock),
       rating: String(product.rating),
-      weightKg: String(product.weightKg ?? 1),
+      weightKg: product.weightKg == null ? '' : String(product.weightKg),
       sellingUnit: isSellingUnit(product.sellingUnit) ? product.sellingUnit : DEFAULT_SELLING_UNIT,
       isFeatured: product.isFeatured,
       isNoCOD: product.isNoCOD,
@@ -892,7 +895,7 @@ export function DashboardProductsManager({
       subCategorySlug: '',
       stock: '',
       rating: '5',
-      weightKg: '1',
+      weightKg: '',
       sellingUnit: DEFAULT_SELLING_UNIT,
       isFeatured: false,
       isNoCOD: false,
@@ -980,7 +983,7 @@ export function DashboardProductsManager({
                       subCategorySlug: '',
                       stock: '',
                       rating: '5',
-                      weightKg: '1',
+                      weightKg: '',
                       sellingUnit: DEFAULT_SELLING_UNIT,
                       isFeatured: false,
                       isNoCOD: false,
@@ -1255,7 +1258,7 @@ export function DashboardProductsManager({
                           {product.isNoCOD ? 'Blocked' : 'Allowed'}
                         </Badge>
                       </TableCell>
-                      <TableCell className="min-w-0">{(product.weightKg ?? 1).toFixed(2)} kg</TableCell>
+                      <TableCell className="min-w-0">{product.weightKg.toFixed(2)} kg</TableCell>
                       <TableCell className="min-w-0">
                         {formatPriceLabelWithUnit(product.price, product.sellingUnit)}
                       </TableCell>

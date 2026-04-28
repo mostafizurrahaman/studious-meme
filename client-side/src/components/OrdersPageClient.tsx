@@ -41,7 +41,7 @@ export function OrdersPageClient({
       unitPriceLabel: formatPriceLabelWithUnit(item.unitPrice, item.sellingUnit),
       sellingUnit: item.sellingUnit,
       quantity: item.quantity,
-      weightKg: item.weightKg ?? 1,
+      weightKg: item.weightKg as number,
       isNoCOD: Boolean(item.isNoCOD),
     }));
 

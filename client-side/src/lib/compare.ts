@@ -122,7 +122,7 @@ export function buildCompareSpecRows(products: Product[]): CompareSpecRow[] {
     { label: "SKU", values: products.map((product) => product.sku) },
     {
       label: "Weight",
-      values: products.map((product) => `${product.weightKg ?? 1} kg`),
+      values: products.map((product) => `${product.weightKg} kg`),
     },
     {
       label: "COD",

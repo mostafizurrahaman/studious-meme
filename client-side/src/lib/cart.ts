@@ -63,7 +63,7 @@ export function toCartItem(product: Product): CartItem {
       : undefined,
     quantity: 1,
     sellingUnit: product.sellingUnit,
-    weightKg: typeof product.weightKg === "number" ? product.weightKg : 1,
+    weightKg: product.weightKg as number,
     isNoCOD: Boolean(product.isNoCOD),
   };
 }

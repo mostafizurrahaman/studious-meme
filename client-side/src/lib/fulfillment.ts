@@ -111,10 +111,14 @@ export function calculateFulfillmentSummary({
   const totalWeightKg = Number(
     items
       .reduce(
-        (sum, item) =>
-          sum +
-          (Number.isFinite(item.weightKg ?? 1) ? (item.weightKg ?? 1) : 1) *
-            item.quantity,
+        (sum, item) => {
+          const itemWeightKg =
+            typeof item.weightKg === "number" && Number.isFinite(item.weightKg)
+              ? item.weightKg
+              : 0;
+
+          return sum + itemWeightKg * item.quantity;
+        },
         0,
       )
       .toFixed(2),

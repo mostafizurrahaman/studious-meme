@@ -68,7 +68,7 @@ export function CartPageClient() {
               oldPriceLabel: undefined,
               quantity: item.quantity,
               sellingUnit: item.productSnapshot.sellingUnit,
-              weightKg: item.productSnapshot.weightKg ?? 1,
+              weightKg: item.productSnapshot.weightKg as number,
               isNoCOD: Boolean(item.productSnapshot.isNoCOD),
             };
           }),
