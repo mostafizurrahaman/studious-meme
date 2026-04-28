@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { CheckCircle2, MessageCircle, Minus, PackageCheck, Plus, Send, Share, Truck } from 'lucide-react';
 import PaymentOptionSvg from '@/assets/Payment-Option.svg';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AddToCompareButton } from '@/components/compare/AddToCompareButton';
 import { AddToWishlistButton } from '@/components/wishlist/AddToWishlistButton';
@@ -178,71 +179,108 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   return (
     <div className="space-y-8">
       <section className="grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] xl:grid-cols-[620px_minmax(0,1fr)]">
-        <div className={cn('grid gap-3', images.length > 1 ? 'sm:grid-cols-[86px_minmax(0,1fr)]' : '')}>
-          {images.length > 1 ? (
-            <div className="order-2 flex gap-2 overflow-x-auto sm:order-1 sm:flex-col sm:overflow-visible">
-              {images.map((image, index) => (
-                <button
-                  key={`${image}-${index}`}
-                  type="button"
-                  onClick={() => setSelectedImage(image)}
-                  className={cn(
-                    'relative size-18 shrink-0 overflow-hidden rounded-lg sm:size-20',
-                    selectedImage === image && 'ring-2 ring-primary/20',
-                  )}
-                >
-                  <Image
-                    src={image}
-                    alt={`${product.title} thumbnail ${index + 1}`}
-                    fill
-                    sizes="80px"
-                    className="object-cover rounded-lg"
-                  />
-                </button>
-              ))}
-            </div>
-          ) : null}
+        <div className="space-y-4">
+          <div className={cn('grid gap-3', images.length > 1 ? 'sm:grid-cols-[86px_minmax(0,1fr)]' : '')}>
+            {images.length > 1 ? (
+              <div className="order-2 flex gap-2 overflow-x-auto sm:order-1 sm:flex-col sm:overflow-visible">
+                {images.map((image, index) => (
+                  <button
+                    key={`${image}-${index}`}
+                    type="button"
+                    onClick={() => setSelectedImage(image)}
+                    className={cn(
+                      'relative size-18 shrink-0 overflow-hidden rounded-lg sm:size-20',
+                      selectedImage === image && 'ring-2 ring-primary/20',
+                    )}
+                  >
+                    <Image
+                      src={image}
+                      alt={`${product.title} thumbnail ${index + 1}`}
+                      fill
+                      sizes="80px"
+                      className="object-cover rounded-lg"
+                    />
+                  </button>
+                ))}
+              </div>
+            ) : null}
 
-          <div className="order-1 sm:order-2">
-            <div
-              className="relative aspect-[4/3] overflow-hidden rounded-lg lg:aspect-[1.05/1]"
-              onMouseMove={handleZoomMove}
-              onMouseEnter={() => setIsZooming(true)}
-              onMouseLeave={() => setIsZooming(false)}
-            >
-              <Image
-                src={selectedImage}
-                alt={product.title}
-                fill
-                priority
-                sizes="(max-width: 1024px) 100vw, 620px"
-                className={cn(
-                  'object-contain transition-opacity rounded-lg',
-                  isZooming ? 'opacity-0' : 'opacity-100',
-                )}
-              />
+            <div className="order-1 sm:order-2">
               <div
-                className={cn(
-                  'absolute inset-0 overflow-hidden rounded-lg bg-no-repeat transition-opacity',
-                  isZooming ? 'opacity-100' : 'opacity-0',
-                )}
-                style={{
-                  backgroundImage: `url(${selectedImage})`,
-                  backgroundSize: '190%',
-                  backgroundPosition: zoomPosition,
-                }}
-              />
+                className="relative aspect-[4/3] overflow-hidden rounded-lg lg:aspect-[1.05/1]"
+                onMouseMove={handleZoomMove}
+                onMouseEnter={() => setIsZooming(true)}
+                onMouseLeave={() => setIsZooming(false)}
+              >
+                <Image
+                  src={selectedImage}
+                  alt={product.title}
+                  fill
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 620px"
+                  className={cn(
+                    'object-contain transition-opacity rounded-lg',
+                    isZooming ? 'opacity-0' : 'opacity-100',
+                  )}
+                />
+                <div
+                  className={cn(
+                    'absolute inset-0 overflow-hidden rounded-lg bg-no-repeat transition-opacity',
+                    isZooming ? 'opacity-100' : 'opacity-0',
+                  )}
+                  style={{
+                    backgroundImage: `url(${selectedImage})`,
+                    backgroundSize: '190%',
+                    backgroundPosition: zoomPosition,
+                  }}
+                />
+              </div>
             </div>
           </div>
+
+          <Card className="overflow-hidden border-0 bg-secondary text-secondary-foreground shadow-sm p-1">
+            <div className="grid gap-3 p-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:p-4">
+              <div className="space-y-2">
+                <div className="inline-flex rounded-full bg-white/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-secondary-foreground">
+                  Bulk pricing
+                </div>
+                <h2 className="text-lg font-extrabold leading-tight sm:text-xl">Need a quotation?</h2>
+                <p className="text-sm leading-6 text-secondary-foreground/78">
+                  Share your quantity and delivery location for project or retail orders.
+                </p>
+              </div>
+              <Button
+                asChild
+                className="h-10 rounded-full bg-white px-5 text-sm font-bold text-black! hover:text-primary! hover:bg-white/90"
+              >
+                <Link href="/quotation-request">Request quotation</Link>
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-2 border-t border-white/10 px-3 py-4 text-xs font-medium text-secondary-foreground/90 sm:px-4">
+              <span className="rounded-full bg-white/10 px-3 py-1">Bulk order support</span>
+              <span className="rounded-full bg-white/10 px-3 py-1">Corporate procurement</span>
+              <span className="rounded-full bg-white/10 px-3 py-1">Delivery coordination</span>
+            </div>
+          </Card>
         </div>
 
         <div className="space-y-3">
           <h1 className="text-xl font-medium leading-tight text-secondary sm:text-2xl lg:text-[28px]">
             {product.title}
           </h1>
-          <div className="text-xs text-muted-foreground">
-            <span className="font-bold">SKU: </span>
-            {product.sku}
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+            <div>
+              <span className="font-bold">SKU: </span>
+              {product.sku}
+            </div>
+            <div>
+              <span className="font-bold">Brand: </span>
+              {product.brand}
+            </div>
+            <div>
+              <span className="font-bold">Category: </span>
+              {product.category}
+            </div>
           </div>
           <div className="flex flex-wrap items-end gap-2">
             {product.oldPrice ? (
@@ -264,7 +302,11 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               {product.title} is available for direct order with dedicated sales support.
             </p>
           )}
-          <Button asChild variant="link" className="h-auto p-0 font-bold text-green-600!">
+          <Button
+            asChild
+            variant="link"
+            className="h-auto p-0 font-bold text-green-600! underline! underline-offset-6"
+          >
             <Link href={WHATSAPP_URL} target="_blank">
               <Send className="size-4" />
               Order on WhatsApp
