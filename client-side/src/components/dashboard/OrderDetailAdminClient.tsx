@@ -107,7 +107,13 @@ export function OrderDetailAdminClient({
           {order.items.map(item => (
             <div key={item.sku} className="flex gap-4 rounded-lg border p-3">
               <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-muted">
-                <Image src={item.image} alt={item.title} fill className="object-contain p-1" />
+                <Image
+                  src={item.image}
+                  alt={item.title}
+                  fill
+                  sizes="64px"
+                  className="object-contain p-1"
+                />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="font-medium">{item.title}</div>

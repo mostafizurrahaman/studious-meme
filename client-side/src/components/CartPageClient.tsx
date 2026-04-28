@@ -129,7 +129,13 @@ export function CartPageClient() {
                     href={item.href}
                     className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl bg-muted"
                   >
-                    <Image src={item.image} alt={item.title} fill className="object-contain p-2" />
+                    <Image
+                      src={item.image}
+                      alt={item.title}
+                      fill
+                      sizes="80px"
+                      className="object-contain p-2"
+                    />
                   </Link>
                   <div className="min-w-0 flex-1">
                     <Link
