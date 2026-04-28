@@ -28,6 +28,8 @@ export default async function SuperAdminOrderDetailPage({ params }: Props) {
   await requireDashboardRoles(["SUPER_ADMIN"]);
   const { orderId } = await params;
   const result = await getOrderById(orderId).catch(() => null);
+
+  console.log({ result });
   const order = result?.data ?? null;
 
   return (

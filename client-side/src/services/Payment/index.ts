@@ -26,6 +26,10 @@ export type BackendPayment = {
   valId?: string;
 };
 
+export type PaginatedBackendEnvelope<T> = BackendEnvelope<T> & {
+  meta?: { page: number; limit: number; total: number; totalPages: number };
+};
+
 export const initiatePortPosPayment = async (
   orderId: string,
 ): Promise<BackendEnvelope<{ url?: string; transactionId?: string }>> => {
@@ -38,10 +42,27 @@ export const initiatePortPosPayment = async (
   });
 };
 
-export const getMyPayments = async (): Promise<BackendEnvelope<unknown[]>> => {
+type UserListParams = {
+  page?: number;
+  limit?: number;
+};
+
+const buildUserListQuery = (params: UserListParams = {}) => {
+  const searchParams = new URLSearchParams();
+
+  if (params.page) searchParams.set("page", String(params.page));
+  if (params.limit) searchParams.set("limit", String(params.limit));
+
+  const query = searchParams.toString();
+  return query ? `?${query}` : "";
+};
+
+export const getMyPayments = async (
+  params: UserListParams = {},
+): Promise<PaginatedBackendEnvelope<BackendPayment[]>> => {
   const accessToken = await getValidAccessTokenForServerHandlerGet();
-  return requestBackendJson<BackendEnvelope<unknown[]>>(
-    "/payment/my-payments",
+  return requestBackendJson<PaginatedBackendEnvelope<BackendPayment[]>>(
+    `/payment/my-payments${buildUserListQuery(params)}`,
     {
       method: "GET",
       token: accessToken ?? undefined,

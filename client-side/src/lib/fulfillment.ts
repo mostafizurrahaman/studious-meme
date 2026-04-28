@@ -39,10 +39,9 @@ export function normalizeText(value?: string) {
 
 export function deriveShippingZone(
   city?: string,
-  address?: string,
 ): ShippingZone {
-  const combined = `${normalizeText(city)} ${normalizeText(address)}`;
-  return combined.includes("dhaka")
+  const selectedDistrict = normalizeText(city);
+  return selectedDistrict === "dhaka"
     ? SHIPPING_ZONE.INSIDE_DHAKA
     : SHIPPING_ZONE.OUTSIDE_DHAKA;
 }
@@ -95,14 +94,16 @@ export function calculateCodEligibility(
 export function calculateFulfillmentSummary({
   items,
   city,
-  address,
+  // address,
   couponSummary,
 }: {
   items: FulfillmentItem[];
   city?: string;
-  address?: string;
+  // address?: string;
   couponSummary?: CouponVerificationSummary | null;
 }) {
+  // void address;
+
   const subtotal = items.reduce(
     (sum, item) => sum + item.unitPrice * item.quantity,
     0,
@@ -118,7 +119,7 @@ export function calculateFulfillmentSummary({
       )
       .toFixed(2),
   );
-  const zone = deriveShippingZone(city, address);
+  const zone = deriveShippingZone(city);
   const shippingCharge = calculateShippingCharge({ totalWeightKg, zone });
   const cod = calculateCodEligibility(items, subtotal);
 

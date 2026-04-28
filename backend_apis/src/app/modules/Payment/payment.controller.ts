@@ -63,12 +63,13 @@ const refundPortPosPayment = asyncHandler(async (req, res) => {
 
 // 5. getMyPayments
 const getMyPayments = asyncHandler(async (req, res) => {
-  const result = await PaymentService.getMyPaymentsFromDB(req.user);
+  const result = await PaymentService.getMyPaymentsFromDB(req.user, req.query);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     message: "Payments retrieved successfully!",
-    data: result,
+    data: result.data,
+    meta: result.meta,
   });
 });
 

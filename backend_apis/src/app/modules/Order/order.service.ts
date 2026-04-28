@@ -381,8 +381,32 @@ const createOrderIntoDB = async (user: IUser, payload: CreateOrderPayload) => {
 };
 
 // 3. getMyOrdersFromDB
-const getMyOrdersFromDB = async (user: IUser) => {
-  return OrderModel.find({ user: user._id }).sort({ createdAt: -1 }).lean();
+const getMyOrdersFromDB = async (
+  user: IUser,
+  query: Record<string, unknown> = {},
+) => {
+  const page = Number(query.page) || 1;
+  const limit = Number(query.limit) || 50;
+  const skip = (page - 1) * limit;
+
+  const [data, total] = await Promise.all([
+    OrderModel.find({ user: user._id })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+    OrderModel.countDocuments({ user: user._id }),
+  ]);
+
+  return {
+    data,
+    meta: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit) || 1,
+    },
+  };
 };
 
 // 4. getSingleOrderForUserFromDB

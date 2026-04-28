@@ -6,7 +6,7 @@ import {
   SHIPPING_ZONE,
   type TDeliveryArea,
   type TShippingZone,
-} from "./order.constants";
+} from './order.constants';
 
 export type CodEligibilityInput = {
   subtotal: number;
@@ -14,10 +14,7 @@ export type CodEligibilityInput = {
 };
 
 const normalizeDeliveryArea = (value?: TShippingZone | TDeliveryArea) => {
-  if (
-    value === DELIVERY_AREA.INSIDE_DHAKA ||
-    value === SHIPPING_ZONE.INSIDE_DHAKA
-  ) {
+  if (value === DELIVERY_AREA.INSIDE_DHAKA || value === SHIPPING_ZONE.INSIDE_DHAKA) {
     return SHIPPING_ZONE.INSIDE_DHAKA;
   }
 
@@ -25,18 +22,13 @@ const normalizeDeliveryArea = (value?: TShippingZone | TDeliveryArea) => {
 };
 
 export function normalizeText(value?: string) {
-  return (value ?? "").trim().toLowerCase();
+  return (value ?? '').trim().toLowerCase();
 }
 
-export function deriveShippingZone(
-  city?: string,
-  address?: string,
-): TShippingZone {
-  const combined = `${normalizeText(city)} ${normalizeText(address)}`;
+export function deriveShippingZone(city?: string): TShippingZone {
+  const selectedDistrict = normalizeText(city);
 
-  return combined.includes("dhaka")
-    ? SHIPPING_ZONE.INSIDE_DHAKA
-    : SHIPPING_ZONE.OUTSIDE_DHAKA;
+  return selectedDistrict === 'dhaka' ? SHIPPING_ZONE.INSIDE_DHAKA : SHIPPING_ZONE.OUTSIDE_DHAKA;
 }
 
 export function calculateShippingCharge({
@@ -62,10 +54,7 @@ export function calculateShippingCharge({
   return rules.baseCharge + extraKg * rules.additionalCharge;
 }
 
-export function calculateCodEligibility({
-  subtotal,
-  itemBlocksCod,
-}: CodEligibilityInput) {
+export function calculateCodEligibility({ subtotal, itemBlocksCod }: CodEligibilityInput) {
   const reasons: string[] = [];
 
   if (!Number.isFinite(subtotal) || subtotal <= COD_MIN_SUBTOTAL_BDT) {
@@ -85,11 +74,11 @@ export function calculateCodEligibility({
 }
 
 export function normalizePaymentMethod(value: string) {
-  return value === "COD" ? "CASH_ON_DELIVERY" : value;
+  return value === 'COD' ? 'CASH_ON_DELIVERY' : value;
 }
 
 export function formatShippingZoneLabel(zone: TShippingZone) {
-  return zone === SHIPPING_ZONE.INSIDE_DHAKA ? "Inside Dhaka" : "Outside Dhaka";
+  return zone === SHIPPING_ZONE.INSIDE_DHAKA ? 'Inside Dhaka' : 'Outside Dhaka';
 }
 
 export function getTotalWeightKg(totalWeightKg: number) {

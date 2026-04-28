@@ -51,12 +51,13 @@ const createOrder = asyncHandler(async (req, res) => {
 
 // 3. getMyOrders
 const getMyOrders = asyncHandler(async (req, res) => {
-  const result = await OrderService.getMyOrdersFromDB(req.user);
+  const result = await OrderService.getMyOrdersFromDB(req.user, req.query);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     message: "Orders fetched successfully!",
-    data: result,
+    data: result.data,
+    meta: result.meta,
   });
 });
 

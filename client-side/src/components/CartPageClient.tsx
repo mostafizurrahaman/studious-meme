@@ -1,65 +1,53 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
-import { Textarea } from "@/components/ui/textarea";
-import { formatMoney, formatPriceLabelWithUnit } from "@/lib/cart";
-import { useCartStore } from "@/lib/cart-store";
-import {
-  calculateFulfillmentSummary,
-  formatShippingZoneLabel,
-} from "@/lib/fulfillment";
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+// import { Separator } from '@/components/ui/separator';
+// import { Textarea } from '@/components/ui/textarea';
+import { formatMoney, formatPriceLabelWithUnit } from '@/lib/cart';
+import { useCartStore } from '@/lib/cart-store';
+import { calculateFulfillmentSummary, formatShippingZoneLabel } from '@/lib/fulfillment';
 import {
   CASH_ON_DELIVERY_LABEL,
-  CHECKOUT_PAYMENT_OPTIONS,
+  // CHECKOUT_PAYMENT_OPTIONS,
   PORTPOS_LABEL,
   getCheckoutPaymentLabel,
-} from "@/lib/payment-method";
-import {
-  clearCart as clearCartPersisted,
-  getMyCart,
-  removeCartItem,
-  updateCartItem,
-} from "@/services/Cart";
+} from '@/lib/payment-method';
+import { clearCart as clearCartPersisted, getMyCart, removeCartItem, updateCartItem } from '@/services/Cart';
 
 export function CartPageClient() {
-  const items = useCartStore((state) => state.items);
-  const hydrated = useCartStore((state) => state.hydrated);
-  const couponCode = useCartStore((state) => state.couponCode);
-  const appliedCoupon = useCartStore((state) => state.appliedCoupon);
-  const couponVerification = useCartStore((state) => state.couponVerification);
-  const isApplyingCoupon = useCartStore((state) => state.isApplyingCoupon);
-  const clear = useCartStore((state) => state.clear);
-  const checkout = useCartStore((state) => state.checkout);
-  const count = useCartStore((state) =>
-    state.items.reduce((sum, item) => sum + item.quantity, 0),
-  );
-  const increase = useCartStore((state) => state.increase);
-  const decrease = useCartStore((state) => state.decrease);
-  const remove = useCartStore((state) => state.remove);
-  const setCouponCode = useCartStore((state) => state.setCouponCode);
-  const applyCoupon = useCartStore((state) => state.applyCoupon);
-  const clearCoupon = useCartStore((state) => state.clearCoupon);
-  const updateCheckout = useCartStore((state) => state.updateCheckout);
-  const replaceItems = useCartStore((state) => state.replaceItems);
-  const [toast, setToast] = useState("");
+  const items = useCartStore(state => state.items);
+  const hydrated = useCartStore(state => state.hydrated);
+  const couponCode = useCartStore(state => state.couponCode);
+  const appliedCoupon = useCartStore(state => state.appliedCoupon);
+  const couponVerification = useCartStore(state => state.couponVerification);
+  const isApplyingCoupon = useCartStore(state => state.isApplyingCoupon);
+  const clear = useCartStore(state => state.clear);
+  const checkout = useCartStore(state => state.checkout);
+  const count = useCartStore(state => state.items.reduce((sum, item) => sum + item.quantity, 0));
+  const increase = useCartStore(state => state.increase);
+  const decrease = useCartStore(state => state.decrease);
+  const remove = useCartStore(state => state.remove);
+  const setCouponCode = useCartStore(state => state.setCouponCode);
+  const applyCoupon = useCartStore(state => state.applyCoupon);
+  const clearCoupon = useCartStore(state => state.clearCoupon);
+  const updateCheckout = useCartStore(state => state.updateCheckout);
+  const replaceItems = useCartStore(state => state.replaceItems);
+  const [toast, setToast] = useState('');
 
   const fulfillment = calculateFulfillmentSummary({
     items,
     city: checkout.city,
-    address: checkout.address,
+    // address: checkout.address,
     couponSummary: couponVerification,
   });
   const paymentValue = getCheckoutPaymentLabel(checkout.payment);
   const selectedPayment =
-    paymentValue === CASH_ON_DELIVERY_LABEL && !fulfillment.codEligible
-      ? PORTPOS_LABEL
-      : paymentValue;
+    paymentValue === CASH_ON_DELIVERY_LABEL && !fulfillment.codEligible ? PORTPOS_LABEL : paymentValue;
   const discount = fulfillment.discount;
   const delivery = fulfillment.shippingCharge;
   const total = fulfillment.total;
@@ -69,39 +57,32 @@ export function CartPageClient() {
       return;
     }
 
-    updateCheckout("payment", PORTPOS_LABEL);
+    updateCheckout('payment', PORTPOS_LABEL);
   }, [checkout.payment, fulfillment.codEligible, paymentValue, updateCheckout]);
 
   useEffect(() => {
     let active = true;
 
     getMyCart()
-      .then((result) => {
+      .then(result => {
         if (!active || !result.success || !Array.isArray(result.data?.items)) {
           return;
         }
 
         replaceItems(
-          result.data.items.map((item) => {
-            const product = item.product as
-              | { _id?: string }
-              | string
-              | undefined;
-            const productId =
-              typeof product === "string" ? product : product?._id;
+          result.data.items.map(item => {
+            const product = item.product as { _id?: string } | string | undefined;
+            const productId = typeof product === 'string' ? product : product?._id;
 
             return {
               productId,
               sku: item.productSnapshot.sku,
               title: item.productSnapshot.title,
-              href: "/shop",
+              href: '/shop',
               image: item.productSnapshot.image,
               brand: item.productSnapshot.brand,
               unitPrice: item.priceSnapshot,
-              unitPriceLabel: formatPriceLabelWithUnit(
-                item.priceSnapshot,
-                item.productSnapshot.sellingUnit,
-              ),
+              unitPriceLabel: formatPriceLabelWithUnit(item.priceSnapshot, item.productSnapshot.sellingUnit),
               oldPriceLabel: undefined,
               quantity: item.quantity,
               sellingUnit: item.productSnapshot.sellingUnit,
@@ -132,17 +113,12 @@ export function CartPageClient() {
     <main className="flex-1 bg-background pb-16">
       <div className="mx-auto w-full max-w-310 px-4 py-6 lg:px-0">
         <Card className="p-6 shadow-sm sm:p-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">
-            Checkout
-          </p>
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">Checkout</p>
           <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-black text-secondary sm:text-4xl">
-                Cart
-              </h1>
+              <h1 className="text-3xl font-black text-secondary sm:text-4xl">Cart</h1>
               <p className="mt-3 text-sm leading-7 text-foreground/65 sm:text-base">
-                Your cart is saved in this browser and the navbar count stays in
-                sync.
+                Your cart is saved in this browser and the navbar count stays in sync.
               </p>
               <div className="mt-4 flex flex-wrap gap-2 text-xs font-semibold text-foreground/60">
                 <span className="rounded-full bg-muted px-3 py-1">
@@ -152,12 +128,12 @@ export function CartPageClient() {
                   Weight {fulfillment.totalWeightKg.toFixed(2)} kg
                 </span>
                 <span className="rounded-full bg-muted px-3 py-1">
-                  COD {fulfillment.codEligible ? "available" : "restricted"}
+                  COD {fulfillment.codEligible ? 'available' : 'restricted'}
                 </span>
               </div>
             </div>
             <div className="rounded-full bg-muted px-4 py-2 text-sm font-semibold text-foreground/70">
-              {count} item{count === 1 ? "" : "s"}
+              {count} item{count === 1 ? '' : 's'}
             </div>
           </div>
         </Card>
@@ -165,21 +141,13 @@ export function CartPageClient() {
         <section className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
           <Card className="space-y-4 p-6 shadow-sm">
             {items.length > 0 ? (
-              items.map((item) => (
-                <div
-                  key={item.sku}
-                  className="flex gap-4 rounded-2xl border border-border p-4"
-                >
+              items.map(item => (
+                <div key={item.sku} className="flex gap-4 rounded-2xl border border-border p-4">
                   <Link
                     href={item.href}
                     className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl bg-muted"
                   >
-                    <Image
-                      src={item.image}
-                      alt={item.title}
-                      fill
-                      className="object-contain p-2"
-                    />
+                    <Image src={item.image} alt={item.title} fill className="object-contain p-2" />
                   </Link>
                   <div className="min-w-0 flex-1">
                     <Link
@@ -191,9 +159,7 @@ export function CartPageClient() {
                     <div className="mt-1 text-sm text-foreground/55">
                       SKU {item.sku} · {item.brand}
                     </div>
-                    <div className="mt-2 text-sm font-bold text-primary">
-                      {item.unitPriceLabel}
-                    </div>
+                    <div className="mt-2 text-sm font-bold text-primary">{item.unitPriceLabel}</div>
                   </div>
                   <div className="flex flex-col items-end gap-3">
                     <div className="flex items-center gap-2 rounded-full border border-border px-2 py-1">
@@ -216,9 +182,7 @@ export function CartPageClient() {
                       >
                         −
                       </Button>
-                      <span className="min-w-6 text-center text-sm font-semibold">
-                        {item.quantity}
-                      </span>
+                      <span className="min-w-6 text-center text-sm font-semibold">{item.quantity}</span>
                       <Button
                         type="button"
                         variant="ghost"
@@ -226,10 +190,7 @@ export function CartPageClient() {
                           const nextQuantity = item.quantity + 1;
                           increase(item.sku);
                           if (item.productId) {
-                            void updateCartItem(
-                              item.productId,
-                              nextQuantity,
-                            ).catch(() => null);
+                            void updateCartItem(item.productId, nextQuantity).catch(() => null);
                           }
                         }}
                         className="h-auto px-2 text-lg leading-none text-foreground/70 hover:bg-transparent"
@@ -258,9 +219,7 @@ export function CartPageClient() {
               ))
             ) : (
               <div className="rounded-3xl border border-dashed border-border p-8 text-center">
-                <div className="text-lg font-black text-primary">
-                  Your cart is empty
-                </div>
+                <div className="text-lg font-black text-primary">Your cart is empty</div>
                 <p className="mt-2 text-sm text-foreground/55">
                   Start browsing the catalog and add products to save them here.
                 </p>
@@ -277,7 +236,7 @@ export function CartPageClient() {
               <div className="flex flex-wrap items-center gap-3">
                 <Input
                   value={couponCode}
-                  onChange={(event) => setCouponCode(event.target.value)}
+                  onChange={event => setCouponCode(event.target.value)}
                   placeholder="Coupon code"
                 />
                 <Button
@@ -287,19 +246,19 @@ export function CartPageClient() {
                     void (async () => {
                       const result = await applyCoupon();
                       setToast(result.message);
-                      window.setTimeout(() => setToast(""), 2200);
+                      window.setTimeout(() => setToast(''), 2200);
                     })();
                   }}
                   className="h-11 rounded-full px-5 text-sm font-bold shadow-sm"
                 >
-                  {isApplyingCoupon ? "Verifying..." : "Apply coupon"}
+                  {isApplyingCoupon ? 'Verifying...' : 'Apply coupon'}
                 </Button>
                 {appliedCoupon ? (
                   <Button
                     type="button"
                     onClick={() => {
                       clearCoupon();
-                      setToast("");
+                      setToast('');
                     }}
                     variant="outline"
                     className="h-11 rounded-full border-border px-5 text-sm font-semibold text-foreground/70"
@@ -311,13 +270,12 @@ export function CartPageClient() {
               <div className="mt-3 text-sm text-foreground/55">
                 {appliedCoupon
                   ? `Applied ${appliedCoupon.code} · ${appliedCoupon.label}`
-                  : couponVerification?.message ||
-                    "Enter a coupon code issued by the admin."}
+                  : couponVerification?.message || 'Enter a coupon code issued by the admin.'}
               </div>
             </Card>
           </Card>
 
-          <Card className="border-0 bg-secondary p-6 text-secondary-foreground shadow-sm">
+          <Card className="border-0 bg-secondary p-6 text-secondary-foreground shadow-sm h-fit">
             <h2 className="text-2xl font-black">Order summary</h2>
             <div className="mt-4 space-y-3 text-sm text-secondary-foreground/80">
               <div className="flex justify-between">
@@ -345,20 +303,17 @@ export function CartPageClient() {
             </div>
             {!fulfillment.codEligible ? (
               <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-                {fulfillment.codReasons.join(" ")}
+                {fulfillment.codReasons.join(' ')}
               </div>
             ) : null}
             <div className="mt-6 grid gap-3">
-              <Button
+              {/* <Button
                 asChild
                 className="h-11 rounded-full px-6 text-sm font-bold shadow-sm"
               >
                 <Link href="/quotation-request">Request quotation</Link>
-              </Button>
-              <Button
-                asChild
-                className="h-11 rounded-full px-6 text-sm font-bold shadow-sm"
-              >
+              </Button> */}
+              <Button asChild className="h-11 rounded-full px-6 text-sm font-bold shadow-sm">
                 <Link href="/checkout">Proceed to checkout</Link>
               </Button>
               <Button
@@ -376,15 +331,11 @@ export function CartPageClient() {
           </Card>
         </section>
 
-        <Card className="mt-6 p-6 shadow-sm sm:p-8">
+        {/* <Card className="mt-6 p-6 shadow-sm sm:p-8">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-black text-secondary">
-                Checkout details
-              </h2>
-              <p className="mt-2 text-sm text-foreground/55">
-                These fields stay saved in this browser.
-              </p>
+              <h2 className="text-2xl font-black text-secondary">Checkout details</h2>
+              <p className="mt-2 text-sm text-foreground/55">These fields stay saved in this browser.</p>
             </div>
             <div className="rounded-full bg-muted px-4 py-2 text-sm font-semibold text-foreground/70">
               Persisted checkout form
@@ -395,23 +346,17 @@ export function CartPageClient() {
 
           <div className="grid gap-4 lg:grid-cols-2">
             {[
-              ["name", "Full name", checkout.name],
-              ["phone", "Phone number", checkout.phone],
-              ["email", "Email address", checkout.email],
-              ["city", "City", checkout.city],
+              ['name', 'Full name', checkout.name],
+              ['phone', 'Phone number', checkout.phone],
+              ['email', 'Email address', checkout.email],
+              ['city', 'City', checkout.city],
             ].map(([key, label, value]) => (
-              <label
-                key={key}
-                className="grid gap-2 text-sm font-semibold text-foreground"
-              >
+              <label key={key} className="grid gap-2 text-sm font-semibold text-foreground">
                 {label}
                 <Input
                   value={value}
-                  onChange={(event) =>
-                    updateCheckout(
-                      key as "name" | "phone" | "email" | "city",
-                      event.target.value,
-                    )
+                  onChange={event =>
+                    updateCheckout(key as 'name' | 'phone' | 'email' | 'city', event.target.value)
                   }
                 />
               </label>
@@ -420,9 +365,7 @@ export function CartPageClient() {
               Delivery address
               <Textarea
                 value={checkout.address}
-                onChange={(event) =>
-                  updateCheckout("address", event.target.value)
-                }
+                onChange={event => updateCheckout('address', event.target.value)}
                 className="min-h-28"
               />
             </label>
@@ -430,7 +373,7 @@ export function CartPageClient() {
               Order note
               <Textarea
                 value={checkout.note}
-                onChange={(event) => updateCheckout("note", event.target.value)}
+                onChange={event => updateCheckout('note', event.target.value)}
                 className="min-h-24"
               />
             </label>
@@ -438,19 +381,14 @@ export function CartPageClient() {
               Payment method
               <select
                 value={selectedPayment}
-                onChange={(event) =>
-                  updateCheckout("payment", event.target.value)
-                }
+                onChange={event => updateCheckout('payment', event.target.value)}
                 className="h-11 rounded-2xl border border-input bg-background px-4 outline-none"
               >
-                {CHECKOUT_PAYMENT_OPTIONS.map((option) => (
+                {CHECKOUT_PAYMENT_OPTIONS.map(option => (
                   <option
                     key={option}
                     value={option}
-                    disabled={
-                      option === CASH_ON_DELIVERY_LABEL &&
-                      !fulfillment.codEligible
-                    }
+                    disabled={option === CASH_ON_DELIVERY_LABEL && !fulfillment.codEligible}
                   >
                     {option}
                   </option>
@@ -458,7 +396,7 @@ export function CartPageClient() {
               </select>
             </label>
           </div>
-        </Card>
+        </Card> */}
 
         {toast ? (
           <div className="fixed right-4 top-4 z-50 rounded-2xl bg-secondary px-4 py-3 text-sm font-semibold text-secondary-foreground shadow-lg">

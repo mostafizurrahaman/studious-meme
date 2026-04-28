@@ -4,21 +4,31 @@ import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { TablePagination } from "@/components/ui/table-pagination";
 import { formatMoney, formatPriceLabelWithUnit, type CartItem } from "@/lib/cart";
 import { formatDashboardDate } from "@/lib/formatDate";
 import { useCartStore } from "@/lib/cart-store";
 import type { BackendOrder } from "@/services/Order";
 import { OrderReviewDialog } from "@/components/OrderReviewDialog";
+import { useRouter } from "next/navigation";
 
 export function OrdersPageClient({
   orders,
   baseHref = "/dashboard/user",
+  paginationMeta,
 }: {
   orders: BackendOrder[];
   baseHref?: string;
+  paginationMeta?: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 }) {
   const [reviewOrder, setReviewOrder] = useState<BackendOrder | null>(null);
   const addItems = useCartStore((state) => state.addItems);
+  const router = useRouter();
 
   const toCartItems = (order: BackendOrder): CartItem[] =>
     order.items.map((item) => ({
@@ -153,6 +163,21 @@ export function OrdersPageClient({
           )}
         </section>
       </div>
+      {paginationMeta && paginationMeta.total > 0 ? (
+        <div className="mt-6">
+          <TablePagination
+            page={paginationMeta.page}
+            limit={paginationMeta.limit}
+            total={paginationMeta.total}
+            onPageChange={(page) =>
+              router.push(`${baseHref}/orders?page=${page}&limit=${paginationMeta.limit}`)
+            }
+            onLimitChange={(limit) =>
+              router.push(`${baseHref}/orders?page=1&limit=${limit}`)
+            }
+          />
+        </div>
+      ) : null}
       {reviewOrder ? (
         <OrderReviewDialog
           order={reviewOrder}

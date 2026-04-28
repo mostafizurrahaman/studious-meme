@@ -60,6 +60,10 @@ export type BackendOrder = {
   updatedAt: string;
 };
 
+export type PaginatedBackendEnvelope<T> = BackendEnvelope<T> & {
+  meta?: { page: number; limit: number; total: number; totalPages: number };
+};
+
 export type CreateOrderPayload = {
   items: Array<{ sku: string; quantity: number }>;
   customer: {
@@ -113,12 +117,27 @@ export const previewCheckout = async (
   );
 };
 
-export const getMyOrders = async (): Promise<
-  BackendEnvelope<BackendOrder[]>
-> => {
+type UserListParams = {
+  page?: number;
+  limit?: number;
+};
+
+const buildUserListQuery = (params: UserListParams = {}) => {
+  const searchParams = new URLSearchParams();
+
+  if (params.page) searchParams.set("page", String(params.page));
+  if (params.limit) searchParams.set("limit", String(params.limit));
+
+  const query = searchParams.toString();
+  return query ? `?${query}` : "";
+};
+
+export const getMyOrders = async (
+  params: UserListParams = {},
+): Promise<PaginatedBackendEnvelope<BackendOrder[]>> => {
   const accessToken = await getValidAccessTokenForServerHandlerGet();
-  return requestBackendJson<BackendEnvelope<BackendOrder[]>>(
-    "/order/my-orders",
+  return requestBackendJson<PaginatedBackendEnvelope<BackendOrder[]>>(
+    `/order/my-orders${buildUserListQuery(params)}`,
     {
       method: "GET",
       token: accessToken ?? undefined,
@@ -174,7 +193,7 @@ export const getOrderById = async (
 ): Promise<BackendEnvelope<BackendOrder>> => {
   const accessToken = await getValidAccessTokenForServerHandlerGet();
   return requestBackendJson<BackendEnvelope<BackendOrder>>(
-    `/order/admin/orders/${orderId}`,
+    `/order/orders/${orderId}`,
     {
       method: "GET",
       token: accessToken ?? undefined,
