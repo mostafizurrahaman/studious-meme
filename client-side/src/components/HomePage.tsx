@@ -147,7 +147,7 @@ export async function HomePage({ heroContent }: HomePageProps) {
           <SectionMarquee />
         </div> */}
 
-        <section className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {/* <section className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {[
             { label: 'FASTEST DELIVERY POSSIBLE', icon: Zap },
             { label: 'SECURE PAYMENT SYSTEM', icon: ShieldCheck },
@@ -164,7 +164,7 @@ export async function HomePage({ heroContent }: HomePageProps) {
               <div className="text-[11px] font-extrabold tracking-[0.18em] text-secondary">{label}</div>
             </div>
           ))}
-        </section>
+        </section> */}
 
         <Card className="mt-8 shadow-sm">
           <CardHeader className="px-5 pb-0 pt-5 sm:px-6">
