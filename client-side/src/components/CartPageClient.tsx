@@ -11,12 +11,6 @@ import { Input } from '@/components/ui/input';
 import { formatMoney, formatPriceLabelWithUnit } from '@/lib/cart';
 import { useCartStore } from '@/lib/cart-store';
 import { calculateFulfillmentSummary, formatShippingZoneLabel } from '@/lib/fulfillment';
-import {
-  CASH_ON_DELIVERY_LABEL,
-  // CHECKOUT_PAYMENT_OPTIONS,
-  PORTPOS_LABEL,
-  getCheckoutPaymentLabel,
-} from '@/lib/payment-method';
 import { clearCart as clearCartPersisted, getMyCart, removeCartItem, updateCartItem } from '@/services/Cart';
 
 export function CartPageClient() {
@@ -35,7 +29,6 @@ export function CartPageClient() {
   const setCouponCode = useCartStore(state => state.setCouponCode);
   const applyCoupon = useCartStore(state => state.applyCoupon);
   const clearCoupon = useCartStore(state => state.clearCoupon);
-  const updateCheckout = useCartStore(state => state.updateCheckout);
   const replaceItems = useCartStore(state => state.replaceItems);
   const [toast, setToast] = useState('');
 
@@ -45,20 +38,9 @@ export function CartPageClient() {
     // address: checkout.address,
     couponSummary: couponVerification,
   });
-  const paymentValue = getCheckoutPaymentLabel(checkout.payment);
-  const selectedPayment =
-    paymentValue === CASH_ON_DELIVERY_LABEL && !fulfillment.codEligible ? PORTPOS_LABEL : paymentValue;
   const discount = fulfillment.discount;
   const delivery = fulfillment.shippingCharge;
   const total = fulfillment.total;
-
-  useEffect(() => {
-    if (fulfillment.codEligible || paymentValue !== CASH_ON_DELIVERY_LABEL) {
-      return;
-    }
-
-    updateCheckout('payment', PORTPOS_LABEL);
-  }, [checkout.payment, fulfillment.codEligible, paymentValue, updateCheckout]);
 
   useEffect(() => {
     let active = true;
@@ -101,7 +83,7 @@ export function CartPageClient() {
 
   if (!hydrated) {
     return (
-      <main className="flex-1 bg-background pb-16">
+      <main className="flex-1 overflow-x-hidden bg-background pb-16">
         <div className="mx-auto w-full max-w-310 px-4 py-6 lg:px-0">
           <Card className="p-6 shadow-sm">Loading cart...</Card>
         </div>
@@ -110,7 +92,7 @@ export function CartPageClient() {
   }
 
   return (
-    <main className="flex-1 bg-background pb-16">
+    <main className="flex-1 overflow-x-hidden bg-background pb-16">
       <div className="mx-auto w-full max-w-310 px-4 py-6 lg:px-0">
         <Card className="p-6 shadow-sm sm:p-8">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">Checkout</p>
@@ -139,10 +121,10 @@ export function CartPageClient() {
         </Card>
 
         <section className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-          <Card className="space-y-4 p-6 shadow-sm">
+          <Card className="space-y-4 overflow-hidden p-6 shadow-sm">
             {items.length > 0 ? (
               items.map(item => (
-                <div key={item.sku} className="flex gap-4 rounded-2xl border border-border p-4">
+                <div key={item.sku} className="flex flex-col gap-4 rounded-2xl border border-border p-4 sm:flex-row">
                   <Link
                     href={item.href}
                     className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl bg-muted"
@@ -161,7 +143,7 @@ export function CartPageClient() {
                     </div>
                     <div className="mt-2 text-sm font-bold text-primary">{item.unitPriceLabel}</div>
                   </div>
-                  <div className="flex flex-col items-end gap-3">
+                  <div className="flex w-full flex-col items-start gap-2 sm:ml-auto sm:w-auto sm:items-end">
                     <div className="flex items-center gap-2 rounded-full border border-border px-2 py-1">
                       <Button
                         type="button"
@@ -210,7 +192,7 @@ export function CartPageClient() {
                           void removeCartItem(item.productId).catch(() => null);
                         }
                       }}
-                      className="h-auto p-0 text-xs font-semibold text-primary"
+                      className="h-auto p-0 text-xs font-semibold text-primary self-start sm:self-end"
                     >
                       Remove
                     </Button>
