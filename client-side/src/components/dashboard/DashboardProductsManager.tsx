@@ -1258,7 +1258,11 @@ export function DashboardProductsManager({
                           {product.isNoCOD ? 'Blocked' : 'Allowed'}
                         </Badge>
                       </TableCell>
-                      <TableCell className="min-w-0">{product.weightKg.toFixed(2)} kg</TableCell>
+                      <TableCell className="min-w-0">
+                        {typeof product.weightKg === 'number'
+                          ? `${product.weightKg.toFixed(2)} kg`
+                          : '-'}
+                      </TableCell>
                       <TableCell className="min-w-0">
                         {formatPriceLabelWithUnit(product.price, product.sellingUnit)}
                       </TableCell>
