@@ -1,7 +1,10 @@
 import { z } from 'zod';
 
 const objectIdSchema = z.string({ error: 'ID is required!' }).trim().min(1, { message: 'ID is required!' });
-const productRefSchema = z.string({ error: 'Product is required!' }).trim().min(1, { message: 'Product is required!' });
+const productRefSchema = z
+  .string({ error: 'Product is required!' })
+  .trim()
+  .min(1, { message: 'Product is required!' });
 
 const reviewImagesSchema = z
   .array(z.string().trim().min(1))
@@ -32,14 +35,11 @@ const manualCreateReviewSchema = z.object({
       .trim()
       .min(1, { message: 'Display name is required!' })
       .max(100, { message: 'Display name cannot exceed 100 characters!' }),
-    displayImage: z
-      .string({ error: 'Display image is required!' })
-      .trim()
-      .min(1, { message: 'Display image is required!' }),
     rating: z.coerce
       .number({ error: 'Rating is required!' })
       .min(1, { message: 'Rating must be at least 1!' })
       .max(5, { message: 'Rating cannot exceed 5!' }),
+
     comment: z
       .string({ error: 'Comment is required!' })
       .trim()

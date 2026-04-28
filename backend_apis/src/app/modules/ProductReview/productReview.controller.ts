@@ -6,8 +6,12 @@ import { ProductReviewService } from './productReview.service';
 
 const getParam = (value: string | string[]) => (Array.isArray(value) ? value[0] : value);
 
+const flattenUploadedFiles = (
+  files: Express.Multer.File[] | Record<string, Express.Multer.File[]> | undefined,
+) => (Array.isArray(files) ? files : Object.values(files ?? {}).flat());
+
 const createCustomerReview = asyncHandler(async (req, res) => {
-  const payload = await uploadFilesAndInjectUrls(req.body, (req.files ?? []) as Express.Multer.File[]);
+  const payload = await uploadFilesAndInjectUrls(req.body, flattenUploadedFiles(req.files));
   const result = await ProductReviewService.createCustomerReviewIntoDB(req.user, payload);
 
   sendResponse(res, {
@@ -18,7 +22,7 @@ const createCustomerReview = asyncHandler(async (req, res) => {
 });
 
 const createManualReview = asyncHandler(async (req, res) => {
-  const payload = await uploadFilesAndInjectUrls(req.body, (req.files ?? []) as Express.Multer.File[]);
+  const payload = await uploadFilesAndInjectUrls(req.body, flattenUploadedFiles(req.files));
   const result = await ProductReviewService.createManualReviewIntoDB(req.user, payload);
 
   sendResponse(res, {
@@ -56,7 +60,7 @@ const getAllReviews = asyncHandler(async (req, res) => {
 });
 
 const updateReview = asyncHandler(async (req, res) => {
-  const payload = await uploadFilesAndInjectUrls(req.body, (req.files ?? []) as Express.Multer.File[]);
+  const payload = await uploadFilesAndInjectUrls(req.body, flattenUploadedFiles(req.files));
   const result = await ProductReviewService.updateReviewIntoDB(getParam(req.params.id), payload, req.user);
 
   sendResponse(res, {

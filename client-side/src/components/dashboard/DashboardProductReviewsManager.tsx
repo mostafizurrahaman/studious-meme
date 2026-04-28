@@ -7,18 +7,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 import { toast } from 'sonner';
-import {
-  Ban,
-  CheckCircle2,
-  Eye,
-  EyeOff,
-  Link2,
-  Loader2,
-  PencilLine,
-  Plus,
-  Star,
-  Trash2,
-} from 'lucide-react';
+import { Ban, CheckCircle2, Eye, EyeOff, Link2, Loader2, PencilLine, Plus, Star, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -30,7 +19,14 @@ import { TableFilter } from '@/components/ui/table-filter';
 import { TablePagination } from '@/components/ui/table-pagination';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { formatDashboardDate } from '@/lib/formatDate';
 import { makeZodResolver } from '@/lib/form-validation';
 import {
@@ -52,8 +48,11 @@ const reviewFormSchema = z.object({
     .trim()
     .min(1, { message: 'Display name is required!' })
     .max(100, { message: 'Display name cannot exceed 100 characters!' }),
-  displayImage: z.string({ error: 'Display image is required!' }).trim().min(1, { message: 'Display image is required!' }),
-  rating: z.coerce.number({ error: 'Rating is required!' }).min(1, { message: 'Rating must be at least 1!' }).max(5, { message: 'Rating cannot exceed 5!' }),
+  displayImage: z.string().trim().optional(),
+  rating: z.coerce
+    .number({ error: 'Rating is required!' })
+    .min(1, { message: 'Rating must be at least 1!' })
+    .max(5, { message: 'Rating cannot exceed 5!' }),
   comment: z
     .string({ error: 'Comment is required!' })
     .trim()
@@ -137,13 +136,29 @@ function UserRefName(
 function statusBadge(status: ReviewStatus) {
   switch (status) {
     case 'approved':
-      return <Badge className="rounded-full bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/10">Approved</Badge>;
+      return (
+        <Badge className="rounded-full bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/10">
+          Approved
+        </Badge>
+      );
     case 'pending':
-      return <Badge variant="secondary" className="rounded-full">Pending</Badge>;
+      return (
+        <Badge variant="secondary" className="rounded-full">
+          Pending
+        </Badge>
+      );
     case 'rejected':
-      return <Badge variant="destructive" className="rounded-full text-white!">Rejected</Badge>;
+      return (
+        <Badge variant="destructive" className="rounded-full text-white!">
+          Rejected
+        </Badge>
+      );
     case 'hidden':
-      return <Badge variant="outline" className="rounded-full">Hidden</Badge>;
+      return (
+        <Badge variant="outline" className="rounded-full">
+          Hidden
+        </Badge>
+      );
     default:
       return <Badge variant="secondary">{status}</Badge>;
   }
@@ -151,9 +166,13 @@ function statusBadge(status: ReviewStatus) {
 
 function sourceBadge(source: ReviewSource) {
   return source === 'customer' ? (
-    <Badge variant="secondary" className="rounded-full">Customer</Badge>
+    <Badge variant="secondary" className="rounded-full">
+      Customer
+    </Badge>
   ) : (
-    <Badge variant="outline" className="rounded-full">Manual</Badge>
+    <Badge variant="outline" className="rounded-full">
+      Manual
+    </Badge>
   );
 }
 
@@ -161,7 +180,14 @@ function Stars({ rating }: { rating: number }) {
   return (
     <div className="flex items-center gap-0.5">
       {Array.from({ length: 5 }, (_, index) => (
-        <Star key={index} className={index < Math.round(rating) ? 'size-4 fill-primary text-primary' : 'size-4 text-muted-foreground/35'} />
+        <Star
+          key={index}
+          className={
+            index < Math.round(rating)
+              ? 'size-4 fill-primary text-primary'
+              : 'size-4 text-muted-foreground/35'
+          }
+        />
       ))}
     </div>
   );
@@ -216,12 +242,13 @@ function ReviewDialogContent({
     },
     mode: 'onTouched',
   });
-  const [imageFields, setImageFields] = useState<string[]>(['']);
+  const [reviewImageFiles, setReviewImageFiles] = useState<File[]>([]);
+  const [displayImageFile, setDisplayImageFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (!review) return;
 
-    const productValue = typeof review.product === 'string' ? review.product : review.product?._id ?? '';
+    const productValue = typeof review.product === 'string' ? review.product : (review.product?._id ?? '');
     form.reset({
       product: productValue,
       displayName: review.displayName,
@@ -231,34 +258,29 @@ function ReviewDialogContent({
       status: review.status,
       images: review.images ?? [],
     });
-    setImageFields(review.images?.length ? review.images : ['']);
+    setReviewImageFiles([]);
+    setDisplayImageFile(null);
   }, [form, review]);
 
   const reviewStatus = useWatch({ control: form.control, name: 'status' }) ?? 'approved';
 
-  function addImageField() {
-    setImageFields(current => (current.length >= MAX_REVIEW_IMAGES ? current : [...current, '']));
-  }
-
-  function removeImageField(index: number) {
-    setImageFields(current => (current.length <= 1 ? [''] : current.filter((_, itemIndex) => itemIndex !== index)));
-  }
-
-  function updateImageField(index: number, value: string) {
-    setImageFields(current => current.map((item, itemIndex) => (itemIndex === index ? value : item)));
+  function handleReviewImageFiles(files?: FileList | File[]) {
+    setReviewImageFiles(Array.from(files ?? []).slice(0, MAX_REVIEW_IMAGES));
   }
 
   function submit(values: ReviewFormValues) {
     if (!review?._id) return;
 
+    const displayImage = displayImageFile ?? values.displayImage?.trim() ?? review.displayImage?.trim() ?? '';
+
     startTransition(async () => {
       const result = await updateProductReview(review._id!, {
         displayName: values.displayName,
-        displayImage: values.displayImage,
+        displayImage,
         rating: values.rating,
         comment: values.comment,
         status: values.status,
-        images: imageFields.map(image => image.trim()).filter(Boolean),
+        images: reviewImageFiles.length > 0 ? reviewImageFiles : (review.images ?? []),
       });
 
       if (!result.success) {
@@ -280,27 +302,41 @@ function ReviewDialogContent({
       <DialogHeader>
         <DialogTitle>{isEdit ? 'Edit review' : 'Review details'}</DialogTitle>
         <DialogDescription>
-          {isEdit ? 'Update reviewer details, content, or status.' : 'Review the product review record and moderation history.'}
+          {isEdit
+            ? 'Update reviewer details, content, or status.'
+            : 'Review the product review record and moderation history.'}
         </DialogDescription>
       </DialogHeader>
 
       <div className="space-y-4">
         <div className="grid gap-3 md:grid-cols-2">
           <div className="rounded-2xl border bg-muted/20 p-3 text-sm">
-            <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Product</div>
+            <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+              Product
+            </div>
             <div className="mt-2 font-medium">{ProductRefName(review.product)}</div>
             {ProductRefSlug(review.product) ? (
-              <Link href={`/product/${ProductRefSlug(review.product)}`} target="_blank" className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+              <Link
+                href={`/product/${ProductRefSlug(review.product)}`}
+                target="_blank"
+                className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+              >
                 Visit product <Link2 className="size-3.5" />
               </Link>
             ) : null}
           </div>
           <div className="rounded-2xl border bg-muted/20 p-3 text-sm">
-            <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Internal</div>
+            <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+              Internal
+            </div>
             <div className="mt-2 flex flex-wrap gap-2">
               {sourceBadge(review.source)}
               {statusBadge(review.status)}
-              {review.isVerifiedPurchase ? <Badge className="rounded-full bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/10">Verified purchase</Badge> : null}
+              {review.isVerifiedPurchase ? (
+                <Badge className="rounded-full bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/10">
+                  Verified purchase
+                </Badge>
+              ) : null}
             </div>
             <div className="mt-3 grid gap-2 text-xs text-muted-foreground">
               <div>User: {UserRefName(review.user)}</div>
@@ -316,21 +352,64 @@ function ReviewDialogContent({
               <div className="space-y-2">
                 <div className="text-xs font-medium text-muted-foreground">Display name</div>
                 <Input placeholder="Reviewer name" {...form.register('displayName')} />
-                {form.formState.errors.displayName?.message ? <p className="text-xs text-destructive">{form.formState.errors.displayName.message}</p> : null}
+                {form.formState.errors.displayName?.message ? (
+                  <p className="text-xs text-destructive">{form.formState.errors.displayName.message}</p>
+                ) : null}
               </div>
               <div className="space-y-2">
-                <div className="text-xs font-medium text-muted-foreground">Display image URL</div>
-                <Input placeholder="https://..." {...form.register('displayImage')} />
-                {form.formState.errors.displayImage?.message ? <p className="text-xs text-destructive">{form.formState.errors.displayImage.message}</p> : null}
+                <div className="flex items-center justify-between gap-3 text-xs font-medium text-muted-foreground">
+                  <span>Display image</span>
+                  <span>
+                    {displayImageFile
+                      ? displayImageFile.name
+                      : review.displayImage
+                        ? 'Current image kept'
+                        : 'Optional'}
+                  </span>
+                </div>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={event => {
+                    setDisplayImageFile(event.target.files?.[0] ?? null);
+                    form.clearErrors('displayImage');
+                  }}
+                />
+                {review.displayImage ? (
+                  <div className="flex items-center gap-3 rounded-2xl border bg-muted/20 p-3 text-xs text-muted-foreground">
+                    <div className="relative size-10 overflow-hidden rounded-full bg-muted">
+                      <Image
+                        src={review.displayImage}
+                        alt={review.displayName}
+                        fill
+                        sizes="40px"
+                        className="object-cover"
+                      />
+                    </div>
+                    <span>
+                      {displayImageFile
+                        ? 'New upload selected'
+                        : 'Current image will stay unless you upload a new one.'}
+                    </span>
+                  </div>
+                ) : null}
+                {form.formState.errors.displayImage?.message ? (
+                  <p className="text-xs text-destructive">{form.formState.errors.displayImage.message}</p>
+                ) : null}
               </div>
               <div className="space-y-2">
                 <div className="text-xs font-medium text-muted-foreground">Rating</div>
                 <Input type="number" min={1} max={5} step="1" {...form.register('rating')} />
-                {form.formState.errors.rating?.message ? <p className="text-xs text-destructive">{form.formState.errors.rating.message}</p> : null}
+                {form.formState.errors.rating?.message ? (
+                  <p className="text-xs text-destructive">{form.formState.errors.rating.message}</p>
+                ) : null}
               </div>
               <div className="space-y-2">
                 <div className="text-xs font-medium text-muted-foreground">Status</div>
-                <Select value={reviewStatus} onValueChange={(value) => form.setValue('status', value as ReviewStatus)}>
+                <Select
+                  value={reviewStatus}
+                  onValueChange={value => form.setValue('status', value as ReviewStatus)}
+                >
                   <SelectTrigger className="h-11 rounded-xl">
                     <SelectValue />
                   </SelectTrigger>
@@ -347,30 +426,39 @@ function ReviewDialogContent({
             <div className="space-y-2">
               <div className="text-xs font-medium text-muted-foreground">Comment</div>
               <Textarea className="min-h-28 rounded-2xl" {...form.register('comment')} />
-              {form.formState.errors.comment?.message ? <p className="text-xs text-destructive">{form.formState.errors.comment.message}</p> : null}
+              {form.formState.errors.comment?.message ? (
+                <p className="text-xs text-destructive">{form.formState.errors.comment.message}</p>
+              ) : null}
             </div>
 
-            <div className="space-y-2">
-              <div className="flex items-center justify-between gap-3 text-xs font-medium text-muted-foreground">
-                <span>Images</span>
-                <Button type="button" variant="outline" size="sm" onClick={addImageField} disabled={imageFields.length >= MAX_REVIEW_IMAGES}>
-                  Add image
-                </Button>
-              </div>
               <div className="space-y-2">
-                {imageFields.map((image, index) => (
-                  <div key={`${index}-${image}`} className="flex gap-2">
-                    <Input value={image} onChange={(e) => updateImageField(index, e.target.value)} placeholder={`Image URL ${index + 1}`} />
-                    <Button type="button" variant="outline" onClick={() => removeImageField(index)} disabled={imageFields.length === 1}>
-                      Remove
-                    </Button>
+                <div className="flex items-center justify-between gap-3 text-xs font-medium text-muted-foreground">
+                  <span>Images</span>
+                  <span>
+                    {reviewImageFiles.length > 0
+                      ? `${reviewImageFiles.length} file${reviewImageFiles.length === 1 ? '' : 's'} selected`
+                      : `Optional upload up to ${MAX_REVIEW_IMAGES}`}
+                  </span>
+                </div>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={event => handleReviewImageFiles(event.target.files ?? undefined)}
+                />
+                {reviewImageFiles.length > 0 ? (
+                  <div className="space-y-1 rounded-2xl border bg-muted/20 p-3 text-xs text-muted-foreground">
+                    {reviewImageFiles.map(file => (
+                      <div key={file.name}>{file.name}</div>
+                    ))}
                   </div>
-                ))}
+                ) : null}
               </div>
-            </div>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={onClose} disabled={isPending}>Cancel</Button>
+              <Button type="button" variant="outline" onClick={onClose} disabled={isPending}>
+                Cancel
+              </Button>
               <Button type="submit" disabled={isPending}>
                 {isPending ? <Loader2 className="size-4 animate-spin" /> : null}
                 Save review
@@ -381,7 +469,13 @@ function ReviewDialogContent({
           <>
             <div className="grid gap-3 md:grid-cols-[auto_minmax(0,1fr)]">
               <div className="relative size-16 overflow-hidden rounded-full bg-muted">
-                <Image src={review.displayImage} alt={review.displayName} fill sizes="64px" className="object-cover" />
+                <Image
+                  src={review.displayImage}
+                  alt={review.displayName}
+                  fill
+                  sizes="64px"
+                  className="object-cover"
+                />
               </div>
               <div>
                 <div className="flex flex-wrap items-center gap-2">
@@ -401,8 +495,17 @@ function ReviewDialogContent({
             {Array.isArray(review.images) && review.images.length > 0 ? (
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {review.images.map((image, index) => (
-                  <div key={`${image}-${index}`} className="relative aspect-square overflow-hidden rounded-xl bg-muted">
-                    <Image src={image} alt={`${review.displayName} review image ${index + 1}`} fill sizes="160px" className="object-cover" />
+                  <div
+                    key={`${image}-${index}`}
+                    className="relative aspect-square overflow-hidden rounded-xl bg-muted"
+                  >
+                    <Image
+                      src={image}
+                      alt={`${review.displayName} review image ${index + 1}`}
+                      fill
+                      sizes="160px"
+                      className="object-cover"
+                    />
                   </div>
                 ))}
               </div>
@@ -414,7 +517,9 @@ function ReviewDialogContent({
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={onClose}>Close</Button>
+              <Button type="button" variant="outline" onClick={onClose}>
+                Close
+              </Button>
             </DialogFooter>
           </>
         )}
@@ -454,8 +559,12 @@ export function DashboardProductReviewsManager({
   const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
   const [pendingDeleteReview, setPendingDeleteReview] = useState<ProductReviewRecord | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [createImageFields, setCreateImageFields] = useState<string[]>(['']);
-  const [pendingStatusChange, setPendingStatusChange] = useState<{ review: ProductReviewRecord; status: ReviewStatus } | null>(null);
+  const [createDisplayImageFile, setCreateDisplayImageFile] = useState<File | null>(null);
+  const [createReviewImageFiles, setCreateReviewImageFiles] = useState<File[]>([]);
+  const [pendingStatusChange, setPendingStatusChange] = useState<{
+    review: ProductReviewRecord;
+    status: ReviewStatus;
+  } | null>(null);
   const createForm = useForm<ReviewFormValues>({
     resolver: makeZodResolver(reviewFormSchema),
     defaultValues: {
@@ -531,7 +640,22 @@ export function DashboardProductReviewsManager({
 
       router.push(`${pathname}?${params.toString()}`);
     },
-    [createdFromFilter, createdToFilter, pathname, paginationMeta.limit, paginationMeta.page, productFilter, ratingFilter, router, search, searchParams, sortFilter, sourceFilter, statusFilter, userFilter],
+    [
+      createdFromFilter,
+      createdToFilter,
+      pathname,
+      paginationMeta.limit,
+      paginationMeta.page,
+      productFilter,
+      ratingFilter,
+      router,
+      search,
+      searchParams,
+      sortFilter,
+      sourceFilter,
+      statusFilter,
+      userFilter,
+    ],
   );
 
   function refresh(message: string, type: 'success' | 'error') {
@@ -593,6 +717,7 @@ export function DashboardProductReviewsManager({
 
   function openCreateDialog() {
     setIsCreateOpen(true);
+    setCreateDisplayImageFile(null);
     createForm.reset({
       product: '',
       displayName: '',
@@ -602,19 +727,27 @@ export function DashboardProductReviewsManager({
       status: 'approved',
       images: [],
     });
-    setCreateImageFields(['']);
+    setCreateReviewImageFiles([]);
   }
 
   function submitManual(values: ReviewFormValues) {
+    const displayImage = createDisplayImageFile ?? values.displayImage?.trim() ?? '';
+
+    if (!displayImage) {
+      createForm.setError('displayImage', { type: 'manual', message: 'Display image is required!' });
+      toast.error('Display image is required!');
+      return;
+    }
+
     startTransition(async () => {
       const result = await createManualProductReview({
         product: values.product,
         displayName: values.displayName,
-        displayImage: values.displayImage,
+        displayImage,
         rating: values.rating,
         comment: values.comment,
         status: values.status,
-        images: createImageFields.map(image => image.trim()).filter(Boolean),
+        images: createReviewImageFiles,
       });
 
       if (!result.success) {
@@ -626,16 +759,8 @@ export function DashboardProductReviewsManager({
     });
   }
 
-  function addCreateImageField() {
-    setCreateImageFields(current => (current.length >= MAX_REVIEW_IMAGES ? current : [...current, '']));
-  }
-
-  function removeCreateImageField(index: number) {
-    setCreateImageFields(current => (current.length <= 1 ? [''] : current.filter((_, itemIndex) => itemIndex !== index)));
-  }
-
-  function updateCreateImageField(index: number, value: string) {
-    setCreateImageFields(current => current.map((item, itemIndex) => (itemIndex === index ? value : item)));
+  function handleCreateReviewImageFiles(files?: FileList | File[]) {
+    setCreateReviewImageFiles(Array.from(files ?? []).slice(0, MAX_REVIEW_IMAGES));
   }
 
   return (
@@ -668,29 +793,121 @@ export function DashboardProductReviewsManager({
           />
 
           <div className="grid gap-2 xl:grid-cols-4">
-            <TableFilter value={search} onChange={(value) => { setSearch(value); updateQuery({ page: 1, searchTerm: value }); }} placeholder="Search comment or name..." className="w-full min-w-56" />
-            <DashboardInput value={productFilter} onChange={(e) => { setProductFilter(e.target.value); updateQuery({ page: 1, product: e.target.value }); }} placeholder="Filter by product" />
-            <DashboardInput value={userFilter} onChange={(e) => { setUserFilter(e.target.value); updateQuery({ page: 1, user: e.target.value }); }} placeholder="Filter by user" />
-            <Select value={statusFilter || 'all'} onValueChange={(value) => { setStatusFilter(value); updateQuery({ page: 1, status: value === 'all' ? '' : value }); }}>
-              <SelectTrigger className="h-11 rounded-xl border-border/70 bg-background/90 px-4 text-sm shadow-sm"><SelectValue placeholder="Status" /></SelectTrigger>
-              <SelectContent>{statusOptions.map(option => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}</SelectContent>
-            </Select>
-            <Select value={sourceFilter || 'all'} onValueChange={(value) => { setSourceFilter(value); updateQuery({ page: 1, source: value === 'all' ? '' : value }); }}>
-              <SelectTrigger className="h-11 rounded-xl border-border/70 bg-background/90 px-4 text-sm shadow-sm"><SelectValue placeholder="Source" /></SelectTrigger>
-              <SelectContent>{sourceOptions.map(option => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}</SelectContent>
-            </Select>
-            <Select value={ratingFilter || 'all'} onValueChange={(value) => { setRatingFilter(value); updateQuery({ page: 1, rating: value === 'all' ? '' : value }); }}>
-              <SelectTrigger className="h-11 rounded-xl border-border/70 bg-background/90 px-4 text-sm shadow-sm"><SelectValue placeholder="Rating" /></SelectTrigger>
+            <TableFilter
+              value={search}
+              onChange={value => {
+                setSearch(value);
+                updateQuery({ page: 1, searchTerm: value });
+              }}
+              placeholder="Search comment or name..."
+              className="w-full min-w-56"
+            />
+            <DashboardInput
+              value={productFilter}
+              onChange={e => {
+                setProductFilter(e.target.value);
+                updateQuery({ page: 1, product: e.target.value });
+              }}
+              placeholder="Filter by product"
+            />
+            <DashboardInput
+              value={userFilter}
+              onChange={e => {
+                setUserFilter(e.target.value);
+                updateQuery({ page: 1, user: e.target.value });
+              }}
+              placeholder="Filter by user"
+            />
+            <Select
+              value={statusFilter || 'all'}
+              onValueChange={value => {
+                setStatusFilter(value);
+                updateQuery({ page: 1, status: value === 'all' ? '' : value });
+              }}
+            >
+              <SelectTrigger className="h-11 rounded-xl border-border/70 bg-background/90 px-4 text-sm shadow-sm">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All ratings</SelectItem>
-                {[5, 4, 3, 2, 1].map(value => <SelectItem key={value} value={String(value)}>{value} stars</SelectItem>)}
+                {statusOptions.map(option => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
-            <DashboardInput value={createdFromFilter} onChange={(e) => { setCreatedFromFilter(e.target.value); updateQuery({ page: 1, createdFrom: e.target.value }); }} type="date" placeholder="From date" />
-            <DashboardInput value={createdToFilter} onChange={(e) => { setCreatedToFilter(e.target.value); updateQuery({ page: 1, createdTo: e.target.value }); }} type="date" placeholder="To date" />
-            <Select value={sortFilter} onValueChange={(value) => { setSortFilter(value); updateQuery({ page: 1, sort: value }); }}>
-              <SelectTrigger className="h-11 rounded-xl border-border/70 bg-background/90 px-4 text-sm shadow-sm"><SelectValue placeholder="Sort" /></SelectTrigger>
-              <SelectContent>{sortOptions.map(option => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}</SelectContent>
+            <Select
+              value={sourceFilter || 'all'}
+              onValueChange={value => {
+                setSourceFilter(value);
+                updateQuery({ page: 1, source: value === 'all' ? '' : value });
+              }}
+            >
+              <SelectTrigger className="h-11 rounded-xl border-border/70 bg-background/90 px-4 text-sm shadow-sm">
+                <SelectValue placeholder="Source" />
+              </SelectTrigger>
+              <SelectContent>
+                {sourceOptions.map(option => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select
+              value={ratingFilter || 'all'}
+              onValueChange={value => {
+                setRatingFilter(value);
+                updateQuery({ page: 1, rating: value === 'all' ? '' : value });
+              }}
+            >
+              <SelectTrigger className="h-11 rounded-xl border-border/70 bg-background/90 px-4 text-sm shadow-sm">
+                <SelectValue placeholder="Rating" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All ratings</SelectItem>
+                {[5, 4, 3, 2, 1].map(value => (
+                  <SelectItem key={value} value={String(value)}>
+                    {value} stars
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <DashboardInput
+              value={createdFromFilter}
+              onChange={e => {
+                setCreatedFromFilter(e.target.value);
+                updateQuery({ page: 1, createdFrom: e.target.value });
+              }}
+              type="date"
+              placeholder="From date"
+            />
+            <DashboardInput
+              value={createdToFilter}
+              onChange={e => {
+                setCreatedToFilter(e.target.value);
+                updateQuery({ page: 1, createdTo: e.target.value });
+              }}
+              type="date"
+              placeholder="To date"
+            />
+            <Select
+              value={sortFilter}
+              onValueChange={value => {
+                setSortFilter(value);
+                updateQuery({ page: 1, sort: value });
+              }}
+            >
+              <SelectTrigger className="h-11 rounded-xl border-border/70 bg-background/90 px-4 text-sm shadow-sm">
+                <SelectValue placeholder="Sort" />
+              </SelectTrigger>
+              <SelectContent>
+                {sortOptions.map(option => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
             </Select>
           </div>
 
@@ -709,7 +926,9 @@ export function DashboardProductReviewsManager({
             <TableBody>
               {reviews.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="h-28 text-center">No product reviews found.</TableCell>
+                  <TableCell colSpan={7} className="h-28 text-center">
+                    No product reviews found.
+                  </TableCell>
                 </TableRow>
               ) : null}
 
@@ -721,7 +940,9 @@ export function DashboardProductReviewsManager({
                     <TableCell className="align-top">
                       <div className="space-y-1">
                         <div className="font-medium">{ProductRefName(review.product)}</div>
-                        {productSlug ? <div className="text-xs text-muted-foreground">{productSlug}</div> : null}
+                        {productSlug ? (
+                          <div className="text-xs text-muted-foreground">{productSlug}</div>
+                        ) : null}
                       </div>
                     </TableCell>
                     <TableCell className="align-top">
@@ -739,29 +960,94 @@ export function DashboardProductReviewsManager({
                     <TableCell className="align-top">{sourceBadge(review.source)}</TableCell>
                     <TableCell className="align-top">{statusBadge(review.status)}</TableCell>
                     <TableCell className="align-top whitespace-nowrap text-sm">
-                      <span className="cursor-help" title={review.createdAt ? formatDashboardDate(review.createdAt, { time: true }) : undefined}>
+                      <span
+                        className="cursor-help"
+                        title={
+                          review.createdAt ? formatDashboardDate(review.createdAt, { time: true }) : undefined
+                        }
+                      >
                         {formatDashboardDate(review.createdAt)}
                       </span>
                     </TableCell>
                     <TableCell className="align-top">
                       <div className="flex flex-wrap justify-end gap-2">
-                        <Button type="button" variant="outline" size="icon" onClick={() => openReview(review, 'view')}><Eye className="size-4" /></Button>
-                        <Button type="button" variant="outline" size="icon" onClick={() => openReview(review, 'edit')}><PencilLine className="size-4" /></Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          onClick={() => openReview(review, 'view')}
+                        >
+                          <Eye className="size-4" />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          onClick={() => openReview(review, 'edit')}
+                        >
+                          <PencilLine className="size-4" />
+                        </Button>
                         {productSlug ? (
-                          <Button asChild type="button" variant="outline" size="icon" title="Visit product details">
-                            <Link href={`/product/${productSlug}`} target="_blank"><Link2 className="size-4" /></Link>
+                          <Button
+                            asChild
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            title="Visit product details"
+                          >
+                            <Link href={`/product/${productSlug}`} target="_blank">
+                              <Link2 className="size-4" />
+                            </Link>
                           </Button>
                         ) : null}
                         {review.status !== 'approved' ? (
-                           <Button type="button" variant="outline" size="icon" title="Approve" onClick={() => review._id ? setPendingStatusChange({ review, status: 'approved' }) : undefined}><CheckCircle2 className="size-4" /></Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            title="Approve"
+                            onClick={() =>
+                              review._id ? setPendingStatusChange({ review, status: 'approved' }) : undefined
+                            }
+                          >
+                            <CheckCircle2 className="size-4" />
+                          </Button>
                         ) : null}
                         {review.status !== 'hidden' ? (
-                          <Button type="button" variant="outline" size="icon" title="Hide" onClick={() => review._id ? setPendingStatusChange({ review, status: 'hidden' }) : undefined}><EyeOff className="size-4" /></Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            title="Hide"
+                            onClick={() =>
+                              review._id ? setPendingStatusChange({ review, status: 'hidden' }) : undefined
+                            }
+                          >
+                            <EyeOff className="size-4" />
+                          </Button>
                         ) : null}
                         {review.status !== 'rejected' ? (
-                          <Button type="button" variant="outline" size="icon" title="Reject" onClick={() => review._id ? setPendingStatusChange({ review, status: 'rejected' }) : undefined}><Ban className="size-4" /></Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            title="Reject"
+                            onClick={() =>
+                              review._id ? setPendingStatusChange({ review, status: 'rejected' }) : undefined
+                            }
+                          >
+                            <Ban className="size-4" />
+                          </Button>
                         ) : null}
-                        <Button type="button" variant="destructive" size="icon" onClick={() => setPendingDeleteReview(review)} disabled={!review._id}><Trash2 className="size-4" /></Button>
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          onClick={() => setPendingDeleteReview(review)}
+                          disabled={!review._id}
+                        >
+                          <Trash2 className="size-4" />
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -774,17 +1060,22 @@ export function DashboardProductReviewsManager({
             page={paginationMeta.page}
             limit={paginationMeta.limit}
             total={paginationMeta.total}
-            onPageChange={(pageValue) => updateQuery({ page: pageValue })}
-            onLimitChange={(limitValue) => updateQuery({ page: 1, limit: limitValue })}
+            onPageChange={pageValue => updateQuery({ page: pageValue })}
+            onLimitChange={limitValue => updateQuery({ page: 1, limit: limitValue })}
           />
         </CardContent>
       </Card>
 
-      <Dialog open={Boolean(selectedReview)} onOpenChange={(open) => (!open ? closeReviewDialog() : undefined)}>
-        <ReviewDialogContent review={selectedReview} mode={dialogMode} onClose={closeReviewDialog} onSaved={handleReviewSaved} />
+      <Dialog open={Boolean(selectedReview)} onOpenChange={open => (!open ? closeReviewDialog() : undefined)}>
+        <ReviewDialogContent
+          review={selectedReview}
+          mode={dialogMode}
+          onClose={closeReviewDialog}
+          onSaved={handleReviewSaved}
+        />
       </Dialog>
 
-      <Dialog open={isCreateOpen} onOpenChange={(open) => setIsCreateOpen(open)}>
+      <Dialog open={isCreateOpen} onOpenChange={open => setIsCreateOpen(open)}>
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
           <DialogHeader>
             <DialogTitle>Create manual review</DialogTitle>
@@ -796,46 +1087,84 @@ export function DashboardProductReviewsManager({
               <div className="space-y-2">
                 <div className="text-xs font-medium text-muted-foreground">Product ID or slug</div>
                 <DashboardInput placeholder="Product ID or slug" {...createForm.register('product')} />
-                {createForm.formState.errors.product?.message ? <p className="text-xs text-destructive">{createForm.formState.errors.product.message}</p> : null}
+                {createForm.formState.errors.product?.message ? (
+                  <p className="text-xs text-destructive">{createForm.formState.errors.product.message}</p>
+                ) : null}
               </div>
               <div className="space-y-2">
                 <div className="text-xs font-medium text-muted-foreground">Display name</div>
                 <DashboardInput placeholder="Display name" {...createForm.register('displayName')} />
-                {createForm.formState.errors.displayName?.message ? <p className="text-xs text-destructive">{createForm.formState.errors.displayName.message}</p> : null}
+                {createForm.formState.errors.displayName?.message ? (
+                  <p className="text-xs text-destructive">
+                    {createForm.formState.errors.displayName.message}
+                  </p>
+                ) : null}
               </div>
               <div className="space-y-2">
-                <div className="text-xs font-medium text-muted-foreground">Display image URL</div>
-                <DashboardInput placeholder="https://..." {...createForm.register('displayImage')} />
-                {createForm.formState.errors.displayImage?.message ? <p className="text-xs text-destructive">{createForm.formState.errors.displayImage.message}</p> : null}
+                <div className="flex items-center justify-between gap-3 text-xs font-medium text-muted-foreground">
+                  <span>Display image</span>
+                  <span>{createDisplayImageFile ? createDisplayImageFile.name : 'Required upload'}</span>
+                </div>
+                <DashboardInput
+                  type="file"
+                  accept="image/*"
+                  onChange={event => {
+                    setCreateDisplayImageFile(event.target.files?.[0] ?? null);
+                    createForm.clearErrors('displayImage');
+                  }}
+                />
+                {createForm.formState.errors.displayImage?.message ? (
+                  <p className="text-xs text-destructive">
+                    {createForm.formState.errors.displayImage.message}
+                  </p>
+                ) : null}
               </div>
               <div className="space-y-2">
                 <div className="text-xs font-medium text-muted-foreground">Rating</div>
                 <DashboardInput type="number" min={1} max={5} step="1" {...createForm.register('rating')} />
-                {createForm.formState.errors.rating?.message ? <p className="text-xs text-destructive">{createForm.formState.errors.rating.message}</p> : null}
+                {createForm.formState.errors.rating?.message ? (
+                  <p className="text-xs text-destructive">{createForm.formState.errors.rating.message}</p>
+                ) : null}
               </div>
               <div className="space-y-2 md:col-span-2">
                 <div className="text-xs font-medium text-muted-foreground">Comment</div>
                 <Textarea className="min-h-28 rounded-2xl" {...createForm.register('comment')} />
-                {createForm.formState.errors.comment?.message ? <p className="text-xs text-destructive">{createForm.formState.errors.comment.message}</p> : null}
+                {createForm.formState.errors.comment?.message ? (
+                  <p className="text-xs text-destructive">{createForm.formState.errors.comment.message}</p>
+                ) : null}
               </div>
               <div className="space-y-2 md:col-span-2">
                 <div className="flex items-center justify-between gap-3 text-xs font-medium text-muted-foreground">
                   <span>Images</span>
-                  <Button type="button" variant="outline" size="sm" onClick={addCreateImageField} disabled={createImageFields.length >= MAX_REVIEW_IMAGES}>Add image</Button>
+                  <span>
+                    {createReviewImageFiles.length > 0
+                      ? `${createReviewImageFiles.length} file${createReviewImageFiles.length === 1 ? '' : 's'} selected`
+                      : `Optional upload up to ${MAX_REVIEW_IMAGES}`}
+                  </span>
                 </div>
-                <div className="space-y-2">
-                  {createImageFields.map((image, index) => (
-                    <div key={`${index}-${image}`} className="flex gap-2">
-                      <DashboardInput value={image} onChange={(e) => updateCreateImageField(index, e.target.value)} placeholder={`Image URL ${index + 1}`} />
-                      <Button type="button" variant="outline" onClick={() => removeCreateImageField(index)} disabled={createImageFields.length === 1}>Remove</Button>
-                    </div>
-                  ))}
-                </div>
+                <DashboardInput
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={event => handleCreateReviewImageFiles(event.target.files ?? undefined)}
+                />
+                {createReviewImageFiles.length > 0 ? (
+                  <div className="space-y-1 rounded-2xl border bg-muted/20 p-3 text-xs text-muted-foreground">
+                    {createReviewImageFiles.map(file => (
+                      <div key={file.name}>{file.name}</div>
+                    ))}
+                  </div>
+                ) : null}
               </div>
               <div className="space-y-2 md:col-span-2">
                 <div className="text-xs font-medium text-muted-foreground">Status</div>
-                <Select value={createStatus} onValueChange={(value) => createForm.setValue('status', value as ReviewStatus)}>
-                  <SelectTrigger className="h-11 rounded-xl"><SelectValue /></SelectTrigger>
+                <Select
+                  value={createStatus}
+                  onValueChange={value => createForm.setValue('status', value as ReviewStatus)}
+                >
+                  <SelectTrigger className="h-11 rounded-xl">
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="pending">Pending</SelectItem>
                     <SelectItem value="approved">Approved</SelectItem>
@@ -847,7 +1176,14 @@ export function DashboardProductReviewsManager({
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)} disabled={isPending}>Cancel</Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsCreateOpen(false)}
+                disabled={isPending}
+              >
+                Cancel
+              </Button>
               <Button type="submit" disabled={isPending}>
                 {isPending ? <Loader2 className="size-4 animate-spin" /> : null}
                 Create review
@@ -859,7 +1195,7 @@ export function DashboardProductReviewsManager({
 
       <DeleteConfirmationDialog
         open={Boolean(pendingDeleteReview)}
-        onOpenChange={(open) => !open && setPendingDeleteReview(null)}
+        onOpenChange={open => !open && setPendingDeleteReview(null)}
         onConfirm={handleDeleteReview}
         title="Delete review"
         description="This will permanently delete the review."
@@ -867,7 +1203,7 @@ export function DashboardProductReviewsManager({
 
       <DeleteConfirmationDialog
         open={Boolean(pendingStatusChange)}
-        onOpenChange={(open) => !open && setPendingStatusChange(null)}
+        onOpenChange={open => !open && setPendingStatusChange(null)}
         onConfirm={confirmStatusChange}
         title={
           pendingStatusChange?.status === 'approved'

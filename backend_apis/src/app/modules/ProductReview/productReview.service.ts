@@ -91,7 +91,18 @@ const resolveDisplayName = (user: IUser) => user.name?.trim() || 'Customer';
 
 const resolveDisplayImage = (user: IUser) => user.image?.trim() || '';
 
-const assertProductExists = async (productId: string | Types.ObjectId, { activeOnly }: { activeOnly: boolean }) => {
+const resolveReviewDisplayImage = (value: unknown, fallback: string) => {
+  if (typeof value === 'string' && value.trim()) {
+    return value.trim();
+  }
+
+  return fallback;
+};
+
+const assertProductExists = async (
+  productId: string | Types.ObjectId,
+  { activeOnly }: { activeOnly: boolean },
+) => {
   const normalizedProductId = typeof productId === 'string' ? productId : productId.toString();
 
   const product = await ProductModel.findOne(
@@ -232,7 +243,7 @@ const createManualReviewIntoDB = async (
     product: product._id,
     createdBy: adminUser._id,
     displayName: payload.displayName.trim(),
-    displayImage: payload.displayImage.trim(),
+    displayImage: resolveReviewDisplayImage(payload.displayImage, ''),
     rating: payload.rating,
     comment: payload.comment.trim(),
     images: payload.images ?? [],

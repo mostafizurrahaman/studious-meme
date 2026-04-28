@@ -1,5 +1,11 @@
 import { Router } from 'express';
-import { adminLimiter, auth, burstProtection, validateRequestFromFormData, validateRequest } from '../../middlewares';
+import {
+  adminLimiter,
+  auth,
+  burstProtection,
+  validateRequestFromFormData,
+  validateRequest,
+} from '../../middlewares';
 import { multerUpload } from '../../lib';
 import { ROLE } from '../User/user.constant';
 import { ProductReviewController } from './productReview.controller';
@@ -19,7 +25,10 @@ router
     auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
     adminLimiter,
     burstProtection('admin', 10_000, 15),
-    multerUpload.array('images', 5),
+    multerUpload.fields([
+      { name: 'displayImage', maxCount: 1 },
+      { name: 'images', maxCount: 5 },
+    ]),
     validateRequestFromFormData(ProductReviewValidation.manualCreateReviewSchema),
     ProductReviewController.createManualReview,
   );
@@ -30,7 +39,10 @@ router
     auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
     adminLimiter,
     burstProtection('admin', 10_000, 15),
-    multerUpload.array('images', 5),
+    multerUpload.fields([
+      { name: 'displayImage', maxCount: 1 },
+      { name: 'images', maxCount: 5 },
+    ]),
     validateRequestFromFormData(ProductReviewValidation.updateReviewSchema),
     ProductReviewController.updateReview,
   )

@@ -85,7 +85,7 @@ export type CreateCustomerReviewPayload = {
 export type CreateManualReviewPayload = {
   product: string;
   displayName: string;
-  displayImage: string;
+  displayImage: File | string;
   rating: number;
   comment: string;
   images?: Array<File | string>;
@@ -94,7 +94,7 @@ export type CreateManualReviewPayload = {
 
 export type UpdateReviewPayload = Partial<{
   displayName: string;
-  displayImage: string;
+  displayImage: File | string;
   rating: number;
   comment: string;
   images: Array<File | string>;
@@ -104,19 +104,29 @@ export type UpdateReviewPayload = Partial<{
 function toFormData(payload: Record<string, unknown>) {
   const formData = new FormData();
 
-  const { images, ...rest } = payload as {
+  const { images, displayImage, ...rest } = payload as {
     images?: Array<File | string>;
+    displayImage?: File | string;
     [key: string]: unknown;
   };
-  const imageUrls = (images ?? []).filter((item): item is string => typeof item === 'string' && Boolean(item));
+  const imageUrls = (images ?? []).filter(
+    (item): item is string => typeof item === 'string' && Boolean(item),
+  );
 
   formData.set(
     'data',
     JSON.stringify({
       ...rest,
       ...(imageUrls.length > 0 ? { images: imageUrls } : {}),
+      ...(typeof displayImage === 'string' && displayImage.trim()
+        ? { displayImage: displayImage.trim() }
+        : {}),
     }),
   );
+
+  if (displayImage instanceof File) {
+    formData.append('displayImage', displayImage);
+  }
 
   (images ?? []).forEach(item => {
     if (item instanceof File) {
@@ -197,14 +207,11 @@ export const getAdminProductReviews = async (
 ): Promise<ProductReviewListResponse> => {
   const accessToken = await getValidAccessTokenForServerHandlerGet();
 
-  return requestBackendJson<ProductReviewListResponse>(
-    `/admin/product-reviews${buildReviewQuery(params)}`,
-    {
-      method: 'GET',
-      token: accessToken ?? undefined,
-      next: { tags: ['PRODUCT_REVIEWS'] },
-    },
-  );
+  return requestBackendJson<ProductReviewListResponse>(`/admin/product-reviews${buildReviewQuery(params)}`, {
+    method: 'GET',
+    token: accessToken ?? undefined,
+    next: { tags: ['PRODUCT_REVIEWS'] },
+  });
 };
 
 export const createManualProductReview = async (

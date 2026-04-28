@@ -15,17 +15,15 @@ import { ProductReviewValidation } from './productReview.validation';
 
 const router = Router();
 
-router
-  .route('/')
-  .post(
-    auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN),
-    actionLimiter,
-    burstProtection('action', 10_000, 12),
-    duplicateSubmissionGuard(),
-    multerUpload.array('images', 5),
-    validateRequestFromFormData(ProductReviewValidation.customerCreateReviewSchema),
-    ProductReviewController.createCustomerReview,
-  );
+router.route('/').post(
+  auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN),
+  actionLimiter,
+  burstProtection('action', 10_000, 12),
+  duplicateSubmissionGuard(),
+   multerUpload.array('images', 5),
+  validateRequestFromFormData(ProductReviewValidation.customerCreateReviewSchema),
+  ProductReviewController.createCustomerReview,
+);
 
 router
   .route('/product/:productId')
