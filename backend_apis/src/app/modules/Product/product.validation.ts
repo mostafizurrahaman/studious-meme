@@ -1,15 +1,9 @@
 import { z } from 'zod';
+import { DEFAULT_SELLING_UNIT, SELLING_UNIT_OPTIONS, normalizeSellingUnitInput } from './selling-unit';
 
 const YOUTUBE_VIDEO_ID_PATTERN = /^[a-zA-Z0-9_-]{11}$/;
 
 const normalizeYouTubeUrl = (value: unknown) => {
-  if (typeof value !== 'string') return value;
-
-  const trimmed = value.trim();
-  return trimmed === '' ? undefined : trimmed;
-};
-
-const normalizeOptionalText = (value: unknown) => {
   if (typeof value !== 'string') return value;
 
   const trimmed = value.trim();
@@ -48,6 +42,11 @@ const isSupportedYouTubeUrl = (value: string) => {
 };
 
 // 1. productBaseSchema
+const sellingUnitSchema = z.preprocess(
+  normalizeSellingUnitInput,
+  z.enum(SELLING_UNIT_OPTIONS, { error: 'Invalid selling unit!' }),
+);
+
 const productBaseSchema = z.object({
   title: z.string({ error: 'Title is required!' }).trim().min(1, { message: 'Title is required!' }),
   slug: z.string({ error: 'Slug is required!' }).trim().min(1, { message: 'Slug is required!' }),
@@ -80,10 +79,6 @@ const productBaseSchema = z.object({
   weightKg: z.coerce
     .number({ error: 'Weight is required!' })
     .min(0.01, { message: 'Weight must be greater than 0!' }),
-  sellingUnit: z.preprocess(
-    normalizeOptionalText,
-    z.string().min(1, { message: 'Selling unit is required!' }).max(64, { message: 'Selling unit is too long!' }).optional(),
-  ),
   stock: z.preprocess(
     value => (value === '' ? null : value),
     z.union([z.coerce.number().int().min(0, { message: 'Stock must be at least 0!' }), z.null()]).optional(),
@@ -95,11 +90,19 @@ const productBaseSchema = z.object({
 });
 
 export const ProductValidation = {
-  productCreateSchema: z.object({ body: productBaseSchema }),
+  productCreateSchema: z.object({
+    body: productBaseSchema.extend({
+      sellingUnit: sellingUnitSchema.default(DEFAULT_SELLING_UNIT),
+    }),
+  }),
   productUpdateSchema: z.object({
     params: z.object({
       slug: z.string({ error: 'Slug is required!' }).trim().min(1, { message: 'Slug is required!' }),
     }),
-    body: productBaseSchema.partial(),
+    body: productBaseSchema
+      .extend({
+        sellingUnit: sellingUnitSchema.optional(),
+      })
+      .partial(),
   }),
 };

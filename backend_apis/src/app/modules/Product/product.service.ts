@@ -6,6 +6,7 @@ import { IProduct } from './product.interface';
 import { CategoryModel } from '../Category/category.model';
 import { MulterFile } from '../../lib/upload';
 import { BrandModel } from '../Brand/brand.model';
+import { DEFAULT_SELLING_UNIT, normalizeSellingUnit } from './selling-unit';
 
 type ProductSort = Record<string, 1 | -1>;
 
@@ -24,13 +25,6 @@ const normalizeSlug = (value: string) =>
     .replace(/^-+|-+$/g, '');
 
 const normalizeYouTubeVideoUrl = (value: unknown) => {
-  if (typeof value !== 'string') return undefined;
-
-  const trimmed = value.trim();
-  return trimmed === '' ? undefined : trimmed;
-};
-
-const normalizeSellingUnit = (value: unknown) => {
   if (typeof value !== 'string') return undefined;
 
   const trimmed = value.trim();
@@ -322,20 +316,14 @@ const createProductIntoDB = async (
 
     const youtubeVideoUrl = normalizeYouTubeVideoUrl(payload.youtubeVideoUrl);
     const youtubeVideoId = youtubeVideoUrl ? extractYouTubeVideoId(youtubeVideoUrl) : undefined;
-    const sellingUnit = normalizeSellingUnit(payload.sellingUnit);
-    const createPayload: Record<string, unknown> = { ...payload };
-
-    if (sellingUnit) {
-      createPayload.sellingUnit = sellingUnit;
-    } else {
-      delete createPayload.sellingUnit;
-    }
+    const sellingUnit = normalizeSellingUnit(payload.sellingUnit) ?? DEFAULT_SELLING_UNIT;
+    const createPayload: Record<string, unknown> = { ...payload, sellingUnit };
 
     return ProductModel.create({
       ...createPayload,
       slug: normalizeSlug(String(payload.slug ?? payload.title ?? '')),
       images,
-      ...(sellingUnit ? { sellingUnit } : {}),
+      sellingUnit,
       ...(youtubeVideoUrl ? { youtubeVideoUrl, youtubeVideoId } : {}),
     });
   } catch (error) {
@@ -448,7 +436,7 @@ const updateProductIntoDB = async (
     };
 
     if (shouldUpdateSellingUnit) {
-      updateSet.sellingUnit = normalizeSellingUnit(payload.sellingUnit) ?? 'pcs';
+      updateSet.sellingUnit = normalizeSellingUnit(payload.sellingUnit) ?? DEFAULT_SELLING_UNIT;
     }
 
     const updateQuery: Record<string, unknown> = { $set: updateSet };

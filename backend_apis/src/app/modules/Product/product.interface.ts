@@ -1,5 +1,7 @@
 import { Types } from 'mongoose';
 
+import type { SellingUnit } from './selling-unit';
+
 export interface IProduct {
   title: string;
   slug: string;
@@ -18,7 +20,7 @@ export interface IProduct {
   weightKg: number;
   stock?: number | null;
   rating: number;
-  sellingUnit?: string;
+  sellingUnit?: SellingUnit;
   isFeatured: boolean;
   isNoCOD: boolean;
   isActive: boolean;

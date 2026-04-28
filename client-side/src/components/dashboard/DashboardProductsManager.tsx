@@ -1,10 +1,19 @@
 'use client';
 
-import { Fragment, useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
+import {
+  Fragment,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+} from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { ImagePlus, Pencil, Plus, Trash2, UploadCloud, X } from 'lucide-react';
-import { useForm, useWatch } from 'react-hook-form';
+import { type UseFormReturn, useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -23,6 +32,7 @@ import { DeleteConfirmationDialog } from '@/components/dashboard/DeleteConfirmat
 import { DashboardRichTextEditor } from '@/components/dashboard/DashboardRichTextEditor';
 import { formatStockLabel } from '@/lib/stock';
 import { formatPriceLabelWithUnit } from '@/lib/cart';
+import { DEFAULT_SELLING_UNIT, SELLING_UNIT_OPTIONS, isSellingUnit } from '@/lib/selling-unit';
 
 type Option = { value: string; label: string };
 const MAX_PRODUCT_IMAGES = 5;
@@ -33,13 +43,6 @@ const stockFieldSchema = z
   .refine(value => value === '' || /^\d+$/.test(value), {
     message: 'Stock must be a valid non-negative whole number!',
   });
-
-const normalizeOptionalText = (value: unknown) => {
-  if (typeof value !== 'string') return value;
-
-  const trimmed = value.trim();
-  return trimmed === '' ? undefined : trimmed;
-};
 
 function richTextHasContent(value?: string) {
   return Boolean(
@@ -141,10 +144,7 @@ const productEditSchema = z.object({
       message: 'Weight must be greater than 0!',
     }),
 
-  sellingUnit: z.preprocess(
-    normalizeOptionalText,
-    z.string().min(1, { message: 'Selling unit is required!' }).max(64, { message: 'Selling unit is too long!' }).optional(),
-  ),
+  sellingUnit: z.enum(SELLING_UNIT_OPTIONS, { error: 'Selling unit is required!' }),
 
   isFeatured: z.boolean().default(false),
   isNoCOD: z.boolean().default(false),
@@ -197,10 +197,7 @@ const productCreateSchema = z.object({
       message: 'Weight must be greater than 0!',
     }),
 
-  sellingUnit: z.preprocess(
-    normalizeOptionalText,
-    z.string().min(1, { message: 'Selling unit is required!' }).max(64, { message: 'Selling unit is too long!' }).optional(),
-  ),
+  sellingUnit: z.enum(SELLING_UNIT_OPTIONS, { error: 'Selling unit is required!' }),
 
   isFeatured: z.boolean().default(false),
   isNoCOD: z.boolean().default(false),
@@ -209,11 +206,297 @@ const productCreateSchema = z.object({
 
 type ProductEditValues = z.infer<typeof productEditSchema>;
 type ProductCreateValues = z.infer<typeof productCreateSchema>;
+type ProductFormValues = ProductCreateValues;
 
 function ErrorText({ message }: { message?: string }) {
   if (!message) return null;
 
   return <p className="text-xs text-destructive">{message}</p>;
+}
+
+function FieldLabel({ children }: { children: ReactNode }) {
+  return <label className="text-xs font-medium text-muted-foreground">{children}</label>;
+}
+
+function FormSection({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <section className="rounded-2xl border border-border/60 bg-background/80 p-4 shadow-sm">
+      <div className="mb-4 border-b border-border/60 pb-3">
+        <h3 className="text-lg font-bold tracking-tight text-foreground">{title}</h3>
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function ProductFormSections({
+  form,
+  titleOnChange,
+  slugOnChange,
+  categoryOnChange,
+  categoryValue,
+  subCategoryOptions,
+  categories,
+  brandOptions,
+  featuresValue,
+  descriptionValue,
+  footerAction,
+}: {
+  form: UseFormReturn<ProductFormValues>;
+  titleOnChange: (value: string) => void;
+  slugOnChange: (value: string) => void;
+  categoryOnChange: (value: string) => void;
+  categoryValue: string;
+  subCategoryOptions: Array<{ slug: string; name: string }>;
+  categories: BackendCategory[];
+  brandOptions: Option[];
+  featuresValue: string;
+  descriptionValue: string;
+  footerAction?: ReactNode;
+}) {
+  const nativeSelectClassName = 'h-10 rounded-md border border-input bg-background px-3 text-sm';
+
+  return (
+    <div className="space-y-5">
+      <FormSection title="Basic Info">
+        <div className="grid gap-1.5 md:grid-cols-2">
+          <div className="grid gap-1.5 md:col-span-2">
+            <FieldLabel>Title</FieldLabel>
+            <DashboardInput
+              placeholder="Title"
+              {...form.register('title', {
+                onChange: e => titleOnChange(e.target.value),
+              })}
+            />
+            <div className="min-h-4" aria-hidden="true" />
+            <ErrorText message={form.formState.errors.title?.message} />
+          </div>
+
+          <div className="grid gap-1.5 md:col-span-2">
+            <FieldLabel>Slug</FieldLabel>
+            <DashboardInput
+              placeholder="Slug"
+              {...form.register('slug', {
+                onChange: e => slugOnChange(e.target.value),
+              })}
+            />
+            <div className="min-h-4" aria-hidden="true" />
+            <ErrorText message={form.formState.errors.slug?.message} />
+          </div>
+
+          <div className="grid gap-1.5">
+            <FieldLabel>SKU</FieldLabel>
+            <DashboardInput placeholder="SKU" {...form.register('sku')} />
+            <div className="min-h-4" aria-hidden="true" />
+            <ErrorText message={form.formState.errors.sku?.message} />
+          </div>
+
+          <div className="grid gap-1.5">
+            <FieldLabel>Brand</FieldLabel>
+            <select className={nativeSelectClassName} {...form.register('brand')}>
+              <option value="">Brand</option>
+              {brandOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <div className="min-h-4" aria-hidden="true" />
+            <ErrorText message={form.formState.errors.brand?.message} />
+          </div>
+
+          <div className="grid gap-1.5">
+            <FieldLabel>Category</FieldLabel>
+            <select
+              className={nativeSelectClassName}
+              {...form.register('category', {
+                onChange: e => categoryOnChange(e.target.value),
+              })}
+            >
+              <option value="">Category</option>
+              {categories.flatMap(category =>
+                category._id
+                  ? [
+                      <option key={category._id} value={category._id}>
+                        {category.name}
+                      </option>,
+                    ]
+                  : [],
+              )}
+            </select>
+            <div className="min-h-4" aria-hidden="true" />
+            <ErrorText message={form.formState.errors.category?.message} />
+          </div>
+
+          <div className="grid gap-1.5">
+            <FieldLabel>Sub-category</FieldLabel>
+            <select
+              className={nativeSelectClassName}
+              {...form.register('subCategorySlug')}
+              disabled={!categoryValue}
+            >
+              <option value="">Sub-category</option>
+              {subCategoryOptions.map(subCategory => (
+                <option key={subCategory.slug} value={subCategory.slug}>
+                  {subCategory.name}
+                </option>
+              ))}
+            </select>
+            <div className="min-h-4" aria-hidden="true" />
+            <ErrorText message={form.formState.errors.subCategorySlug?.message} />
+          </div>
+        </div>
+      </FormSection>
+
+      <FormSection title="Pricing & Inventory">
+        <div className="grid gap-2 md:grid-cols-2">
+          <div className="grid gap-1.5">
+            <FieldLabel>Price</FieldLabel>
+            <DashboardInput
+              placeholder="Price"
+              type="number"
+              min={0}
+              step="0.01"
+              {...form.register('price')}
+            />
+            <div className="min-h-4" aria-hidden="true" />
+            <ErrorText message={form.formState.errors.price?.message} />
+          </div>
+
+          <div className="grid gap-1.5">
+            <FieldLabel>Old price</FieldLabel>
+            <DashboardInput
+              placeholder="Old price"
+              type="number"
+              min={0}
+              step="0.01"
+              {...form.register('oldPrice')}
+            />
+            <div className="min-h-4" aria-hidden="true" />
+            <ErrorText message={form.formState.errors.oldPrice?.message} />
+          </div>
+
+          <div className="grid gap-1.5">
+            <FieldLabel>Selling unit</FieldLabel>
+            <select className={nativeSelectClassName} {...form.register('sellingUnit')}>
+              {SELLING_UNIT_OPTIONS.map(unit => (
+                <option key={unit} value={unit}>
+                  {unit}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-muted-foreground">Select how this product is sold.</p>
+            <ErrorText message={form.formState.errors.sellingUnit?.message} />
+          </div>
+
+          <div className="grid gap-1.5">
+            <FieldLabel>Weight (kg)</FieldLabel>
+            <DashboardInput
+              placeholder="Weight (kg)"
+              type="number"
+              min={0.01}
+              step="0.01"
+              {...form.register('weightKg')}
+            />
+            <div className="min-h-4" aria-hidden="true" />
+            <ErrorText message={form.formState.errors.weightKg?.message} />
+          </div>
+
+          <div className="grid gap-1.5">
+            <FieldLabel>Stock count</FieldLabel>
+            <DashboardInput
+              placeholder="Stock count"
+              type="number"
+              min={0}
+              step={1}
+              {...form.register('stock')}
+            />
+            <p className="text-xs text-muted-foreground">Leave blank to keep it always in stock.</p>
+            <ErrorText message={form.formState.errors.stock?.message} />
+          </div>
+
+          <div className="grid gap-1.5">
+            <FieldLabel>Rating</FieldLabel>
+            <DashboardInput
+              placeholder="Rating"
+              type="number"
+              min={0}
+              step="0.1"
+              {...form.register('rating')}
+            />
+            <div className="min-h-4" aria-hidden="true" />
+            <ErrorText message={form.formState.errors.rating?.message} />
+          </div>
+
+          <div className="grid gap-1.5">
+            <FieldLabel>Badge</FieldLabel>
+            <DashboardInput placeholder="Badge, e.g. Sale, New, Hot" {...form.register('badge')} />
+            <div className="min-h-4" aria-hidden="true" />
+            <ErrorText message={form.formState.errors.badge?.message} />
+          </div>
+        </div>
+      </FormSection>
+
+      <FormSection title="Media">
+        <div className="grid gap-2">
+          <div className="grid gap-1.5">
+            <FieldLabel>YouTube video URL</FieldLabel>
+            <DashboardInput placeholder="YouTube video URL" {...form.register('youtubeVideoUrl')} />
+            <p className="text-xs text-muted-foreground">Paste a YouTube video link</p>
+            <ErrorText message={form.formState.errors.youtubeVideoUrl?.message} />
+          </div>
+        </div>
+      </FormSection>
+
+      <FormSection title="Options">
+        <div className="flex flex-wrap gap-3">
+          <label className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+            <input type="checkbox" {...form.register('isFeatured')} />
+            Featured
+          </label>
+          <label className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+            <input type="checkbox" {...form.register('isNoCOD')} />
+            No COD
+          </label>
+          <label className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+            <input type="checkbox" {...form.register('isActive')} />
+            Active
+          </label>
+        </div>
+      </FormSection>
+
+      <FormSection title="Content">
+        <div className="grid gap-3">
+          <DashboardRichTextEditor
+            label="Features"
+            value={featuresValue ?? ''}
+            minHeightClassName="min-h-40"
+            onChange={value =>
+              form.setValue('features', value, {
+                shouldDirty: true,
+                shouldValidate: true,
+              })
+            }
+          />
+          <ErrorText message={form.formState.errors.features?.message} />
+
+          <DashboardRichTextEditor
+            label="Description"
+            value={descriptionValue ?? ''}
+            onChange={value =>
+              form.setValue('description', value, {
+                shouldDirty: true,
+                shouldValidate: true,
+              })
+            }
+          />
+          <ErrorText message={form.formState.errors.description?.message} />
+        </div>
+      </FormSection>
+
+      {footerAction ?? null}
+    </div>
+  );
 }
 
 function resolveProductRefLabel(value: BackendProduct['brand']) {
@@ -272,7 +555,7 @@ export function DashboardProductsManager({
       stock: '',
       rating: '5',
       weightKg: '1',
-      sellingUnit: '',
+      sellingUnit: DEFAULT_SELLING_UNIT,
       isFeatured: false,
       isNoCOD: false,
       isActive: true,
@@ -327,6 +610,7 @@ export function DashboardProductsManager({
       stock: '0',
       rating: '5',
       weightKg: '1',
+      sellingUnit: DEFAULT_SELLING_UNIT,
       isFeatured: false,
       isNoCOD: false,
       isActive: true,
@@ -554,7 +838,7 @@ export function DashboardProductsManager({
       stock: product.stock == null ? '' : String(product.stock),
       rating: String(product.rating),
       weightKg: String(product.weightKg ?? 1),
-      sellingUnit: product.sellingUnit ?? '',
+      sellingUnit: isSellingUnit(product.sellingUnit) ? product.sellingUnit : DEFAULT_SELLING_UNIT,
       isFeatured: product.isFeatured,
       isNoCOD: product.isNoCOD,
       isActive: product.isActive,
@@ -581,7 +865,7 @@ export function DashboardProductsManager({
       stock: '',
       rating: '5',
       weightKg: '1',
-      sellingUnit: '',
+      sellingUnit: DEFAULT_SELLING_UNIT,
       isFeatured: false,
       isNoCOD: false,
       isActive: true,
@@ -603,257 +887,92 @@ export function DashboardProductsManager({
           <CardDescription>Add a new catalog item using backend CRUD.</CardDescription>
         </CardHeader>
         <CardContent className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
-          <div className="grid gap-3 md:grid-cols-2">
-            <div className="grid gap-1.5 md:col-span-2">
-              <DashboardInput
-                placeholder="Title"
-                {...productCreateForm.register('title', {
-                  onChange: e => handleTitleChange(e.target.value),
-                })}
-              />
-              <ErrorText message={productCreateForm.formState.errors.title?.message} />
-            </div>
-            <div className="grid gap-1.5">
-              <DashboardInput
-                placeholder="Slug"
-                {...productCreateForm.register('slug', {
-                  onChange: e => handleSlugChange(e.target.value),
-                })}
-              />
-              <ErrorText message={productCreateForm.formState.errors.slug?.message} />
-            </div>
-            <div className="grid gap-1.5">
-              <DashboardInput placeholder="SKU" {...productCreateForm.register('sku')} />
-              <ErrorText message={productCreateForm.formState.errors.sku?.message} />
-            </div>
-            <div className="grid gap-1.5">
-              <DashboardInput
-                placeholder="Price"
-                type="number"
-                min={0}
-                step="0.01"
-                {...productCreateForm.register('price')}
-              />
-              <ErrorText message={productCreateForm.formState.errors.price?.message} />
-            </div>
-            <DashboardInput
-              placeholder="Old price"
-              type="number"
-              min={0}
-              step="0.01"
-              {...productCreateForm.register('oldPrice')}
-            />
-            <DashboardInput
-              placeholder="Badge. ex: Sale, New, Hot"
-              {...productCreateForm.register('badge')}
-            />
-            <div className="grid gap-1.5 md:col-span-2">
-              <DashboardInput
-                placeholder="YouTube video URL"
-                {...productCreateForm.register('youtubeVideoUrl')}
-              />
-              <p className="text-xs text-muted-foreground">Paste a YouTube video link</p>
-              <ErrorText message={productCreateForm.formState.errors.youtubeVideoUrl?.message} />
-            </div>
-            <div className="grid gap-1.5">
-              <select
-                className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-                {...productCreateForm.register('category', {
-                  onChange: e => handleCategoryChange(e.target.value),
-                })}
-              >
-                <option value="">Category</option>
-                {categories.flatMap(category =>
-                  category._id
-                    ? [
-                        <option key={category._id} value={category._id}>
-                          {category.name}
-                        </option>,
-                      ]
-                    : [],
-                )}
-              </select>
-              <ErrorText message={productCreateForm.formState.errors.category?.message} />
-            </div>
-            <div className="grid gap-1.5">
-              <select
-                className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-                {...productCreateForm.register('subCategorySlug')}
-                disabled={!createCategory}
-              >
-                <option value="">Sub-category</option>
-                {subCategoryOptions.map(subCategory => (
-                  <option key={subCategory.slug} value={subCategory.slug}>
-                    {subCategory.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="grid gap-1.5">
-              <select
-                className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-                {...productCreateForm.register('brand')}
-              >
-                <option value="">Brand</option>
-                {brandOptions.map(option => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <ErrorText message={productCreateForm.formState.errors.brand?.message} />
-            </div>
-            <div className="grid gap-1.5">
-              <DashboardInput
-                placeholder="Stock count (optional)"
-                type="number"
-                min={0}
-                step={1}
-                {...productCreateForm.register('stock')}
-              />
-              <p className="text-xs text-muted-foreground">Leave blank to keep it always in stock.</p>
-              <ErrorText message={productCreateForm.formState.errors.stock?.message} />
-            </div>
-            <div className="grid gap-1.5">
-              <DashboardInput
-                placeholder="Rating"
-                type="number"
-                min={0}
-                step="0.1"
-                {...productCreateForm.register('rating')}
-              />
-              <ErrorText message={productCreateForm.formState.errors.rating?.message} />
-            </div>
-            <div className="grid gap-1.5">
-              <DashboardInput
-                placeholder="Weight (kg)"
-                type="number"
-                min={0.01}
-                step="0.01"
-                {...productCreateForm.register('weightKg')}
-              />
-              <ErrorText message={productCreateForm.formState.errors.weightKg?.message} />
-            </div>
-            <div className="grid gap-1.5">
-              <DashboardInput
-                placeholder="Selling unit (optional, e.g. pcs)"
-                {...productCreateForm.register('sellingUnit')}
-              />
-              <p className="text-xs text-muted-foreground">Defaults to pcs when left blank.</p>
-              <ErrorText message={productCreateForm.formState.errors.sellingUnit?.message} />
-            </div>
-            <label className="flex items-center gap-2 self-start text-sm">
-              <input type="checkbox" {...productCreateForm.register('isFeatured')} />
-              Featured
-            </label>
-            <label className="flex items-center gap-2 self-start text-sm">
-              <input type="checkbox" {...productCreateForm.register('isNoCOD')} />
-              No COD
-            </label>
-            <label className="flex items-center gap-2 self-start text-sm">
-              <input type="checkbox" {...productCreateForm.register('isActive')} />
-              Active
-            </label>
-            <div className="md:col-span-2">
-              <DashboardRichTextEditor
-                label="Features"
-                value={createFeatures ?? ''}
-                minHeightClassName="min-h-40"
-                onChange={value =>
-                  productCreateForm.setValue('features', value, {
-                    shouldDirty: true,
-                    shouldValidate: true,
-                  })
-                }
-              />
-              <ErrorText message={productCreateForm.formState.errors.features?.message} />
-            </div>
-            <div className="md:col-span-2">
-              <DashboardRichTextEditor
-                label="Description"
-                value={createDescription ?? ''}
-                onChange={value =>
-                  productCreateForm.setValue('description', value, {
-                    shouldDirty: true,
-                    shouldValidate: true,
-                  })
-                }
-              />
-              <ErrorText message={productCreateForm.formState.errors.description?.message} />
-            </div>
-            <div className="md:col-span-2">
-              <Button
-                type="button"
-                disabled={isPending || isCreating}
-                className="gap-2"
-                onClick={productCreateForm.handleSubmit(async values => {
-                  if (productImageFiles.length === 0) {
-                    toast.error('At least one product image is required.');
-                    return;
-                  }
+          <ProductFormSections
+            form={productCreateForm}
+            titleOnChange={handleTitleChange}
+            slugOnChange={handleSlugChange}
+            categoryOnChange={handleCategoryChange}
+            categoryValue={createCategory}
+            subCategoryOptions={subCategoryOptions}
+            categories={categories}
+            brandOptions={brandOptions}
+            featuresValue={createFeatures ?? ''}
+            descriptionValue={createDescription ?? ''}
+            footerAction={
+              <div className="pt-2">
+                <Button
+                  type="button"
+                  disabled={isPending || isCreating}
+                  className="gap-2"
+                  onClick={productCreateForm.handleSubmit(async values => {
+                    if (productImageFiles.length === 0) {
+                      toast.error('At least one product image is required.');
+                      return;
+                    }
 
-                  setIsCreating(true);
-                  const result = await createProduct({
-                    title: values.title.trim(),
-                    slug: values.slug.trim(),
-                    sku: values.sku.trim(),
-                    images: productImageFiles,
-                    features: values.features ?? '',
-                    description: values.description ?? '',
-                    price: Number(values.price),
-                    oldPrice: values.oldPrice?.trim() ? Number(values.oldPrice) : undefined,
-                    badge: values.badge?.trim() || undefined,
-                    youtubeVideoUrl: values.youtubeVideoUrl?.trim() ?? '',
-                    brand: values.brand.trim(),
-                    category: values.category.trim(),
-                    subCategorySlug: values.subCategorySlug?.trim() || undefined,
-                    stock: values.stock.trim() ? Number(values.stock) : null,
-                    rating: Number(values.rating),
-                    weightKg: Number(values.weightKg),
-                    sellingUnit: values.sellingUnit?.trim() || undefined,
-                    isFeatured: values.isFeatured,
-                    isNoCOD: values.isNoCOD,
-                    isActive: values.isActive,
-                  });
-                  setIsCreating(false);
+                    setIsCreating(true);
+                    const result = await createProduct({
+                      title: values.title.trim(),
+                      slug: values.slug.trim(),
+                      sku: values.sku.trim(),
+                      images: productImageFiles,
+                      features: values.features ?? '',
+                      description: values.description ?? '',
+                      price: Number(values.price),
+                      oldPrice: values.oldPrice?.trim() ? Number(values.oldPrice) : undefined,
+                      badge: values.badge?.trim() || undefined,
+                      youtubeVideoUrl: values.youtubeVideoUrl?.trim() ?? '',
+                      brand: values.brand.trim(),
+                      category: values.category.trim(),
+                      subCategorySlug: values.subCategorySlug?.trim() || undefined,
+                      stock: values.stock.trim() ? Number(values.stock) : null,
+                      rating: Number(values.rating),
+                      weightKg: Number(values.weightKg),
+                      sellingUnit: values.sellingUnit,
+                      isFeatured: values.isFeatured,
+                      isNoCOD: values.isNoCOD,
+                      isActive: values.isActive,
+                    });
+                    setIsCreating(false);
 
-                  if (!result?.success)
-                    return refresh(result?.message ?? 'Failed to create product.', 'error');
+                    if (!result?.success)
+                      return refresh(result?.message ?? 'Failed to create product.', 'error');
 
-                  productCreateForm.reset({
-                    title: '',
-                    slug: '',
-                    sku: '',
-                    features: '',
-                    description: '',
-                    price: '',
-                    oldPrice: '',
-                    badge: '',
-                    brand: '',
-                    category: '',
-                    subCategorySlug: '',
-                    stock: '',
-                    rating: '5',
-                    weightKg: '1',
-                    sellingUnit: '',
-                    isFeatured: false,
-                    isNoCOD: false,
-                    isActive: true,
-                  });
-                  productImagePreviews.forEach(preview => {
-                    if (preview.startsWith('blob:')) URL.revokeObjectURL(preview);
-                  });
-                  setProductImageFiles([]);
-                  setProductImagePreviews([]);
-                  setSlugAutoSync(true);
-                  refresh(result.message ?? 'Product created successfully.', 'success');
-                })}
-              >
-                <Plus className="size-4" />
-                {isCreating ? 'Creating product...' : 'Create product'}
-              </Button>
-            </div>
-          </div>
+                    productCreateForm.reset({
+                      title: '',
+                      slug: '',
+                      sku: '',
+                      features: '',
+                      description: '',
+                      price: '',
+                      oldPrice: '',
+                      badge: '',
+                      brand: '',
+                      category: '',
+                      subCategorySlug: '',
+                      stock: '',
+                      rating: '5',
+                      weightKg: '1',
+                      sellingUnit: DEFAULT_SELLING_UNIT,
+                      isFeatured: false,
+                      isNoCOD: false,
+                      isActive: true,
+                    });
+                    productImagePreviews.forEach(preview => {
+                      if (preview.startsWith('blob:')) URL.revokeObjectURL(preview);
+                    });
+                    setProductImageFiles([]);
+                    setProductImagePreviews([]);
+                    setSlugAutoSync(true);
+                    refresh(result.message ?? 'Product created successfully.', 'success');
+                  })}
+                >
+                  <Plus className="size-4" />
+                  {isCreating ? 'Creating product...' : 'Create product'}
+                </Button>
+              </div>
+            }
+          />
           <div className="justify-self-stretch xl:sticky xl:top-6">
             <div
               role="button"
@@ -877,7 +996,7 @@ export function DashboardProductsManager({
                   <UploadCloud className="size-5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="text-sm font-semibold text-foreground">Product images</div>
+                  <div className="text-xs font-medium text-muted-foreground">Product images</div>
                   <p className="text-xs text-muted-foreground">Click or drop to upload up to 5 images.</p>
                   <div className="mt-2 grid grid-cols-2 gap-2">
                     {productImagePreviews.length > 0 ? (
@@ -1031,7 +1150,9 @@ export function DashboardProductsManager({
                             <div className="flex items-start gap-2">
                               <span className="shrink-0">Selling unit:</span>
                               <span className="min-w-0 truncate text-foreground/80">
-                                {product.sellingUnit?.trim() || 'pcs'}
+                                {isSellingUnit(product.sellingUnit)
+                                  ? product.sellingUnit
+                                  : DEFAULT_SELLING_UNIT}
                               </span>
                             </div>
                             <div className="flex items-start gap-2">
@@ -1117,7 +1238,7 @@ export function DashboardProductsManager({
                                     stock: values.stock.trim() ? Number(values.stock) : null,
                                     rating: Number(values.rating),
                                     weightKg: Number(values.weightKg),
-                                    sellingUnit: values.sellingUnit?.trim() || undefined,
+                                    sellingUnit: values.sellingUnit,
                                     isFeatured: values.isFeatured,
                                     isNoCOD: values.isNoCOD,
                                     isActive: values.isActive,
@@ -1172,225 +1293,22 @@ export function DashboardProductsManager({
                       <TableRow key={`${product.sku}-edit`}>
                         <TableCell colSpan={11} className="bg-muted/20">
                           <div className="grid gap-6 rounded-xl border bg-background p-4 xl:grid-cols-[minmax(0,1fr)_340px]">
-                            <div className="grid gap-3 md:grid-cols-2">
-                              <div className="grid gap-1.5 md:col-span-2">
-                                <DashboardInput
-                                  placeholder="Title"
-                                  {...productEditForm.register('title', {
-                                    onChange: e => handleEditingTitleChange(e.target.value),
-                                  })}
-                                />
-                                <ErrorText message={productEditForm.formState.errors.title?.message} />
-                              </div>
-
-                              <div className="grid gap-1.5 md:col-span-2">
-                                <div className="flex items-center gap-2">
-                                  <span>Slug</span>
-                                  <span className="text-xs font-normal text-destructive">
-                                    (Editing is bad for seo)
-                                  </span>
-                                </div>
-                                <DashboardInput
-                                  placeholder="Slug"
-                                  {...productEditForm.register('slug', {
-                                    onChange: e => {
-                                      productEditForm.setValue('slug', slugify(e.target.value), {
-                                        shouldValidate: true,
-                                      });
-                                    },
-                                  })}
-                                />
-                                <ErrorText message={productEditForm.formState.errors.slug?.message} />
-                              </div>
-
-                              <div className="grid gap-1.5">
-                                <DashboardInput
-                                  placeholder="Price"
-                                  type="number"
-                                  min={0}
-                                  step="0.01"
-                                  {...productEditForm.register('price')}
-                                />
-                                <ErrorText message={productEditForm.formState.errors.price?.message} />
-                              </div>
-
-                              <div className="grid gap-1.5">
-                                <DashboardInput
-                                  placeholder="Old price"
-                                  type="number"
-                                  min={0}
-                                  step="0.01"
-                                  {...productEditForm.register('oldPrice')}
-                                />
-                                <ErrorText message={productEditForm.formState.errors.oldPrice?.message} />
-                              </div>
-
-                              <div className="grid gap-1.5">
-                                <DashboardInput
-                                  placeholder="Badge. ex: Sale, New, Hot"
-                                  {...productEditForm.register('badge')}
-                                />
-                                <ErrorText message={productEditForm.formState.errors.badge?.message} />
-                              </div>
-
-                              <div className="grid gap-1.5 md:col-span-2">
-                                <DashboardInput
-                                  placeholder="YouTube video URL"
-                                  {...productEditForm.register('youtubeVideoUrl')}
-                                />
-                                <p className="text-xs text-muted-foreground">Paste a YouTube video link</p>
-                                <ErrorText
-                                  message={productEditForm.formState.errors.youtubeVideoUrl?.message}
-                                />
-                              </div>
-
-                              <div className="grid gap-1.5">
-                                <DashboardInput placeholder="SKU" {...productEditForm.register('sku')} />
-                                <ErrorText message={productEditForm.formState.errors.sku?.message} />
-                              </div>
-
-                              <div className="grid gap-1.5">
-                                <select
-                                  className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-                                  {...productEditForm.register('category', {
-                                    onChange: e => handleEditingCategoryChange(e.target.value),
-                                  })}
-                                >
-                                  <option value="">Category</option>
-                                  {categories.flatMap(category =>
-                                    category._id
-                                      ? [
-                                          <option key={category._id} value={category._id}>
-                                            {category.name}
-                                          </option>,
-                                        ]
-                                      : [],
-                                  )}
-                                </select>
-                                <ErrorText message={productEditForm.formState.errors.category?.message} />
-                              </div>
-
-                              <div className="grid gap-1.5">
-                                <select
-                                  className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-                                  {...productEditForm.register('subCategorySlug')}
-                                  disabled={!editingCategory}
-                                >
-                                  <option value="">Sub-category</option>
-                                  {editingSubCategoryOptions.map(subCategory => (
-                                    <option key={subCategory.slug} value={subCategory.slug}>
-                                      {subCategory.name}
-                                    </option>
-                                  ))}
-                                </select>
-                                <ErrorText
-                                  message={productEditForm.formState.errors.subCategorySlug?.message}
-                                />
-                              </div>
-
-                              <div className="grid gap-1.5">
-                                <select
-                                  className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-                                  {...productEditForm.register('brand')}
-                                >
-                                  <option value="">Brand</option>
-                                  {brandOptions.map(option => (
-                                    <option key={option.value} value={option.value}>
-                                      {option.label}
-                                    </option>
-                                  ))}
-                                </select>
-                                <ErrorText message={productEditForm.formState.errors.brand?.message} />
-                              </div>
-
-                              <div className="grid gap-1.5">
-                                <DashboardInput
-                                  placeholder="Stock count (optional)"
-                                  type="number"
-                                  min={0}
-                                  step={1}
-                                  {...productEditForm.register('stock')}
-                                />
-                                <p className="text-xs text-muted-foreground">
-                                  Leave blank to keep it always in stock.
-                                </p>
-                                <ErrorText message={productEditForm.formState.errors.stock?.message} />
-                              </div>
-
-                              <div className="grid gap-1.5">
-                                <DashboardInput
-                                  placeholder="Rating"
-                                  type="number"
-                                  min={0}
-                                  step="0.1"
-                                  {...productEditForm.register('rating')}
-                                />
-                                <ErrorText message={productEditForm.formState.errors.rating?.message} />
-                              </div>
-
-                              <div className="grid gap-1.5">
-                                <DashboardInput
-                                  placeholder="Weight (kg)"
-                                  type="number"
-                                  min={0.01}
-                                  step="0.01"
-                                  {...productEditForm.register('weightKg')}
-                                />
-                                <ErrorText message={productEditForm.formState.errors.weightKg?.message} />
-                              </div>
-
-                              <div className="grid gap-1.5">
-                                <DashboardInput
-                                  placeholder="Selling unit (optional, e.g. pcs)"
-                                  {...productEditForm.register('sellingUnit')}
-                                />
-                                <p className="text-xs text-muted-foreground">
-                                  Defaults to pcs when left blank.
-                                </p>
-                                <ErrorText message={productEditForm.formState.errors.sellingUnit?.message} />
-                              </div>
-
-                              <label className="flex items-center gap-2 text-sm">
-                                <input type="checkbox" {...productEditForm.register('isFeatured')} />
-                                Featured
-                              </label>
-                              <label className="flex items-center gap-2 text-sm">
-                                <input type="checkbox" {...productEditForm.register('isNoCOD')} />
-                                No COD
-                              </label>
-                              <label className="flex items-center gap-2 text-sm">
-                                <input type="checkbox" {...productEditForm.register('isActive')} />
-                                Active
-                              </label>
-                              <div className="md:col-span-2">
-                                <DashboardRichTextEditor
-                                  label="Features"
-                                  value={editingFeatures ?? ''}
-                                  minHeightClassName="min-h-40"
-                                  onChange={value =>
-                                    productEditForm.setValue('features', value, {
-                                      shouldDirty: true,
-                                      shouldValidate: true,
-                                    })
-                                  }
-                                />
-                                <ErrorText message={productEditForm.formState.errors.features?.message} />
-                              </div>
-                              <div className="md:col-span-2">
-                                <DashboardRichTextEditor
-                                  label="Description"
-                                  value={editingDescription ?? ''}
-                                  onChange={value =>
-                                    productEditForm.setValue('description', value, {
-                                      shouldDirty: true,
-                                      shouldValidate: true,
-                                    })
-                                  }
-                                />
-                                <ErrorText message={productEditForm.formState.errors.description?.message} />
-                              </div>
-                            </div>
-
+                            <ProductFormSections
+                              form={productEditForm}
+                              titleOnChange={handleEditingTitleChange}
+                              slugOnChange={value => {
+                                productEditForm.setValue('slug', slugify(value), {
+                                  shouldValidate: true,
+                                });
+                              }}
+                              categoryOnChange={handleEditingCategoryChange}
+                              categoryValue={editingCategory}
+                              subCategoryOptions={editingSubCategoryOptions}
+                              categories={categories}
+                              brandOptions={brandOptions}
+                              featuresValue={editingFeatures ?? ''}
+                              descriptionValue={editingDescription ?? ''}
+                            />
                             <div className="justify-self-stretch xl:sticky xl:top-6">
                               <div
                                 role="button"
@@ -1413,7 +1331,7 @@ export function DashboardProductsManager({
                                     <UploadCloud className="size-5" />
                                   </div>
                                   <div className="min-w-0 flex-1">
-                                    <div className="text-sm font-semibold text-foreground">
+                                    <div className="text-xs font-medium text-muted-foreground">
                                       Product images
                                     </div>
                                     <p className="text-xs text-muted-foreground">

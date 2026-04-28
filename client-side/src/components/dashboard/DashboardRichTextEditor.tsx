@@ -102,7 +102,7 @@ export function DashboardRichTextEditor({
 
   return (
     <div className="grid gap-2">
-      <label className="text-sm font-semibold text-foreground" htmlFor={editorId}>
+      <label className="text-xs font-medium text-muted-foreground" htmlFor={editorId}>
         {label}
       </label>
       <div className="overflow-hidden rounded-xl border bg-background">

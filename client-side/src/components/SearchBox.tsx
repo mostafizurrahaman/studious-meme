@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { searchProducts, type SearchResult } from '@/services/Product';
 import { Loader2, Search } from 'lucide-react';
 

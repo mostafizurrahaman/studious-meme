@@ -2,6 +2,7 @@ import httpStatus from "http-status";
 import { Types } from "mongoose";
 import { AppError } from "../../utils";
 import { ProductModel } from "../Product/product.model";
+import { DEFAULT_SELLING_UNIT, normalizeSellingUnit } from "../Product/selling-unit";
 import { IUser } from "../User/user.interface";
 import { ComparisonHistoryModel } from "./comparisonHistory.model";
 import { ComparisonHistoryEventModel } from "./comparisonHistoryEvent.model";
@@ -41,7 +42,7 @@ const getProductSnapshot = async (productId: string) => {
       sku: product.sku,
       slug: product.slug,
       price: product.price,
-      sellingUnit: typeof product.sellingUnit === 'string' && product.sellingUnit.trim() ? product.sellingUnit.trim() : 'pcs',
+       sellingUnit: normalizeSellingUnit(product.sellingUnit) ?? DEFAULT_SELLING_UNIT,
       stock: product.stock,
       rating: product.rating,
       oldPrice: product.oldPrice,

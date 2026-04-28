@@ -1,5 +1,6 @@
 import { model, Schema } from 'mongoose';
 import { IProduct } from './product.interface';
+import { DEFAULT_SELLING_UNIT } from './selling-unit';
 
 export type { IProduct } from './product.interface';
 
@@ -44,7 +45,7 @@ const productSchema = new Schema<IProduct>(
     },
     subCategorySlug: { type: String, index: true },
     weightKg: { type: Number, required: true, min: 0.01, default: 1 },
-    sellingUnit: { type: String, trim: true, default: 'pcs' },
+    sellingUnit: { type: String, trim: true, default: DEFAULT_SELLING_UNIT },
     stock: { type: Number, min: 0, default: null },
     rating: { type: Number, required: true, min: 0 },
     isFeatured: { type: Boolean, default: false, index: true },

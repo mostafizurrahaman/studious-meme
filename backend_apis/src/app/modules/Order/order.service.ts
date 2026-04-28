@@ -12,6 +12,7 @@ import {
 } from "./order.interface";
 import { normalizePaymentMethod } from "./order.utils";
 import { CouponService } from "../Coupon/coupon.service";
+import { DEFAULT_SELLING_UNIT, normalizeSellingUnit } from "../Product/selling-unit";
 
 type CreateOrderPayload = {
   items: Array<{ sku: string; quantity: number }>;
@@ -70,12 +71,7 @@ const getAvailableStock = (value: number | null | undefined) =>
   typeof value === "number" && Number.isFinite(value) ? value : null;
 
 const resolveSellingUnit = (value: unknown) => {
-  if (typeof value !== "string") {
-    return "pcs";
-  }
-
-  const trimmed = value.trim();
-  return trimmed === "" ? "pcs" : trimmed;
+  return normalizeSellingUnit(value) ?? DEFAULT_SELLING_UNIT;
 };
 
 const createOrderId = () =>
