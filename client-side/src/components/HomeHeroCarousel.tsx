@@ -48,9 +48,9 @@ export function HomeHeroCarousel({ slides, features }: HomeHeroCarouselProps) {
     );
   }
 
-  const topFeature = featureCards[1] ?? featureCards[0] ?? heroSlide;
-  const bottomFeatures = [featureCards[0], featureCards[2]].filter(Boolean) as HeroSlide[];
-  const mobileFeatures = featureCards.slice(0, 2);
+  const topFeature =  featureCards[0] ?? heroSlide;
+  const bottomFeatures = [featureCards[1], featureCards[2]].filter(Boolean) as HeroSlide[];
+  const mobileFeatures = [featureCards[1], featureCards[2]].filter(Boolean) as HeroSlide[];
 
   return (
     <div className="overflow-hidden border-0 rounded-none bg-transparent shadow-none">
