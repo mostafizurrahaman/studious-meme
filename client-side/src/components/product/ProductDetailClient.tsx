@@ -3,8 +3,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useMemo, useState } from 'react';
-import { MessageCircle, Minus, PackageCheck, Plus, Send, Share, Truck } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { MessageCircle, Minus, PackageCheck, Play, Plus, Send, Share, Truck } from 'lucide-react';
 import PaymentOptionSvg from '@/assets/Payment-Option.svg';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -99,6 +99,20 @@ function sanitizeProductHtml(value: string) {
 
 const YOUTUBE_VIDEO_ID_PATTERN = /^[a-zA-Z0-9_-]{11}$/;
 
+type GalleryMedia =
+  | {
+      type: 'image';
+      src: string;
+      thumb: string;
+      alt: string;
+    }
+  | {
+      type: 'video';
+      src: string;
+      thumb: string;
+      alt: string;
+    };
+
 function resolveYouTubeVideoId(product: Product) {
   if (product.youtubeVideoId?.trim()) {
     return product.youtubeVideoId.trim();
@@ -147,19 +161,57 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
     () => (product.images.length > 0 ? product.images : [getProductPrimaryImage(product)]),
     [product],
   );
-  const [selectedImage, setSelectedImage] = useState(images[0]);
+  const youtubeVideoId = resolveYouTubeVideoId(product);
+  const galleryItems = useMemo<GalleryMedia[]>(() => {
+    const baseItems = images.map((image, index) => ({
+      type: 'image' as const,
+      src: image,
+      thumb: image,
+      alt: `${product.title} image ${index + 1}`,
+    }));
+
+    if (!youtubeVideoId) return baseItems;
+
+    return [
+      ...baseItems,
+      {
+        type: 'video' as const,
+        src: `https://www.youtube-nocookie.com/embed/${youtubeVideoId}?rel=0&modestbranding=1`,
+        thumb: `https://img.youtube.com/vi/${youtubeVideoId}/hqdefault.jpg`,
+        alt: `${product.title} video`,
+      },
+    ];
+  }, [images, product.title, youtubeVideoId]);
+  const [selectedMedia, setSelectedMedia] = useState<GalleryMedia | null>(null);
   const [zoomPosition, setZoomPosition] = useState('50% 50%');
   const [isZooming, setIsZooming] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const description = sanitizeProductHtml(product.description?.trim() ?? '');
   const features = sanitizeProductHtml(product.features?.trim() ?? '');
-  const youtubeVideoId = resolveYouTubeVideoId(product);
   const productUrl = `https://malamal.com.bd/product/${product.slug}/`;
   const encodedProductUrl = encodeURIComponent(productUrl);
   const primaryImage = getProductPrimaryImage(product);
   const shareMedia = primaryImage.startsWith('http') ? primaryImage : `https://malamal.com.bd${primaryImage}`;
 
+  useEffect(() => {
+    setSelectedMedia(current => {
+      if (!current) return galleryItems[0] ?? null;
+
+      const stillExists = galleryItems.some(item => item.src === current.src && item.type === current.type);
+
+      return stillExists ? current : (galleryItems[0] ?? null);
+    });
+  }, [galleryItems]);
+
+  const activeMedia = selectedMedia ?? galleryItems[0] ?? null;
+
+  useEffect(() => {
+    setIsZooming(false);
+    setZoomPosition('50% 50%');
+  }, [activeMedia?.src, activeMedia?.type]);
+
   function handleZoomMove(event: React.MouseEvent<HTMLDivElement>) {
+    if (activeMedia?.type !== 'image') return;
     const rect = event.currentTarget.getBoundingClientRect();
     const x = ((event.clientX - rect.left) / rect.width) * 100;
     const y = ((event.clientY - rect.top) / rect.height) * 100;
@@ -180,26 +232,37 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
     <div className="space-y-8">
       <section className="grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] xl:grid-cols-[620px_minmax(0,1fr)]">
         <div className="space-y-4">
-          <div className={cn('grid gap-3', images.length > 1 ? 'sm:grid-cols-[86px_minmax(0,1fr)]' : '')}>
-            {images.length > 1 ? (
+          <div
+            className={cn('grid gap-3', galleryItems.length > 1 ? 'sm:grid-cols-[86px_minmax(0,1fr)]' : '')}
+          >
+            {galleryItems.length > 1 ? (
               <div className="order-2 flex gap-2 overflow-x-auto sm:order-1 sm:flex-col sm:overflow-visible">
-                {images.map((image, index) => (
+                {galleryItems.map((item, index) => (
                   <button
-                    key={`${image}-${index}`}
+                    key={`${item.type}-${item.src}-${index}`}
                     type="button"
-                    onClick={() => setSelectedImage(image)}
+                    onClick={() => setSelectedMedia(item)}
                     className={cn(
                       'relative size-18 shrink-0 overflow-hidden rounded-lg sm:size-20',
-                      selectedImage === image && 'ring-2 ring-primary/20',
+                      activeMedia?.src === item.src &&
+                        activeMedia.type === item.type &&
+                        'ring-2 ring-primary/20',
                     )}
                   >
                     <Image
-                      src={image}
-                      alt={`${product.title} thumbnail ${index + 1}`}
+                      src={item.thumb}
+                      alt={item.alt}
                       fill
                       sizes="80px"
                       className="object-cover rounded-lg"
                     />
+                    {item.type === 'video' ? (
+                      <span className="absolute inset-0 flex items-center justify-center bg-black/20 text-white">
+                        <span className="flex size-7 items-center justify-center rounded-full bg-black/65">
+                          <Play className="size-3.5 fill-white text-white" />
+                        </span>
+                      </span>
+                    ) : null}
                   </button>
                 ))}
               </div>
@@ -212,33 +275,47 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                 onMouseEnter={() => setIsZooming(true)}
                 onMouseLeave={() => setIsZooming(false)}
               >
-                <Image
-                  src={selectedImage}
-                  alt={product.title}
-                  fill
-                  priority
-                  sizes="(max-width: 1024px) 100vw, 620px"
-                  className={cn(
-                    'object-contain transition-opacity rounded-lg',
-                    isZooming ? 'opacity-0' : 'opacity-100',
-                  )}
-                />
-                <div
-                  className={cn(
-                    'absolute inset-0 overflow-hidden rounded-lg bg-no-repeat transition-opacity',
-                    isZooming ? 'opacity-100' : 'opacity-0',
-                  )}
-                  style={{
-                    backgroundImage: `url(${selectedImage})`,
-                    backgroundSize: '190%',
-                    backgroundPosition: zoomPosition,
-                  }}
-                />
+                {activeMedia?.type === 'video' ? (
+                  <iframe
+                    className="absolute inset-0 h-full w-full rounded-lg"
+                    src={activeMedia.src}
+                    title={activeMedia.alt}
+                    loading="lazy"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  />
+                ) : activeMedia?.src ? (
+                  <>
+                    <Image
+                      src={activeMedia.src}
+                      alt={product.title}
+                      fill
+                      priority
+                      sizes="(max-width: 1024px) 100vw, 620px"
+                      className={cn(
+                        'object-contain transition-opacity rounded-lg',
+                        isZooming ? 'opacity-0' : 'opacity-100',
+                      )}
+                    />
+                    <div
+                      className={cn(
+                        'absolute inset-0 overflow-hidden rounded-lg bg-no-repeat transition-opacity',
+                        isZooming ? 'opacity-100' : 'opacity-0',
+                      )}
+                      style={{
+                        backgroundImage: `url(${activeMedia.src})`,
+                        backgroundSize: '190%',
+                        backgroundPosition: zoomPosition,
+                      }}
+                    />
+                  </>
+                ) : null}
               </div>
             </div>
           </div>
 
-          <Card className="overflow-hidden border-0 bg-secondary text-secondary-foreground shadow-sm p-1">
+          <Card className="hidden overflow-hidden border-0 bg-secondary p-1 text-secondary-foreground shadow-sm lg:block">
             <div className="grid gap-3 p-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:p-4">
               <div className="space-y-2">
                 <div className="inline-flex rounded-full bg-white/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-secondary-foreground">
@@ -292,6 +369,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               {formatPriceLabelWithUnit(product.price, product.sellingUnit)}
             </span>
           </div>
+
           {features ? (
             <div
               className="overflow-hidden text-sm leading-6 text-foreground/75 [&_li]:ml-5 [&_ol]:list-decimal [&_p]:mb-2 [&_ul]:list-disc"
@@ -412,6 +490,31 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
         </div>
       </section>
 
+      <Card className="overflow-hidden border-0 bg-secondary p-1 text-secondary-foreground shadow-sm lg:hidden">
+        <div className="space-y-3 p-3">
+          <div className="flex items-center justify-between gap-3">
+            <div className="inline-flex rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-secondary-foreground">
+              Bulk pricing
+            </div>
+            <span className="hidden text-xs font-medium text-secondary-foreground/70 sm:inline">
+              Quick quote
+            </span>
+          </div>
+          <div className="space-y-1.5">
+            <h2 className="text-base font-extrabold leading-tight sm:text-lg">Need a quote?</h2>
+            <p className="max-w-[28ch] text-sm leading-5 text-secondary-foreground/78">
+              Tell us your quantity and delivery area.
+            </p>
+          </div>
+          <Button
+            asChild
+            className="h-10 w-full rounded-full bg-white px-5 text-sm font-bold text-black! hover:bg-white/90 hover:text-primary!"
+          >
+            <Link href="/quotation-request">Request quote</Link>
+          </Button>
+        </div>
+      </Card>
+
       <section className="rounded-md bg-card p-5 shadow-sm">
         <h2 className="text-xl font-medium text-secondary">Description</h2>
         <div
@@ -424,7 +527,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
         />
       </section>
 
-      {youtubeVideoId ? (
+      {/* {youtubeVideoId ? (
         <section className="rounded-md bg-card p-5 shadow-sm">
           <h2 className="text-xl font-medium text-secondary">Product Video</h2>
           <div className="mt-4 aspect-video overflow-hidden rounded-lg border bg-black">
@@ -439,8 +542,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
             />
           </div>
         </section>
-      ) : null}
-
+      ) : null} */}
     </div>
   );
 }
