@@ -430,7 +430,7 @@ function ProductFormSections({
 
           <div className="grid gap-1.5">
             <FieldLabel>Badge</FieldLabel>
-            <DashboardInput placeholder="Badge, e.g. Sale, New, Hot" {...form.register('badge')} />
+            <DashboardInput placeholder="Badge, e.g. Sale, New, Hot, -25%" {...form.register('badge')} />
             <div className="min-h-4" aria-hidden="true" />
             <ErrorText message={form.formState.errors.badge?.message} />
           </div>

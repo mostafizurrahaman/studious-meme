@@ -6,10 +6,10 @@ import {
   ShieldCheck,
   DoorClosed,
   BadgeCheck,
-  FileText,
-  LayoutGrid,
-  Navigation,
-  Gauge,
+  BadgePercent,
+  GitCompare,
+  Heart,
+  ShoppingCart,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { getCategoryAccentClassName, getCategoryAccentStyle } from '@/lib/category-accent';
@@ -325,10 +325,26 @@ export async function HomePage({ heroContent }: HomePageProps) {
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             {[
-              { title: 'SEO content', text: 'Built for content-rich catalog pages', icon: FileText },
-              { title: 'Product grids', text: 'Structured for live data', icon: LayoutGrid },
-              { title: 'Navigation', text: 'Matches the existing shop flow', icon: Navigation },
-              { title: 'Performance', text: 'Minimal client-side code', icon: Gauge },
+              {
+                title: 'Best Deals',
+                text: 'Find value-for-money products faster',
+                icon: BadgePercent,
+              },
+              {
+                title: 'Compare Products',
+                text: 'Compare specs, prices and choices side by side',
+                icon: GitCompare,
+              },
+              {
+                title: 'Save Wishlist',
+                text: 'Keep favorite products for later purchase',
+                icon: Heart,
+              },
+              {
+                title: 'Easy Shopping',
+                text: 'Add to cart and checkout with confidence',
+                icon: ShoppingCart,
+              },
             ].map(({ title, text, icon: Icon }) => (
               <div
                 key={title}
