@@ -1,20 +1,23 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { formatMoney, formatPriceLabelWithUnit, type CartItem } from "@/lib/cart";
 import { formatDashboardDate } from "@/lib/formatDate";
 import { useCartStore } from "@/lib/cart-store";
 import type { BackendOrder } from "@/services/Order";
+import { OrderReviewDialog } from "@/components/OrderReviewDialog";
 
 export function OrdersPageClient({
   orders,
-  baseHref = "/my-account",
+  baseHref = "/dashboard/user",
 }: {
   orders: BackendOrder[];
   baseHref?: string;
 }) {
+  const [reviewOrder, setReviewOrder] = useState<BackendOrder | null>(null);
   const addItems = useCartStore((state) => state.addItems);
 
   const toCartItems = (order: BackendOrder): CartItem[] =>
@@ -115,7 +118,7 @@ export function OrdersPageClient({
                     asChild
                     className="h-10 rounded-full bg-secondary px-4 text-sm font-semibold text-secondary-foreground hover:bg-secondary/90"
                   >
-                    <Link href={`/my-account/orders/${order.orderId}`}>
+                    <Link href={`${baseHref}/orders/${order.orderId}`}>
                       View details
                     </Link>
                   </Button>
@@ -127,6 +130,16 @@ export function OrdersPageClient({
                   >
                     Reorder
                   </Button>
+                  {order.status === 'DELIVERED' ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setReviewOrder(order)}
+                      className="h-10 rounded-full border-primary/30 px-4 text-sm font-semibold text-primary"
+                    >
+                      Write review
+                    </Button>
+                  ) : null}
                 </div>
               </Card>
             ))
@@ -140,6 +153,13 @@ export function OrdersPageClient({
           )}
         </section>
       </div>
+      {reviewOrder ? (
+        <OrderReviewDialog
+          order={reviewOrder}
+          open={Boolean(reviewOrder)}
+          onOpenChange={(open) => !open && setReviewOrder(null)}
+        />
+      ) : null}
     </main>
   );
 }

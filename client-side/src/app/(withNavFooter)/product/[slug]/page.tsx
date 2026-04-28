@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ProductCard } from '@/components/ProductCard';
 import { ProductDetailClient } from '@/components/product/ProductDetailClient';
+import { ProductReviewsSection } from '@/components/product/ProductReviewsSection';
 import { ProductQuestionsSection } from '@/components/product/ProductQuestionsSection';
 import { SeoScripts } from '@/components/SeoScripts';
 import { buildProductMetadata, buildProductSchemas } from '@/lib/seo';
@@ -12,6 +13,7 @@ import {
   mapBackendProductToStorefrontProduct,
 } from '@/services/Product';
 import { getAnsweredProductQuestionsByProduct } from '@/services/ProductQuestion';
+import { getProductReviewsByProduct } from '@/services/ProductReview';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -76,6 +78,24 @@ export default async function ProductPage({ params }: Props) {
     notFound();
   }
 
+  const reviewsResult = await getProductReviewsByProduct(productId, {
+    page: 1,
+    limit: 5,
+  }).catch(() => null);
+  const approvedReviews = reviewsResult?.data ?? [];
+  const reviewPaginationMeta = {
+    page: reviewsResult?.meta?.page ?? 1,
+    limit: reviewsResult?.meta?.limit ?? 5,
+    total: reviewsResult?.meta?.total ?? approvedReviews.length,
+    totalPages:
+      reviewsResult?.meta?.totalPages ?? (Math.ceil(approvedReviews.length / 5) || 1),
+  };
+  const reviewSummary = {
+    total: reviewsResult?.summary?.total ?? approvedReviews.length,
+    averageRating: reviewsResult?.summary?.averageRating ?? 0,
+    productRating: reviewsResult?.summary?.productRating ?? Number(product.rating),
+  };
+
   const productQuestionsResult = productId
     ? await getAnsweredProductQuestionsByProduct(productId, {
         page: 1,
@@ -110,6 +130,15 @@ export default async function ProductPage({ params }: Props) {
 
           <div className="mt-3 rounded-md bg-background p-3 shadow-sm sm:p-4">
             <ProductDetailClient product={product} />
+          </div>
+
+          <div className="mt-8">
+            <ProductReviewsSection
+              productId={productId}
+              initialReviews={approvedReviews}
+              paginationMeta={reviewPaginationMeta}
+              summary={reviewSummary}
+            />
           </div>
 
           <div className="mt-8">

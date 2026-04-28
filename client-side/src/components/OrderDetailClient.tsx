@@ -13,7 +13,7 @@ import type { BackendOrder } from "@/services/Order";
 
 export function OrderDetailClient({
   order,
-  backHref = "/my-account/orders",
+  backHref = "/dashboard/user/orders",
 }: {
   order: BackendOrder | null;
   backHref?: string;

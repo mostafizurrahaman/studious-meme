@@ -216,11 +216,11 @@
 //   );
 // }
 
-"use client";
+'use client';
 
-import Image from "next/image";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   ChevronDown,
   Crown,
@@ -238,7 +238,7 @@ import {
   BadgeCheck,
   Settings,
   ShieldUser,
-} from "lucide-react";
+} from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -256,25 +256,18 @@ import {
   SidebarSeparator,
   SidebarTrigger,
   useSidebar,
-} from "@/components/ui/sidebar";
+} from '@/components/ui/sidebar';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { UserDropdownMenu } from "@/components/account/UserDropdownMenu";
-import {
-  getRoleLabel,
-  normalizeRole,
-  normalizeRoleSegment,
-} from "@/lib/auth/roles";
-import {
-  getDashboardNavigationItems,
-  getDashboardRoleConfig,
-} from "@/lib/dashboard-navigation";
-import { dashboardPageSlugs, pageLabels } from "@/lib/page-content";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/dropdown-menu';
+import { UserDropdownMenu } from '@/components/account/UserDropdownMenu';
+import { getRoleLabel, normalizeRole, normalizeRoleSegment } from '@/lib/auth/roles';
+import { getDashboardNavigationItems, getDashboardRoleConfig } from '@/lib/dashboard-navigation';
+import { dashboardPageSlugs, pageLabels } from '@/lib/page-content';
+import { cn } from '@/lib/utils';
 
 type DashboardShellProps = {
   children: React.ReactNode;
@@ -288,16 +281,16 @@ type DashboardShellProps = {
 
 function DashboardFooterUser() {
   const { state } = useSidebar();
-  const compact = state === "collapsed";
+  const compact = state === 'collapsed';
 
   return <UserDropdownMenu compact={compact} />;
 }
 
 export function DashboardShell({ children, user }: DashboardShellProps) {
   const pathname = usePathname();
-  const role = normalizeRole(user?.role) ?? "USER";
+  const role = normalizeRole(user?.role) ?? 'USER';
   const roleConfig = getDashboardRoleConfig(role);
-  const normalizedRole = normalizeRoleSegment(user?.role) ?? "user";
+  const normalizedRole = normalizeRoleSegment(user?.role) ?? 'user';
   const iconByLabel: Record<string, typeof LayoutDashboard> = {
     Dashboard: LayoutDashboard,
     Admins: ShieldUser,
@@ -310,39 +303,41 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
     Orders: ReceiptText,
     Payments: ReceiptText,
     Quotations: ReceiptText,
-    "Product Questions": MessageSquareText,
+    'Product Questions': MessageSquareText,
+    'Product Reviews': MessageSquareText,
     Wishlist: Heart,
     Compare: GitCompareArrows,
     Cart: ShoppingCart,
     Profile: Settings,
   };
-  const navItems = getDashboardNavigationItems(role).map((item) => ({
+  const navItems = getDashboardNavigationItems(role).map(item => ({
     ...item,
     icon: iconByLabel[item.label] ?? LayoutDashboard,
   }));
-  const canManagePages = role === "ADMIN" || role === "SUPER_ADMIN";
+  const canManagePages = role === 'ADMIN' || role === 'SUPER_ADMIN';
   const pageBasePath = `/dashboard/${normalizedRole}/pages`;
-  const pageManagementItems = dashboardPageSlugs.map((slug) => ({
+  const pageManagementItems = dashboardPageSlugs.map(slug => ({
     label: pageLabels[slug],
     href: `${pageBasePath}/${slug}`,
   }));
   const hasActivePage = pathname.startsWith(pageBasePath);
   const navSections = [
     {
-      label: "Overview",
-      items: navItems.filter((item) => ["Dashboard"].includes(item.label)),
+      label: 'Overview',
+      items: navItems.filter(item => ['Dashboard'].includes(item.label)),
     },
     {
-      label: "Management",
-      items: navItems.filter((item) =>
+      label: 'Management',
+      items: navItems.filter(item =>
         [
-          "Admins",
-          "Hero Sections",
-          "Users",
-          "Products",
-          "Product Questions",
-          "Brands",
-          "Categories",
+          'Admins',
+          'Hero Sections',
+          'Users',
+          'Products',
+          'Product Questions',
+          'Product Reviews',
+          'Brands',
+          'Categories',
         ].includes(item.label),
       ),
       // TODO: add coupons back
@@ -353,23 +348,16 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
       // ),
     },
     {
-      label: "Sales",
-      items: navItems.filter((item) =>
-        [
-          "Orders",
-          "Payments",
-          "Quotations",
-          "Wishlist",
-          "Compare",
-          "Cart",
-        ].includes(item.label),
+      label: 'Sales',
+      items: navItems.filter(item =>
+        ['Orders', 'Payments', 'Quotations', 'Wishlist', 'Compare', 'Cart'].includes(item.label),
       ),
     },
     {
-      label: "Account",
-      items: navItems.filter((item) => ["Profile"].includes(item.label)),
+      label: 'Account',
+      items: navItems.filter(item => ['Profile'].includes(item.label)),
     },
-  ].filter((section) => section.items.length > 0);
+  ].filter(section => section.items.length > 0);
 
   return (
     <SidebarProvider defaultOpen>
@@ -392,16 +380,12 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
               className="size-12 shrink-0 object-contain transition group-data-[collapsible=icon]:size-8"
             />
             <div className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
-              <p className="truncate text-sm font-bold text-sidebar-foreground">
-                Malamal Dashboard
-              </p>
-              <p className="truncate text-xs font-medium text-sidebar-foreground/65">
-                {roleConfig.eyebrow}
-              </p>
+              <p className="truncate text-sm font-bold text-sidebar-foreground">Malamal Dashboard</p>
+              <p className="truncate text-xs font-medium text-sidebar-foreground/65">{roleConfig.eyebrow}</p>
             </div>
           </Link>
           <div className="flex items-center gap-2 rounded-lg border border-primary/15 bg-primary/8 px-3 py-2 text-primary group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2">
-            {role === "SUPER_ADMIN" ? (
+            {role === 'SUPER_ADMIN' ? (
               <Crown className="size-4 shrink-0" />
             ) : (
               <Sparkles className="size-4 shrink-0" />
@@ -420,7 +404,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
               </SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu className="gap-1">
-                  {section.label === "Management" && canManagePages ? (
+                  {section.label === 'Management' && canManagePages ? (
                     <SidebarMenuItem>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -428,36 +412,30 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
                             isActive={hasActivePage}
                             size="lg"
                             className={cn(
-                              "group/item relative h-12 rounded-lg border border-transparent px-2 text-sm font-semibold transition-all",
+                              'group/item relative h-12 rounded-lg border border-transparent px-2 text-sm font-semibold transition-all',
                               hasActivePage
-                                ? "border-primary/20 bg-primary/12 text-primary shadow-sm ring-1 ring-primary/15 before:absolute before:inset-y-2 before:left-0 before:w-1 before:rounded-r-full before:bg-primary"
-                                : "text-sidebar-foreground/75 hover:border-sidebar-border/70 hover:bg-sidebar-accent/70 hover:text-sidebar-foreground",
+                                ? 'border-primary/20 bg-primary/12 text-primary shadow-sm ring-1 ring-primary/15 before:absolute before:inset-y-2 before:left-0 before:w-1 before:rounded-r-full before:bg-primary'
+                                : 'text-sidebar-foreground/75 hover:border-sidebar-border/70 hover:bg-sidebar-accent/70 hover:text-sidebar-foreground',
                             )}
                           >
                             <span className="flex items-center gap-3">
                               <span
                                 className={cn(
-                                  "flex size-8 shrink-0 items-center justify-center rounded-md transition",
+                                  'flex size-8 shrink-0 items-center justify-center rounded-md transition',
                                   hasActivePage
-                                    ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20"
-                                    : "bg-sidebar-accent text-sidebar-foreground/70 group-hover/item:bg-background group-hover/item:text-primary",
+                                    ? 'bg-primary text-primary-foreground shadow-sm shadow-primary/20'
+                                    : 'bg-sidebar-accent text-sidebar-foreground/70 group-hover/item:bg-background group-hover/item:text-primary',
                                 )}
                               >
                                 <FileText className="size-4" />
                               </span>
-                              <span className="truncate group-data-[collapsible=icon]:hidden">
-                                Pages
-                              </span>
+                              <span className="truncate group-data-[collapsible=icon]:hidden">Pages</span>
                               <ChevronDown className="ml-auto size-4 opacity-70 group-data-[collapsible=icon]:hidden" />
                             </span>
                           </SidebarMenuButton>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          align="start"
-                          side="right"
-                          className="w-52"
-                        >
-                          {pageManagementItems.map((item) => (
+                        <DropdownMenuContent align="start" side="right" className="w-52">
+                          {pageManagementItems.map(item => (
                             <DropdownMenuItem key={item.href} asChild>
                               <Link href={item.href}>{item.label}</Link>
                             </DropdownMenuItem>
@@ -466,11 +444,10 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
                       </DropdownMenu>
                     </SidebarMenuItem>
                   ) : null}
-                  {section.items.map((item) => {
+                  {section.items.map(item => {
                     const active =
                       pathname === item.href ||
-                      (item.href !== `/dashboard/${normalizedRole}` &&
-                        pathname.startsWith(`${item.href}/`));
+                      (item.href !== `/dashboard/${normalizedRole}` && pathname.startsWith(`${item.href}/`));
 
                     return (
                       <SidebarMenuItem key={item.href}>
@@ -479,22 +456,19 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
                           isActive={active}
                           size="lg"
                           className={cn(
-                            "group/item relative h-12 rounded-lg border border-transparent px-2 text-sm font-semibold transition-all",
+                            'group/item relative h-12 rounded-lg border border-transparent px-2 text-sm font-semibold transition-all',
                             active
-                              ? "border-primary/20 bg-primary/12 text-primary shadow-sm ring-1 ring-primary/15 before:absolute before:inset-y-2 before:left-0 before:w-1 before:rounded-r-full before:bg-primary"
-                              : "text-sidebar-foreground/75 hover:border-sidebar-border/70 hover:bg-sidebar-accent/70 hover:text-sidebar-foreground",
+                              ? 'border-primary/20 bg-primary/12 text-primary shadow-sm ring-1 ring-primary/15 before:absolute before:inset-y-2 before:left-0 before:w-1 before:rounded-r-full before:bg-primary'
+                              : 'text-sidebar-foreground/75 hover:border-sidebar-border/70 hover:bg-sidebar-accent/70 hover:text-sidebar-foreground',
                           )}
                         >
-                          <Link
-                            href={item.href}
-                            className="flex items-center gap-3"
-                          >
+                          <Link href={item.href} className="flex items-center gap-3">
                             <span
                               className={cn(
-                                "flex size-8 shrink-0 items-center justify-center rounded-md transition",
+                                'flex size-8 shrink-0 items-center justify-center rounded-md transition',
                                 active
-                                  ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20"
-                                  : "bg-sidebar-accent text-sidebar-foreground/70 group-hover/item:bg-background group-hover/item:text-primary",
+                                  ? 'bg-primary text-primary-foreground shadow-sm shadow-primary/20'
+                                  : 'bg-sidebar-accent text-sidebar-foreground/70 group-hover/item:bg-background group-hover/item:text-primary',
                               )}
                             >
                               <item.icon className="size-4" />
@@ -540,16 +514,12 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
                 </span>
               </div>
               <h1 className="mt-1 truncate text-base font-semibold text-foreground">{`${getRoleLabel(role)} dashboard`}</h1>
-              <p className="truncate text-sm text-muted-foreground">
-                {roleConfig.description}
-              </p>
+              <p className="truncate text-sm text-muted-foreground">{roleConfig.description}</p>
             </div>
           </div>
         </header>
 
-        <div className="min-h-[calc(100vh-4rem)] bg-muted/20 px-4 py-6 md:px-6">
-          {children}
-        </div>
+        <div className="min-h-[calc(100vh-4rem)] bg-muted/20 px-4 py-6 md:px-6">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

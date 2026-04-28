@@ -252,31 +252,10 @@ export const aboutUsMetadata = buildMetadata({
   path: '/about-us',
 });
 
-export const myProfileMetadata = buildMetadata({
-  title: 'My Profile',
-  description: 'Manage your account profile and settings.',
-  path: '/my-account/profile',
-  noindex: true,
-});
-
 export const myAccountMetadata = buildMetadata({
   title: 'My Account - User Dashboard',
   description: 'Manage your account, orders, addresses and preferences.',
   path: '/my-account',
-  noindex: true,
-});
-
-export const ordersMetadata = buildMetadata({
-  title: 'My Orders - Order History',
-  description: 'View all your orders, order details, status and delivery information.',
-  path: '/my-account/orders',
-  noindex: true,
-});
-
-export const orderDetailMetadata = buildMetadata({
-  title: 'Order Details',
-  description: 'View your order details, items, status and delivery information.',
-  path: '/my-account/orders',
   noindex: true,
 });
 
@@ -966,13 +945,13 @@ export const myAccountSchemas = [
 export const ordersSchemas = [
   buildBreadcrumbSchema([
     { name: 'Home', url: '/' },
-    { name: 'My Account', url: '/my-account' },
-    { name: 'Orders', url: '/my-account/orders' },
+    { name: 'Dashboard', url: '/dashboard/user' },
+    { name: 'Orders', url: '/dashboard/user/orders' },
   ]),
   buildWebPageSchema(
-    'My Orders',
+    'Orders',
     'View all your orders, order details, status and delivery information.',
-    '/my-account/orders',
+    '/dashboard/user/orders',
   ),
 ];
 
@@ -980,14 +959,14 @@ export function buildOrderDetailSchemas(orderId: string) {
   return [
     buildBreadcrumbSchema([
       { name: 'Home', url: '/' },
-      { name: 'My Account', url: '/my-account' },
-      { name: 'Orders', url: '/my-account/orders' },
-      { name: `Order ${orderId}`, url: `/my-account/orders/${orderId}` },
+      { name: 'Dashboard', url: '/dashboard/user' },
+      { name: 'Orders', url: '/dashboard/user/orders' },
+      { name: `Order ${orderId}`, url: `/dashboard/user/orders/${orderId}` },
     ]),
     buildWebPageSchema(
       `Order ${orderId}`,
       'View your order details, status and delivery information.',
-      `/my-account/orders/${orderId}`,
+      `/dashboard/user/orders/${orderId}`,
     ),
   ];
 }

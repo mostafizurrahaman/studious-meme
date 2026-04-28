@@ -15,6 +15,8 @@ import { WishlistHistoryRoutes } from "../modules/WishlistHistory/wishlistHistor
 import { CouponRoutes } from "../modules/Coupon/coupon.routes";
 import { ProductQuestionRoutes } from "../modules/ProductQuestion/productQuestion.routes";
 import { ProductQuestionAdminRoutes } from "../modules/ProductQuestion/productQuestion.admin.routes";
+import { ProductReviewRoutes } from "../modules/ProductReview/productReview.routes";
+import { ProductReviewAdminRoutes } from "../modules/ProductReview/productReview.admin.routes";
 
 const router = Router();
 
@@ -54,6 +56,14 @@ const moduleRoutes = [
   {
     path: "/admin/product-questions",
     route: ProductQuestionAdminRoutes,
+  },
+  {
+    path: "/product-reviews",
+    route: ProductReviewRoutes,
+  },
+  {
+    path: "/admin/product-reviews",
+    route: ProductReviewAdminRoutes,
   },
   {
     path: "/compare",

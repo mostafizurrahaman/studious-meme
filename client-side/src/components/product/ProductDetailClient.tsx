@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
-import { CheckCircle2, MessageCircle, Minus, PackageCheck, Plus, Send, Share, Truck } from 'lucide-react';
+import { MessageCircle, Minus, PackageCheck, Plus, Send, Share, Truck } from 'lucide-react';
 import PaymentOptionSvg from '@/assets/Payment-Option.svg';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -441,13 +441,6 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
         </section>
       ) : null}
 
-      <section className="rounded-md bg-card p-5 shadow-sm">
-        <h2 className="text-xl font-medium text-secondary">Customer Reviews</h2>
-        <div className="mt-5 flex items-center gap-2 text-sm text-muted-foreground">
-          <CheckCircle2 className="size-4" />
-          There are no reviews yet.
-        </div>
-      </section>
     </div>
   );
 }

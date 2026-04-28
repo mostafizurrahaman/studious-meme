@@ -12,7 +12,7 @@ import {
 } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
-import { ImagePlus, Pencil, Plus, Trash2, UploadCloud, X } from 'lucide-react';
+import { Copy, ImagePlus, Pencil, Plus, Trash2, UploadCloud, X } from 'lucide-react';
 import { type UseFormReturn, useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 import { Badge } from '@/components/ui/badge';
@@ -705,6 +705,34 @@ export function DashboardProductsManager({
     router.refresh();
   }
 
+  async function handleCopyProductId(productId?: string) {
+    const value = productId?.trim();
+    if (!value) {
+      toast.error('Product ID is not available.');
+      return;
+    }
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(value);
+      } else {
+        const textArea = document.createElement('textarea');
+        textArea.value = value;
+        textArea.setAttribute('readonly', '');
+        textArea.style.position = 'fixed';
+        textArea.style.opacity = '0';
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+      }
+
+      toast.success('Product ID copied.');
+    } catch {
+      toast.error('Could not copy product ID.');
+    }
+  }
+
   function closeDeleteDialog() {
     if (isPending) return;
     setPendingDeleteProduct(null);
@@ -1135,6 +1163,24 @@ export function DashboardProductsManager({
                             Slug: {product.slug}
                           </span>
                           <div className="grid gap-0.5 text-xs text-muted-foreground">
+                            <div className="flex min-w-0 items-center gap-2">
+                              <span className="shrink-0">Product ID:</span>
+                              <code className="min-w-0 max-w-48 truncate rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[11px] font-medium text-foreground/90">
+                                {product._id ?? '-'}
+                              </code>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6 shrink-0 text-muted-foreground hover:text-foreground"
+                                onClick={() => handleCopyProductId(product._id)}
+                                disabled={!product._id}
+                                title="Copy product ID"
+                                aria-label={`Copy product ID for ${product.title}`}
+                              >
+                                <Copy className="h-3.5 w-3.5" />
+                              </Button>
+                            </div>
                             <div className="flex items-start gap-2">
                               <span className="shrink-0">Category:</span>
                               <span className="min-w-0 truncate text-foreground/80">
