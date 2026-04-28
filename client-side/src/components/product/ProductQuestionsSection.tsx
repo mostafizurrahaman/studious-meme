@@ -137,7 +137,7 @@ export function ProductQuestionsSection({
     <section className="rounded-2xl bg-card p-4 shadow-sm sm:p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-secondary sm:text-2xl">Questions & Answers</h2>
+          <h2 className="text-xl font-medium text-secondary">Questions & Answers</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Browse answered questions or ask something before ordering.
           </p>
@@ -154,7 +154,9 @@ export function ProductQuestionsSection({
               No answered questions yet.
             </div>
           ) : (
-            questions.map(question => <QuestionCard key={question._id ?? question.question} question={question} />)
+            questions.map(question => (
+              <QuestionCard key={question._id ?? question.question} question={question} />
+            ))
           )}
 
           {hasMore ? (
@@ -173,9 +175,7 @@ export function ProductQuestionsSection({
               <MessageSquarePlus className="size-5 text-primary" />
               Ask a question
             </CardTitle>
-            <CardDescription>
-              Logged-in users can submit a question for the product team.
-            </CardDescription>
+            <CardDescription>Logged-in users can submit a question for the product team.</CardDescription>
           </CardHeader>
           <CardContent>
             <form className="space-y-3" onSubmit={questionForm.handleSubmit(handleSubmit)}>

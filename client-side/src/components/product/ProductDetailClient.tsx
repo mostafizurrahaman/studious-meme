@@ -330,9 +330,9 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
       </section>
 
       <section className="rounded-md bg-card p-5 shadow-sm">
-        <h2 className="text-xl font-bold text-secondary">Description</h2>
+        <h2 className="text-xl font-medium text-secondary">Description</h2>
         <div
-          className="mt-4 text-sm leading-7 text-foreground/70 [&_a]:font-semibold [&_a]:text-primary [&_h2]:mt-6 [&_h2]:text-xl [&_h2]:font-black [&_h3]:mt-5 [&_h3]:text-lg [&_h3]:font-bold [&_li]:ml-5 [&_ol]:list-decimal [&_p]:mb-3 [&_ul]:list-disc"
+          className="mt-2 text-sm leading-7 text-foreground/70 [&_a]:font-semibold [&_a]:text-primary [&_h2]:mt-6 [&_h2]:text-xl [&_h2]:font-black [&_h3]:mt-5 [&_h3]:text-lg [&_h3]:font-bold [&_li]:ml-5 [&_ol]:list-decimal [&_p]:mb-3 [&_ul]:list-disc"
           dangerouslySetInnerHTML={{
             __html:
               description ||
@@ -342,7 +342,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
       </section>
 
       <section className="rounded-md bg-card p-5 shadow-sm">
-        <h2 className="text-xl font-bold text-secondary">Customer Reviews</h2>
+        <h2 className="text-xl font-medium text-secondary">Customer Reviews</h2>
         <div className="mt-5 flex items-center gap-2 text-sm text-muted-foreground">
           <CheckCircle2 className="size-4" />
           There are no reviews yet.
