@@ -12,7 +12,6 @@ import {
   Gauge,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import { getCategoryAccentClassName, getCategoryAccentStyle } from '@/lib/category-accent';
 import { ProductCard } from '@/components/ProductCard';
 import { SectionHeading } from '@/components/SectionHeading';
@@ -316,7 +315,7 @@ export async function HomePage({ heroContent }: HomePageProps) {
             <p className="text-xs font-medium uppercase tracking-[0.3em] text-secondary-foreground/65">
               Built for the storefront workflow
             </p>
-            <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-4xl">
+            <h2 className="mt-4 text-3xl font-medium leading-tight sm:text-4xl">
               Catalog, cart and checkout flows are all covered here.
             </h2>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-secondary-foreground/78 sm:text-base">

@@ -15,7 +15,7 @@ export function HomeAboutSection() {
   return (
     <Card className="mt-8 shadow-sm">
       <CardContent className="p-6">
-        <h2 className="text-xl font-black text-secondary sm:text-2xl">
+        <h2 className="text-xl font-medium text-secondary sm:text-2xl">
           {siteConfig.name} - Online Hardware Store Bangladesh
         </h2>
         <Separator className="my-5" />
