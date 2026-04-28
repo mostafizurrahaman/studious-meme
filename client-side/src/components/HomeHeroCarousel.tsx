@@ -110,12 +110,12 @@ export function HomeHeroCarousel({ slides, features }: HomeHeroCarouselProps) {
         </div>
 
         {mobileFeatures.length > 0 ? (
-          <div className="no-scrollbar flex snap-x snap-mandatory gap-1.5 overflow-x-auto pt-3 pb-1 pr-4 lg:hidden">
+          <div className="grid grid-cols-2 gap-2 pt-3 pb-1 lg:hidden">
             {mobileFeatures.map((slide, index) => (
               <Link
                 key={`${slide.title}-${index}`}
                 href={slide.href}
-                className="relative aspect-[1.3/1] w-[60%] shrink-0 snap-start overflow-hidden border border-border bg-muted shadow-sm first:ml-0"
+                className="relative aspect-[1.3/1] w-full overflow-hidden border border-border bg-muted p-1.5 shadow-sm"
                 aria-label={slide.title}
               >
                 <Image
