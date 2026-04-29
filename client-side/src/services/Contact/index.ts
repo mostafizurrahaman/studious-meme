@@ -1,8 +1,9 @@
 "use server";
 
 import type { FieldValues } from "react-hook-form";
-import { updateTag } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { requestBackendJson } from "@/lib/backend-api";
+import { CACHE_TAGS } from "@/lib/cache-tags";
 import { getValidAccessTokenForServerHandlerGet } from "@/lib/getValidAccessToken";
 
 type BackendEnvelope<T> = {
@@ -39,7 +40,7 @@ export const createContact = async (
     },
   );
 
-  updateTag("CONTACTS");
+  revalidateTag(CACHE_TAGS.CONTACTS, 'max');
   return result;
 };
 

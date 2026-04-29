@@ -8,7 +8,6 @@ import {
 } from "@/services/Product";
 
 export const metadata = promotionsMetadata;
-export const revalidate = 300;
 
 type Props = {
   searchParams: Promise<{ page?: string; limit?: string }>;

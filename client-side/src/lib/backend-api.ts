@@ -56,6 +56,7 @@ export async function requestBackendJson<T>(
   options: BackendRequestOptions = {},
 ): Promise<T> {
   const { body, headers, token, baseUrl, ...fetchOptions } = options;
+  const method = String(fetchOptions.method ?? "GET").toUpperCase();
 
   const requestHeaders = new Headers(headers);
 
@@ -73,7 +74,6 @@ export async function requestBackendJson<T>(
       ? undefined
       : (body as BodyInit);
 
-  const method = String(fetchOptions.method ?? "GET").toUpperCase();
   const nextOptions =
     !token && method === "GET" && !fetchOptions.cache
       ? {
@@ -85,10 +85,13 @@ export async function requestBackendJson<T>(
         }
       : {};
 
+  const cacheOptions = token && method === "GET" && !fetchOptions.cache ? { cache: "no-store" as const } : {};
+
   const response = await fetch(
     `${(baseUrl ?? getBackendApiBase()).replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`,
     {
       ...fetchOptions,
+      ...cacheOptions,
       ...nextOptions,
       headers: requestHeaders,
       body: requestBody,

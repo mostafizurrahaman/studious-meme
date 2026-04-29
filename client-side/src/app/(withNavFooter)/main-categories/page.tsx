@@ -14,8 +14,6 @@ import {
 } from "@/services/Category/mappers";
 
 export const metadata = mainCategoriesMetadata;
-export const revalidate = 300;
-
 export default async function MainCategoriesPage() {
   const categoriesResult = await getActiveCategories().catch(() => null);
   const backendCategories = Array.isArray(categoriesResult?.data)

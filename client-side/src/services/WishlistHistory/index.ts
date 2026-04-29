@@ -1,7 +1,8 @@
 "use server";
 
-import { updateTag } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { requestBackendJson } from "@/lib/backend-api";
+import { CACHE_TAGS } from "@/lib/cache-tags";
 import {
   getValidAccessTokenForServerActions,
   getValidAccessTokenForServerHandlerGet,
@@ -57,7 +58,7 @@ export const addWishlistItem = async (
     token: accessToken,
   });
 
-  updateTag("WISHLIST");
+  revalidateTag(CACHE_TAGS.WISHLIST, 'max');
   return result;
 };
 
@@ -81,7 +82,7 @@ export const removeWishlistItem = async (
     },
   );
 
-  updateTag("WISHLIST");
+  revalidateTag(CACHE_TAGS.WISHLIST, 'max');
   return result;
 };
 
@@ -99,7 +100,7 @@ export const getMyWishlist = async (): Promise<
     {
       method: "GET",
       token: accessToken,
-      next: { tags: ["WISHLIST"] },
+      next: { tags: [CACHE_TAGS.WISHLIST] },
     },
   );
 };
@@ -129,7 +130,7 @@ export const getAllWishlist = async (
     {
       method: "GET",
       token: accessToken ?? undefined,
-      next: { tags: ["WISHLIST"] },
+      next: { tags: [CACHE_TAGS.WISHLIST] },
     },
   );
 };
@@ -155,7 +156,7 @@ export const getWishlistInsights = async (): Promise<
     {
       method: "GET",
       token: accessToken ?? undefined,
-      next: { tags: ["WISHLIST"] },
+      next: { tags: [CACHE_TAGS.WISHLIST] },
     },
   );
 };

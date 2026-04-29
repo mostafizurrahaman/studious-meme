@@ -1,7 +1,9 @@
 "use server";
 
-import { updateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { requestBackendJson } from "@/lib/backend-api";
+import { CACHE_REVALIDATE } from "@/lib/cache-revalidate";
+import { CACHE_TAGS } from "@/lib/cache-tags";
 import { getValidAccessTokenForServerActions } from "@/lib/getValidAccessToken";
 import type { Brand as StorefrontBrand } from "@/lib/storefront-types";
 import { slugify } from "@/lib/slug";
@@ -58,7 +60,7 @@ export const getAllBrands = async (
     `/brand/brands${query ? `?${query}` : ""}`,
     {
       method: "GET",
-      next: { tags: ["BRANDS"] },
+      next: { revalidate: CACHE_REVALIDATE.LONG, tags: [CACHE_TAGS.BRANDS] },
     },
   );
 };
@@ -107,7 +109,7 @@ export const getActiveBrands = async (): Promise<
     "/brand/brands/active",
     {
       method: "GET",
-      next: { tags: ["BRANDS"] },
+      next: { revalidate: CACHE_REVALIDATE.LONG, tags: [CACHE_TAGS.BRANDS] },
     },
   );
 };
@@ -119,7 +121,10 @@ export const getBrandBySlug = async (
     `/brand/brands/${slug}`,
     {
       method: "GET",
-      next: { tags: ["BRANDS"] },
+      next: {
+        revalidate: CACHE_REVALIDATE.LONG,
+        tags: [CACHE_TAGS.BRANDS, CACHE_TAGS.BRAND(slug)],
+      },
     },
   );
 };
@@ -131,7 +136,10 @@ export const getActiveBrandBySlug = async (
     `/brand/brands/active/${slug}`,
     {
       method: "GET",
-      next: { tags: ["BRANDS"] },
+      next: {
+        revalidate: CACHE_REVALIDATE.LONG,
+        tags: [CACHE_TAGS.BRANDS, CACHE_TAGS.BRAND(slug)],
+      },
     },
   );
 };
@@ -183,7 +191,9 @@ export const createBrand = async (
     },
   );
 
-  updateTag("BRANDS");
+  revalidateTag(CACHE_TAGS.BRANDS, 'max');
+
+  revalidatePath('/shop-by-brands');
   return result;
 };
 
@@ -204,7 +214,7 @@ export const updateBrand = async (
     },
   );
 
-  updateTag("BRANDS");
+  revalidateTag(CACHE_TAGS.BRANDS, 'max');
   return result;
 };
 
@@ -220,6 +230,6 @@ export const deleteBrand = async (
     },
   );
 
-  updateTag("BRANDS");
+  revalidateTag(CACHE_TAGS.BRANDS, 'max');
   return result;
 };

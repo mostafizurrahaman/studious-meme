@@ -1,7 +1,9 @@
 'use server';
 
-import { updateTag } from 'next/cache';
+import { revalidateTag } from 'next/cache';
 import { requestBackendJson } from '@/lib/backend-api';
+import { CACHE_REVALIDATE } from '@/lib/cache-revalidate';
+import { CACHE_TAGS } from '@/lib/cache-tags';
 import {
   getValidAccessTokenForServerActions,
   getValidAccessTokenForServerHandlerGet,
@@ -185,7 +187,7 @@ export const createProductReview = async (
     token: accessToken,
   });
 
-  updateTag('PRODUCT_REVIEWS');
+  revalidateTag(CACHE_TAGS.PRODUCT_REVIEWS, 'max');
   return result;
 };
 
@@ -197,7 +199,10 @@ export const getProductReviewsByProduct = async (
     `/product-reviews/product/${productId}${buildReviewQuery(params)}`,
     {
       method: 'GET',
-      next: { tags: ['PRODUCT_REVIEWS'] },
+      next: {
+        revalidate: CACHE_REVALIDATE.DEFAULT,
+        tags: [CACHE_TAGS.PRODUCT_REVIEWS, CACHE_TAGS.PRODUCT(productId)],
+      },
     },
   );
 };
@@ -210,7 +215,7 @@ export const getAdminProductReviews = async (
   return requestBackendJson<ProductReviewListResponse>(`/admin/product-reviews${buildReviewQuery(params)}`, {
     method: 'GET',
     token: accessToken ?? undefined,
-    next: { tags: ['PRODUCT_REVIEWS'] },
+    next: { revalidate: CACHE_REVALIDATE.DEFAULT, tags: [CACHE_TAGS.PRODUCT_REVIEWS] },
   });
 };
 
@@ -229,7 +234,7 @@ export const createManualProductReview = async (
     token: accessToken,
   });
 
-  updateTag('PRODUCT_REVIEWS');
+  revalidateTag(CACHE_TAGS.PRODUCT_REVIEWS, 'max');
   return result;
 };
 
@@ -252,7 +257,7 @@ export const updateProductReview = async (
     },
   );
 
-  updateTag('PRODUCT_REVIEWS');
+  revalidateTag(CACHE_TAGS.PRODUCT_REVIEWS, 'max');
   return result;
 };
 
@@ -275,7 +280,7 @@ export const updateProductReviewStatus = async (
     },
   );
 
-  updateTag('PRODUCT_REVIEWS');
+  revalidateTag(CACHE_TAGS.PRODUCT_REVIEWS, 'max');
   return result;
 };
 
@@ -296,6 +301,6 @@ export const deleteProductReview = async (
     },
   );
 
-  updateTag('PRODUCT_REVIEWS');
+  revalidateTag(CACHE_TAGS.PRODUCT_REVIEWS, 'max');
   return result;
 };

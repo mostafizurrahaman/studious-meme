@@ -14,8 +14,6 @@ import {
   type BackendCategory,
 } from "@/services/Category/mappers";
 
-export const revalidate = 300;
-
 const MainLayout = async ({ children }: { children: React.ReactNode }) => {
   const [categoriesResult, brandsResult] = await Promise.all([
     getActiveCategories().catch(() => null),

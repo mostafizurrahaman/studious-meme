@@ -1,7 +1,9 @@
 "use server";
 
-import { updateTag } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { requestBackendJson } from "@/lib/backend-api";
+import { CACHE_REVALIDATE } from "@/lib/cache-revalidate";
+import { CACHE_TAGS } from "@/lib/cache-tags";
 import { getValidAccessTokenForServerActions } from "@/lib/getValidAccessToken";
 import type { BackendBrand } from "@/services/Brand";
 import type { BackendCategory } from "@/services/Category/mappers";
@@ -56,7 +58,18 @@ export const getHomeContent = async (): Promise<
     }>
   >("/hero/home", {
     method: "GET",
-    next: { tags: ["HERO", "PRODUCTS", "BRANDS", "CATEGORIES"] },
+    next: {
+      revalidate: CACHE_REVALIDATE.LONG,
+      tags: [
+        CACHE_TAGS.HOME_CONTENT,
+        CACHE_TAGS.MARKETING_CONTENT,
+        CACHE_TAGS.PRODUCTS,
+        CACHE_TAGS.FEATURED_PRODUCTS,
+        CACHE_TAGS.LATEST_PRODUCTS,
+        CACHE_TAGS.BRANDS,
+        CACHE_TAGS.CATEGORIES,
+      ],
+    },
   });
 };
 
@@ -67,7 +80,7 @@ export const getAllHeroSections = async (): Promise<
     "/hero/heroes",
     {
       method: "GET",
-      next: { tags: ["HERO"] },
+      next: { revalidate: CACHE_REVALIDATE.LONG, tags: [CACHE_TAGS.HERO, CACHE_TAGS.MARKETING_CONTENT] },
     },
   );
 };
@@ -79,7 +92,7 @@ export const getHeroSectionById = async (
     `/hero/heroes/${id}`,
     {
       method: "GET",
-      next: { tags: ["HERO"] },
+      next: { revalidate: CACHE_REVALIDATE.LONG, tags: [CACHE_TAGS.HERO, CACHE_TAGS.MARKETING_CONTENT] },
     },
   );
 };
@@ -137,7 +150,9 @@ export const createHeroSection = async (
     },
   );
 
-  updateTag("HERO");
+  revalidateTag(CACHE_TAGS.HERO, 'max');
+  revalidateTag(CACHE_TAGS.HOME_CONTENT, 'max');
+  revalidateTag(CACHE_TAGS.MARKETING_CONTENT, 'max');
   return result;
 };
 
@@ -155,7 +170,9 @@ export const updateHeroSection = async (
     },
   );
 
-  updateTag("HERO");
+  revalidateTag(CACHE_TAGS.HERO, 'max');
+  revalidateTag(CACHE_TAGS.HOME_CONTENT, 'max');
+  revalidateTag(CACHE_TAGS.MARKETING_CONTENT, 'max');
   return result;
 };
 
@@ -171,6 +188,8 @@ export const deleteHeroSection = async (
     },
   );
 
-  updateTag("HERO");
+  revalidateTag(CACHE_TAGS.HERO, 'max');
+  revalidateTag(CACHE_TAGS.HOME_CONTENT, 'max');
+  revalidateTag(CACHE_TAGS.MARKETING_CONTENT, 'max');
   return result;
 };

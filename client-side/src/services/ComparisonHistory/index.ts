@@ -1,7 +1,8 @@
 "use server";
 
-import { updateTag } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { requestBackendJson } from "@/lib/backend-api";
+import { CACHE_TAGS } from "@/lib/cache-tags";
 import {
   getValidAccessTokenForServerActions,
   getValidAccessTokenForServerHandlerGet,
@@ -61,7 +62,7 @@ export const addCompareItem = async (
     token: accessToken,
   });
 
-  updateTag("COMPARISON_HISTORY");
+  revalidateTag(CACHE_TAGS.COMPARISON_HISTORY, 'max');
   return result;
 };
 
@@ -85,7 +86,7 @@ export const removeCompareItem = async (
     },
   );
 
-  updateTag("COMPARISON_HISTORY");
+  revalidateTag(CACHE_TAGS.COMPARISON_HISTORY, 'max');
   return result;
 };
 
@@ -103,7 +104,7 @@ export const getMyComparisonHistory = async (): Promise<
     {
       method: "GET",
       token: accessToken,
-      next: { tags: ["COMPARISON_HISTORY"] },
+      next: { tags: [CACHE_TAGS.COMPARISON_HISTORY] },
     },
   );
 };
@@ -133,7 +134,7 @@ export const getAllComparisonHistory = async (
     {
       method: "GET",
       token: accessToken ?? undefined,
-      next: { tags: ["COMPARISON_HISTORY"] },
+      next: { tags: [CACHE_TAGS.COMPARISON_HISTORY] },
     },
   );
 };
@@ -159,7 +160,7 @@ export const getComparisonInsights = async (): Promise<
     {
       method: "GET",
       token: accessToken ?? undefined,
-      next: { tags: ["COMPARISON_HISTORY"] },
+      next: { tags: [CACHE_TAGS.COMPARISON_HISTORY] },
     },
   );
 };

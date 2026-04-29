@@ -1,7 +1,8 @@
 "use server";
 
-import { updateTag } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { requestBackendJson } from "@/lib/backend-api";
+import { CACHE_TAGS } from "@/lib/cache-tags";
 import {
   getValidAccessTokenForServerActions,
   getValidAccessTokenForServerHandlerGet,
@@ -87,7 +88,7 @@ export const getMyCart = async (): Promise<BackendEnvelope<BackendCart>> => {
   return requestBackendJson<BackendEnvelope<BackendCart>>("/cart", {
     method: "GET",
     token: accessToken,
-    next: { tags: ["CART"] },
+    next: { tags: [CACHE_TAGS.CART] },
   });
 };
 
@@ -113,7 +114,7 @@ export const addCartItem = async (
     },
   );
 
-  updateTag("CART");
+  revalidateTag(CACHE_TAGS.CART, 'max');
   return result;
 };
 
@@ -139,7 +140,7 @@ export const updateCartItem = async (
     },
   );
 
-  updateTag("CART");
+  revalidateTag(CACHE_TAGS.CART, 'max');
   return result;
 };
 
@@ -163,7 +164,7 @@ export const removeCartItem = async (
     },
   );
 
-  updateTag("CART");
+  revalidateTag(CACHE_TAGS.CART, 'max');
   return result;
 };
 
@@ -185,7 +186,7 @@ export const clearCart = async (): Promise<BackendEnvelope<BackendCart>> => {
     },
   );
 
-  updateTag("CART");
+  revalidateTag(CACHE_TAGS.CART, 'max');
   return result;
 };
 
@@ -209,7 +210,7 @@ export const getAllCarts = async (
     {
       method: "GET",
       token: accessToken ?? undefined,
-      next: { tags: ["CART"] },
+      next: { tags: [CACHE_TAGS.CART] },
     },
   );
 };
@@ -235,7 +236,7 @@ export const getCartInsights = async (): Promise<
     {
       method: "GET",
       token: accessToken ?? undefined,
-      next: { tags: ["CART"] },
+      next: { tags: [CACHE_TAGS.CART] },
     },
   );
 };

@@ -10,7 +10,6 @@ import {
 } from "@/services/Brand";
 
 export const metadata = shopByBrandsMetadata;
-export const revalidate = 300;
 
 export default async function ShopByBrandsPage() {
   const brandsResult = await getActiveBrands().catch(() => null);

@@ -1,7 +1,9 @@
 'use server';
 
-import { updateTag } from 'next/cache';
+import { revalidateTag } from 'next/cache';
 import { requestBackendJson } from '@/lib/backend-api';
+import { CACHE_REVALIDATE } from '@/lib/cache-revalidate';
+import { CACHE_TAGS } from '@/lib/cache-tags';
 import {
   getValidAccessTokenForServerActions,
   getValidAccessTokenForServerHandlerGet,
@@ -117,7 +119,7 @@ export const createProductQuestion = async (
     token: accessToken,
   });
 
-  updateTag('PRODUCT_QUESTIONS');
+  revalidateTag(CACHE_TAGS.PRODUCT_QUESTIONS, 'max');
   return result;
 };
 
@@ -129,7 +131,10 @@ export const getAnsweredProductQuestionsByProduct = async (
     `/product-questions/product/${productId}${buildQuestionQuery(params)}`,
     {
       method: 'GET',
-      next: { tags: ['PRODUCT_QUESTIONS'] },
+      next: {
+        revalidate: CACHE_REVALIDATE.DEFAULT,
+        tags: [CACHE_TAGS.PRODUCT_QUESTIONS, CACHE_TAGS.PRODUCT(productId)],
+      },
     },
   );
 };
@@ -144,7 +149,7 @@ export const getAllProductQuestions = async (
     {
       method: 'GET',
       token: accessToken ?? undefined,
-      next: { tags: ['PRODUCT_QUESTIONS'] },
+      next: { revalidate: CACHE_REVALIDATE.DEFAULT, tags: [CACHE_TAGS.PRODUCT_QUESTIONS] },
     },
   );
 };
@@ -171,7 +176,7 @@ export const answerProductQuestion = async (
     },
   );
 
-  updateTag('PRODUCT_QUESTIONS');
+  revalidateTag(CACHE_TAGS.PRODUCT_QUESTIONS, 'max');
   return result;
 };
 
@@ -197,7 +202,7 @@ export const updateProductQuestionStatus = async (
     },
   );
 
-  updateTag('PRODUCT_QUESTIONS');
+  revalidateTag(CACHE_TAGS.PRODUCT_QUESTIONS, 'max');
   return result;
 };
 
@@ -221,6 +226,6 @@ export const deleteProductQuestion = async (
     },
   );
 
-  updateTag('PRODUCT_QUESTIONS');
+  revalidateTag(CACHE_TAGS.PRODUCT_QUESTIONS, 'max');
   return result;
 };

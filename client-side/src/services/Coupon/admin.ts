@@ -1,7 +1,8 @@
 "use server";
 
-import { updateTag } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { requestBackendJson } from "@/lib/backend-api";
+import { CACHE_TAGS } from "@/lib/cache-tags";
 import {
   getValidAccessTokenForServerActions,
   getValidAccessTokenForServerHandlerGet,
@@ -35,7 +36,7 @@ type CouponQueryParams = {
   discountType?: CouponDiscountType;
 };
 
-const COUPON_TAG = "COUPONS";
+// const COUPON_TAG = "COUPONS";
 
 const normalizeOptionalText = (value?: string) => {
   const text = value?.trim();
@@ -157,7 +158,7 @@ export const createCoupon = async (
     },
   );
 
-  updateTag(COUPON_TAG);
+  revalidateTag(CACHE_TAGS.COUPONS, 'max');
   return result;
 };
 
@@ -175,7 +176,7 @@ export const updateCoupon = async (
     },
   );
 
-  updateTag(COUPON_TAG);
+  revalidateTag(CACHE_TAGS.COUPONS, 'max');
   return result;
 };
 
@@ -193,7 +194,7 @@ export const updateCouponStatus = async (
     },
   );
 
-  updateTag(COUPON_TAG);
+  revalidateTag(CACHE_TAGS.COUPONS, 'max');
   return result;
 };
 
@@ -209,6 +210,6 @@ export const deleteCoupon = async (
     },
   );
 
-  updateTag(COUPON_TAG);
+  revalidateTag(CACHE_TAGS.COUPONS, 'max');
   return result;
 };

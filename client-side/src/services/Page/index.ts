@@ -1,9 +1,10 @@
 "use server";
 
 import type { FieldValues } from "react-hook-form";
-import { updateTag } from "next/cache";
-
+import { revalidateTag } from "next/cache";
 import { requestBackendJson } from "@/lib/backend-api";
+import { CACHE_REVALIDATE } from "@/lib/cache-revalidate";
+import { CACHE_TAGS } from "@/lib/cache-tags";
 import { getValidAccessTokenForServerActions } from "@/lib/getValidAccessToken";
 import type { BackendPage } from "@/lib/page-content";
 
@@ -19,7 +20,7 @@ export const getAllPages = async (): Promise<
 > => {
   return requestBackendJson<BackendEnvelope<BackendPage[]>>("/page/retrieve", {
     method: "GET",
-    next: { tags: ["PAGES"] },
+    next: { revalidate: CACHE_REVALIDATE.LONG, tags: [CACHE_TAGS.PAGES, CACHE_TAGS.MARKETING_CONTENT] },
   });
 };
 
@@ -30,7 +31,7 @@ export const getPageByType = async (
     `/page/retrieve/${type}`,
     {
       method: "GET",
-      next: { tags: ["PAGES"] },
+      next: { revalidate: CACHE_REVALIDATE.LONG, tags: [CACHE_TAGS.PAGES, CACHE_TAGS.MARKETING_CONTENT] },
     },
   );
 };
@@ -48,6 +49,7 @@ export const createOrUpdatePageByType = async (
     },
   );
 
-  updateTag("PAGES");
+  revalidateTag(CACHE_TAGS.PAGES, 'max');
+  revalidateTag(CACHE_TAGS.MARKETING_CONTENT, 'max');
   return result;
 };

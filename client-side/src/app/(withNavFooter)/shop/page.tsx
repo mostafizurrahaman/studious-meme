@@ -13,7 +13,6 @@ import {
 } from "@/services/Product";
 
 export const metadata = shopMetadata;
-export const revalidate = 300;
 
 type Props = {
   searchParams: Promise<{

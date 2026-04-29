@@ -1,7 +1,9 @@
 "use server";
 
-import { updateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { requestBackendJson } from "@/lib/backend-api";
+import { CACHE_REVALIDATE } from "@/lib/cache-revalidate";
+import { CACHE_TAGS } from "@/lib/cache-tags";
 import { getValidAccessTokenForServerActions } from "@/lib/getValidAccessToken";
 import { slugify } from "@/lib/slug";
 import type { BackendCategory } from "./mappers";
@@ -57,7 +59,7 @@ type CategoryMutationPayload = {
 export const getAllCategories = async (): Promise<BackendEnvelope<unknown>> => {
   return requestBackendJson<BackendEnvelope<unknown>>("/category/categories", {
     method: "GET",
-    next: { tags: ["CATEGORIES"] },
+    next: { revalidate: CACHE_REVALIDATE.LONG, tags: [CACHE_TAGS.CATEGORIES] },
   });
 };
 
@@ -68,7 +70,7 @@ export const getActiveCategories = async (): Promise<
     "/category/categories/active",
     {
       method: "GET",
-      next: { tags: ["CATEGORIES"] },
+      next: { revalidate: CACHE_REVALIDATE.LONG, tags: [CACHE_TAGS.CATEGORIES] },
     },
   );
 };
@@ -78,7 +80,7 @@ export const getAllCategoriesNameAndId = async (): Promise<
 > => {
   return requestBackendJson<BackendEnvelope<unknown>>("/category/categories", {
     method: "GET",
-    next: { tags: ["CATEGORIES"] },
+    next: { revalidate: CACHE_REVALIDATE.LONG, tags: [CACHE_TAGS.CATEGORIES] },
   });
 };
 
@@ -89,7 +91,10 @@ export const getCategoryBySlug = async (
     `/category/categories/${slug}`,
     {
       method: "GET",
-      next: { tags: ["CATEGORIES"] },
+      next: {
+        revalidate: CACHE_REVALIDATE.LONG,
+        tags: [CACHE_TAGS.CATEGORIES, CACHE_TAGS.CATEGORY(slug)],
+      },
     },
   );
 };
@@ -101,7 +106,10 @@ export const getActiveCategoryBySlug = async (
     `/category/categories/active/${slug}`,
     {
       method: "GET",
-      next: { tags: ["CATEGORIES"] },
+      next: {
+        revalidate: CACHE_REVALIDATE.LONG,
+        tags: [CACHE_TAGS.CATEGORIES, CACHE_TAGS.CATEGORY(slug)],
+      },
     },
   );
 };
@@ -126,7 +134,9 @@ export const createCategory = async (
     },
   );
 
-  updateTag("CATEGORIES");
+  revalidateTag(CACHE_TAGS.CATEGORIES, 'max');
+
+  revalidatePath(`/category/${slugify(payload.slug ?? payload.name)}`);
   return result;
 };
 
@@ -151,7 +161,7 @@ export const updateCategory = async (
     },
   );
 
-  updateTag("CATEGORIES");
+  revalidateTag(CACHE_TAGS.CATEGORIES, 'max');
   return result;
 };
 
@@ -167,7 +177,7 @@ export const deleteCategory = async (
     },
   );
 
-  updateTag("CATEGORIES");
+  revalidateTag(CACHE_TAGS.CATEGORIES, 'max');
   return result;
 };
 
@@ -188,7 +198,7 @@ export const createCategorySubCategory = async (
     },
   );
 
-  updateTag("CATEGORIES");
+  revalidateTag(CACHE_TAGS.CATEGORIES, 'max');
   return result;
 };
 
@@ -210,7 +220,7 @@ export const updateCategorySubCategory = async (
     },
   );
 
-  updateTag("CATEGORIES");
+  revalidateTag(CACHE_TAGS.CATEGORIES, 'max');
   return result;
 };
 
@@ -227,6 +237,6 @@ export const deleteCategorySubCategory = async (
     },
   );
 
-  updateTag("CATEGORIES");
+  revalidateTag(CACHE_TAGS.CATEGORIES, 'max');
   return result;
 };

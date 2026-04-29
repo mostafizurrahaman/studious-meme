@@ -1,8 +1,10 @@
 'use server';
 
-import { updateTag } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 
 import { requestBackendJson } from '@/lib/backend-api';
+import { CACHE_REVALIDATE } from '@/lib/cache-revalidate';
+import { CACHE_TAGS } from '@/lib/cache-tags';
 import { getValidAccessTokenForServerActions } from '@/lib/getValidAccessToken';
 import { formatStockLabel } from '@/lib/stock';
 import type { Product as StorefrontProduct } from '@/lib/storefront-types';
@@ -150,7 +152,10 @@ export const getAllProducts = async (
 
   return requestBackendJson<BackendEnvelope<BackendProduct[]>>(
     `/product/products${query ? `?${query}` : ''}`,
-    { method: 'GET', next: { tags: ['PRODUCTS'] } },
+    {
+      method: 'GET',
+      next: { revalidate: CACHE_REVALIDATE.DEFAULT, tags: [CACHE_TAGS.PRODUCTS] },
+    },
   );
 };
 
@@ -160,7 +165,10 @@ const fetchActiveProductsPage = async (pageParams: Omit<GetAllProductsParams, 'i
 
   return requestBackendJson<BackendEnvelope<BackendProduct[]>>(
     `/product/products/active${query ? `?${query}` : ''}`,
-    { method: 'GET', next: { tags: ['PRODUCTS'] } },
+    {
+      method: 'GET',
+      next: { revalidate: CACHE_REVALIDATE.DEFAULT, tags: [CACHE_TAGS.PRODUCTS] },
+    },
   );
 };
 
@@ -210,7 +218,10 @@ export const getAllActiveProductsAcrossPages = async (
 export const getProductBySlug = async (slug: string): Promise<BackendEnvelope<BackendProduct>> => {
   return requestBackendJson<BackendEnvelope<BackendProduct>>(`/product/products/${slug}`, {
     method: 'GET',
-    next: { tags: ['PRODUCTS'] },
+    next: {
+      revalidate: CACHE_REVALIDATE.DEFAULT,
+      tags: [CACHE_TAGS.PRODUCTS, CACHE_TAGS.PRODUCT(slug)],
+    },
   });
 };
 
@@ -219,7 +230,10 @@ export const getActiveProductBySlug = async (
 ): Promise<BackendEnvelope<BackendProduct | null>> => {
   return requestBackendJson<BackendEnvelope<BackendProduct | null>>(`/product/products/active/${slug}`, {
     method: 'GET',
-    next: { tags: ['PRODUCTS'] },
+    next: {
+      revalidate: CACHE_REVALIDATE.DEFAULT,
+      tags: [CACHE_TAGS.PRODUCTS, CACHE_TAGS.PRODUCT(slug)],
+    },
   });
 };
 
@@ -241,7 +255,10 @@ export const getProductsByCategorySlug = async (
     `/product/products/by-category/${slug}${query ? `?${query}` : ''}`,
     {
       method: 'GET',
-      next: { tags: ['PRODUCTS', 'CATEGORIES'] },
+      next: {
+        revalidate: CACHE_REVALIDATE.DEFAULT,
+        tags: [CACHE_TAGS.PRODUCTS, CACHE_TAGS.CATEGORIES, CACHE_TAGS.CATEGORY(slug)],
+      },
     },
   );
 };
@@ -264,7 +281,10 @@ export const getProductsBySubCategorySlug = async (
     `/product/products/by-sub-category/${slug}${query ? `?${query}` : ''}`,
     {
       method: 'GET',
-      next: { tags: ['PRODUCTS', 'CATEGORIES'] },
+      next: {
+        revalidate: CACHE_REVALIDATE.DEFAULT,
+        tags: [CACHE_TAGS.PRODUCTS, CACHE_TAGS.CATEGORIES, CACHE_TAGS.CATEGORY(slug)],
+      },
     },
   );
 };
@@ -333,7 +353,7 @@ export const createProduct = async (
     token: accessToken ?? undefined,
   });
 
-  updateTag('PRODUCTS');
+  revalidateTag(CACHE_TAGS.PRODUCTS, 'max');
   return result;
 };
 
@@ -342,16 +362,23 @@ export const updateProduct = async (
   payload: Partial<ProductMutationPayload>,
 ): Promise<BackendEnvelope<BackendProduct>> => {
   const accessToken = await getValidAccessTokenForServerActions();
+  const nextSlug = payload.slug ? slugify(payload.slug) : slug;
   const result = await requestBackendJson<BackendEnvelope<BackendProduct>>(`/product/products/${slug}`, {
     method: 'PATCH',
     body: toFormData({
       ...payload,
-      slug: payload.slug ? slugify(payload.slug) : payload.slug,
+      slug: payload.slug ? nextSlug : payload.slug,
     }),
     token: accessToken ?? undefined,
   });
 
-  updateTag('PRODUCTS');
+  revalidateTag(CACHE_TAGS.PRODUCTS, 'max');
+
+  if (nextSlug !== slug) {
+    revalidatePath(`/product/${slug}`);
+    revalidatePath(`/product/${nextSlug}`);
+  }
+
   return result;
 };
 
@@ -362,7 +389,7 @@ export const deleteProduct = async (slug: string): Promise<BackendEnvelope<Backe
     token: accessToken ?? undefined,
   });
 
-  updateTag('PRODUCTS');
+  revalidateTag(CACHE_TAGS.PRODUCTS, 'max');
   return result;
 };
 
@@ -387,7 +414,10 @@ export const searchProducts = async (searchTerm: string, limit = 10): Promise<Se
     limit: String(limit),
   });
 
-  const result = await requestBackendJson<BackendEnvelope<SearchResult>>(`/product/search?${params}`);
+  const result = await requestBackendJson<BackendEnvelope<SearchResult>>(`/product/search?${params}`, {
+    method: 'GET',
+    next: { revalidate: CACHE_REVALIDATE.SHORT, tags: [CACHE_TAGS.PRODUCTS] },
+  });
 
   return result.data ?? { products: [], suggestions: [] };
 };
