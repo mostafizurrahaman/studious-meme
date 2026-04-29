@@ -2,16 +2,16 @@
 
 import { useActionState, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
-
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
-import { formatMoney, formatPriceLabelWithUnit } from '@/lib/cart';
+import { formatMoney } from '@/lib/cart';
 import { useCartStore } from '@/lib/cart-store';
+import { mergeBackendCartIntoLocalItems, mapBackendCartItemsToStoreItems } from '@/lib/cart-hydration';
 import { BANGLADESH_DISTRICTS } from '@/lib/bangladesh-districts';
 import {
   CASH_ON_DELIVERY_LABEL,
@@ -90,6 +90,8 @@ export function CheckoutPageClient() {
   const clear = useCartStore(state => state.clear);
   const replaceItems = useCartStore(state => state.replaceItems);
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [result, formAction, pending] = useActionState<CheckoutActionState, FormData>(submitCheckoutAction, {
     ok: false,
     error: '',
@@ -128,26 +130,12 @@ export function CheckoutPageClient() {
 
     getMyCart()
       .then(result => {
-        if (!active || !result.success || !Array.isArray(result.data?.items)) {
+        if (!active || !result.success || !Array.isArray(result.data?.items) || result.data.items.length === 0) {
           return;
         }
 
-        replaceItems(
-          result.data.items.map(item => ({
-            sku: item.productSnapshot.sku,
-            title: item.productSnapshot.title,
-            href: '/shop',
-            image: item.productSnapshot.image,
-            brand: item.productSnapshot.brand,
-            unitPrice: item.priceSnapshot,
-            unitPriceLabel: formatPriceLabelWithUnit(item.priceSnapshot, item.productSnapshot.sellingUnit),
-            oldPriceLabel: undefined,
-            quantity: item.quantity,
-            sellingUnit: item.productSnapshot.sellingUnit,
-            weightKg: item.productSnapshot.weightKg as number,
-            isNoCOD: Boolean(item.productSnapshot.isNoCOD),
-          })),
-        );
+        const backendItems = mapBackendCartItemsToStoreItems(result.data.items);
+        replaceItems(mergeBackendCartIntoLocalItems(useCartStore.getState().items, backendItems));
       })
       .catch(() => null);
 
@@ -159,7 +147,8 @@ export function CheckoutPageClient() {
   useEffect(() => {
     if (!result.ok) {
       if (isCheckoutLoginRequired(result.error)) {
-        router.replace('/my-account?notice=checkout');
+        const currentPath = `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
+        router.replace(`/my-account?redirect=${encodeURIComponent(currentPath)}`);
       }
 
       return;
@@ -180,7 +169,7 @@ export function CheckoutPageClient() {
     }, 800);
 
     return () => window.clearTimeout(timeout);
-  }, [clear, result, router]);
+  }, [clear, pathname, result, router, searchParams]);
 
   if (!hydrated) {
     return (

@@ -12,10 +12,19 @@ import {
   verifyOtpForForgotPassword,
   verifySignupOtp,
 } from "@/services/Auth";
+import { addCartItem, getMyCart, updateCartItem } from "@/services/Cart";
+import { decodeAuthToken } from "@/lib/auth/session";
+import type { CartItem } from "@/lib/cart";
+import { mapBackendCartItemsToStoreItems } from "@/lib/cart-hydration";
+
+type GuestCartItem = {
+  productId: string;
+  quantity: number;
+};
 
 export type SignInState =
-  | { ok: false; message: string }
-  | { ok: true; message: string };
+  | { ok: false; message: string; role?: string; cartItems?: CartItem[] }
+  | { ok: true; message: string; role?: string; cartItems?: CartItem[] };
 
 export type ForgotPasswordState =
   | {
@@ -32,11 +41,107 @@ export type ForgotPasswordState =
     };
 
 export type SignUpState =
-  | { ok: false; message: string; email?: string }
-  | { ok: true; message: string; email: string; step: "otp" | "done" };
+  | {
+      ok: false;
+      message: string;
+      email?: string;
+      role?: string;
+      cartItems?: CartItem[];
+    }
+  | {
+      ok: true;
+      message: string;
+      email: string;
+      step: "otp" | "done";
+      role?: string;
+      cartItems?: CartItem[];
+    };
 
 function readValue(formData: FormData, key: string) {
   return String(formData.get(key) ?? "").trim();
+}
+
+function readGuestCartItems(formData: FormData): GuestCartItem[] {
+  const raw = readValue(formData, "guestCartJson");
+
+  if (!raw) {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(raw) as unknown[];
+
+    return parsed.reduce<GuestCartItem[]>((acc, item) => {
+      if (!item || typeof item !== "object") {
+        return acc;
+      }
+
+      const record = item as Record<string, unknown>;
+      const productId = typeof record.productId === "string" ? record.productId : "";
+      const quantity = Number(record.quantity);
+
+      if (!productId || !Number.isInteger(quantity) || quantity <= 0) {
+        return acc;
+      }
+
+      acc.push({ productId, quantity });
+      return acc;
+    }, []);
+  } catch {
+    return [];
+  }
+}
+
+function getBackendProductId(product: unknown) {
+  if (!product || typeof product !== "object") {
+    return typeof product === "string" ? product : undefined;
+  }
+
+  const record = product as { _id?: string; id?: string };
+  return record._id ?? record.id;
+}
+
+async function hydrateBackendCartFromGuestCart(formData: FormData) {
+  try {
+    const guestItems = readGuestCartItems(formData);
+
+    if (!guestItems.length) {
+      const cart = await getMyCart();
+      return mapBackendCartItemsToStoreItems(cart?.data?.items ?? []);
+    }
+
+    const currentCart = await getMyCart();
+    const backendItems = Array.isArray(currentCart?.data?.items)
+      ? currentCart.data.items
+      : [];
+    const backendItemMap = new Map(
+      backendItems
+        .map((item) => {
+          const productId = getBackendProductId(item.product);
+          return productId ? [productId, item.quantity] : null;
+        })
+        .filter((entry): entry is [string, number] => Boolean(entry)),
+    );
+
+    for (const item of guestItems) {
+      const existingQuantity = backendItemMap.get(item.productId);
+      const nextQuantity = (existingQuantity ?? 0) + item.quantity;
+
+      if (existingQuantity) {
+        await updateCartItem(item.productId, nextQuantity);
+      } else {
+        await addCartItem(item.productId, item.quantity);
+      }
+
+      backendItemMap.set(item.productId, nextQuantity);
+    }
+
+    const refreshedCart = await getMyCart();
+    return mapBackendCartItemsToStoreItems(refreshedCart?.data?.items ?? []);
+  } catch {
+    const cart = await getMyCart().catch(() => null);
+    return mapBackendCartItemsToStoreItems(cart?.data?.items ?? []);
+  }
 }
 
 export async function submitSignIn(
@@ -56,12 +161,19 @@ export async function submitSignIn(
     return { ok: false, message: result?.message ?? "Failed to sign in." };
   }
 
+  const cartItems = await hydrateBackendCartFromGuestCart(formData);
+  const user = result.data?.accessToken
+    ? decodeAuthToken(result.data.accessToken)
+    : null;
+
   revalidatePath("/my-account");
   revalidatePath("/dashboard");
 
   return {
     ok: true,
     message: result.message ?? "Signed in successfully.",
+    role: user?.role,
+    cartItems,
   };
 }
 
@@ -144,6 +256,11 @@ export async function submitSignupOtp(
     };
   }
 
+  const cartItems = await hydrateBackendCartFromGuestCart(formData);
+  const user = result.data?.accessToken
+    ? decodeAuthToken(result.data.accessToken)
+    : null;
+
   revalidatePath("/my-account");
   revalidatePath("/dashboard");
 
@@ -152,6 +269,8 @@ export async function submitSignupOtp(
     email: userEmail,
     step: "done",
     message: result.message ?? "Account verified successfully.",
+    role: user?.role,
+    cartItems,
   };
 }
 

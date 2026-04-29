@@ -190,8 +190,13 @@ describe("compare helpers", () => {
     expect(rows).toEqual(
       expect.arrayContaining([
         { label: "Brand", values: ["Brand One"] },
-        { label: "Price", values: ["100"] },
-        { label: "Old price", values: ["120"] },
+        { label: "Category", values: ["Category One"] },
+        { label: "Price", values: ["৳ 100 / pcs"] },
+        { label: "Old price", values: ["৳ 120 / pcs"] },
+        { label: "Stock", values: ["3 in stock"] },
+        { label: "Rating", values: ["4.5"] },
+        { label: "SKU", values: ["SKU-1"] },
+        { label: "Weight", values: ["1.5 kg"] },
         { label: "COD", values: ["Available"] },
       ]),
     );

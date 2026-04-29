@@ -14,6 +14,7 @@ export type CartItem = {
   sellingUnit?: string;
   weightKg: number;
   isNoCOD: boolean;
+  syncedQuantity?: number;
 };
 
 export function parseMoney(value: string) {
@@ -65,5 +66,6 @@ export function toCartItem(product: Product): CartItem {
     sellingUnit: product.sellingUnit,
     weightKg: product.weightKg as number,
     isNoCOD: Boolean(product.isNoCOD),
+    syncedQuantity: 0,
   };
 }

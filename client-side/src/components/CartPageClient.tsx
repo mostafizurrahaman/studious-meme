@@ -8,8 +8,9 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 // import { Separator } from '@/components/ui/separator';
 // import { Textarea } from '@/components/ui/textarea';
-import { formatMoney, formatPriceLabelWithUnit } from '@/lib/cart';
+import { formatMoney } from '@/lib/cart';
 import { useCartStore } from '@/lib/cart-store';
+import { mergeBackendCartIntoLocalItems, mapBackendCartItemsToStoreItems } from '@/lib/cart-hydration';
 import { calculateFulfillmentSummary, formatShippingZoneLabel } from '@/lib/fulfillment';
 import { clearCart as clearCartPersisted, getMyCart, removeCartItem, updateCartItem } from '@/services/Cart';
 
@@ -26,6 +27,7 @@ export function CartPageClient() {
   const increase = useCartStore(state => state.increase);
   const decrease = useCartStore(state => state.decrease);
   const remove = useCartStore(state => state.remove);
+  const markItemAsSynced = useCartStore(state => state.markItemAsSynced);
   const setCouponCode = useCartStore(state => state.setCouponCode);
   const applyCoupon = useCartStore(state => state.applyCoupon);
   const clearCoupon = useCartStore(state => state.clearCoupon);
@@ -47,32 +49,12 @@ export function CartPageClient() {
 
     getMyCart()
       .then(result => {
-        if (!active || !result.success || !Array.isArray(result.data?.items)) {
+        if (!active || !result.success || !Array.isArray(result.data?.items) || result.data.items.length === 0) {
           return;
         }
 
-        replaceItems(
-          result.data.items.map(item => {
-            const product = item.product as { _id?: string } | string | undefined;
-            const productId = typeof product === 'string' ? product : product?._id;
-
-            return {
-              productId,
-              sku: item.productSnapshot.sku,
-              title: item.productSnapshot.title,
-              href: '/shop',
-              image: item.productSnapshot.image,
-              brand: item.productSnapshot.brand,
-              unitPrice: item.priceSnapshot,
-              unitPriceLabel: formatPriceLabelWithUnit(item.priceSnapshot, item.productSnapshot.sellingUnit),
-              oldPriceLabel: undefined,
-              quantity: item.quantity,
-              sellingUnit: item.productSnapshot.sellingUnit,
-              weightKg: item.productSnapshot.weightKg as number,
-              isNoCOD: Boolean(item.productSnapshot.isNoCOD),
-            };
-          }),
-        );
+        const backendItems = mapBackendCartItemsToStoreItems(result.data.items);
+        replaceItems(mergeBackendCartIntoLocalItems(useCartStore.getState().items, backendItems));
       })
       .catch(() => null);
 
@@ -163,7 +145,13 @@ export function CartPageClient() {
                               nextQuantity > 0
                                 ? updateCartItem(item.productId, nextQuantity)
                                 : removeCartItem(item.productId)
-                            ).catch(() => null);
+                            )
+                              .then(result => {
+                                if (result?.success && nextQuantity > 0 && item.productId) {
+                                  markItemAsSynced(item.productId);
+                                }
+                              })
+                              .catch(() => null);
                           }
                         }}
                         className="h-auto px-2 text-lg leading-none text-foreground/70 hover:bg-transparent"
@@ -178,7 +166,13 @@ export function CartPageClient() {
                           const nextQuantity = item.quantity + 1;
                           increase(item.sku);
                           if (item.productId) {
-                            void updateCartItem(item.productId, nextQuantity).catch(() => null);
+                            void updateCartItem(item.productId, nextQuantity)
+                              .then(result => {
+                                if (result?.success) {
+                                  markItemAsSynced(item.productId);
+                                }
+                              })
+                              .catch(() => null);
                           }
                         }}
                         className="h-auto px-2 text-lg leading-none text-foreground/70 hover:bg-transparent"

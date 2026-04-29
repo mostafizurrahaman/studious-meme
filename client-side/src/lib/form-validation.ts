@@ -58,23 +58,14 @@ const requiredEmail = (label = "Email") =>
     .email({ message: "Invalid email format!" })
     .transform((value) => value.toLowerCase());
 
-const requiredPassword = (label: string, minLength = 8) =>
+const requiredPassword = (label: string) =>
   z
     .string({ error: `${label} is required!` })
-    .min(minLength, {
-      message: `${label} must be at least ${minLength} characters long!`,
+    .trim()
+    .min(6, {
+      message: "Password must be at least 6 characters long.",
     })
-    .max(20, { message: `${label} cannot exceed 20 characters!` })
-    .regex(/[A-Z]/, {
-      message: `${label} must contain at least one uppercase letter!`,
-    })
-    .regex(/[a-z]/, {
-      message: `${label} must contain at least one lowercase letter!`,
-    })
-    .regex(/[0-9]/, { message: `${label} must contain at least one number!` })
-    .regex(/[@$!%*?&#]/, {
-      message: `${label} must contain at least one special character!`,
-    });
+    .max(20, { message: "Password must be between 6 and 20 characters." });
 
 const requiredPhone = () =>
   z

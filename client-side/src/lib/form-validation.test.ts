@@ -12,16 +12,40 @@ describe("form validation schemas", () => {
     ).toBe(true);
     expect(
       authFormSchemas.forgotPasswordReset.safeParse({
-        newPassword: "Strong@123",
-        confirmPassword: "Strong@123",
+        newPassword: "123456",
+        confirmPassword: "123456",
       }).success,
     ).toBe(true);
   });
 
+  it("uses the simplified password rule", () => {
+    const validPassword = authFormSchemas.signUp.safeParse({
+      name: "Amina",
+      email: "amina@example.com",
+      password: "123456",
+      confirmPassword: "123456",
+    });
+
+    const shortPassword = authFormSchemas.signUp.safeParse({
+      name: "Amina",
+      email: "amina@example.com",
+      password: "12345",
+      confirmPassword: "12345",
+    });
+
+    expect(validPassword.success).toBe(true);
+    expect(shortPassword.success).toBe(false);
+    if (!shortPassword.success) {
+      expect(shortPassword.error.issues[0]?.message).toBe(
+        "Password must be at least 6 characters long.",
+      );
+    }
+  });
+
   it("rejects mismatched reset passwords", () => {
     const result = authFormSchemas.forgotPasswordReset.safeParse({
-      newPassword: "Strong@123",
-      confirmPassword: "Strong@124",
+      newPassword: "123456",
+      confirmPassword: "123457",
     });
 
     expect(result.success).toBe(false);

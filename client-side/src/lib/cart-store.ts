@@ -66,6 +66,7 @@ type CartState = {
   updateOrderStatus: (id: string, status: OrderStatus) => void;
   replaceItems: (items: CartItem[]) => void;
   setHydrated: (hydrated: boolean) => void;
+  markItemAsSynced: (productId?: string) => void;
 };
 
 const defaultCheckout: CheckoutForm = {
@@ -77,6 +78,10 @@ const defaultCheckout: CheckoutForm = {
   note: "",
   payment: "Cash on delivery",
 };
+
+function getItemKey(item: Pick<CartItem, "productId" | "sku">) {
+  return item.productId ?? item.sku;
+}
 
 const resetCouponState = {
   appliedCoupon: null,
@@ -295,6 +300,17 @@ export const useCartStore = create<CartState>()(
           items,
           ...resetCouponState,
         }),
+      markItemAsSynced: (productId) => {
+        if (!productId) return;
+
+        set((state) => ({
+          items: state.items.map((item) =>
+            getItemKey(item) === productId
+              ? { ...item, syncedQuantity: item.quantity }
+              : item,
+          ),
+        }));
+      },
       addOrder: (order) =>
         set((state) => ({
           orders: [order, ...state.orders],

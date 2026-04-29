@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { decodeAuthToken } from "@/lib/auth/session";
+import { getSafeRedirectPath } from "@/lib/auth/redirect";
 import {
   getDashboardPathByRole,
   isAllowedDashboardPath,
@@ -64,12 +65,13 @@ async function refreshAccessToken(
 }
 
 export async function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const { pathname, searchParams } = request.nextUrl;
   const currentAccessToken = request.cookies.get("accessToken")?.value ?? null;
   const currentRefreshToken =
     request.cookies.get("refreshToken")?.value ?? null;
   let session = decodeAuthToken(currentAccessToken);
   let refreshedAccessToken: string | null = null;
+  const safeRedirect = getSafeRedirectPath(searchParams.get("redirect"));
 
   if (!session) {
     const accessToken = await refreshAccessToken(request);
@@ -103,21 +105,36 @@ export async function proxy(request: NextRequest) {
 
   if (!session) {
     if (currentRefreshToken) {
-      return buildResponse("redirect", "/my-account", true);
+      return buildResponse(
+        "redirect",
+        safeRedirect ? `/my-account?redirect=${safeRedirect}` : "/my-account",
+        true,
+      );
     }
 
     if (pathname === "/my-account") {
       return buildResponse("next");
     }
 
-    return buildResponse("redirect", "/my-account");
+    return buildResponse(
+      "redirect",
+      safeRedirect ? `/my-account?redirect=${safeRedirect}` : "/my-account",
+    );
   }
 
   if (pathname === "/my-account" || pathname.startsWith("/my-account/")) {
-    return buildResponse(
-      "redirect",
-      getDashboardPathByRole(session.role) ?? "/dashboard",
-    );
+    if (safeRedirect) {
+      return buildResponse("redirect", safeRedirect);
+    }
+
+    if (session.role === "ADMIN" || session.role === "SUPER_ADMIN") {
+      return buildResponse(
+        "redirect",
+        getDashboardPathByRole(session.role) ?? "/",
+      );
+    }
+
+    return buildResponse("redirect", "/");
   }
 
   if (pathname === "/dashboard" || pathname.startsWith("/dashboard/")) {

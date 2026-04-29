@@ -157,6 +157,7 @@ function resolveYouTubeVideoId(product: Product) {
 export function ProductDetailClient({ product }: ProductDetailClientProps) {
   const router = useRouter();
   const addProductQuantity = useCartStore(state => state.addProductQuantity);
+  const markItemAsSynced = useCartStore(state => state.markItemAsSynced);
   const images = useMemo(
     () => (product.images.length > 0 ? product.images : [getProductPrimaryImage(product)]),
     [product],
@@ -222,7 +223,13 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   function addQuantityToCart(redirect = false) {
     addProductQuantity(product, quantity);
     if (product.id) {
-      void addCartItem(product.id, quantity).catch(() => null);
+      void addCartItem(product.id, quantity)
+        .then(result => {
+          if (result?.success) {
+            markItemAsSynced(product.id);
+          }
+        })
+        .catch(() => null);
     }
     // toast.success('Product added to cart.');
     if (redirect) router.push('/checkout');

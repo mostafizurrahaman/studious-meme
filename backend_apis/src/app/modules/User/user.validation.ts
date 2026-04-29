@@ -4,6 +4,13 @@ import { z } from "zod";
 export const zodEnumFromObject = <T extends Record<string, string>>(obj: T) =>
   z.enum([...Object.values(obj)] as [string, ...string[]]);
 
+const passwordSchema = (label: string) =>
+  z
+    .string({ error: `${label} is required!` })
+    .trim()
+    .min(6, { message: "Password must be at least 6 characters long." })
+    .max(20, { message: "Password must be between 6 and 20 characters." });
+
 // 1. createUserSchema
 const createUserSchema = z.object({
   body: z
@@ -29,24 +36,7 @@ const createUserSchema = z.object({
           message: "Email must be string!", // Check that email is string
         }),
 
-      password: z
-        .string({
-          error: "Password is required",
-        })
-        .min(8, { message: "Password must be at least 8 characters long" })
-        .max(20, { message: "Password cannot exceed 20 characters" })
-        .regex(/[A-Z]/, {
-          message: "Password must contain at least one uppercase letter",
-        })
-        .regex(/[a-z]/, {
-          message: "Password must contain at least one lowercase letter",
-        })
-        .regex(/[0-9]/, {
-          message: "Password must contain at least one number",
-        })
-        .regex(/[@$!%*?&#]/, {
-          message: "Password must contain at least one special character",
-        }),
+      password: passwordSchema("Password"),
     })
     .passthrough(),
 });
@@ -101,24 +91,7 @@ const signinSchema = z.object({
         message: "Email must be string!", // Check that email is string
       }),
 
-    password: z
-      .string({
-        error: "Password is required!",
-      })
-      .min(8, { message: "Password must be at least 8 characters long!" })
-      .max(20, { message: "Password cannot exceed 20 characters!" })
-      .regex(/[A-Z]/, {
-        message: "Password must contain at least one uppercase letter!",
-      })
-      .regex(/[a-z]/, {
-        message: "Password must contain at least one lowercase letter!",
-      })
-      .regex(/[0-9]/, {
-        message: "Password must contain at least one number!",
-      })
-      .regex(/[@$!%*?&#]/, {
-        message: "Password must contain at least one special character!",
-      }),
+    password: passwordSchema("Password"),
   }),
 });
 
@@ -147,49 +120,9 @@ const updateProfileDataSchema = z.object({
 // 6. changePasswordSchema
 const changePasswordSchema = z.object({
   body: z.object({
-    oldPassword: z
-      .string({
-        error: "Old password is required!",
-      })
-      .trim()
-      .min(8, {
-        message: "Old password must be at least 8 characters long!",
-      })
-      .max(20, { message: "Old password cannot exceed 20 characters!" })
-      .regex(/[A-Z]/, {
-        message: "Old password must contain at least one uppercase letter!",
-      })
-      .regex(/[a-z]/, {
-        message: "Old password must contain at least one lowercase letter!",
-      })
-      .regex(/[0-9]/, {
-        message: "Password must contain at least one number!",
-      })
-      .regex(/[@$!%*?&#]/, {
-        message: "Old password must contain at least one special character!",
-      }),
+    oldPassword: passwordSchema("Old password"),
 
-    newPassword: z
-      .string({
-        error: "New password is required!",
-      })
-      .trim()
-      .min(8, {
-        message: "New password must be at least 8 characters long!",
-      })
-      .max(20, { message: "New password cannot exceed 20 characters!" })
-      .regex(/[A-Z]/, {
-        message: "New password must contain at least one uppercase letter!",
-      })
-      .regex(/[a-z]/, {
-        message: "New password must contain at least one lowercase letter!",
-      })
-      .regex(/[0-9]/, {
-        message: "Password must contain at least one number!",
-      })
-      .regex(/[@$!%*?&#]/, {
-        message: "New password must contain at least one special character!",
-      }),
+    newPassword: passwordSchema("New password"),
   }),
 });
 
@@ -233,26 +166,7 @@ const resetPasswordSchema = z.object({
   body: z.object({
     resetPasswordToken: z.string({ error: "Token is required!" }),
 
-    newPassword: z
-      .string({
-        error: "New password is required!",
-      })
-      .min(8, {
-        message: "New password must be at least 8 characters long!",
-      })
-      .max(20, { message: "New password cannot exceed 20 characters!" })
-      .regex(/[A-Z]/, {
-        message: "New password must contain at least one uppercase letter!",
-      })
-      .regex(/[a-z]/, {
-        message: "New password must contain at least one lowercase letter!",
-      })
-      .regex(/[0-9]/, {
-        message: "New password must contain at least one number!",
-      })
-      .regex(/[@$!%*?&#]/, {
-        message: "New password must contain at least one special character!",
-      }),
+    newPassword: passwordSchema("New password"),
   }),
 });
 
@@ -281,14 +195,7 @@ const deactivateUserAccountSchema = z.object({
           message: "Email must be string!",
         }),
 
-      password: z
-        .string({
-          error: "Password is required!",
-        })
-        .min(6, {
-          message: "Password must be at least 6 characters long!",
-        })
-        .max(20, { message: "Password cannot exceed 20 characters!" }),
+      password: passwordSchema("Password"),
 
       deactivationReason: z
         .string({

@@ -1,5 +1,12 @@
 import { z } from "zod";
 
+const passwordSchema = () =>
+  z
+    .string({ error: "Password is required!" })
+    .trim()
+    .min(6, { message: "Password must be at least 6 characters long." })
+    .max(20, { message: "Password must be between 6 and 20 characters." });
+
 // 1. adminCreateSchema
 const adminCreateSchema = z.object({
   body: z.object({
@@ -12,20 +19,7 @@ const adminCreateSchema = z.object({
       .trim()
       .email({ message: "Invalid email format!" })
       .transform((v) => v.toLowerCase()),
-    password: z
-      .string({ error: "Password is required!" })
-      .min(8, { message: "Password must be at least 8 characters long!" })
-      .max(20, { message: "Password cannot exceed 20 characters!" })
-      .regex(/[A-Z]/, {
-        message: "Password must contain at least one uppercase letter!",
-      })
-      .regex(/[a-z]/, {
-        message: "Password must contain at least one lowercase letter!",
-      })
-      .regex(/[0-9]/, { message: "Password must contain at least one number!" })
-      .regex(/[@$!%*?&#]/, {
-        message: "Password must contain at least one special character!",
-      }),
+    password: passwordSchema(),
     phone: z.string().optional(),
     image: z.string().optional(),
   }),

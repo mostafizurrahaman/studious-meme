@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, type ComponentProps } from 'react';
+import { useEffect, useMemo, useRef, useState, type ComponentProps } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
@@ -23,6 +23,9 @@ import { Input } from '@/components/ui/input';
 import { accountBenefits } from '@/lib/static-site-content';
 import { useUser } from '@/context/UserContext';
 import { authFormSchemas, makeZodResolver } from '@/lib/form-validation';
+import { useCartStore } from '@/lib/cart-store';
+import { getSafeRedirectPath } from '@/lib/auth/redirect';
+import { getDashboardPathByRole } from '@/lib/auth/roles';
 
 const initialState = { ok: false, message: '' } as const;
 
@@ -199,6 +202,31 @@ export function MyAccountAuthForm() {
   const [signupEmail, setSignupEmail] = useState('');
   const [forgotEmail, setForgotEmail] = useState('');
   const authNoticeShownRef = useRef('');
+  const checkoutNoticeShownRef = useRef('');
+  const guestCartItems = useCartStore(state => state.items);
+  const replaceItems = useCartStore(state => state.replaceItems);
+  const guestCartJson = useMemo(
+    () =>
+      JSON.stringify(
+        guestCartItems
+          .map(item => {
+            const syncedQuantity = item.syncedQuantity ?? 0;
+            const quantity = item.quantity - syncedQuantity;
+
+            if (quantity <= 0 || !item.productId) {
+              return null;
+            }
+
+            return {
+              productId: item.productId,
+              quantity,
+            };
+          })
+          .filter(Boolean),
+      ),
+    [guestCartItems],
+  );
+  const safeRedirect = getSafeRedirectPath(searchParams.get('redirect'));
 
   const signInForm = useForm<SignInValues>({
     resolver: makeZodResolver(authFormSchemas.signIn),
@@ -246,26 +274,39 @@ export function MyAccountAuthForm() {
     return formData;
   }
 
+  function getPostAuthDestination(role?: string) {
+    if (role === 'ADMIN' || role === 'SUPER_ADMIN') {
+      return getDashboardPathByRole(role) ?? '/';
+    }
+
+    return '/';
+  }
+
+  function applyAuthResultCart(cartItems?: typeof guestCartItems) {
+    if (!cartItems?.length) return;
+
+    replaceItems(cartItems);
+  }
+
   useEffect(() => {
-    const notice = searchParams.get('notice');
-    if (!notice || authNoticeShownRef.current === notice) return;
+    const compareNotice = searchParams.get('notice');
+    if (compareNotice && authNoticeShownRef.current !== compareNotice) {
+      authNoticeShownRef.current = compareNotice;
 
-    authNoticeShownRef.current = notice;
+      if (compareNotice === 'compare') {
+        toast.info('Sign in to save comparison items to your account.');
+      }
 
-    if (notice === 'compare') {
-      toast.info('Sign in to save comparison items to your account.');
+      if (compareNotice === 'wishlist') {
+        toast.info('Sign in to save wishlist items to your account.');
+      }
     }
 
-    if (notice === 'wishlist') {
-      toast.info('Sign in to save wishlist items to your account.');
-    }
-
-    if (notice === 'checkout') {
+    if (safeRedirect?.startsWith('/checkout') && checkoutNoticeShownRef.current !== safeRedirect) {
+      checkoutNoticeShownRef.current = safeRedirect;
       toast.info('Sign in to place your order.');
     }
-
-    router.replace('/my-account');
-  }, [router, searchParams]);
+  }, [safeRedirect, searchParams]);
 
   return (
     <section className="mt-6 grid gap-6 lg:grid-cols-[1fr_0.9fr]">
@@ -313,7 +354,10 @@ export function MyAccountAuthForm() {
               className="grid gap-4"
               onSubmit={signInForm.handleSubmit(async values => {
                 setIsSubmitting(true);
-                const result = await submitSignIn(initialState, toFormData(values));
+                const result = await submitSignIn(
+                  initialState,
+                  toFormData({ ...values, guestCartJson }),
+                );
                 setIsSubmitting(false);
 
                 if (!result.ok) {
@@ -326,8 +370,9 @@ export function MyAccountAuthForm() {
                 }
 
                 toast.success(result.message);
+                applyAuthResultCart(result.cartItems);
                 setIsLoading(true);
-                router.push('/');
+                router.push(safeRedirect ?? getPostAuthDestination(result.role));
               })}
             >
               <LabeledInput
@@ -447,6 +492,7 @@ export function MyAccountAuthForm() {
                   toFormData({
                     'otp-email': signupEmail,
                     otp: values.otp,
+                    guestCartJson,
                   }),
                 );
                 setIsSubmitting(false);
@@ -457,8 +503,9 @@ export function MyAccountAuthForm() {
                 }
 
                 toast.success(result.message);
+                applyAuthResultCart(result.cartItems);
                 setIsLoading(true);
-                router.push('/');
+                router.push(safeRedirect ?? getPostAuthDestination(result.role));
               })}
             >
               <LabeledInput
