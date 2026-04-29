@@ -24,6 +24,12 @@ import type { CheckoutActionState } from '@/app/(withNavFooter)/checkout/actions
 import { calculateFulfillmentSummary, formatShippingZoneLabel } from '@/lib/fulfillment';
 import { getMyCart } from '@/services/Cart';
 
+const CHECKOUT_LOGIN_MESSAGE = 'Sign in to place your order.';
+
+function isCheckoutLoginRequired(error: string) {
+  return error === CHECKOUT_LOGIN_MESSAGE;
+}
+
 function FieldError({ message }: { message?: string }) {
   if (!message) return null;
 
@@ -151,7 +157,13 @@ export function CheckoutPageClient() {
   }, [replaceItems]);
 
   useEffect(() => {
-    if (!result.ok) return;
+    if (!result.ok) {
+      if (isCheckoutLoginRequired(result.error)) {
+        router.replace('/my-account?notice=checkout');
+      }
+
+      return;
+    }
 
     clear();
     toast.success(
@@ -210,7 +222,7 @@ export function CheckoutPageClient() {
               noValidate
               onSubmit={() => setSubmitAttempted(true)}
             >
-              {!result.ok && result.error ? (
+              {!result.ok && result.error && !isCheckoutLoginRequired(result.error) ? (
                 <div className="rounded-2xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive">
                   {result.error}
                 </div>
@@ -225,6 +237,7 @@ export function CheckoutPageClient() {
                   <label key={key} className="grid gap-2 text-sm font-semibold text-foreground">
                     {label}
                     <Input
+                      className="text-gray-600"
                       name={key}
                       value={value}
                       aria-invalid={Boolean(
@@ -264,7 +277,7 @@ export function CheckoutPageClient() {
                     value={checkout.city}
                     aria-invalid={Boolean(cityError)}
                     onChange={event => updateCheckout('city', event.target.value)}
-                    className={`h-11 rounded-2xl border bg-background px-4 outline-none ${cityError ? 'border-destructive/50 ring-2 ring-destructive/15' : 'border-input'}`}
+                    className={`h-11 rounded-2xl border bg-background px-4 outline-none text-gray-600 ${cityError ? 'border-destructive/50 ring-2 ring-destructive/15' : 'border-input'}`}
                   >
                     <option value="" disabled>
                       Select district
@@ -289,18 +302,19 @@ export function CheckoutPageClient() {
                   value={checkout.address}
                   aria-invalid={Boolean(addressError)}
                   onChange={event => updateCheckout('address', event.target.value)}
-                  className={addressError ? 'border-destructive/50 ring-2 ring-destructive/15' : undefined}
+                    className={`${addressError ? 'border-destructive/50 ring-2 ring-destructive/15' : ''} text-gray-600`}
                 />
                 <FieldError message={addressError} />
               </label>
-              <label className="grid gap-2 text-sm font-semibold text-foreground">
-                Order note
-                <Textarea
-                  name="note"
-                  value={checkout.note}
-                  onChange={event => updateCheckout('note', event.target.value)}
-                />
-              </label>
+                <label className="grid gap-2 text-sm font-semibold text-foreground">
+                  Order note
+                  <Textarea
+                    name="note"
+                    value={checkout.note}
+                    onChange={event => updateCheckout('note', event.target.value)}
+                    className="text-gray-600"
+                  />
+                </label>
               <fieldset className="grid gap-3">
                 <legend className="text-sm font-semibold text-foreground pb-2">Payment method</legend>
                 <div className="grid gap-3">

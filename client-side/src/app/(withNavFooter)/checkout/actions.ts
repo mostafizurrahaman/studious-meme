@@ -5,8 +5,15 @@ import { createOrder, previewCheckout } from '@/services/Order';
 import { initiatePortPosPayment } from '@/services/Payment';
 import { BANGLADESH_DISTRICTS } from '@/lib/bangladesh-districts';
 import { normalizeOrderPaymentMethod } from '@/lib/payment-method';
+import { getValidAccessTokenForServerActions } from '@/lib/getValidAccessToken';
 
 type CheckoutActionErrors = Partial<Record<'name' | 'phone' | 'email' | 'city' | 'address', string>>;
+
+const CHECKOUT_LOGIN_MESSAGE = 'Sign in to place your order.';
+
+function isUnauthorizedMessage(message?: string | null) {
+  return message?.trim() === 'You are not authorized!';
+}
 
 type CartItem = {
   sku: string;
@@ -98,6 +105,12 @@ export async function submitCheckoutAction(
   _prevState: CheckoutActionState,
   formData: FormData,
 ): Promise<CheckoutActionState> {
+  const accessToken = await getValidAccessTokenForServerActions();
+
+  if (!accessToken) {
+    return fail(CHECKOUT_LOGIN_MESSAGE);
+  }
+
   let items: CartItem[] = [];
 
   try {
@@ -142,6 +155,10 @@ export async function submitCheckoutAction(
   });
 
   if (!previewResult?.success || !previewResult.data) {
+    if (isUnauthorizedMessage(previewResult?.message ?? previewResult?.error)) {
+      return fail(CHECKOUT_LOGIN_MESSAGE);
+    }
+
     return fail(previewResult?.message ?? 'Failed to preview checkout summary.');
   }
 
@@ -157,6 +174,10 @@ export async function submitCheckoutAction(
   });
 
   if (!orderResult?.success || !orderResult.data) {
+    if (isUnauthorizedMessage(orderResult?.message ?? orderResult?.error)) {
+      return fail(CHECKOUT_LOGIN_MESSAGE);
+    }
+
     return fail(orderResult?.message ?? 'Failed to place order.');
   }
 
