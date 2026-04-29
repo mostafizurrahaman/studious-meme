@@ -237,7 +237,7 @@ export function CheckoutPageClient() {
                   <label key={key} className="grid gap-2 text-sm font-semibold text-foreground">
                     {label}
                     <Input
-                      className="text-gray-600"
+                      className="text-gray-500"
                       name={key}
                       value={value}
                       aria-invalid={Boolean(
@@ -277,7 +277,7 @@ export function CheckoutPageClient() {
                     value={checkout.city}
                     aria-invalid={Boolean(cityError)}
                     onChange={event => updateCheckout('city', event.target.value)}
-                    className={`h-11 rounded-2xl border bg-background px-4 outline-none text-gray-600 ${cityError ? 'border-destructive/50 ring-2 ring-destructive/15' : 'border-input'}`}
+                    className={`h-11 rounded-2xl border bg-background px-4 outline-none text-gray-500 ${cityError ? 'border-destructive/50 ring-2 ring-destructive/15' : 'border-input'}`}
                   >
                     <option value="" disabled>
                       Select district
@@ -302,7 +302,7 @@ export function CheckoutPageClient() {
                   value={checkout.address}
                   aria-invalid={Boolean(addressError)}
                   onChange={event => updateCheckout('address', event.target.value)}
-                    className={`${addressError ? 'border-destructive/50 ring-2 ring-destructive/15' : ''} text-gray-600`}
+                    className={`${addressError ? 'border-destructive/50 ring-2 ring-destructive/15' : ''} text-gray-500`}
                 />
                 <FieldError message={addressError} />
               </label>
@@ -312,7 +312,7 @@ export function CheckoutPageClient() {
                     name="note"
                     value={checkout.note}
                     onChange={event => updateCheckout('note', event.target.value)}
-                    className="text-gray-600"
+                    className="text-gray-500"
                   />
                 </label>
               <fieldset className="grid gap-3">
