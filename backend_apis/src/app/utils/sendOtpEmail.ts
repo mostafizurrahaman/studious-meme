@@ -1,16 +1,16 @@
-import httpStatus from "http-status";
-import nodemailer from "nodemailer";
-import config from "../config";
-import AppError from "./AppError";
-import path from "path";
+import httpStatus from 'http-status';
+import nodemailer from 'nodemailer';
+import config from '../config';
+import AppError from './AppError';
+import path from 'path';
 
 const sendOtpEmail = async ({
   email,
   otp,
-  name = "User",
-  subject = "Your OTP for Account Verification",
-  logoCid = "malamal_logo",
-  customMessage = "",
+  name = 'User',
+  subject = 'Your OTP for Account Verification',
+  logoCid = 'malamal_logo',
+  customMessage = '',
   attachments = [],
 }: {
   email: string;
@@ -27,7 +27,7 @@ const sendOtpEmail = async ({
       // host: 'smtp.gmail.com',
       // port: 587,
       // secure: false, // true for 465, false for other ports
-      service: "gmail",
+      service: 'gmail',
       auth: {
         user: config.nodemailer.email,
         pass: config.nodemailer.password,
@@ -46,11 +46,11 @@ const sendOtpEmail = async ({
       attachments: [
         ...attachments, // Attach any custom attachments
         {
-          filename: "logo.png",
+          filename: 'logo.png',
           path:
-            config.NODE_ENV === "production"
-              ? "https://res.cloudinary.com/dweesppci/image/upload/v1773643973/1773643973677-KHALED-SIDDIQUE.png" // ✅ works on Vercel
-              : path.join(__dirname, "assets", "logo.png"), // ✅ works locally
+            config.NODE_ENV === 'production'
+              ? 'https://res.cloudinary.com/dweesppci/image/upload/v1777476137/1777476137166-KHALED-SIDDIQUE.png' // ✅ works on Vercel
+              : path.join(__dirname, 'assets', 'logo.png'), // ✅ works locally
           cid: logoCid, // Embed logo with CID
         },
       ],
@@ -71,22 +71,14 @@ const sendOtpEmail = async ({
     // Log the error and throw a custom error with a message
     // eslint-disable-next-line no-console
     console.log(error);
-    throw new AppError(
-      httpStatus.INTERNAL_SERVER_ERROR,
-      "Failed to send email",
-    );
+    throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to send email');
   }
 };
 
 export default sendOtpEmail;
 
 // Utility function to generate the email HTML content dynamically
-const generateEmailHTML = (
-  otp: string,
-  name: string,
-  logoCid: string,
-  customMessage: string = "",
-) => {
+const generateEmailHTML = (otp: string, name: string, logoCid: string, customMessage: string = '') => {
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -185,7 +177,7 @@ const generateEmailHTML = (
     <p><strong>Note:</strong> This OTP will expire in 5 minutes. Be sure to enter it before it expires.</p>
 
     <!-- Optional Custom Message Section -->
-    ${customMessage ? `<p><strong>Additional Info:</strong> ${customMessage}</p>` : ""}
+    ${customMessage ? `<p><strong>Additional Info:</strong> ${customMessage}</p>` : ''}
 
     <!-- Footer -->
     <div class="footer">
