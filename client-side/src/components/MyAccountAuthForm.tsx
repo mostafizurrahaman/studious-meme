@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type ComponentProps } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, type FieldErrors, type FieldValues } from 'react-hook-form';
 import { type z } from 'zod';
 import { OTPInput, type SlotProps, REGEXP_ONLY_DIGITS } from 'input-otp';
 import {
@@ -95,6 +95,31 @@ function ErrorText({ message }: { message?: string }) {
   if (!message) return null;
 
   return <p className="text-xs text-destructive">{message}</p>;
+}
+
+function getFirstErrorMessage(errors: FieldErrors<FieldValues>): string {
+  for (const error of Object.values(errors)) {
+    if (!error) {
+      continue;
+    }
+
+    if ('message' in error && typeof error.message === 'string') {
+      return error.message;
+    }
+
+    if (typeof error === 'object') {
+      const message = getFirstErrorMessage(error as FieldErrors<FieldValues>);
+      if (message) {
+        return message;
+      }
+    }
+  }
+
+  return 'Please fix the highlighted fields.';
+}
+
+function showFirstFormError(errors: FieldErrors<FieldValues>) {
+  toast.error(getFirstErrorMessage(errors));
 }
 
 function OtpSlot(props: SlotProps) {
@@ -347,20 +372,23 @@ export function MyAccountAuthForm() {
             <form
               key="signup-form"
               className="grid gap-4"
-              onSubmit={signUpForm.handleSubmit(async values => {
-                setIsSubmitting(true);
-                const result = await submitSignUp(initialState, toFormData(values));
-                setIsSubmitting(false);
+              onSubmit={signUpForm.handleSubmit(
+                async values => {
+                  setIsSubmitting(true);
+                  const result = await submitSignUp(initialState, toFormData(values));
+                  setIsSubmitting(false);
 
-                if (!result.ok) {
-                  toast.error(result.message);
-                  return;
-                }
+                  if (!result.ok) {
+                    toast.error(result.message);
+                    return;
+                  }
 
-                toast.success(result.message);
-                setSignupEmail(result.email);
-                setView('signup-otp');
-              })}
+                  toast.success(result.message);
+                  setSignupEmail(result.email);
+                  setView('signup-otp');
+                },
+                showFirstFormError,
+              )}
             >
               <LabeledInput
                 id="signup-name"
