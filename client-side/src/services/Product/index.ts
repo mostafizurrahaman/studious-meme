@@ -1,7 +1,6 @@
 'use server';
 
 import { revalidatePath, revalidateTag } from 'next/cache';
-
 import { requestBackendJson } from '@/lib/backend-api';
 import { CACHE_REVALIDATE } from '@/lib/cache-revalidate';
 import { CACHE_TAGS } from '@/lib/cache-tags';
@@ -354,6 +353,7 @@ export const createProduct = async (
   });
 
   revalidateTag(CACHE_TAGS.PRODUCTS, 'max');
+  revalidateTag(CACHE_TAGS.SEARCH, 'max');
   return result;
 };
 
@@ -373,6 +373,7 @@ export const updateProduct = async (
   });
 
   revalidateTag(CACHE_TAGS.PRODUCTS, 'max');
+  revalidateTag(CACHE_TAGS.SEARCH, 'max');
 
   if (nextSlug !== slug) {
     revalidatePath(`/product/${slug}`);
@@ -390,6 +391,7 @@ export const deleteProduct = async (slug: string): Promise<BackendEnvelope<Backe
   });
 
   revalidateTag(CACHE_TAGS.PRODUCTS, 'max');
+  revalidateTag(CACHE_TAGS.SEARCH, 'max');
   return result;
 };
 
@@ -416,7 +418,7 @@ export const searchProducts = async (searchTerm: string, limit = 10): Promise<Se
 
   const result = await requestBackendJson<BackendEnvelope<SearchResult>>(`/product/search?${params}`, {
     method: 'GET',
-    next: { revalidate: CACHE_REVALIDATE.SHORT, tags: [CACHE_TAGS.PRODUCTS] },
+    next: { revalidate: CACHE_REVALIDATE.SHORT, tags: [CACHE_TAGS.PRODUCTS, CACHE_TAGS.SEARCH] },
   });
 
   return result.data ?? { products: [], suggestions: [] };
