@@ -1,11 +1,12 @@
-import { IPagePayload } from "./page.interface";
-import { Page } from "./page.model";
+import { TPageSlugs } from './page.constant';
+import { IPagePayload } from './page.interface';
+import { Page } from './page.model';
 
 // 1. createOrUpdatePageIntoDB
 const createOrUpdatePageIntoDB = async (payload: IPagePayload) => {
   const result = await Page.findOneAndUpdate({ slug: payload.slug }, payload, {
     upsert: true,
-    returnDocument: "after",
+    returnDocument: 'after',
   });
 
   return result;
@@ -19,7 +20,7 @@ const getAllPagesFromDB = async () => {
 };
 
 // 3. getPageBySlugFromDB
-const getPageBySlugFromDB = async (slug: string) => {
+const getPageBySlugFromDB = async (slug: TPageSlugs) => {
   const result = await Page.findOne({ slug });
 
   return result;

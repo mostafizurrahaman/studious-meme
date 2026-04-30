@@ -1,25 +1,18 @@
-import { Document, Types } from "mongoose";
-import type { TShippingZone } from "./order.constants";
+import { Document, Types } from 'mongoose';
+import type { TShippingZone } from './order.constants';
 
-export type TPaymentMethod = "CASH_ON_DELIVERY" | "PORTPOS";
-export type TPaymentMethodInput = TPaymentMethod | "COD";
-export type TPaymentGateway = "CASH_ON_DELIVERY" | "PORTPOS";
-export type TPaymentStatus =
-  | "UNPAID"
-  | "PENDING_PAYMENT"
-  | "PAID"
-  | "FAILED"
-  | "CANCELLED"
-  | "REFUNDED";
-export type TOrderState =
-  | "PLACED"
-  | "PENDING_PAYMENT"
-  | "CONFIRMED"
-  | "PROCESSING"
-  | "SHIPPED"
-  | "DELIVERED"
-  | "CANCELLED";
-export type TOrderStatus = TOrderState;
+export type TPaymentMethod = 'CASH_ON_DELIVERY' | 'PORTPOS';
+export type TPaymentMethodInput = TPaymentMethod | 'COD';
+export type TPaymentGateway = 'CASH_ON_DELIVERY' | 'PORTPOS';
+export type TPaymentStatus = 'UNPAID' | 'PENDING_PAYMENT' | 'PAID' | 'FAILED' | 'CANCELLED' | 'REFUNDED';
+export type TOrderStatus =
+  | 'PLACED'
+  | 'PENDING_PAYMENT'
+  | 'CONFIRMED'
+  | 'PROCESSING'
+  | 'SHIPPED'
+  | 'DELIVERED'
+  | 'CANCELLED';
 
 export interface IOrderItemSnapshot {
   product: Types.ObjectId;
@@ -67,8 +60,7 @@ export interface IOrder extends Document {
   paymentMethod: TPaymentMethod;
   paymentGateway?: TPaymentGateway;
   paymentStatus: TPaymentStatus;
-  orderStatus: TOrderState;
-  status: TOrderState;
+  status: TOrderStatus;
   paymentId?: Types.ObjectId;
   invoiceId?: string;
   transactionId?: string;

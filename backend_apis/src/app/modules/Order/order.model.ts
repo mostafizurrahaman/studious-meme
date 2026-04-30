@@ -71,12 +71,6 @@ const orderSchema = new Schema<IOrder>(
       required: true,
       default: 'UNPAID',
     },
-    orderStatus: {
-      type: String,
-      enum: ['PLACED', 'PENDING_PAYMENT', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'],
-      required: true,
-      default: 'PLACED',
-    },
     status: {
       type: String,
       enum: ['PLACED', 'PENDING_PAYMENT', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'],

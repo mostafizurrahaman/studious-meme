@@ -7,6 +7,7 @@ import {
   type TDeliveryArea,
   type TShippingZone,
 } from './order.constants';
+import { TPaymentMethod } from './order.interface';
 
 export type CodEligibilityInput = {
   subtotal: number;
@@ -73,8 +74,8 @@ export function calculateCodEligibility({ subtotal, itemBlocksCod }: CodEligibil
   };
 }
 
-export function normalizePaymentMethod(value: string) {
-  return value === 'COD' ? 'CASH_ON_DELIVERY' : value;
+export function normalizePaymentMethod(value: string): TPaymentMethod {
+  return value === 'COD' ? 'CASH_ON_DELIVERY' : (value as TPaymentMethod);
 }
 
 export function formatShippingZoneLabel(zone: TShippingZone) {

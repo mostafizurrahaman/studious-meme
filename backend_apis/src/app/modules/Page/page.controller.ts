@@ -1,7 +1,8 @@
-import httpStatus from "http-status";
-import { asyncHandler } from "../../utils";
-import { sendResponse } from "../../utils";
-import { PageService } from "./page.service";
+import httpStatus from 'http-status';
+import { asyncHandler } from '../../utils';
+import { sendResponse } from '../../utils';
+import { TPageSlugs } from './page.constant';
+import { PageService } from './page.service';
 
 // 1. createOrUpdatePage
 const createOrUpdatePage = asyncHandler(async (req, res) => {
@@ -9,7 +10,7 @@ const createOrUpdatePage = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
-    message: "Page created successfully!",
+    message: 'Page created successfully!',
     data: result,
   });
 });
@@ -20,7 +21,7 @@ const getAllPages = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Pages retrieved successfully!",
+    message: 'Pages retrieved successfully!',
     data: result,
   });
 });
@@ -28,11 +29,11 @@ const getAllPages = asyncHandler(async (req, res) => {
 // 3. getPageBySlug
 const getPageBySlug = asyncHandler(async (req, res) => {
   const { slug } = req.params;
-  const result = await PageService.getPageBySlugFromDB(slug as string);
+  const result = await PageService.getPageBySlugFromDB(slug as TPageSlugs);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Page retrieved successfully!",
+    message: 'Page retrieved successfully!',
     data: result,
   });
 });

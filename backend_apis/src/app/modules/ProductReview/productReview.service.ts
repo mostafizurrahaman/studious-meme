@@ -121,7 +121,7 @@ const assertProductExists = async (
 const findDeliveredOrderForProduct = async (userId: Types.ObjectId, productId: Types.ObjectId) => {
   return OrderModel.findOne({
     user: userId,
-    $or: [{ status: 'DELIVERED' }, { orderStatus: 'DELIVERED' }],
+    status: 'DELIVERED',
     'items.product': productId,
   })
     .select('_id orderId items')
