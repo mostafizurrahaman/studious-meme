@@ -13,7 +13,7 @@ export const siteConfig = {
   supportEmail: 'info@malamal.com.bd',
   address: 'Level 11 & 12, Medona Tower, 28, Mohakhali C/A, Dhaka-1212.',
   ogImage: process.env.NEXT_PUBLIC_SITE_OG_IMAGE?.trim() || '/logo.png',
-  googleVerification: process.env.GOOGLE_SITE_VERIFICATION?.trim() || '',
+  googleVerification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim() || '',
 };
 
 type AboutSection = {
