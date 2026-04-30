@@ -1,6 +1,7 @@
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { Application, Request, Response } from 'express';
+import helmet from 'helmet';
 import morgan from 'morgan';
 import routes from './app/routes';
 import { globalErrorHandler, notFoundHandler } from './app/utils';
@@ -14,6 +15,82 @@ import { globalLimiter } from './app/middlewares';
 const app: Application = express();
 
 app.set('trust proxy', 1);
+
+// Security headers with Helmet
+const isProduction = process.env.NODE_ENV === 'production';
+app.use(
+  helmet({
+    crossOriginResourcePolicy: {
+      policy: 'cross-origin',
+    },
+
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: {
+        defaultSrc: ["'self'"],
+
+        scriptSrc: [
+          "'self'",
+          // "'unsafe-inline'",
+          // 'https://www.googletagmanager.com',
+          // 'https://www.google-analytics.com',
+        ],
+
+        styleSrc: ["'none'"], // [("'self'", "'unsafe-inline'")]
+
+        imgSrc: ["'self'"], // [ "'self'", 'data:', 'blob:', 'https:', 'https://res.cloudinary.com', 'https://img.youtube.com' ]
+
+        connectSrc: [
+          "'self'",
+          // 'http://localhost:3000',
+          // 'http://localhost:3001',
+          // 'http://localhost:3002',
+          // 'http://localhost:5173',
+          // 'https://*.vercel.app',
+          // 'https://malamal.com.bd',
+          // 'https://www.malamal.com.bd',
+          // 'https://malamal.xyz',
+          // 'https://www.malamal.xyz',
+          // 'https://www.google-analytics.com',
+          // 'https://www.googletagmanager.com',
+        ],
+
+        fontSrc: ["'self'"], // ["'self'", 'data:', 'https:']
+
+        frameSrc: ["'none'"], // ["'self'", 'https://www.youtube.com', 'https://www.youtube-nocookie.com']
+
+        mediaSrc: ["'none'"], // ["'self'", 'https:', 'blob:'],
+
+        objectSrc: ["'none'"],
+
+        baseUri: ["'self'"],
+
+        formAction: ["'none'"],
+        // formAction: [
+        //   "'self'",
+        //   'https://malamal.com.bd',
+        //   'https://www.malamal.com.bd',
+        //   'https://malamal.xyz',
+        //   'https://www.malamal.xyz',
+        // ],
+
+        ...(isProduction ? { upgradeInsecureRequests: [] } : {}),
+      },
+    },
+
+    referrerPolicy: {
+      policy: 'strict-origin-when-cross-origin',
+    },
+
+    hsts: isProduction
+      ? {
+          maxAge: 31536000,
+          includeSubDomains: true,
+          preload: true,
+        }
+      : false,
+  }),
+);
 
 // (3)
 // response time logger
@@ -35,10 +112,10 @@ app.use(cookieParser());
 app.use(morgan('dev'));
 
 // json parser
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 
 // form data parser
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // global rate limiting
 app.use(globalLimiter);

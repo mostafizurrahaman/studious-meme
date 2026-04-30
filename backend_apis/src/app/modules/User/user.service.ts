@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import z from "zod";
-import httpStatus from "http-status";
-import config from "../../config";
+import z from 'zod';
+import httpStatus from 'http-status';
+import config from '../../config';
 import {
   createAccessToken,
   createRefreshToken,
@@ -9,25 +8,19 @@ import {
   generateOtp,
   sendImageToCloudinary,
   verifyToken,
-} from "../../lib";
-import { AppError, sendOtpEmail } from "../../utils";
-import { IUser } from "./user.interface";
-import UserModel from "./user.model";
-import {
-  defaultUserImage,
-  OTP_EXPIRY_MINUTES,
-  ROLE,
-  TDeactiveAccountPayload,
-} from "./user.constant";
-import { UserValidation } from "./user.validation";
-import jwt, { JwtPayload, SignOptions } from "jsonwebtoken";
-import { MulterFile } from "../../lib/upload";
+} from '../../lib';
+import { AppError, sendOtpEmail } from '../../utils';
+import { IUser } from './user.interface';
+import UserModel from './user.model';
+import { defaultUserImage, OTP_EXPIRY_MINUTES, ROLE, TDeactiveAccountPayload } from './user.constant';
+import { UserValidation } from './user.validation';
+import jwt, { JwtPayload, SignOptions } from 'jsonwebtoken';
+import { MulterFile } from '../../lib/upload';
+import { PipelineStage } from 'mongoose';
 
 // 1. createUserIntoDB
 const createUserIntoDB = async (payload: IUser) => {
-  const existingUser = await UserModel.isUserExistsByEmailWithPassword(
-    payload.email,
-  );
+  const existingUser = await UserModel.isUserExistsByEmailWithPassword(payload.email);
 
   // if user exists but unverified
   if (existingUser && !existingUser.isVerifiedByOTP) {
@@ -43,27 +36,25 @@ const createUserIntoDB = async (payload: IUser) => {
       });
 
       existingUser.otp = otp;
-      existingUser.otpExpiry = new Date(
-        now.getTime() + OTP_EXPIRY_MINUTES * 60 * 1000,
-      );
+      existingUser.otpExpiry = new Date(now.getTime() + OTP_EXPIRY_MINUTES * 60 * 1000);
       await existingUser.save();
 
       throw new AppError(
         httpStatus.BAD_REQUEST,
-        "You have an unverified account, verify it with the new OTP sent to the mail!",
+        'You have an unverified account, verify it with the new OTP sent to the mail!',
       );
     } else {
       // if OTP is valid till now
       throw new AppError(
         httpStatus.BAD_REQUEST,
-        "You have an unverified account, verify it now with the otp sent to the mail!",
+        'You have an unverified account, verify it now with the otp sent to the mail!',
       );
     }
   }
 
   if (existingUser && existingUser.isVerifiedByOTP) {
     // if user is already verified
-    throw new AppError(httpStatus.BAD_REQUEST, "User already exists!");
+    throw new AppError(httpStatus.BAD_REQUEST, 'User already exists!');
   }
 
   if (!existingUser) {
@@ -92,16 +83,10 @@ const sendSignupOtpAgainIntoDB = async (userEmail: string) => {
   const user = await UserModel.isUserExistsByEmailWithPassword(userEmail);
 
   if (!user) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "You must sign up first to get an OTP!",
-    );
+    throw new AppError(httpStatus.BAD_REQUEST, 'You must sign up first to get an OTP!');
   } else if (user.isVerifiedByOTP) {
     // if user is already verified
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "This account is already verified!",
-    );
+    throw new AppError(httpStatus.BAD_REQUEST, 'This account is already verified!');
   } else if (!user.otpExpiry || user.otpExpiry < now) {
     // sending new OTP if previous one is expired
     const otp = generateOtp();
@@ -122,11 +107,11 @@ const sendSignupOtpAgainIntoDB = async (userEmail: string) => {
       email: user?.email,
       otp: user?.otp,
       name: user?.name,
-      customMessage: "Verify quickly using this OTP!",
+      customMessage: 'Verify quickly using this OTP!',
     });
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      "An OTP was already sent. Please wait until it expires before requesting a new one.",
+      'An OTP was already sent. Please wait until it expires before requesting a new one.',
     );
   }
 };
@@ -137,28 +122,22 @@ const verifySignupOtpIntoDB = async (userEmail: string, otp: string) => {
   const user = await UserModel.isUserExistsByEmailWithPassword(userEmail);
 
   if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, "User not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found!');
   }
 
   // Check if the user is already verified
   if (user.isVerifiedByOTP) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "This account is already verified!",
-    );
+    throw new AppError(httpStatus.BAD_REQUEST, 'This account is already verified!');
   }
 
   // Check if OTP is expired
   if (!user.otpExpiry || user.otpExpiry < now) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "OTP has been expired. Please request a new one!",
-    );
+    throw new AppError(httpStatus.BAD_REQUEST, 'OTP has been expired. Please request a new one!');
   }
 
   // If OTP is invalid, throw error
   if (user?.otp !== otp) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Invalid OTP!");
+    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid OTP!');
   }
 
   // Mark user as verified
@@ -196,13 +175,13 @@ const signinIntoDB = async (payload: { email: string; password: string }) => {
   // const user = await UserModel.findOne({ email: payload.email }).select('+password');
   const user = await UserModel.isUserExistsByEmailWithPassword(payload.email);
 
-    if (!user) {
-        throw new AppError(httpStatus.NOT_FOUND, 'User does not exist!');
-    }
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User does not exist!');
+  }
 
-    if (!user.isActive) {
-        throw new AppError(httpStatus.BAD_REQUEST, 'User is not active!');
-    }
+  if (!user.isActive) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'User is not active!');
+  }
 
   // no need this part as isDeleted is functioned to hide the soft deleted user
   // if (user.isDeleted) {
@@ -218,17 +197,14 @@ const signinIntoDB = async (payload: { email: string; password: string }) => {
     user.otpExpiry = new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000);
     await user.save();
 
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "Verify your account with the new OTP sent to the mail!",
-    );
+    throw new AppError(httpStatus.BAD_REQUEST, 'Verify your account with the new OTP sent to the mail!');
   }
 
   // Validate password
   const isPasswordCorrect = await user.isPasswordMatched(payload.password);
 
   if (!isPasswordCorrect) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Invalid credentials!");
+    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid credentials!');
   }
 
   // Prepare user data for token generation
@@ -258,13 +234,10 @@ const signinIntoDB = async (payload: { email: string; password: string }) => {
 };
 
 // 5. updateProfilePhotoIntoDB
-const updateProfilePhotoIntoDB = async (
-  user: IUser,
-  imageFile: MulterFile | undefined,
-) => {
+const updateProfilePhotoIntoDB = async (user: IUser, imageFile: MulterFile | undefined) => {
   // 1. Validation: Ensure an image file is provided
   if (!imageFile) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Image is required!");
+    throw new AppError(httpStatus.BAD_REQUEST, 'Image is required!');
   }
 
   // 2. Upload the new profile photo to Cloudinary
@@ -274,17 +247,14 @@ const updateProfilePhotoIntoDB = async (
   const userNewData = await UserModel.findByIdAndUpdate(
     user._id,
     { image: secure_url },
-    { returnDocument: "after" },
-  ).select("name email phone dob image role");
+    { returnDocument: 'after' },
+  ).select('name email phone dob image role');
 
   // 4. Rollback Logic: If DB update fails, delete the newly uploaded image from Cloudinary
   if (!userNewData) {
     // Use secure_url to delete from Cloudinary, not the local path
     await deleteImageFromCloudinary(secure_url);
-    throw new AppError(
-      httpStatus.INTERNAL_SERVER_ERROR,
-      "Failed to update profile photo. Please try again!",
-    );
+    throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to update profile photo. Please try again!');
   }
 
   // 5. Cleanup: Delete the previous image from Cloudinary if it exists and is not a default image
@@ -321,11 +291,11 @@ const updateProfileDataIntoDB = async (
   },
 ) => {
   const user = await UserModel.findByIdAndUpdate(userData._id, payload, {
-    returnDocument: "after",
+    returnDocument: 'after',
   });
 
   if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, "User not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found!');
   }
 
   // Prepare user data for tokens
@@ -358,26 +328,20 @@ const changePasswordIntoDB = async (
   const user = await UserModel.findOne({
     _id: userData._id,
     isActive: true,
-  }).select("+password");
+  }).select('+password');
 
   if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, "User not exists!"); // auth middleware already handled all checking
+    throw new AppError(httpStatus.NOT_FOUND, 'User not exists!'); // auth middleware already handled all checking
   }
 
   const isCredentialsCorrect = await user.isPasswordMatched(oldPassword);
 
   if (!isCredentialsCorrect) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "Current password is not correct!",
-    );
+    throw new AppError(httpStatus.BAD_REQUEST, 'Current password is not correct!');
   }
 
   if (oldPassword === newPassword) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "New password must be different!",
-    );
+    throw new AppError(httpStatus.BAD_REQUEST, 'New password must be different!');
   }
 
   user.password = newPassword;
@@ -409,7 +373,7 @@ const forgotPassword = async (email: string) => {
   const user = await UserModel.findOne({ email, isActive: true });
 
   if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, "User not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found!');
   }
 
   const now = new Date();
@@ -449,24 +413,24 @@ const forgotPassword = async (email: string) => {
 
 // 9. sendForgotPasswordOtpAgain 2.(send OTP again)
 const sendForgotPasswordOtpAgain = async (forgotPassToken: string) => {
-  let decoded: any;
+  let decoded: JwtPayload;
   try {
     decoded = jwt.verify(forgotPassToken, config.jwt.otp_secret!, {
       ignoreExpiration: true,
-    });
+    }) as JwtPayload;
   } catch {
-    throw new AppError(httpStatus.BAD_REQUEST, "Invalid token!");
+    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid token!');
   }
-  const email = decoded.email;
+  const email = decoded.email as string;
 
   if (!email) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Invalid token!");
+    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid token!');
   }
 
   const user = await UserModel.findOne({ email, isActive: true });
 
   if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, "User not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found!');
   }
 
   const now = new Date();
@@ -500,25 +464,22 @@ const sendForgotPasswordOtpAgain = async (forgotPassToken: string) => {
 };
 
 // 10. verifyOtpForForgotPassword 3. (verify OTP)
-const verifyOtpForForgotPassword = async (payload: {
-  token: string;
-  otp: string;
-}) => {
-  let decoded: any;
+const verifyOtpForForgotPassword = async (payload: { token: string; otp: string }) => {
+  let decoded: JwtPayload;
   try {
     decoded = jwt.verify(payload.token, config.jwt.otp_secret!, {
       ignoreExpiration: true,
-    });
+    }) as JwtPayload;
   } catch {
-    throw new AppError(httpStatus.BAD_REQUEST, "Invalid token!");
+    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid token!');
   }
 
-  const email = decoded.email;
+  const email = decoded.email as string;
 
   const user = await UserModel.findOne({ email, isActive: true });
 
   if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, "User not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found!');
   }
 
   // Check if OTP expired
@@ -533,15 +494,12 @@ const verifyOtpForForgotPassword = async (payload: {
 
     await sendOtpEmail({ email, otp: newOtp, name: user?.name });
 
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "OTP expired. A new OTP has been sent!",
-    );
+    throw new AppError(httpStatus.BAD_REQUEST, 'OTP expired. A new OTP has been sent!');
   }
 
   // Check if OTP matches
   if (user.otp !== payload.otp) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Invalid OTP!");
+    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid OTP!');
   }
 
   // OTP verified → issue reset password token
@@ -564,19 +522,16 @@ const resetPasswordIntoDB = async (
   const { resetPasswordToken, newPassword } = payload;
 
   if (!resetPasswordToken) {
-    throw new AppError(httpStatus.FORBIDDEN, "Invalid reset password token!");
+    throw new AppError(httpStatus.FORBIDDEN, 'Invalid reset password token!');
   }
 
-  const resetPasswordPayload = verifyToken(
-    resetPasswordToken,
-    config.jwt.otp_secret!,
-  ) as {
+  const resetPasswordPayload = verifyToken(resetPasswordToken, config.jwt.otp_secret!) as {
     email: string;
     isResetPassword?: boolean;
   };
 
   if (!resetPasswordPayload?.isResetPassword) {
-    throw new AppError(httpStatus.FORBIDDEN, "Invalid reset password token!");
+    throw new AppError(httpStatus.FORBIDDEN, 'Invalid reset password token!');
   }
 
   const user = await UserModel.findOne({
@@ -585,7 +540,7 @@ const resetPasswordIntoDB = async (
   });
 
   if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, "User not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found!');
   }
 
   user.password = newPassword;
@@ -599,9 +554,7 @@ const resetPasswordIntoDB = async (
 
 // 12. fetchProfileFromDB
 const fetchProfileFromDB = async (user: IUser) => {
-  const result = await UserModel.findById(user._id).select(
-    "name email phone dob image role",
-  );
+  const result = await UserModel.findById(user._id).select('name email phone dob image role');
 
   return result;
 };
@@ -609,10 +562,7 @@ const fetchProfileFromDB = async (user: IUser) => {
 // 13. getNewAccessTokenFromServer
 const getNewAccessTokenFromServer = async (refreshToken: string) => {
   // checking if the given token is valid
-  const decoded = verifyToken(
-    refreshToken,
-    config.jwt.refresh_secret!,
-  ) as JwtPayload;
+  const decoded = verifyToken(refreshToken, config.jwt.refresh_secret!) as JwtPayload;
 
   const { email, iat } = decoded;
 
@@ -620,11 +570,11 @@ const getNewAccessTokenFromServer = async (refreshToken: string) => {
   const user = await UserModel.isUserExistsByEmailWithPassword(email);
 
   if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, "User not exists!");
+    throw new AppError(httpStatus.NOT_FOUND, 'User not exists!');
   }
 
   if (!user.isActive) {
-    throw new AppError(httpStatus.BAD_REQUEST, "You are not authorized!");
+    throw new AppError(httpStatus.BAD_REQUEST, 'You are not authorized!');
   }
 
   // no need this part as isDeleted is functioned to hide the soft deleted user
@@ -633,12 +583,12 @@ const getNewAccessTokenFromServer = async (refreshToken: string) => {
   // }
 
   if (!user.isVerifiedByOTP) {
-    throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized!");
+    throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized!');
   }
 
   // checking if any hacker using a token even-after the user changed the password
   if (user.passwordChangedAt && user.isJWTIssuedBeforePasswordChanged(iat)) {
-    throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized!");
+    throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized!');
   }
 
   // Prepare user data for tokens
@@ -660,25 +610,22 @@ const getNewAccessTokenFromServer = async (refreshToken: string) => {
 };
 
 // 14. deactivateAccountIntoDB
-const deactivateAccountIntoDB = async (
-  user: IUser,
-  payload: TDeactiveAccountPayload,
-) => {
+const deactivateAccountIntoDB = async (user: IUser, payload: TDeactiveAccountPayload) => {
   const { email, password, deactivationReason } = payload;
 
   const currentUser = await UserModel.findOne({
     _id: user._id,
     email: email,
-  }).select("+password");
+  }).select('+password');
 
   if (!currentUser) {
-    throw new AppError(httpStatus.NOT_FOUND, "User not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found!');
   }
 
   const isPasswordCorrect = currentUser.isPasswordMatched(password);
 
   if (!isPasswordCorrect) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Invalid credentials");
+    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid credentials');
   }
 
   const result = await UserModel.findByIdAndUpdate(
@@ -690,8 +637,8 @@ const deactivateAccountIntoDB = async (
       },
     },
     {
-      returnDocument: "after",
-      select: "email name address isActive deactivationReason",
+      returnDocument: 'after',
+      select: 'email name address isActive deactivationReason',
     },
   );
 
@@ -707,7 +654,7 @@ const deleteSpecificUserAccountIntoDB = async (user: IUser) => {
         isDeleted: true,
       },
     },
-    { returnDocument: "after", select: "email name address isDeleted" },
+    { returnDocument: 'after', select: 'email name address isDeleted' },
   );
 
   return result;
@@ -816,33 +763,31 @@ const adminGetAllUsersFromDB = async (query: Record<string, unknown>) => {
     limit: limitQuery,
     // fields: fieldsQuery,
     ...rawFilters
-  } = query as Record<string, any>;
+  } = query as Record<string, unknown>;
 
   if (rawFilters.isActive !== undefined) {
-    rawFilters.isActive =
-      rawFilters.isActive === "true" || rawFilters.isActive === true;
+    rawFilters.isActive = rawFilters.isActive === 'true' || rawFilters.isActive === true;
   }
 
   const page = Number(pageQuery) || 1;
   const limit = Number(limitQuery) || 10;
   const skip = (page - 1) * limit;
 
-  // Base match: exclude admins and super admins
   const matchStage: Record<string, unknown> = {
     role: { $nin: [ROLE.ADMIN, ROLE.SUPER_ADMIN] },
     ...rawFilters,
   };
 
-  const pipeline: any[] = [{ $match: matchStage }];
+  const pipeline: PipelineStage[] = [{ $match: matchStage }];
 
   // Search by name, email, phone
   if (searchTerm) {
     pipeline.push({
       $match: {
         $or: [
-          { name: { $regex: searchTerm, $options: "i" } },
-          { email: { $regex: searchTerm, $options: "i" } },
-          { phone: { $regex: searchTerm, $options: "i" } },
+          { name: { $regex: searchTerm, $options: 'i' } },
+          { email: { $regex: searchTerm, $options: 'i' } },
+          { phone: { $regex: searchTerm, $options: 'i' } },
           // { address: { $regex: searchTerm, $options: 'i' } },
         ],
       },
@@ -851,12 +796,12 @@ const adminGetAllUsersFromDB = async (query: Record<string, unknown>) => {
 
   // Sort
   const sortStage: Record<string, 1 | -1> = {};
-  const sortString = (sortQuery as string) || "-createdAt";
+  const sortString = (sortQuery as string) || '-createdAt';
   sortString
-    .split(",")
+    .split(',')
     .filter(Boolean)
     .forEach((field: string) => {
-      if (field.startsWith("-")) {
+      if (field.startsWith('-')) {
         sortStage[field.substring(1)] = -1;
       } else {
         sortStage[field] = 1;
@@ -894,9 +839,9 @@ const adminGetAllUsersFromDB = async (query: Record<string, unknown>) => {
   // };
   // }
 
-  const facetPipeline: any = {
+  const facetPipeline: Record<string, PipelineStage.FacetPipelineStage[]> = {
     data: [{ $skip: skip }, { $limit: limit }],
-    meta: [{ $count: "total" }],
+    meta: [{ $count: 'total' }],
   };
 
   // if (projectStage) {
@@ -921,18 +866,15 @@ const adminGetAllUsersFromDB = async (query: Record<string, unknown>) => {
   return { data: facetResult.data, meta };
 };
 
-const adminUpdateUserStatusIntoDB = async (
-  userId: string,
-  isActive: boolean,
-) => {
+const adminUpdateUserStatusIntoDB = async (userId: string, isActive: boolean) => {
   const user = await UserModel.findOneAndUpdate(
     { _id: userId, role: { $nin: [ROLE.ADMIN, ROLE.SUPER_ADMIN] } },
     { isActive },
-    { returnDocument: "after", runValidators: true },
-  ).select("name email phone image isActive isDeleted createdAt updatedAt");
+    { returnDocument: 'after', runValidators: true },
+  ).select('name email phone image isActive isDeleted createdAt updatedAt');
 
   if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, "User not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found!');
   }
 
   return null;
@@ -942,11 +884,11 @@ const adminDeleteUserIntoDB = async (userId: string) => {
   const user = await UserModel.findOneAndUpdate(
     { _id: userId, role: { $nin: [ROLE.ADMIN, ROLE.SUPER_ADMIN] } },
     { isDeleted: true, isActive: false },
-    { returnDocument: "after", runValidators: true },
-  ).select("name email phone image isActive isDeleted createdAt updatedAt");
+    { returnDocument: 'after', runValidators: true },
+  ).select('name email phone image isActive isDeleted createdAt updatedAt');
 
   if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, "User not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found!');
   }
 
   return null;
