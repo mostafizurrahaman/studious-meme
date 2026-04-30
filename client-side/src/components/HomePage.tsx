@@ -1,16 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import {
-  ArrowUpRight,
-  Zap,
-  ShieldCheck,
-  DoorClosed,
-  BadgeCheck,
-  BadgePercent,
-  GitCompare,
-  Heart,
-  ShoppingCart,
-} from 'lucide-react';
+import { ArrowUpRight, BadgePercent, GitCompare, Heart, ShoppingCart } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { getCategoryAccentClassName, getCategoryAccentStyle } from '@/lib/category-accent';
 import { ProductCard } from '@/components/ProductCard';

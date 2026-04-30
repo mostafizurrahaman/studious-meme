@@ -258,8 +258,6 @@ function ReviewDialogContent({
       status: review.status,
       images: review.images ?? [],
     });
-    setReviewImageFiles([]);
-    setDisplayImageFile(null);
   }, [form, review]);
 
   const reviewStatus = useWatch({ control: form.control, name: 'status' }) ?? 'approved';
@@ -431,29 +429,29 @@ function ReviewDialogContent({
               ) : null}
             </div>
 
-              <div className="space-y-2">
-                <div className="flex items-center justify-between gap-3 text-xs font-medium text-muted-foreground">
-                  <span>Images</span>
-                  <span>
-                    {reviewImageFiles.length > 0
-                      ? `${reviewImageFiles.length} file${reviewImageFiles.length === 1 ? '' : 's'} selected`
-                      : `Optional upload up to ${MAX_REVIEW_IMAGES}`}
-                  </span>
-                </div>
-                <Input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={event => handleReviewImageFiles(event.target.files ?? undefined)}
-                />
-                {reviewImageFiles.length > 0 ? (
-                  <div className="space-y-1 rounded-2xl border bg-muted/20 p-3 text-xs text-muted-foreground">
-                    {reviewImageFiles.map(file => (
-                      <div key={file.name}>{file.name}</div>
-                    ))}
-                  </div>
-                ) : null}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between gap-3 text-xs font-medium text-muted-foreground">
+                <span>Images</span>
+                <span>
+                  {reviewImageFiles.length > 0
+                    ? `${reviewImageFiles.length} file${reviewImageFiles.length === 1 ? '' : 's'} selected`
+                    : `Optional upload up to ${MAX_REVIEW_IMAGES}`}
+                </span>
               </div>
+              <Input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={event => handleReviewImageFiles(event.target.files ?? undefined)}
+              />
+              {reviewImageFiles.length > 0 ? (
+                <div className="space-y-1 rounded-2xl border bg-muted/20 p-3 text-xs text-muted-foreground">
+                  {reviewImageFiles.map(file => (
+                    <div key={file.name}>{file.name}</div>
+                  ))}
+                </div>
+              ) : null}
+            </div>
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={onClose} disabled={isPending}>
@@ -1068,6 +1066,7 @@ export function DashboardProductReviewsManager({
 
       <Dialog open={Boolean(selectedReview)} onOpenChange={open => (!open ? closeReviewDialog() : undefined)}>
         <ReviewDialogContent
+          key={`${selectedReview?._id ?? 'none'}-${dialogMode}`}
           review={selectedReview}
           mode={dialogMode}
           onClose={closeReviewDialog}

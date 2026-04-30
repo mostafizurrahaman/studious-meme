@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { searchProducts, type SearchResult } from '@/services/Product';
 import { Loader2, Search } from 'lucide-react';
 
-const DEBOUNCE_MS = 300;
+const DEBOUNCE_MS = 600;
 
 export function SearchBox() {
   const [query, setQuery] = useState('');
@@ -30,10 +30,7 @@ export function SearchBox() {
       clearTimeout(timeoutRef.current);
     }
 
-    if (query.trim().length < 2) {
-      setResults(null);
-      return;
-    }
+    if (query.trim().length < 2) return;
 
     timeoutRef.current = setTimeout(async () => {
       setIsLoading(true);
@@ -56,7 +53,9 @@ export function SearchBox() {
     };
   }, [query]);
 
-  const showDropdown = isOpen && results && (results.products.length > 0 || results.suggestions.length > 0);
+  const visibleResults = query.trim().length >= 2 ? results : null;
+  const showDropdown =
+    isOpen && visibleResults && (visibleResults.products.length > 0 || visibleResults.suggestions.length > 0);
 
   return (
     <div ref={wrapperRef} className="relative w-full">
@@ -85,10 +84,10 @@ export function SearchBox() {
 
       {showDropdown && (
         <div className="absolute left-0 right-0 top-full z-9999 mt-2 overflow-hidden rounded-xl border border-border bg-background shadow-lg">
-          {results!.suggestions.length > 0 && (
+          {visibleResults.suggestions.length > 0 && (
             <div className="border-b border-border p-2 bg-white!">
               {/* <p className="px-3 py-1.5 text-xs font-semibold text-muted-foreground">Suggestions</p> */}
-              {results!.suggestions.slice(0, 12).map((item, index) => (
+              {visibleResults.suggestions.slice(0, 12).map((item, index) => (
                 <Link
                   key={index}
                   href={`/product/${item.slug}`}

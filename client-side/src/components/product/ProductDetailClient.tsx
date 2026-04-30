@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { MessageCircle, Minus, PackageCheck, Play, Plus, Send, Share, Truck } from 'lucide-react';
 import PaymentOptionSvg from '@/assets/Payment-Option.svg';
 import { Card } from '@/components/ui/card';
@@ -184,8 +184,11 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
     ];
   }, [images, product.title, youtubeVideoId]);
   const [selectedMedia, setSelectedMedia] = useState<GalleryMedia | null>(null);
-  const [zoomPosition, setZoomPosition] = useState('50% 50%');
-  const [isZooming, setIsZooming] = useState(false);
+  const [zoomState, setZoomState] = useState({
+    mediaKey: '',
+    position: '50% 50%',
+    isZooming: false,
+  });
   const [quantity, setQuantity] = useState(1);
   const description = sanitizeProductHtml(product.description?.trim() ?? '');
   const features = sanitizeProductHtml(product.features?.trim() ?? '');
@@ -194,30 +197,25 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   const primaryImage = getProductPrimaryImage(product);
   const shareMedia = primaryImage.startsWith('http') ? primaryImage : `https://malamal.com.bd${primaryImage}`;
 
-  useEffect(() => {
-    setSelectedMedia(current => {
-      if (!current) return galleryItems[0] ?? null;
-
-      const stillExists = galleryItems.some(item => item.src === current.src && item.type === current.type);
-
-      return stillExists ? current : (galleryItems[0] ?? null);
-    });
-  }, [galleryItems]);
-
-  const activeMedia = selectedMedia ?? galleryItems[0] ?? null;
-
-  useEffect(() => {
-    setIsZooming(false);
-    setZoomPosition('50% 50%');
-  }, [activeMedia?.src, activeMedia?.type]);
+  const selectedMediaStillExists = selectedMedia
+    ? galleryItems.some(item => item.src === selectedMedia.src && item.type === selectedMedia.type)
+    : false;
+  const activeMedia = selectedMediaStillExists ? selectedMedia : (galleryItems[0] ?? null);
+  const activeMediaKey = activeMedia ? `${activeMedia.type}:${activeMedia.src}` : '';
+  const isZooming = zoomState.mediaKey === activeMediaKey ? zoomState.isZooming : false;
+  const zoomPosition = zoomState.mediaKey === activeMediaKey ? zoomState.position : '50% 50%';
 
   function handleZoomMove(event: React.MouseEvent<HTMLDivElement>) {
     if (activeMedia?.type !== 'image') return;
     const rect = event.currentTarget.getBoundingClientRect();
     const x = ((event.clientX - rect.left) / rect.width) * 100;
     const y = ((event.clientY - rect.top) / rect.height) * 100;
-    setZoomPosition(`${x}% ${y}%`);
-    setIsZooming(true);
+    setZoomState({ mediaKey: activeMediaKey, position: `${x}% ${y}%`, isZooming: true });
+  }
+
+  function resetZoom(media: GalleryMedia | null = activeMedia) {
+    const mediaKey = media ? `${media.type}:${media.src}` : '';
+    setZoomState({ mediaKey, position: '50% 50%', isZooming: false });
   }
 
   function addQuantityToCart(redirect = false) {
@@ -248,7 +246,10 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                   <button
                     key={`${item.type}-${item.src}-${index}`}
                     type="button"
-                    onClick={() => setSelectedMedia(item)}
+                    onClick={() => {
+                      setSelectedMedia(item);
+                      resetZoom(item);
+                    }}
                     className={cn(
                       'relative size-18 shrink-0 overflow-hidden rounded-lg sm:size-20',
                       activeMedia?.src === item.src &&
@@ -279,8 +280,14 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               <div
                 className="relative aspect-[4/3] overflow-hidden rounded-lg lg:aspect-[1.05/1]"
                 onMouseMove={handleZoomMove}
-                onMouseEnter={() => setIsZooming(true)}
-                onMouseLeave={() => setIsZooming(false)}
+                onMouseEnter={() =>
+                  setZoomState(current => ({
+                    mediaKey: activeMediaKey,
+                    position: current.mediaKey === activeMediaKey ? current.position : '50% 50%',
+                    isZooming: true,
+                  }))
+                }
+                onMouseLeave={() => resetZoom()}
               >
                 {activeMedia?.type === 'video' ? (
                   <iframe
