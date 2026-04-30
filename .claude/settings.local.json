@@ -7,7 +7,9 @@
       "Bash(xargs grep *)",
       "Bash(pnpm build *)",
       "Bash(npm install *)",
-      "Bash(grep -v \"^\\\\s*//\")"
+      "Bash(grep -v \"^\\\\s*//\")",
+      "Bash(npx vitest *)",
+      "Bash(node -e ' *)"
     ]
   }
 }
