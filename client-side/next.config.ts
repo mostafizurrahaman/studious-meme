@@ -34,6 +34,9 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   reactCompiler: true,
   images: {
+    // The legacy WordPress image host can resolve through a NAT64 address that
+    // Next.js treats as private, even though the hostname is explicitly trusted.
+    dangerouslyAllowLocalIP: true,
     qualities: [50, 75, 90, 100],
     remotePatterns: [
       {
