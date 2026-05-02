@@ -5,7 +5,6 @@ import { CategoryPageClient } from '@/components/CategoryPageClient';
 import { SeoScripts } from '@/components/SeoScripts';
 import { Card } from '@/components/ui/card';
 import { buildCategoryMetadata, buildCategorySchemas } from '@/lib/seo';
-import { getActiveBrands } from '@/services/Brand';
 import {
   getActiveCategories,
   getActiveCategoryBySlug,
@@ -74,6 +73,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
     1,
   );
   const backendCategory = await getActiveCategoryBySlug(slug).catch(() => null);
+
   const category = backendCategory?.data
     ? mapBackendCategoryToCategoryPageEntry(backendCategory.data)
     : null;
@@ -90,7 +90,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
           (item) => item.slug === subCategorySlug,
         ) ?? null)
       : null;
-  const [productsResult, brandsResult] = await Promise.all([
+  const productsResult = await (
     subCategorySlug
       ? getProductsBySubCategorySlug(subCategorySlug, {
           page,
@@ -98,16 +98,16 @@ export default async function CategoryPage({ params, searchParams }: Props) {
           b: query.b,
           s: query.s,
           p: query.p,
-        }).catch(() => null)
+        })
       : getProductsByCategorySlug(slug, {
           page,
           limit,
           b: query.b,
           s: query.s,
           p: query.p,
-        }).catch(() => null),
-    getActiveBrands().catch(() => null),
-  ]);
+        })
+  ).catch(() => null);
+
   const products = productsResult?.data?.length
     ? await Promise.all(
         productsResult.data.map(mapBackendProductToStorefrontProduct),
@@ -119,8 +119,6 @@ export default async function CategoryPage({ params, searchParams }: Props) {
     page: productsResult?.meta?.page ?? page,
     totalPages: productsResult?.meta?.totalPages ?? 1,
   };
-  const brandFilters =
-    brandsResult?.data?.map((brand) => brand.name).filter(Boolean) ?? [];
 
   return (
     <>
@@ -129,16 +127,16 @@ export default async function CategoryPage({ params, searchParams }: Props) {
         <div className="px-4 py-6 lg:px-6">
           <nav
             aria-label="Breadcrumb"
-            className="mb-4 text-sm text-foreground/55"
+            className="mb-4 overflow-hidden text-sm text-foreground/55"
           >
-            <ol className="flex flex-wrap items-center gap-2">
-              <li>
+            <ol className="flex items-center gap-2 overflow-hidden whitespace-nowrap">
+              <li className="shrink-0">
                 <Link href="/" className="cursor-pointer hover:text-primary">
                   Home
                 </Link>
               </li>
-              <li>/</li>
-              <li>
+              <li className="shrink-0">/</li>
+              <li className="shrink-0">
                 <Link
                   href="/main-categories"
                   className="cursor-pointer hover:text-primary"
@@ -146,8 +144,10 @@ export default async function CategoryPage({ params, searchParams }: Props) {
                   Main Categories
                 </Link>
               </li>
-              <li>/</li>
-              <li className="font-semibold text-foreground/75">{title}</li>
+              <li className="shrink-0">/</li>
+              <li className="min-w-0 truncate font-semibold text-foreground/75">
+                {title}
+              </li>
             </ol>
           </nav>
           <Suspense
@@ -158,7 +158,6 @@ export default async function CategoryPage({ params, searchParams }: Props) {
             <CategoryPageClient
               category={category}
               products={products}
-              brands={brandFilters}
               meta={meta}
               selectedSubCategory={selectedSubCategory}
             />
