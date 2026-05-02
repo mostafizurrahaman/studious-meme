@@ -1,9 +1,11 @@
+import { Suspense } from 'react';
 import { FloatingCategoryRail } from '@/components/FloatingCategoryRail';
 import { Footer } from '@/components/Footer';
 import { MobileToolbar } from '@/components/MobileToolbar';
 import { Container } from '@/components/Container';
 import { StorefrontHeader } from '@/components/StorefrontHeader';
 import { StorefrontFloatingContact } from '@/components/StorefrontFloatingContact';
+import Loading from './loading';
 import {
   getActiveBrands,
   mapBackendBrandToStorefrontBrand,
@@ -45,7 +47,9 @@ const MainLayout = async ({ children }: { children: React.ReactNode }) => {
       >
         <FloatingCategoryRail categories={categories} />
         <Container>
-          <div className="min-h-screen">{children}</div>
+          <div className="min-h-screen">
+            <Suspense fallback={<Loading />}>{children}</Suspense>
+          </div>
         </Container>
       </main>
       <Footer categories={categories} brands={brands} />
