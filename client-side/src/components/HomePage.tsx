@@ -133,13 +133,13 @@ export async function HomePage({ heroContent }: HomePageProps) {
 
   const categoryCards = heroContent?.categories?.length
     ? heroContent.categories
-        .slice(0, 6)
+        .slice(0, 8)
         .map(mapBackendCategoryToStorefrontCategory)
     : [];
 
   const brandItems = heroContent?.brands?.length
     ? await Promise.all(
-        heroContent.brands.map(mapBackendBrandToStorefrontBrand),
+        heroContent.brands.slice(0, 16).map(mapBackendBrandToStorefrontBrand),
       )
     : [];
 
@@ -271,7 +271,8 @@ export async function HomePage({ heroContent }: HomePageProps) {
                             {card.name}
                           </div>
                           <p className="mt-2 text-sm leading-6 text-foreground/65">
-                            {card.description}
+                            {card.description.slice(0, 40) +
+                              (card.description.length > 40 ? '...' : '')}
                           </p>
                         </div>
 

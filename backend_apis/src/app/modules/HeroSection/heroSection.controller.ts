@@ -4,8 +4,10 @@ import { HeroSectionService } from './heroSection.service';
 import { getParam } from '../../lib/getParam';
 
 // 1. getHomeContent
-const getHomeContent = asyncHandler(async (_req, res) => {
-  const result = await HeroSectionService.getHomeContentFromDB();
+const getHomeContent = asyncHandler(async (req, res) => {
+  const result = await HeroSectionService.getHomeContentFromDB(req.query);
+
+  // console.dir({ result }, { depth: null });
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

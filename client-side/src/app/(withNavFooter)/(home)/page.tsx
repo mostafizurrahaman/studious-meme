@@ -12,6 +12,8 @@ export default async function Page() {
   const heroContent = await getHomeContent().catch(() => null);
   const content = heroContent?.data ?? null;
 
+  console.dir({ content }, {depth:null});
+
   const [schemaProducts, schemaBrands] = await Promise.all([
     content?.featuredProducts?.length || content?.latestProducts?.length
       ? Promise.all(

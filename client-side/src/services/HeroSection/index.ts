@@ -39,7 +39,17 @@ export type BackendHeroSection = {
   isActive: boolean;
 };
 
-export const getHomeContent = async (): Promise<
+type GetHomeContentParams = {
+  brandLimit?: number;
+  categoryLimit?: number;
+};
+
+export const getHomeContent = async (
+  params: GetHomeContentParams = {
+    brandLimit: 16,
+    categoryLimit: 8,
+  },
+): Promise<
   BackendEnvelope<{
     heroSection: BackendHeroSection;
     brands: BackendBrand[];
@@ -48,6 +58,15 @@ export const getHomeContent = async (): Promise<
     latestProducts: BackendProduct[];
   }>
 > => {
+  const searchParams = new URLSearchParams();
+
+  if (params.brandLimit)
+    searchParams.set('brandLimit', String(params.brandLimit));
+  if (params.categoryLimit)
+    searchParams.set('categoryLimit', String(params.categoryLimit));
+
+  const query = searchParams.toString();
+
   return requestBackendJson<
     BackendEnvelope<{
       heroSection: BackendHeroSection;
@@ -56,7 +75,7 @@ export const getHomeContent = async (): Promise<
       featuredProducts: BackendProduct[];
       latestProducts: BackendProduct[];
     }>
-  >('/hero/home', {
+  >(`/hero/home${query ? `?${query}` : ''}`, {
     method: 'GET',
     next: {
       revalidate: CACHE_REVALIDATE.LONG,

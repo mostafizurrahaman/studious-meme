@@ -1,10 +1,19 @@
 import type { NextConfig } from 'next';
 
 const isProduction = process.env.NODE_ENV === 'production';
+const scriptSrc = [
+  "'self'",
+  "'unsafe-inline'",
+  !isProduction ? "'unsafe-eval'" : '',
+  'https://www.googletagmanager.com',
+  'https://www.google-analytics.com',
+]
+  .filter(Boolean)
+  .join(' ');
 
 const csp = `
   default-src 'self';
-  script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com;
+  script-src ${scriptSrc};
   style-src 'self' 'unsafe-inline';
   img-src 'self' data: blob: https://res.cloudinary.com https://img.youtube.com https://malamal.com.bd https://i0.wp.com;
   font-src 'self' data:;

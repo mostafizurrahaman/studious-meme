@@ -46,6 +46,11 @@ const keepOnlyLatestHeroSection = async () => {
   return latest;
 };
 
+const getPositiveLimit = (value: unknown) => {
+  const limit = Number(value);
+  return Number.isInteger(limit) && limit > 0 ? limit : undefined;
+};
+
 // 1. ensureHeroSectionImages
 const ensureHeroSectionImages = (payload: Partial<IHeroSection>) => {
   const cards = [...(payload.slides || []), ...(payload.features || [])];
@@ -61,7 +66,9 @@ const ensureHeroSectionImages = (payload: Partial<IHeroSection>) => {
 };
 
 // 2. getHomeContentFromDB
-const getHomeContentFromDB = async () => {
+const getHomeContentFromDB = async (query: Record<string, unknown> = {}) => {
+  const brandLimit = getPositiveLimit(query.brandLimit);
+  const categoryLimit = getPositiveLimit(query.categoryLimit);
   const [activeBrandIds, activeCategoryIds] = await Promise.all([
     BrandModel.find({ isActive: true }).distinct('_id'),
     CategoryModel.find({ isActive: true }).distinct('_id'),
@@ -75,13 +82,19 @@ const getHomeContentFromDB = async () => {
   const [heroSection, brands, categories, featuredProducts, latestProducts] =
     await Promise.all([
       HeroSectionModel.findOne({ isActive: true }).lean(),
-      BrandModel.find({ isActive: true }).sort({ name: 1 }).lean(),
-      CategoryModel.find({ isActive: true }).sort({ name: 1 }).lean(),
+      BrandModel.find({ isActive: true })
+        .sort({ name: 1 })
+        .limit(brandLimit ?? 0)
+        .lean(),
+      CategoryModel.find({ isActive: true })
+        .sort({ name: 1 })
+        .limit(categoryLimit ?? 0)
+        .lean(),
       ProductModel.find({ ...activeProductFilter, isFeatured: true })
         .populate('brand')
         .populate('category')
         .sort({ createdAt: -1 })
-        .limit(12)
+        .limit(10)
         .lean(),
       ProductModel.find(activeProductFilter)
         .populate('brand')
