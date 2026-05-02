@@ -1,14 +1,14 @@
-import { absoluteUrl } from "@/lib/seo";
+import { absoluteUrl } from '@/lib/seo';
 import {
   getAllActiveProductsAcrossPages,
   mapBackendProductToStorefrontProduct,
-} from "@/services/Product";
-import { getActiveCategories } from "@/services/Category";
+} from '@/services/Product';
+import { getActiveCategories } from '@/services/Category';
 import {
   mapBackendCategoryToStorefrontCategory,
   type BackendCategory,
-} from "@/services/Category/mappers";
-import type { MetadataRoute } from "next";
+} from '@/services/Category/mappers';
+import type { MetadataRoute } from 'next';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
@@ -16,69 +16,69 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const staticRoutes: MetadataRoute.Sitemap = [
     {
-      url: absoluteUrl("/"),
+      url: absoluteUrl('/'),
       lastModified: now,
-      changeFrequency: "daily",
+      changeFrequency: 'daily',
       priority: 1,
     },
     {
-      url: absoluteUrl("/shop"),
+      url: absoluteUrl('/shop'),
       lastModified: now,
-      changeFrequency: "daily",
+      changeFrequency: 'daily',
       priority: 0.9,
     },
     {
-      url: absoluteUrl("/main-categories"),
+      url: absoluteUrl('/main-categories'),
       lastModified: now,
-      changeFrequency: "weekly",
+      changeFrequency: 'weekly',
       priority: 0.7,
     },
     {
-      url: absoluteUrl("/shop-by-brands"),
+      url: absoluteUrl('/shop-by-brands'),
       lastModified: now,
-      changeFrequency: "weekly",
+      changeFrequency: 'weekly',
       priority: 0.6,
     },
     {
-      url: absoluteUrl("/promotions"),
+      url: absoluteUrl('/promotions'),
       lastModified: now,
-      changeFrequency: "weekly",
+      changeFrequency: 'weekly',
       priority: 0.6,
     },
     {
-      url: absoluteUrl("/our-contacts"),
+      url: absoluteUrl('/our-contacts'),
       lastModified: now,
-      changeFrequency: "yearly",
+      changeFrequency: 'yearly',
       priority: 0.4,
     },
     {
-      url: absoluteUrl("/quotation-request"),
+      url: absoluteUrl('/quotation-request'),
       lastModified: now,
-      changeFrequency: "yearly",
+      changeFrequency: 'yearly',
       priority: 0.4,
     },
     {
-      url: absoluteUrl("/about-us"),
+      url: absoluteUrl('/about-us'),
       lastModified: now,
-      changeFrequency: "yearly",
+      changeFrequency: 'yearly',
       priority: 0.4,
     },
     {
-      url: absoluteUrl("/terms-and-conditions"),
+      url: absoluteUrl('/terms-and-conditions'),
       lastModified: now,
-      changeFrequency: "yearly",
+      changeFrequency: 'yearly',
       priority: 0.2,
     },
     {
-      url: absoluteUrl("/privacy-policy"),
+      url: absoluteUrl('/privacy-policy'),
       lastModified: now,
-      changeFrequency: "yearly",
+      changeFrequency: 'yearly',
       priority: 0.2,
     },
     {
-      url: absoluteUrl("/return-policy"),
+      url: absoluteUrl('/return-policy'),
       lastModified: now,
-      changeFrequency: "yearly",
+      changeFrequency: 'yearly',
       priority: 0.2,
     },
   ];
@@ -98,7 +98,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         return {
           url: absoluteUrl(`/category/${category.slug}`),
           lastModified: toLastModified(item.updatedAt ?? item.createdAt),
-          changeFrequency: "weekly" as const,
+          changeFrequency: 'weekly' as const,
           priority: 0.7,
         };
       })
@@ -110,7 +110,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         return {
           url: absoluteUrl(`/product/${product.slug}`),
           lastModified: toLastModified(item.updatedAt ?? item.createdAt),
-          changeFrequency: "weekly" as const,
+          changeFrequency: 'weekly' as const,
           priority: 0.8,
         };
       })

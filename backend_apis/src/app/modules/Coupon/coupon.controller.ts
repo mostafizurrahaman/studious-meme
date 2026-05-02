@@ -1,6 +1,6 @@
-import httpStatus from "http-status";
-import { asyncHandler, sendResponse } from "../../utils";
-import { CouponService } from "./coupon.service";
+import httpStatus from 'http-status';
+import { asyncHandler, sendResponse } from '../../utils';
+import { CouponService } from './coupon.service';
 
 const getSingleParam = (value: string | string[]) =>
   Array.isArray(value) ? value[0] : value;
@@ -22,7 +22,7 @@ const createCoupon = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
-    message: "Coupon created successfully!",
+    message: 'Coupon created successfully!',
     data: result,
   });
 });
@@ -33,7 +33,7 @@ const getAllCoupons = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Coupons fetched successfully!",
+    message: 'Coupons fetched successfully!',
     data: result.data,
     meta: result.meta,
   });
@@ -47,7 +47,7 @@ const getCoupon = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Coupon fetched successfully!",
+    message: 'Coupon fetched successfully!',
     data: result,
   });
 });
@@ -61,7 +61,7 @@ const updateCoupon = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Coupon updated successfully!",
+    message: 'Coupon updated successfully!',
     data: result,
   });
 });
@@ -75,7 +75,7 @@ const updateCouponStatus = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Coupon status updated successfully!",
+    message: 'Coupon status updated successfully!',
     data: result,
   });
 });
@@ -88,7 +88,7 @@ const deleteCoupon = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Coupon deleted successfully!",
+    message: 'Coupon deleted successfully!',
     data: result,
   });
 });

@@ -7,7 +7,13 @@ import { Loader2, MessageSquarePlus } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { formatDashboardDate } from '@/lib/formatDate';
 import { makeZodResolver } from '@/lib/form-validation';
@@ -54,8 +60,12 @@ function QuestionCard({ question }: { question: ProductQuestionRecord }) {
     <article className="rounded-2xl border bg-background/90 p-4 shadow-sm">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-1">
-          <div className="text-sm font-semibold text-secondary">{question.question}</div>
-          <div className="text-xs text-muted-foreground">Asked by {resolveName(question.user)}</div>
+          <div className="text-sm font-semibold text-secondary">
+            {question.question}
+          </div>
+          <div className="text-xs text-muted-foreground">
+            Asked by {resolveName(question.user)}
+          </div>
         </div>
         <Badge variant="secondary">Answered</Badge>
       </div>
@@ -101,7 +111,9 @@ export function ProductQuestionsSection({
         return;
       }
 
-      toast.success('Your question has been submitted and is waiting for an answer.');
+      toast.success(
+        'Your question has been submitted and is waiting for an answer.',
+      );
       questionForm.reset({ question: '' });
     });
   }
@@ -121,7 +133,7 @@ export function ProductQuestionsSection({
         return;
       }
 
-      setQuestions(current => [...current, ...(result.data ?? [])]);
+      setQuestions((current) => [...current, ...(result.data ?? [])]);
       if (result.meta) {
         setMeta({
           page: result.meta.page ?? nextPage,
@@ -137,7 +149,9 @@ export function ProductQuestionsSection({
     <section className="rounded-2xl bg-card p-4 shadow-sm sm:p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h2 className="text-xl font-medium text-secondary">Questions & Answers</h2>
+          <h2 className="text-xl font-medium text-secondary">
+            Questions & Answers
+          </h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Browse answered questions or ask something before ordering.
           </p>
@@ -154,15 +168,25 @@ export function ProductQuestionsSection({
               No answered questions yet.
             </div>
           ) : (
-            questions.map(question => (
-              <QuestionCard key={question._id ?? question.question} question={question} />
+            questions.map((question) => (
+              <QuestionCard
+                key={question._id ?? question.question}
+                question={question}
+              />
             ))
           )}
 
           {hasMore ? (
             <div className="flex justify-center pt-2">
-              <Button type="button" variant="outline" onClick={loadMoreQuestions} disabled={isLoadingMore}>
-                {isLoadingMore ? <Loader2 className="size-4 animate-spin" /> : null}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={loadMoreQuestions}
+                disabled={isLoadingMore}
+              >
+                {isLoadingMore ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : null}
                 Load more questions
               </Button>
             </div>
@@ -175,10 +199,15 @@ export function ProductQuestionsSection({
               <MessageSquarePlus className="size-5 text-primary" />
               Ask a question
             </CardTitle>
-            <CardDescription>Logged-in users can submit a question for the product team.</CardDescription>
+            <CardDescription>
+              Logged-in users can submit a question for the product team.
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <form className="space-y-3" onSubmit={questionForm.handleSubmit(handleSubmit)}>
+            <form
+              className="space-y-3"
+              onSubmit={questionForm.handleSubmit(handleSubmit)}
+            >
               <div className="space-y-1.5">
                 <Textarea
                   placeholder="Type your question here..."
@@ -186,12 +215,16 @@ export function ProductQuestionsSection({
                   {...questionForm.register('question')}
                 />
                 {questionForm.formState.errors.question?.message ? (
-                  <p className="text-xs text-destructive">{questionForm.formState.errors.question.message}</p>
+                  <p className="text-xs text-destructive">
+                    {questionForm.formState.errors.question.message}
+                  </p>
                 ) : null}
               </div>
 
               <Button type="submit" className="w-full" disabled={isSubmitting}>
-                {isSubmitting ? <Loader2 className="size-4 animate-spin" /> : null}
+                {isSubmitting ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : null}
                 Submit question
               </Button>
             </form>

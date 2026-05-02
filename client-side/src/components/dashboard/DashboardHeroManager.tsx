@@ -1,61 +1,61 @@
-"use client";
+'use client';
 
-import { useMemo, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import { Pencil, Plus, Trash2 } from "lucide-react";
-import { z } from "zod";
-import { Button } from "@/components/ui/button";
+import { useMemo, useState, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { z } from 'zod';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { DashboardInput } from "@/components/dashboard/DashboardInput";
-import { FileUpload } from "@/components/ui/file-upload";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/card';
+import { DashboardInput } from '@/components/dashboard/DashboardInput';
+import { FileUpload } from '@/components/ui/file-upload';
+import { cn } from '@/lib/utils';
 import {
   createHeroSection,
   deleteHeroSection,
   type BackendHeroSection,
   updateHeroSection,
-} from "@/services/HeroSection";
-import { DeleteConfirmationDialog } from "@/components/dashboard/DeleteConfirmationDialog";
+} from '@/services/HeroSection';
+import { DeleteConfirmationDialog } from '@/components/dashboard/DeleteConfirmationDialog';
 
 const heroCardSchema = z.object({
   image: z.union([z.string(), z.instanceof(File)]).optional(),
   imageAlt: z
-    .string({ error: "Image alt is required!" })
+    .string({ error: 'Image alt is required!' })
     .trim()
-    .min(1, { message: "Image alt is required!" }),
+    .min(1, { message: 'Image alt is required!' }),
   title: z
-    .string({ error: "Title is required!" })
+    .string({ error: 'Title is required!' })
     .trim()
-    .min(1, { message: "Title is required!" }),
+    .min(1, { message: 'Title is required!' }),
   description: z
-    .string({ error: "Description is required!" })
+    .string({ error: 'Description is required!' })
     .trim()
-    .min(1, { message: "Description is required!" }),
+    .min(1, { message: 'Description is required!' }),
   clickUrl: z
-    .string({ error: "Click URL is required!" })
+    .string({ error: 'Click URL is required!' })
     .trim()
-    .min(1, { message: "Click URL is required!" }),
+    .min(1, { message: 'Click URL is required!' }),
 });
 
 const heroSectionSchema = z.object({
   slides: z
     .array(heroCardSchema)
-    .min(1, { message: "At least one slide is required!" }),
+    .min(1, { message: 'At least one slide is required!' }),
   features: z
     .array(heroCardSchema)
-    .min(1, { message: "At least one feature is required!" }),
+    .min(1, { message: 'At least one feature is required!' }),
   isActive: z.boolean(),
 });
 
 type HeroCardErrors = Partial<
-  Record<"image" | "imageAlt" | "title" | "description" | "clickUrl", string>
+  Record<'image' | 'imageAlt' | 'title' | 'description' | 'clickUrl', string>
 >;
 
 type HeroSectionErrors = {
@@ -68,10 +68,10 @@ type HeroCardForm = ReturnType<typeof emptyCard>;
 function emptyCard() {
   return {
     image: null as string | File | null,
-    imageAlt: "",
-    title: "",
-    description: "",
-    clickUrl: "",
+    imageAlt: '',
+    title: '',
+    description: '',
+    clickUrl: '',
   };
 }
 
@@ -91,11 +91,11 @@ function toErrors(cards: HeroCardForm[]): HeroCardErrors[] {
     return parsed.error.issues.reduce<HeroCardErrors>((acc, issue) => {
       const key = issue.path[0];
       if (
-        key === "image" ||
-        key === "imageAlt" ||
-        key === "title" ||
-        key === "description" ||
-        key === "clickUrl"
+        key === 'image' ||
+        key === 'imageAlt' ||
+        key === 'title' ||
+        key === 'description' ||
+        key === 'clickUrl'
       ) {
         acc[key] = issue.message;
       }
@@ -130,11 +130,11 @@ function validateCard(card: HeroCardForm): HeroCardErrors {
   return parsed.error.issues.reduce<HeroCardErrors>((acc, issue) => {
     const key = issue.path[0];
     if (
-      key === "image" ||
-      key === "imageAlt" ||
-      key === "title" ||
-      key === "description" ||
-      key === "clickUrl"
+      key === 'image' ||
+      key === 'imageAlt' ||
+      key === 'title' ||
+      key === 'description' ||
+      key === 'clickUrl'
     ) {
       acc[key] = issue.message;
     }
@@ -196,8 +196,8 @@ export function DashboardHeroManager({
   const rows = useMemo(() => heroes.slice(0, 10), [heroes]);
   const hasExistingHero = rows.length > 0;
 
-  function refresh(message: string, type: "success" | "error") {
-    if (type === "success") {
+  function refresh(message: string, type: 'success' | 'error') {
+    if (type === 'success') {
       toast.success(message);
     } else {
       toast.error(message);
@@ -218,13 +218,13 @@ export function DashboardHeroManager({
       const result = await deleteHeroSection(heroId);
       if (!result?.success)
         return refresh(
-          result?.message ?? "Failed to delete hero section.",
-          "error",
+          result?.message ?? 'Failed to delete hero section.',
+          'error',
         );
       setPendingDeleteHero(null);
       refresh(
-        result.message ?? "Hero section deleted successfully.",
-        "success",
+        result.message ?? 'Hero section deleted successfully.',
+        'success',
       );
     });
   }
@@ -235,7 +235,7 @@ export function DashboardHeroManager({
     setCards: (cards: HeroCardForm[]) => void,
     setErrors: (errors: HeroCardErrors[]) => void,
     onAddCard: () => void,
-    tone: "slides" | "features",
+    tone: 'slides' | 'features',
     label: string,
   ) => (
     <div className="space-y-3">
@@ -244,10 +244,10 @@ export function DashboardHeroManager({
         <div
           key={`${label}-${index}`}
           className={cn(
-            "rounded-2xl border p-4 shadow-sm",
-            tone === "slides"
-              ? "border-emerald-200 bg-emerald-50/70"
-              : "border-amber-200 bg-amber-50/70",
+            'rounded-2xl border p-4 shadow-sm',
+            tone === 'slides'
+              ? 'border-emerald-200 bg-emerald-50/70'
+              : 'border-amber-200 bg-amber-50/70',
           )}
         >
           <div className="grid items-start gap-5 xl:grid-cols-2">
@@ -407,8 +407,8 @@ export function DashboardHeroManager({
               (slidesErrors) =>
                 setFormErrors({ ...formErrors, slides: slidesErrors }),
               () => setForm({ ...form, slides: [...form.slides, emptyCard()] }),
-              "slides",
-              "Slides",
+              'slides',
+              'Slides',
             )}
             {renderCards(
               form.features,
@@ -418,8 +418,8 @@ export function DashboardHeroManager({
                 setFormErrors({ ...formErrors, features: featuresErrors }),
               () =>
                 setForm({ ...form, features: [...form.features, emptyCard()] }),
-              "features",
-              "Features",
+              'features',
+              'Features',
             )}
             <label className="flex items-center gap-2 text-sm">
               <input
@@ -446,13 +446,13 @@ export function DashboardHeroManager({
                   const result = await createHeroSection(form);
                   if (!result?.success)
                     return refresh(
-                      result?.message ?? "Failed to create hero section.",
-                      "error",
+                      result?.message ?? 'Failed to create hero section.',
+                      'error',
                     );
                   setForm(emptyHero());
                   refresh(
-                    result.message ?? "Hero section created successfully.",
-                    "success",
+                    result.message ?? 'Hero section created successfully.',
+                    'success',
                   );
                 })
               }
@@ -468,7 +468,7 @@ export function DashboardHeroManager({
           const active = isEditing ? editingForm : hero;
           return (
             <Card
-              key={hero._id ?? hero.slides[0]?.title ?? "hero-section"}
+              key={hero._id ?? hero.slides[0]?.title ?? 'hero-section'}
               className="shadow-sm"
             >
               <CardHeader>
@@ -507,8 +507,8 @@ export function DashboardHeroManager({
                       slides: [...editingForm.slides, emptyCard()],
                     });
                   },
-                  "slides",
-                  "Slides",
+                  'slides',
+                  'Slides',
                 )}
                 {renderCards(
                   active.features as ReturnType<typeof emptyCard>[],
@@ -539,8 +539,8 @@ export function DashboardHeroManager({
                       features: [...editingForm.features, emptyCard()],
                     });
                   },
-                  "features",
-                  "Features",
+                  'features',
+                  'Features',
                 )}
                 <div className="flex justify-end gap-2">
                   {isEditing ? (
@@ -565,14 +565,14 @@ export function DashboardHeroManager({
                             if (!result?.success)
                               return refresh(
                                 result?.message ??
-                                  "Failed to update hero section.",
-                                "error",
+                                  'Failed to update hero section.',
+                                'error',
                               );
                             setEditingId(null);
                             refresh(
                               result.message ??
-                                "Hero section updated successfully.",
-                              "success",
+                                'Hero section updated successfully.',
+                              'success',
                             );
                           });
                         }}
@@ -609,7 +609,7 @@ export function DashboardHeroManager({
                             ? setPendingDeleteHero({
                                 id: hero._id,
                                 label:
-                                  hero.slides[0]?.title || "this hero section",
+                                  hero.slides[0]?.title || 'this hero section',
                               })
                             : undefined
                         }
@@ -632,7 +632,7 @@ export function DashboardHeroManager({
         onConfirm={confirmDeleteHero}
         isPending={isPending}
         title="Delete hero section?"
-        description={`This will permanently delete ${pendingDeleteHero?.label || "this hero section"} and its slides/features.`}
+        description={`This will permanently delete ${pendingDeleteHero?.label || 'this hero section'} and its slides/features.`}
         confirmLabel="Delete hero"
       />
     </div>

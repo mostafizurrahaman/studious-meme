@@ -56,7 +56,9 @@ export type ProductQuestionRecord = {
   updatedAt?: string;
 };
 
-export type ProductQuestionListResponse = BackendEnvelope<ProductQuestionRecord[]>;
+export type ProductQuestionListResponse = BackendEnvelope<
+  ProductQuestionRecord[]
+>;
 export type CreateProductQuestionPayload = {
   product: string;
   question: string;
@@ -89,9 +91,11 @@ const buildQuestionQuery = (params: ProductQuestionListParams = {}) => {
   if (params.page) searchParams.set('page', String(params.page));
   if (params.limit) searchParams.set('limit', String(params.limit));
   if (params.status) searchParams.set('status', params.status);
-  if (params.product?.trim()) searchParams.set('product', params.product.trim());
+  if (params.product?.trim())
+    searchParams.set('product', params.product.trim());
   if (params.user?.trim()) searchParams.set('user', params.user.trim());
-  if (params.searchTerm?.trim()) searchParams.set('searchTerm', params.searchTerm.trim());
+  if (params.searchTerm?.trim())
+    searchParams.set('searchTerm', params.searchTerm.trim());
   if (params.sort) searchParams.set('sort', params.sort);
 
   const query = searchParams.toString();
@@ -110,7 +114,9 @@ export const createProductQuestion = async (
     };
   }
 
-  const result = await requestBackendJson<BackendEnvelope<ProductQuestionRecord>>('/product-questions', {
+  const result = await requestBackendJson<
+    BackendEnvelope<ProductQuestionRecord>
+  >('/product-questions', {
     method: 'POST',
     body: {
       product: payload.product,
@@ -149,7 +155,10 @@ export const getAllProductQuestions = async (
     {
       method: 'GET',
       token: accessToken ?? undefined,
-      next: { revalidate: CACHE_REVALIDATE.DEFAULT, tags: [CACHE_TAGS.PRODUCT_QUESTIONS] },
+      next: {
+        revalidate: CACHE_REVALIDATE.DEFAULT,
+        tags: [CACHE_TAGS.PRODUCT_QUESTIONS],
+      },
     },
   );
 };
@@ -167,14 +176,13 @@ export const answerProductQuestion = async (
     };
   }
 
-  const result = await requestBackendJson<BackendEnvelope<ProductQuestionRecord>>(
-    `/admin/product-questions/${questionId}/answer`,
-    {
-      method: 'PATCH',
-      body: payload,
-      token: accessToken,
-    },
-  );
+  const result = await requestBackendJson<
+    BackendEnvelope<ProductQuestionRecord>
+  >(`/admin/product-questions/${questionId}/answer`, {
+    method: 'PATCH',
+    body: payload,
+    token: accessToken,
+  });
 
   revalidateTag(CACHE_TAGS.PRODUCT_QUESTIONS, 'max');
   return result;
@@ -193,14 +201,13 @@ export const updateProductQuestionStatus = async (
     };
   }
 
-  const result = await requestBackendJson<BackendEnvelope<ProductQuestionRecord>>(
-    `/admin/product-questions/${questionId}/status`,
-    {
-      method: 'PATCH',
-      body: payload,
-      token: accessToken,
-    },
-  );
+  const result = await requestBackendJson<
+    BackendEnvelope<ProductQuestionRecord>
+  >(`/admin/product-questions/${questionId}/status`, {
+    method: 'PATCH',
+    body: payload,
+    token: accessToken,
+  });
 
   revalidateTag(CACHE_TAGS.PRODUCT_QUESTIONS, 'max');
   return result;
@@ -218,13 +225,12 @@ export const deleteProductQuestion = async (
     };
   }
 
-  const result = await requestBackendJson<BackendEnvelope<ProductQuestionRecord>>(
-    `/admin/product-questions/${questionId}`,
-    {
-      method: 'DELETE',
-      token: accessToken,
-    },
-  );
+  const result = await requestBackendJson<
+    BackendEnvelope<ProductQuestionRecord>
+  >(`/admin/product-questions/${questionId}`, {
+    method: 'DELETE',
+    token: accessToken,
+  });
 
   revalidateTag(CACHE_TAGS.PRODUCT_QUESTIONS, 'max');
   return result;

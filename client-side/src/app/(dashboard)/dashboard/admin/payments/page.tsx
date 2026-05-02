@@ -1,17 +1,17 @@
-import type { Metadata } from "next";
-import { requireDashboardRoles } from "@/lib/dashboard-auth";
-import { buildMetadata } from "@/lib/seo";
-import { getAllPaymentsForAdmin } from "@/services/Payment";
-import { DashboardPaymentsManager } from "@/components/dashboard/DashboardPaymentsManager";
+import type { Metadata } from 'next';
+import { requireDashboardRoles } from '@/lib/dashboard-auth';
+import { buildMetadata } from '@/lib/seo';
+import { getAllPaymentsForAdmin } from '@/services/Payment';
+import { DashboardPaymentsManager } from '@/components/dashboard/DashboardPaymentsManager';
 
 export const metadata: Metadata = buildMetadata({
-  title: "Payments",
-  description: "Manage storefront payment history.",
-  path: "/dashboard/admin/payments",
+  title: 'Payments',
+  description: 'Manage storefront payment history.',
+  path: '/dashboard/admin/payments',
   noindex: true,
 });
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 type Props = {
   searchParams: Promise<{ page?: string; limit?: string }>;
@@ -24,7 +24,7 @@ const parsePositiveInteger = (value: string | undefined, fallback: number) => {
 };
 
 export default async function AdminPaymentsPage({ searchParams }: Props) {
-  await requireDashboardRoles(["ADMIN", "SUPER_ADMIN"]);
+  await requireDashboardRoles(['ADMIN', 'SUPER_ADMIN']);
   const query = await searchParams;
   const page = parsePositiveInteger(query.page, 1);
   const limit = parsePositiveInteger(query.limit, 50);

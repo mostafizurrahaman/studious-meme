@@ -1,5 +1,11 @@
 import type { Metadata } from 'next';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { requireDashboardRoles } from '@/lib/dashboard-auth';
 import { buildMetadata } from '@/lib/seo';
 import { getOrderById } from '@/services/Order';
@@ -31,12 +37,17 @@ export default async function SuperAdminOrderDetailPage({ params }: Props) {
         <div>
           <CardTitle>Order {orderId}</CardTitle>
           <CardDescription>
-            {order ? `${order.items.length} items · ৳ ${order.total}` : 'Not found'}
+            {order
+              ? `${order.items.length} items · ৳ ${order.total}`
+              : 'Not found'}
           </CardDescription>
         </div>
       </CardHeader>
       <CardContent>
-        <OrderDetailAdminClient order={order} backHref="/dashboard/super-admin/orders" />
+        <OrderDetailAdminClient
+          order={order}
+          backHref="/dashboard/super-admin/orders"
+        />
       </CardContent>
     </Card>
   );

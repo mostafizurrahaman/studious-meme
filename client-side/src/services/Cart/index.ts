@@ -1,12 +1,12 @@
-"use server";
+'use server';
 
-import { revalidateTag } from "next/cache";
-import { requestBackendJson } from "@/lib/backend-api";
-import { CACHE_TAGS } from "@/lib/cache-tags";
+import { revalidateTag } from 'next/cache';
+import { requestBackendJson } from '@/lib/backend-api';
+import { CACHE_TAGS } from '@/lib/cache-tags';
 import {
   getValidAccessTokenForServerActions,
   getValidAccessTokenForServerHandlerGet,
-} from "@/lib/getValidAccessToken";
+} from '@/lib/getValidAccessToken';
 
 type BackendEnvelope<T> = {
   success?: boolean;
@@ -20,19 +20,19 @@ export type BackendCartItem = {
   product?: unknown;
   quantity: number;
   priceSnapshot: number;
-    productSnapshot: {
-      title: string;
-      brand: string;
-      category: string;
-      categorySlug?: string;
-      image: string;
-      sku: string;
-      slug: string;
-      price: number;
-      sellingUnit?: string;
-      stock?: number | null;
-      weightKg?: number;
-      isNoCOD?: boolean;
+  productSnapshot: {
+    title: string;
+    brand: string;
+    category: string;
+    categorySlug?: string;
+    image: string;
+    sku: string;
+    slug: string;
+    price: number;
+    sellingUnit?: string;
+    stock?: number | null;
+    weightKg?: number;
+    isNoCOD?: boolean;
   };
 };
 
@@ -58,21 +58,21 @@ export type CartHistoryRecord = {
       }
     | string;
   product?: { _id?: string } | string | null;
-    productSnapshot?: {
-      title: string;
-      brand: string;
-      category: string;
-      categorySlug?: string;
-      image: string;
-      sku: string;
-      slug: string;
-      price: number;
-      sellingUnit?: string;
-      stock?: number | null;
-      weightKg?: number;
-      isNoCOD?: boolean;
+  productSnapshot?: {
+    title: string;
+    brand: string;
+    category: string;
+    categorySlug?: string;
+    image: string;
+    sku: string;
+    slug: string;
+    price: number;
+    sellingUnit?: string;
+    stock?: number | null;
+    weightKg?: number;
+    isNoCOD?: boolean;
   };
-  action?: "add" | "update" | "remove" | "clear";
+  action?: 'add' | 'update' | 'remove' | 'clear';
   quantity?: number;
   createdAt?: string;
   updatedAt?: string;
@@ -85,8 +85,8 @@ export const getMyCart = async (): Promise<BackendEnvelope<BackendCart>> => {
     return { success: false, data: { items: [], subtotal: 0, totalItems: 0 } };
   }
 
-  return requestBackendJson<BackendEnvelope<BackendCart>>("/cart", {
-    method: "GET",
+  return requestBackendJson<BackendEnvelope<BackendCart>>('/cart', {
+    method: 'GET',
     token: accessToken,
     next: { tags: [CACHE_TAGS.CART] },
   });
@@ -101,14 +101,14 @@ export const addCartItem = async (
   if (!accessToken) {
     return {
       success: false,
-      message: "Sign in to save cart items to your account.",
+      message: 'Sign in to save cart items to your account.',
     };
   }
 
   const result = await requestBackendJson<BackendEnvelope<BackendCart>>(
-    "/cart/items",
+    '/cart/items',
     {
-      method: "POST",
+      method: 'POST',
       body: { productId, quantity },
       token: accessToken,
     },
@@ -127,14 +127,14 @@ export const updateCartItem = async (
   if (!accessToken) {
     return {
       success: false,
-      message: "Sign in to update cart items on your account.",
+      message: 'Sign in to update cart items on your account.',
     };
   }
 
   const result = await requestBackendJson<BackendEnvelope<BackendCart>>(
-    "/cart/items",
+    '/cart/items',
     {
-      method: "PATCH",
+      method: 'PATCH',
       body: { productId, quantity },
       token: accessToken,
     },
@@ -152,14 +152,14 @@ export const removeCartItem = async (
   if (!accessToken) {
     return {
       success: false,
-      message: "Sign in to update cart items on your account.",
+      message: 'Sign in to update cart items on your account.',
     };
   }
 
   const result = await requestBackendJson<BackendEnvelope<BackendCart>>(
     `/cart/items/${productId}`,
     {
-      method: "DELETE",
+      method: 'DELETE',
       token: accessToken,
     },
   );
@@ -174,14 +174,14 @@ export const clearCart = async (): Promise<BackendEnvelope<BackendCart>> => {
   if (!accessToken) {
     return {
       success: false,
-      message: "Sign in to clear cart items on your account.",
+      message: 'Sign in to clear cart items on your account.',
     };
   }
 
   const result = await requestBackendJson<BackendEnvelope<BackendCart>>(
-    "/cart/clear",
+    '/cart/clear',
     {
-      method: "DELETE",
+      method: 'DELETE',
       token: accessToken,
     },
   );
@@ -194,10 +194,10 @@ type AdminListParams = { page?: number; limit?: number };
 
 const buildAdminQuery = (params: AdminListParams = {}) => {
   const searchParams = new URLSearchParams();
-  if (params.page) searchParams.set("page", String(params.page));
-  if (params.limit) searchParams.set("limit", String(params.limit));
+  if (params.page) searchParams.set('page', String(params.page));
+  if (params.limit) searchParams.set('limit', String(params.limit));
   const query = searchParams.toString();
-  return query ? `?${query}` : "";
+  return query ? `?${query}` : '';
 };
 
 export const getAllCarts = async (
@@ -208,7 +208,7 @@ export const getAllCarts = async (
   return requestBackendJson<BackendEnvelope<CartHistoryRecord[]>>(
     `/cart/admin${buildAdminQuery(params)}`,
     {
-      method: "GET",
+      method: 'GET',
       token: accessToken ?? undefined,
       next: { tags: [CACHE_TAGS.CART] },
     },
@@ -232,9 +232,9 @@ export const getCartInsights = async (): Promise<
   const accessToken = await getValidAccessTokenForServerHandlerGet();
 
   return requestBackendJson<BackendEnvelope<CartInsightSummary>>(
-    "/cart/admin/summary",
+    '/cart/admin/summary',
     {
-      method: "GET",
+      method: 'GET',
       token: accessToken ?? undefined,
       next: { tags: [CACHE_TAGS.CART] },
     },

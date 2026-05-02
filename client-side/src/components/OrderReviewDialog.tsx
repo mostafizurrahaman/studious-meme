@@ -15,7 +15,13 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { formatDashboardDate } from '@/lib/formatDate';
 import { makeZodResolver } from '@/lib/form-validation';
@@ -26,7 +32,10 @@ import { z } from 'zod';
 const MAX_REVIEW_IMAGES = 5;
 
 const reviewSchema = z.object({
-  product: z.string({ error: 'Product is required!' }).trim().min(1, { message: 'Product is required!' }),
+  product: z
+    .string({ error: 'Product is required!' })
+    .trim()
+    .min(1, { message: 'Product is required!' }),
   rating: z.coerce
     .number({ error: 'Rating is required!' })
     .min(1, { message: 'Rating is required!' })
@@ -64,7 +73,12 @@ function Stars({ rating }: { rating: number }) {
   );
 }
 
-export function OrderReviewDialog({ order, open, onOpenChange, onSaved }: Props) {
+export function OrderReviewDialog({
+  order,
+  open,
+  onOpenChange,
+  onSaved,
+}: Props) {
   const [isSubmitting, startSubmitting] = useTransition();
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
@@ -80,9 +94,14 @@ export function OrderReviewDialog({ order, open, onOpenChange, onSaved }: Props)
     mode: 'onTouched',
   });
 
-  const selectedProduct = useWatch({ control: form.control, name: 'product' }) ?? defaultProduct;
-  const watchedRating = useWatch({ control: form.control, name: 'rating' }) ?? 5;
-  const selectedItem = order?.items.find(item => item.slug === selectedProduct) ?? order?.items[0] ?? null;
+  const selectedProduct =
+    useWatch({ control: form.control, name: 'product' }) ?? defaultProduct;
+  const watchedRating =
+    useWatch({ control: form.control, name: 'rating' }) ?? 5;
+  const selectedItem =
+    order?.items.find((item) => item.slug === selectedProduct) ??
+    order?.items[0] ??
+    null;
 
   function handleOpenChange(nextOpen: boolean) {
     if (!nextOpen) {
@@ -106,7 +125,7 @@ export function OrderReviewDialog({ order, open, onOpenChange, onSaved }: Props)
         }),
       );
 
-      selectedFiles.forEach(file => {
+      selectedFiles.forEach((file) => {
         formData.append('images', file);
       });
 
@@ -144,7 +163,9 @@ export function OrderReviewDialog({ order, open, onOpenChange, onSaved }: Props)
             <div className="rounded-2xl border bg-muted/20 p-4 text-sm">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
-                  <div className="font-semibold text-foreground">{order.orderId}</div>
+                  <div className="font-semibold text-foreground">
+                    {order.orderId}
+                  </div>
                   <div className="text-xs text-muted-foreground">
                     Delivered {formatDashboardDate(order.updatedAt)}
                   </div>
@@ -157,13 +178,18 @@ export function OrderReviewDialog({ order, open, onOpenChange, onSaved }: Props)
 
             <form className="space-y-4" onSubmit={form.handleSubmit(submit)}>
               <div className="space-y-2">
-                <div className="text-xs font-medium text-muted-foreground">Product</div>
-                <Select value={selectedProduct} onValueChange={value => form.setValue('product', value)}>
+                <div className="text-xs font-medium text-muted-foreground">
+                  Product
+                </div>
+                <Select
+                  value={selectedProduct}
+                  onValueChange={(value) => form.setValue('product', value)}
+                >
                   <SelectTrigger className="h-11 rounded-xl">
                     <SelectValue placeholder="Select product" />
                   </SelectTrigger>
                   <SelectContent>
-                    {order.items.map(item => (
+                    {order.items.map((item) => (
                       <SelectItem key={item.slug} value={item.slug}>
                         {item.title}
                       </SelectItem>
@@ -184,7 +210,9 @@ export function OrderReviewDialog({ order, open, onOpenChange, onSaved }: Props)
                     />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="font-semibold text-foreground">{selectedItem.title}</div>
+                    <div className="font-semibold text-foreground">
+                      {selectedItem.title}
+                    </div>
                     <div className="text-xs text-muted-foreground">
                       SKU {selectedItem.sku} · Qty {selectedItem.quantity}
                     </div>
@@ -193,23 +221,37 @@ export function OrderReviewDialog({ order, open, onOpenChange, onSaved }: Props)
               ) : null}
 
               <div className="space-y-2">
-                <div className="text-xs font-medium text-muted-foreground">Rating</div>
-                <Input type="number" min={1} max={5} step="1" {...form.register('rating')} />
+                <div className="text-xs font-medium text-muted-foreground">
+                  Rating
+                </div>
+                <Input
+                  type="number"
+                  min={1}
+                  max={5}
+                  step="1"
+                  {...form.register('rating')}
+                />
                 <Stars rating={Number(watchedRating)} />
                 {form.formState.errors.rating?.message ? (
-                  <p className="text-xs text-destructive">{form.formState.errors.rating.message}</p>
+                  <p className="text-xs text-destructive">
+                    {form.formState.errors.rating.message}
+                  </p>
                 ) : null}
               </div>
 
               <div className="space-y-2">
-                <div className="text-xs font-medium text-muted-foreground">Comment</div>
+                <div className="text-xs font-medium text-muted-foreground">
+                  Comment
+                </div>
                 <Textarea
                   className="min-h-28 rounded-2xl"
                   placeholder="Tell others what you think..."
                   {...form.register('comment')}
                 />
                 {form.formState.errors.comment?.message ? (
-                  <p className="text-xs text-destructive">{form.formState.errors.comment.message}</p>
+                  <p className="text-xs text-destructive">
+                    {form.formState.errors.comment.message}
+                  </p>
                 ) : null}
               </div>
 
@@ -224,13 +266,18 @@ export function OrderReviewDialog({ order, open, onOpenChange, onSaved }: Props)
                   type="file"
                   accept="image/*"
                   multiple
-                  onChange={event =>
-                    setSelectedFiles(Array.from(event.target.files ?? []).slice(0, MAX_REVIEW_IMAGES))
+                  onChange={(event) =>
+                    setSelectedFiles(
+                      Array.from(event.target.files ?? []).slice(
+                        0,
+                        MAX_REVIEW_IMAGES,
+                      ),
+                    )
                   }
                 />
                 {selectedFiles.length > 0 ? (
                   <div className="space-y-1 rounded-2xl border bg-muted/20 p-3 text-xs text-muted-foreground">
-                    {selectedFiles.map(file => (
+                    {selectedFiles.map((file) => (
                       <div key={file.name}>{file.name}</div>
                     ))}
                   </div>
@@ -246,8 +293,13 @@ export function OrderReviewDialog({ order, open, onOpenChange, onSaved }: Props)
                 >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isSubmitting || order.status !== 'DELIVERED'}>
-                  {isSubmitting ? <Loader2 className="size-4 animate-spin" /> : null}
+                <Button
+                  type="submit"
+                  disabled={isSubmitting || order.status !== 'DELIVERED'}
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : null}
                   Submit review
                 </Button>
               </DialogFooter>

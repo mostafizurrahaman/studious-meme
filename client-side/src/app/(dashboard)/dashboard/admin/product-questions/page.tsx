@@ -2,7 +2,10 @@ import type { Metadata } from 'next';
 import { DashboardProductQuestionsManager } from '@/components/dashboard/DashboardProductQuestionsManager';
 import { requireDashboardRoles } from '@/lib/dashboard-auth';
 import { buildMetadata } from '@/lib/seo';
-import { getAllProductQuestions, type ProductQuestionListSort } from '@/services/ProductQuestion';
+import {
+  getAllProductQuestions,
+  type ProductQuestionListSort,
+} from '@/services/ProductQuestion';
 
 type Props = {
   searchParams: Promise<{
@@ -30,7 +33,9 @@ const parsePositiveInteger = (value: string | undefined, fallback: number) => {
   return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
 };
 
-export default async function AdminProductQuestionsPage({ searchParams }: Props) {
+export default async function AdminProductQuestionsPage({
+  searchParams,
+}: Props) {
   await requireDashboardRoles(['ADMIN', 'SUPER_ADMIN']);
   const query = await searchParams;
   const page = parsePositiveInteger(query.page, 1);
@@ -55,7 +60,8 @@ export default async function AdminProductQuestionsPage({ searchParams }: Props)
     limit: questionsResult?.meta?.limit ?? limit,
     total: questionsResult?.meta?.total ?? questions.length,
     totalPages:
-      questionsResult?.meta?.totalPages ?? (Math.ceil(questions.length / limit) || 1),
+      questionsResult?.meta?.totalPages ??
+      (Math.ceil(questions.length / limit) || 1),
   };
 
   return (

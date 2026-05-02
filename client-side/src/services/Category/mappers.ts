@@ -1,7 +1,7 @@
 import type {
   CategoryPageEntry,
   StorefrontCategory,
-} from "@/lib/storefront-types";
+} from '@/lib/storefront-types';
 
 export type BackendSubCategory = {
   name: string;
@@ -28,12 +28,12 @@ export type BackendCategory = {
 };
 
 const accentPalette = [
-  "from-[#0e2f56] to-[#163f77]",
-  "from-[#4d6b92] to-[#90a4c8]",
-  "from-[#5f2d1f] to-[#c56c47]",
-  "from-[#233647] to-[#5a7288]",
-  "from-primary to-secondary",
-  "from-[#3d5a48] to-[#80a27c]",
+  'from-[#0e2f56] to-[#163f77]',
+  'from-[#4d6b92] to-[#90a4c8]',
+  'from-[#5f2d1f] to-[#c56c47]',
+  'from-[#233647] to-[#5a7288]',
+  'from-primary to-secondary',
+  'from-[#3d5a48] to-[#80a27c]',
 ] as const;
 
 function getAccent(slug: string, accent?: string): string {

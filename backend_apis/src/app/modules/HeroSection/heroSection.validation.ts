@@ -1,24 +1,24 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 // 1. heroCardSchema
 const heroCardSchema = z.object({
   image: z.string().optional(),
   imageAlt: z
-    .string({ error: "Image alt is required!" })
+    .string({ error: 'Image alt is required!' })
     .trim()
-    .min(1, { message: "Image alt is required!" }),
+    .min(1, { message: 'Image alt is required!' }),
   title: z
-    .string({ error: "Title is required!" })
+    .string({ error: 'Title is required!' })
     .trim()
-    .min(1, { message: "Title is required!" }),
+    .min(1, { message: 'Title is required!' }),
   description: z
-    .string({ error: "Description is required!" })
+    .string({ error: 'Description is required!' })
     .trim()
-    .min(1, { message: "Description is required!" }),
+    .min(1, { message: 'Description is required!' }),
   clickUrl: z
-    .string({ error: "Click URL is required!" })
+    .string({ error: 'Click URL is required!' })
     .trim()
-    .min(1, { message: "Click URL is required!" }),
+    .min(1, { message: 'Click URL is required!' }),
 });
 
 // 2. HeroSectionValidation
@@ -38,9 +38,9 @@ export const HeroSectionValidation = {
     }),
     params: z.object({
       heroSectionId: z
-        .string({ error: "Hero section ID is required!" })
+        .string({ error: 'Hero section ID is required!' })
         .trim()
-        .min(1, { message: "Hero section ID is required!" }),
+        .min(1, { message: 'Hero section ID is required!' }),
     }),
   }),
 };

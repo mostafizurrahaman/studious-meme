@@ -1,4 +1,4 @@
-import { Query } from "mongoose";
+import { Query } from 'mongoose';
 
 class QueryBuilder<T> {
   public modelQuery: Query<T[], T>;
@@ -13,7 +13,7 @@ class QueryBuilder<T> {
     const searchTerm = this?.query?.searchTerm;
     if (searchTerm) {
       const searchConditions = searchableFields.map((field) => ({
-        [field]: { $regex: searchTerm, $options: "i" },
+        [field]: { $regex: searchTerm, $options: 'i' },
       }));
 
       this.modelQuery = this?.modelQuery?.find({
@@ -26,13 +26,13 @@ class QueryBuilder<T> {
   filter() {
     const queryObject = { ...this?.query };
     const excludeableFields = [
-      "searchTerm",
-      "sort",
-      "page",
-      "limit",
-      "fields",
-      "minPrice",
-      "maxPrice",
+      'searchTerm',
+      'sort',
+      'page',
+      'limit',
+      'fields',
+      'minPrice',
+      'maxPrice',
     ];
     excludeableFields.forEach((field) => delete queryObject[field]);
 
@@ -42,7 +42,7 @@ class QueryBuilder<T> {
 
   sort() {
     const sortBy =
-      (this?.query?.sort as string)?.split(",")?.join(" ") || "-createdAt";
+      (this?.query?.sort as string)?.split(',')?.join(' ') || '-createdAt';
     this.modelQuery = this?.modelQuery.sort(sortBy);
     return this;
   }
@@ -57,7 +57,7 @@ class QueryBuilder<T> {
   }
 
   fields() {
-    const fields = (this?.query?.fields as string)?.split(",")?.join(" ");
+    const fields = (this?.query?.fields as string)?.split(',')?.join(' ');
     if (fields) {
       this.modelQuery = this?.modelQuery.select(fields);
     }

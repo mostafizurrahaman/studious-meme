@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { cn } from '@/lib/utils';
 
 function getInitials(name?: string | null): string {
-  if (!name) return "U";
+  if (!name) return 'U';
 
   return name
-    .split(" ")
+    .split(' ')
     .filter(Boolean)
     .map((part) => part[0])
-    .join("")
+    .join('')
     .slice(0, 2)
     .toUpperCase();
 }
@@ -28,11 +28,11 @@ export function UserAvatar({
   className,
   fallbackClassName,
 }: UserAvatarProps) {
-  const safeImage = image?.trim() || "";
+  const safeImage = image?.trim() || '';
 
   return (
     <Avatar className={cn(className)}>
-      {safeImage ? <AvatarImage src={safeImage} alt={name ?? "User"} /> : null}
+      {safeImage ? <AvatarImage src={safeImage} alt={name ?? 'User'} /> : null}
       <AvatarFallback className={fallbackClassName}>
         {getInitials(name)}
       </AvatarFallback>

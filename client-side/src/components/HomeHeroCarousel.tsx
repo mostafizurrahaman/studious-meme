@@ -28,7 +28,7 @@ export function HomeHeroCarousel({ slides, features }: HomeHeroCarouselProps) {
     if (slides.length <= 1) return;
 
     const timer = window.setInterval(() => {
-      setHeroIndex(prev => (prev + 1) % slides.length);
+      setHeroIndex((prev) => (prev + 1) % slides.length);
     }, 5000);
 
     return () => window.clearInterval(timer);
@@ -39,24 +39,35 @@ export function HomeHeroCarousel({ slides, features }: HomeHeroCarouselProps) {
     return (
       <Card className="flex min-h-80 items-center justify-center p-8 text-center shadow-sm">
         <div>
-          <div className="text-xl font-black text-secondary">No active homepage banners</div>
+          <div className="text-xl font-black text-secondary">
+            No active homepage banners
+          </div>
           <p className="mt-2 text-sm text-foreground/60">
-            Publish homepage hero content from the dashboard to fill this section.
+            Publish homepage hero content from the dashboard to fill this
+            section.
           </p>
         </div>
       </Card>
     );
   }
 
-  const topFeature =  featureCards[0] ?? heroSlide;
-  const bottomFeatures = [featureCards[1], featureCards[2]].filter(Boolean) as HeroSlide[];
-  const mobileFeatures = [featureCards[1], featureCards[2]].filter(Boolean) as HeroSlide[];
+  const topFeature = featureCards[0] ?? heroSlide;
+  const bottomFeatures = [featureCards[1], featureCards[2]].filter(
+    Boolean,
+  ) as HeroSlide[];
+  const mobileFeatures = [featureCards[1], featureCards[2]].filter(
+    Boolean,
+  ) as HeroSlide[];
 
   return (
     <div className="overflow-hidden border-0 rounded-none bg-transparent shadow-none">
       <div className="grid h-full items-stretch gap-0 p-0 lg:grid-cols-2 lg:gap-4 lg:p-6">
         <div className="relative aspect-1163/794 overflow-hidden bg-background sm:h-full sm:min-h-96 sm:aspect-auto">
-          <Link href={heroSlide.href} aria-label={heroSlide.title} className="absolute inset-0 z-10">
+          <Link
+            href={heroSlide.href}
+            aria-label={heroSlide.title}
+            className="absolute inset-0 z-10"
+          >
             <Image
               src={heroSlide.image}
               alt={heroSlide.title}
@@ -73,7 +84,11 @@ export function HomeHeroCarousel({ slides, features }: HomeHeroCarouselProps) {
             <>
               <Button
                 type="button"
-                onClick={() => setHeroIndex(prev => (prev - 1 + slides.length) % slides.length)}
+                onClick={() =>
+                  setHeroIndex(
+                    (prev) => (prev - 1 + slides.length) % slides.length,
+                  )
+                }
                 aria-label="Previous banner"
                 variant="secondary"
                 size="icon"
@@ -83,7 +98,9 @@ export function HomeHeroCarousel({ slides, features }: HomeHeroCarouselProps) {
               </Button>
               <Button
                 type="button"
-                onClick={() => setHeroIndex(prev => (prev + 1) % slides.length)}
+                onClick={() =>
+                  setHeroIndex((prev) => (prev + 1) % slides.length)
+                }
                 aria-label="Next banner"
                 variant="secondary"
                 size="icon"

@@ -73,14 +73,16 @@ const parsePositiveInteger = (value: unknown, fallback: number) => {
   return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
 };
 
-const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const escapeRegExp = (value: string) =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-const getString = (value: unknown) => (typeof value === 'string' ? value.trim() : '');
+const getString = (value: unknown) =>
+  typeof value === 'string' ? value.trim() : '';
 
 const csv = (value: unknown) =>
   getString(value)
     .split(',')
-    .map(item => item.trim())
+    .map((item) => item.trim())
     .filter(Boolean);
 
 const pickSort = (value: unknown): ProductSort => {
@@ -110,9 +112,17 @@ const parseCustomPriceRange = (value: string) => {
   const parsedMax = rawMax ? Number(rawMax) : undefined;
 
   const min =
-    typeof parsedMin === 'number' && Number.isFinite(parsedMin) && parsedMin >= 0 ? parsedMin : undefined;
+    typeof parsedMin === 'number' &&
+    Number.isFinite(parsedMin) &&
+    parsedMin >= 0
+      ? parsedMin
+      : undefined;
   const max =
-    typeof parsedMax === 'number' && Number.isFinite(parsedMax) && parsedMax >= 0 ? parsedMax : undefined;
+    typeof parsedMax === 'number' &&
+    Number.isFinite(parsedMax) &&
+    parsedMax >= 0
+      ? parsedMax
+      : undefined;
 
   if (min === undefined && max === undefined) return null;
 
@@ -141,7 +151,7 @@ const buildProductFilters = async (query: Record<string, unknown>) => {
 
   if (searchTerm) {
     and.push({
-      $or: ['title', 'sku', 'slug', 'badge'].map(field => ({
+      $or: ['title', 'sku', 'slug', 'badge'].map((field) => ({
         [field]: { $regex: escapeRegExp(searchTerm), $options: 'i' },
       })),
     });
@@ -150,7 +160,10 @@ const buildProductFilters = async (query: Record<string, unknown>) => {
   if (categorySlug) {
     const category = await CategoryModel.findOne({
       ...(includeInactive ? {} : { isActive: true }),
-      $or: [{ slug: categorySlug }, { name: { $regex: `^${escapeRegExp(categorySlug)}$`, $options: 'i' } }],
+      $or: [
+        { slug: categorySlug },
+        { name: { $regex: `^${escapeRegExp(categorySlug)}$`, $options: 'i' } },
+      ],
     })
       .select('_id')
       .lean();
@@ -171,7 +184,7 @@ const buildProductFilters = async (query: Record<string, unknown>) => {
       $or: [
         { slug: { $in: brandValues } },
         { name: { $in: brandValues } },
-        ...brandValues.map(value => ({
+        ...brandValues.map((value) => ({
           name: { $regex: `^${escapeRegExp(value)}$`, $options: 'i' },
         })),
       ],
@@ -179,12 +192,18 @@ const buildProductFilters = async (query: Record<string, unknown>) => {
       .select('_id')
       .lean();
 
-    filter.brand = brands.length ? { $in: brands.map(brand => brand._id) } : null;
+    filter.brand = brands.length
+      ? { $in: brands.map((brand) => brand._id) }
+      : null;
   }
 
   if (stock === 'in-stock') {
     and.push({
-      $or: [{ stock: { $gt: 0 } }, { stock: { $exists: false } }, { stock: null }],
+      $or: [
+        { stock: { $gt: 0 } },
+        { stock: { $exists: false } },
+        { stock: null },
+      ],
     });
   }
 
@@ -216,13 +235,19 @@ const buildProductFilters = async (query: Record<string, unknown>) => {
 
   if (stock === 'featured' || tag === 'featured') {
     and.push({
-      $or: [{ isFeatured: true }, { badge: { $regex: 'featured', $options: 'i' } }],
+      $or: [
+        { isFeatured: true },
+        { badge: { $regex: 'featured', $options: 'i' } },
+      ],
     });
   }
 
   if (stock === 'sale' || tag === 'sale') {
     and.push({
-      $or: [{ oldPrice: { $exists: true, $ne: null } }, { badge: { $regex: 'sale|%', $options: 'i' } }],
+      $or: [
+        { oldPrice: { $exists: true, $ne: null } },
+        { badge: { $regex: 'sale|%', $options: 'i' } },
+      ],
     });
   }
 
@@ -234,7 +259,9 @@ const buildProductFilters = async (query: Record<string, unknown>) => {
 
   if (tag === 'industrial' || tag === 'home') {
     const pattern =
-      tag === 'industrial' ? /tool|machine|industrial|welding|cutting/i : /home|fan|cleaning|cooler/i;
+      tag === 'industrial'
+        ? /tool|machine|industrial|welding|cutting/i
+        : /home|fan|cleaning|cooler/i;
     if (!filter.category) {
       const categories = await CategoryModel.find({
         ...(includeInactive ? {} : { isActive: true }),
@@ -242,7 +269,7 @@ const buildProductFilters = async (query: Record<string, unknown>) => {
       })
         .select('_id')
         .lean();
-      filter.category = { $in: categories.map(category => category._id) };
+      filter.category = { $in: categories.map((category) => category._id) };
     }
   }
 
@@ -253,7 +280,7 @@ const buildProductFilters = async (query: Record<string, unknown>) => {
       referenceFilters.push(
         CategoryModel.find({ isActive: true })
           .distinct('_id')
-          .then(categoryIds => {
+          .then((categoryIds) => {
             filter.category = { $in: categoryIds };
           }),
       );
@@ -263,7 +290,7 @@ const buildProductFilters = async (query: Record<string, unknown>) => {
       referenceFilters.push(
         BrandModel.find({ isActive: true })
           .distinct('_id')
-          .then(brandIds => {
+          .then((brandIds) => {
             filter.brand = { $in: brandIds };
           }),
       );
@@ -288,7 +315,9 @@ const createProductIntoDB = async (
   payload: Partial<IProduct>,
   imageFiles?: MulterFile[] | { [fieldname: string]: MulterFile[] },
 ) => {
-  const files = Array.isArray(imageFiles) ? imageFiles : Object.values(imageFiles ?? {}).flat();
+  const files = Array.isArray(imageFiles)
+    ? imageFiles
+    : Object.values(imageFiles ?? {}).flat();
   const uploadedImages: string[] = [];
 
   try {
@@ -305,7 +334,10 @@ const createProductIntoDB = async (
           : [];
 
     if (images.length === 0) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'At least one product image is required!');
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'At least one product image is required!',
+      );
     }
     if (images.length > MAX_PRODUCT_IMAGES) {
       throw new AppError(
@@ -315,8 +347,11 @@ const createProductIntoDB = async (
     }
 
     const youtubeVideoUrl = normalizeYouTubeVideoUrl(payload.youtubeVideoUrl);
-    const youtubeVideoId = youtubeVideoUrl ? extractYouTubeVideoId(youtubeVideoUrl) : undefined;
-    const sellingUnit = normalizeSellingUnit(payload.sellingUnit) ?? DEFAULT_SELLING_UNIT;
+    const youtubeVideoId = youtubeVideoUrl
+      ? extractYouTubeVideoId(youtubeVideoUrl)
+      : undefined;
+    const sellingUnit =
+      normalizeSellingUnit(payload.sellingUnit) ?? DEFAULT_SELLING_UNIT;
     const createPayload: Record<string, unknown> = { ...payload, sellingUnit };
 
     return ProductModel.create({
@@ -327,7 +362,9 @@ const createProductIntoDB = async (
       ...(youtubeVideoUrl ? { youtubeVideoUrl, youtubeVideoId } : {}),
     });
   } catch (error) {
-    await Promise.all(uploadedImages.map(url => deleteImageFromCloudinary(url)));
+    await Promise.all(
+      uploadedImages.map((url) => deleteImageFromCloudinary(url)),
+    );
 
     throw error;
   }
@@ -369,7 +406,10 @@ const getAllActiveProductsFromDB = async (query: Record<string, unknown>) =>
 
 // 4. getProductBySlugFromDB
 const getProductBySlugFromDB = async (slug: string) => {
-  const doc = await ProductModel.findOne({ slug }).populate('brand').populate('category').lean();
+  const doc = await ProductModel.findOne({ slug })
+    .populate('brand')
+    .populate('category')
+    .lean();
   if (!doc) throw new AppError(httpStatus.NOT_FOUND, 'Product not found!');
   return doc;
 };
@@ -381,7 +421,8 @@ const getActiveProductBySlugFromDB = async (slug: string) => {
     .populate({ path: 'category', match: { isActive: true } })
     .lean();
 
-  if (!doc || !doc.brand || !doc.category) throw new AppError(httpStatus.NOT_FOUND, 'Product not found!');
+  if (!doc || !doc.brand || !doc.category)
+    throw new AppError(httpStatus.NOT_FOUND, 'Product not found!');
 
   return doc;
 };
@@ -398,7 +439,9 @@ const updateProductIntoDB = async (
     throw new AppError(httpStatus.NOT_FOUND, 'Product not found!');
   }
 
-  const files = Array.isArray(imageFiles) ? imageFiles : Object.values(imageFiles ?? {}).flat();
+  const files = Array.isArray(imageFiles)
+    ? imageFiles
+    : Object.values(imageFiles ?? {}).flat();
   const uploadedImages: string[] = [];
 
   try {
@@ -408,19 +451,36 @@ const updateProductIntoDB = async (
     }
 
     const existingImages = existingProduct.images;
-    const retainedImages = Array.isArray(payload.images) ? payload.images : existingImages;
+    const retainedImages = Array.isArray(payload.images)
+      ? payload.images
+      : existingImages;
     const nextImages = Array.from(
-      new Set(uploadedImages.length > 0 ? [...retainedImages, ...uploadedImages] : retainedImages),
+      new Set(
+        uploadedImages.length > 0
+          ? [...retainedImages, ...uploadedImages]
+          : retainedImages,
+      ),
     );
-    const shouldUpdateYoutubeVideoUrl = Object.prototype.hasOwnProperty.call(payload, 'youtubeVideoUrl');
-    const shouldUpdateSellingUnit = Object.prototype.hasOwnProperty.call(payload, 'sellingUnit');
+    const shouldUpdateYoutubeVideoUrl = Object.prototype.hasOwnProperty.call(
+      payload,
+      'youtubeVideoUrl',
+    );
+    const shouldUpdateSellingUnit = Object.prototype.hasOwnProperty.call(
+      payload,
+      'sellingUnit',
+    );
     const youtubeVideoUrl = shouldUpdateYoutubeVideoUrl
       ? normalizeYouTubeVideoUrl(payload.youtubeVideoUrl)
       : undefined;
-    const youtubeVideoId = youtubeVideoUrl ? extractYouTubeVideoId(youtubeVideoUrl) : undefined;
+    const youtubeVideoId = youtubeVideoUrl
+      ? extractYouTubeVideoId(youtubeVideoUrl)
+      : undefined;
 
     if (nextImages.length === 0) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'At least one product image is required!');
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'At least one product image is required!',
+      );
     }
     if (nextImages.length > MAX_PRODUCT_IMAGES) {
       throw new AppError(
@@ -436,7 +496,8 @@ const updateProductIntoDB = async (
     };
 
     if (shouldUpdateSellingUnit) {
-      updateSet.sellingUnit = normalizeSellingUnit(payload.sellingUnit) ?? DEFAULT_SELLING_UNIT;
+      updateSet.sellingUnit =
+        normalizeSellingUnit(payload.sellingUnit) ?? DEFAULT_SELLING_UNIT;
     }
 
     const updateQuery: Record<string, unknown> = { $set: updateSet };
@@ -458,19 +519,25 @@ const updateProductIntoDB = async (
     });
 
     if (!updated) {
-      await Promise.all(uploadedImages.map(url => deleteImageFromCloudinary(url)));
+      await Promise.all(
+        uploadedImages.map((url) => deleteImageFromCloudinary(url)),
+      );
       throw new AppError(httpStatus.NOT_FOUND, 'Product not found!');
     }
 
     if (uploadedImages.length > 0) {
       await Promise.all(
-        existingImages.filter(url => !nextImages.includes(url)).map(url => deleteImageFromCloudinary(url)),
+        existingImages
+          .filter((url) => !nextImages.includes(url))
+          .map((url) => deleteImageFromCloudinary(url)),
       );
     }
 
     return updated;
   } catch (error) {
-    await Promise.all(uploadedImages.map(url => deleteImageFromCloudinary(url)));
+    await Promise.all(
+      uploadedImages.map((url) => deleteImageFromCloudinary(url)),
+    );
 
     throw error;
   }
@@ -486,7 +553,10 @@ const deleteProductFromDB = async (slug: string) => {
 };
 
 // 6. getProductsByCategorySlugFromDB
-const getProductsByCategorySlugFromDB = async (slug: string, query: Record<string, unknown> = {}) => {
+const getProductsByCategorySlugFromDB = async (
+  slug: string,
+  query: Record<string, unknown> = {},
+) => {
   const category = await CategoryModel.findOne({ slug, isActive: true }).lean();
   if (!category) {
     throw new AppError(httpStatus.NOT_FOUND, 'Category not found!');

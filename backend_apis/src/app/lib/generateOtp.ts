@@ -1,4 +1,4 @@
-import otpGenerator from "otp-generator";
+import otpGenerator from 'otp-generator';
 
 const generateOtp = () => {
   const otp = otpGenerator.generate(6, {

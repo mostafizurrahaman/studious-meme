@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { X } from "lucide-react";
-import { useDebouncedCallback } from "use-debounce";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useState } from 'react';
+import { X } from 'lucide-react';
+import { useDebouncedCallback } from 'use-debounce';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 type TableFilterProps = {
   value: string;
@@ -16,7 +16,7 @@ type TableFilterProps = {
 export function TableFilter({
   value,
   onChange,
-  placeholder = "Search...",
+  placeholder = 'Search...',
   className,
 }: TableFilterProps) {
   const [inputValue, setInputValue] = useState(value);
@@ -40,8 +40,8 @@ export function TableFilter({
           variant="outline"
           size="icon"
           onClick={() => {
-            setInputValue("");
-            onChange("");
+            setInputValue('');
+            onChange('');
           }}
         >
           <X className="size-4" />

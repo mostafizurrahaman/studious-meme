@@ -1,4 +1,4 @@
-import { model, Schema, Types } from "mongoose";
+import { model, Schema, Types } from 'mongoose';
 
 type ComparisonProductSnapshot = {
   title: string;
@@ -51,8 +51,8 @@ const comparisonProductSnapshotSchema = new Schema<ComparisonProductSnapshot>(
 
 const comparisonHistorySchema = new Schema<ComparisonHistoryDoc>(
   {
-    user: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    product: { type: Schema.Types.ObjectId, ref: "Product", required: true },
+    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    product: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
     productSnapshot: { type: comparisonProductSnapshotSchema, required: true },
   },
   { timestamps: true, versionKey: false },
@@ -61,14 +61,14 @@ const comparisonHistorySchema = new Schema<ComparisonHistoryDoc>(
 comparisonHistorySchema.index({ user: 1, product: 1 }, { unique: true });
 comparisonHistorySchema.index(
   { user: 1, createdAt: -1 },
-  { name: "comparisonHistory_user_createdAt_idx" },
+  { name: 'comparisonHistory_user_createdAt_idx' },
 );
 comparisonHistorySchema.index(
-  { user: 1, "productSnapshot.category": 1 },
-  { name: "comparisonHistory_user_category_idx" },
+  { user: 1, 'productSnapshot.category': 1 },
+  { name: 'comparisonHistory_user_category_idx' },
 );
 
 export const ComparisonHistoryModel = model<ComparisonHistoryDoc>(
-  "ComparisonHistory",
+  'ComparisonHistory',
   comparisonHistorySchema,
 );

@@ -1,21 +1,21 @@
-import type { Metadata } from "next";
-import { DashboardUsersManager } from "@/components/dashboard/DashboardUsersManager";
-import { requireDashboardRoles } from "@/lib/dashboard-auth";
-import { buildMetadata } from "@/lib/seo";
-import { getAllUsers } from "@/services/Admin";
+import type { Metadata } from 'next';
+import { DashboardUsersManager } from '@/components/dashboard/DashboardUsersManager';
+import { requireDashboardRoles } from '@/lib/dashboard-auth';
+import { buildMetadata } from '@/lib/seo';
+import { getAllUsers } from '@/services/Admin';
 
 type Props = {
   searchParams: Promise<{ page?: string; limit?: string; searchTerm?: string }>;
 };
 
 export const metadata: Metadata = buildMetadata({
-  title: "Users",
-  description: "Manage customer accounts.",
-  path: "/dashboard/super-admin/users",
+  title: 'Users',
+  description: 'Manage customer accounts.',
+  path: '/dashboard/super-admin/users',
   noindex: true,
 });
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 const parsePositiveInteger = (value: string | undefined, fallback: number) => {
   const parsed = Number(value);
@@ -24,11 +24,11 @@ const parsePositiveInteger = (value: string | undefined, fallback: number) => {
 };
 
 export default async function SuperAdminUsersPage({ searchParams }: Props) {
-  await requireDashboardRoles(["SUPER_ADMIN"]);
+  await requireDashboardRoles(['SUPER_ADMIN']);
   const query = await searchParams;
   const page = parsePositiveInteger(query.page, 1);
   const limit = parsePositiveInteger(query.limit, 50);
-  const searchTerm = query.searchTerm?.trim() ?? "";
+  const searchTerm = query.searchTerm?.trim() ?? '';
   const usersResult = await getAllUsers({ page, limit, searchTerm }).catch(
     () => null,
   );

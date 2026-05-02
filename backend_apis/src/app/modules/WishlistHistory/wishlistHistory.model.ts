@@ -1,4 +1,4 @@
-import { model, Schema, Types } from "mongoose";
+import { model, Schema, Types } from 'mongoose';
 
 type WishlistProductSnapshot = {
   title: string;
@@ -40,8 +40,8 @@ const wishlistProductSnapshotSchema = new Schema<WishlistProductSnapshot>(
 
 const wishlistHistorySchema = new Schema<WishlistHistoryDoc>(
   {
-    user: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    product: { type: Schema.Types.ObjectId, ref: "Product", required: true },
+    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    product: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
     productSnapshot: { type: wishlistProductSnapshotSchema, required: true },
   },
   { timestamps: true, versionKey: false },
@@ -50,10 +50,10 @@ const wishlistHistorySchema = new Schema<WishlistHistoryDoc>(
 wishlistHistorySchema.index({ user: 1, product: 1 }, { unique: true });
 wishlistHistorySchema.index(
   { user: 1, updatedAt: -1 },
-  { name: "wishlistHistory_user_updatedAt_idx" },
+  { name: 'wishlistHistory_user_updatedAt_idx' },
 );
 
 export const WishlistHistoryModel = model<WishlistHistoryDoc>(
-  "WishlistHistory",
+  'WishlistHistory',
   wishlistHistorySchema,
 );

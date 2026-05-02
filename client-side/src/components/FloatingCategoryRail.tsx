@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import { useMemo, useState } from "react";
-import Link from "next/link";
-import { Card } from "@/components/ui/card";
-import type { Category } from "@/lib/storefront-types";
+import Image from 'next/image';
+import { useMemo, useState } from 'react';
+import Link from 'next/link';
+import { Card } from '@/components/ui/card';
+import type { Category } from '@/lib/storefront-types';
 
 type Props = {
   categories: Category[];
@@ -13,7 +13,7 @@ type Props = {
 export function FloatingCategoryRail({ categories }: Props) {
   const [open, setOpen] = useState(false);
   const [activeCategorySlug, setActiveCategorySlug] = useState(
-    categories[0]?.slug ?? "",
+    categories[0]?.slug ?? '',
   );
 
   const activeCategory = useMemo(
@@ -28,14 +28,14 @@ export function FloatingCategoryRail({ categories }: Props) {
     <div
       className="fixed left-2 z-50 hidden lg:block"
       style={{
-        top: "calc(var(--storefront-header-height, clamp(120px, 12vw, 160px)) + 0.75rem)",
+        top: 'calc(var(--storefront-header-height, clamp(120px, 12vw, 160px)) + 0.75rem)',
       }}
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
     >
       <Card
         className={`overflow-hidden rounded-2xl shadow-md ring-1 ring-black/10 backdrop-blur transition-[width] duration-200 ${
-          open ? "w-72" : "w-10"
+          open ? 'w-72' : 'w-10'
         }`}
       >
         <div className="grid gap-1.5 px-1.5 py-2.5">
@@ -45,7 +45,7 @@ export function FloatingCategoryRail({ categories }: Props) {
             </span>
             <span
               className={`rounded-full bg-primary px-4 py-1.5 text-sm font-bold text-primary-foreground transition ${
-                open ? "opacity-100" : "w-0 overflow-hidden opacity-0"
+                open ? 'opacity-100' : 'w-0 overflow-hidden opacity-0'
               } whitespace-nowrap`}
             >
               Categories
@@ -59,7 +59,7 @@ export function FloatingCategoryRail({ categories }: Props) {
               onMouseEnter={() => setActiveCategorySlug(category.slug)}
               onFocus={() => setActiveCategorySlug(category.slug)}
               className={`flex items-center gap-2 rounded-md px-0.5 py-1.5 hover:bg-muted ${
-                activeCategorySlug === category.slug ? "bg-muted" : ""
+                activeCategorySlug === category.slug ? 'bg-muted' : ''
               }`}
             >
               <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border border-border bg-background">
@@ -77,7 +77,7 @@ export function FloatingCategoryRail({ categories }: Props) {
               </span>
               <span
                 className={`text-sm text-foreground/85 whitespace-nowrap transition ${
-                  open ? "opacity-100" : "w-0 overflow-hidden opacity-0"
+                  open ? 'opacity-100' : 'w-0 overflow-hidden opacity-0'
                 }`}
               >
                 {category.name}
@@ -107,7 +107,7 @@ export function FloatingCategoryRail({ categories }: Props) {
           <Link
             href="/main-categories"
             className={`rounded-md px-1 py-1.5 text-sm font-semibold text-foreground/85 hover:bg-muted whitespace-nowrap transition ${
-              open ? "opacity-100" : "h-0 overflow-hidden p-0 opacity-0"
+              open ? 'opacity-100' : 'h-0 overflow-hidden p-0 opacity-0'
             }`}
           >
             See All Categories &gt;&gt;
@@ -116,7 +116,7 @@ export function FloatingCategoryRail({ categories }: Props) {
       </Card>
       <div
         className={`pointer-events-none fixed inset-0 z-[-1] bg-secondary/35 transition ${
-          open ? "opacity-100" : "opacity-0"
+          open ? 'opacity-100' : 'opacity-0'
         }`}
       />
     </div>

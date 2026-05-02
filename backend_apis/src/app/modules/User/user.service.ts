@@ -12,7 +12,12 @@ import {
 import { AppError, sendOtpEmail } from '../../utils';
 import { IUser } from './user.interface';
 import UserModel from './user.model';
-import { defaultUserImage, OTP_EXPIRY_MINUTES, ROLE, TDeactiveAccountPayload } from './user.constant';
+import {
+  defaultUserImage,
+  OTP_EXPIRY_MINUTES,
+  ROLE,
+  TDeactiveAccountPayload,
+} from './user.constant';
 import { UserValidation } from './user.validation';
 import jwt, { JwtPayload, SignOptions } from 'jsonwebtoken';
 import { MulterFile } from '../../lib/upload';
@@ -20,7 +25,9 @@ import { PipelineStage } from 'mongoose';
 
 // 1. createUserIntoDB
 const createUserIntoDB = async (payload: IUser) => {
-  const existingUser = await UserModel.isUserExistsByEmailWithPassword(payload.email);
+  const existingUser = await UserModel.isUserExistsByEmailWithPassword(
+    payload.email,
+  );
 
   // if user exists but unverified
   if (existingUser && !existingUser.isVerifiedByOTP) {
@@ -36,7 +43,9 @@ const createUserIntoDB = async (payload: IUser) => {
       });
 
       existingUser.otp = otp;
-      existingUser.otpExpiry = new Date(now.getTime() + OTP_EXPIRY_MINUTES * 60 * 1000);
+      existingUser.otpExpiry = new Date(
+        now.getTime() + OTP_EXPIRY_MINUTES * 60 * 1000,
+      );
       await existingUser.save();
 
       throw new AppError(
@@ -83,10 +92,16 @@ const sendSignupOtpAgainIntoDB = async (userEmail: string) => {
   const user = await UserModel.isUserExistsByEmailWithPassword(userEmail);
 
   if (!user) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'You must sign up first to get an OTP!');
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'You must sign up first to get an OTP!',
+    );
   } else if (user.isVerifiedByOTP) {
     // if user is already verified
-    throw new AppError(httpStatus.BAD_REQUEST, 'This account is already verified!');
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'This account is already verified!',
+    );
   } else if (!user.otpExpiry || user.otpExpiry < now) {
     // sending new OTP if previous one is expired
     const otp = generateOtp();
@@ -127,12 +142,18 @@ const verifySignupOtpIntoDB = async (userEmail: string, otp: string) => {
 
   // Check if the user is already verified
   if (user.isVerifiedByOTP) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'This account is already verified!');
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'This account is already verified!',
+    );
   }
 
   // Check if OTP is expired
   if (!user.otpExpiry || user.otpExpiry < now) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'OTP has been expired. Please request a new one!');
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'OTP has been expired. Please request a new one!',
+    );
   }
 
   // If OTP is invalid, throw error
@@ -197,7 +218,10 @@ const signinIntoDB = async (payload: { email: string; password: string }) => {
     user.otpExpiry = new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000);
     await user.save();
 
-    throw new AppError(httpStatus.BAD_REQUEST, 'Verify your account with the new OTP sent to the mail!');
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Verify your account with the new OTP sent to the mail!',
+    );
   }
 
   // Validate password
@@ -234,7 +258,10 @@ const signinIntoDB = async (payload: { email: string; password: string }) => {
 };
 
 // 5. updateProfilePhotoIntoDB
-const updateProfilePhotoIntoDB = async (user: IUser, imageFile: MulterFile | undefined) => {
+const updateProfilePhotoIntoDB = async (
+  user: IUser,
+  imageFile: MulterFile | undefined,
+) => {
   // 1. Validation: Ensure an image file is provided
   if (!imageFile) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Image is required!');
@@ -254,7 +281,10 @@ const updateProfilePhotoIntoDB = async (user: IUser, imageFile: MulterFile | und
   if (!userNewData) {
     // Use secure_url to delete from Cloudinary, not the local path
     await deleteImageFromCloudinary(secure_url);
-    throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to update profile photo. Please try again!');
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      'Failed to update profile photo. Please try again!',
+    );
   }
 
   // 5. Cleanup: Delete the previous image from Cloudinary if it exists and is not a default image
@@ -337,11 +367,17 @@ const changePasswordIntoDB = async (
   const isCredentialsCorrect = await user.isPasswordMatched(oldPassword);
 
   if (!isCredentialsCorrect) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'Current password is not correct!');
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Current password is not correct!',
+    );
   }
 
   if (oldPassword === newPassword) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'New password must be different!');
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'New password must be different!',
+    );
   }
 
   user.password = newPassword;
@@ -464,7 +500,10 @@ const sendForgotPasswordOtpAgain = async (forgotPassToken: string) => {
 };
 
 // 10. verifyOtpForForgotPassword 3. (verify OTP)
-const verifyOtpForForgotPassword = async (payload: { token: string; otp: string }) => {
+const verifyOtpForForgotPassword = async (payload: {
+  token: string;
+  otp: string;
+}) => {
   let decoded: JwtPayload;
   try {
     decoded = jwt.verify(payload.token, config.jwt.otp_secret!, {
@@ -494,7 +533,10 @@ const verifyOtpForForgotPassword = async (payload: { token: string; otp: string 
 
     await sendOtpEmail({ email, otp: newOtp, name: user?.name });
 
-    throw new AppError(httpStatus.BAD_REQUEST, 'OTP expired. A new OTP has been sent!');
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'OTP expired. A new OTP has been sent!',
+    );
   }
 
   // Check if OTP matches
@@ -525,7 +567,10 @@ const resetPasswordIntoDB = async (
     throw new AppError(httpStatus.FORBIDDEN, 'Invalid reset password token!');
   }
 
-  const resetPasswordPayload = verifyToken(resetPasswordToken, config.jwt.otp_secret!) as {
+  const resetPasswordPayload = verifyToken(
+    resetPasswordToken,
+    config.jwt.otp_secret!,
+  ) as {
     email: string;
     isResetPassword?: boolean;
   };
@@ -554,7 +599,9 @@ const resetPasswordIntoDB = async (
 
 // 12. fetchProfileFromDB
 const fetchProfileFromDB = async (user: IUser) => {
-  const result = await UserModel.findById(user._id).select('name email phone dob image role');
+  const result = await UserModel.findById(user._id).select(
+    'name email phone dob image role',
+  );
 
   return result;
 };
@@ -562,7 +609,10 @@ const fetchProfileFromDB = async (user: IUser) => {
 // 13. getNewAccessTokenFromServer
 const getNewAccessTokenFromServer = async (refreshToken: string) => {
   // checking if the given token is valid
-  const decoded = verifyToken(refreshToken, config.jwt.refresh_secret!) as JwtPayload;
+  const decoded = verifyToken(
+    refreshToken,
+    config.jwt.refresh_secret!,
+  ) as JwtPayload;
 
   const { email, iat } = decoded;
 
@@ -610,7 +660,10 @@ const getNewAccessTokenFromServer = async (refreshToken: string) => {
 };
 
 // 14. deactivateAccountIntoDB
-const deactivateAccountIntoDB = async (user: IUser, payload: TDeactiveAccountPayload) => {
+const deactivateAccountIntoDB = async (
+  user: IUser,
+  payload: TDeactiveAccountPayload,
+) => {
   const { email, password, deactivationReason } = payload;
 
   const currentUser = await UserModel.findOne({
@@ -766,7 +819,8 @@ const adminGetAllUsersFromDB = async (query: Record<string, unknown>) => {
   } = query as Record<string, unknown>;
 
   if (rawFilters.isActive !== undefined) {
-    rawFilters.isActive = rawFilters.isActive === 'true' || rawFilters.isActive === true;
+    rawFilters.isActive =
+      rawFilters.isActive === 'true' || rawFilters.isActive === true;
   }
 
   const page = Number(pageQuery) || 1;
@@ -866,7 +920,10 @@ const adminGetAllUsersFromDB = async (query: Record<string, unknown>) => {
   return { data: facetResult.data, meta };
 };
 
-const adminUpdateUserStatusIntoDB = async (userId: string, isActive: boolean) => {
+const adminUpdateUserStatusIntoDB = async (
+  userId: string,
+  isActive: boolean,
+) => {
   const user = await UserModel.findOneAndUpdate(
     { _id: userId, role: { $nin: [ROLE.ADMIN, ROLE.SUPER_ADMIN] } },
     { isActive },

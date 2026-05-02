@@ -1,17 +1,17 @@
-import type { Metadata } from "next";
-import { DashboardCouponsManager } from "@/components/dashboard/DashboardCouponsManager";
-import { requireDashboardRoles } from "@/lib/dashboard-auth";
-import { buildMetadata } from "@/lib/seo";
-import { getAllCoupons } from "@/services/Coupon/admin";
+import type { Metadata } from 'next';
+import { DashboardCouponsManager } from '@/components/dashboard/DashboardCouponsManager';
+import { requireDashboardRoles } from '@/lib/dashboard-auth';
+import { buildMetadata } from '@/lib/seo';
+import { getAllCoupons } from '@/services/Coupon/admin';
 
 export const metadata: Metadata = buildMetadata({
-  title: "Coupons",
-  description: "Create, update, and disable coupon offers.",
-  path: "/dashboard/admin/coupons",
+  title: 'Coupons',
+  description: 'Create, update, and disable coupon offers.',
+  path: '/dashboard/admin/coupons',
   noindex: true,
 });
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 type Props = {
   searchParams: Promise<{ page?: string; limit?: string; searchTerm?: string }>;
@@ -24,11 +24,11 @@ const parsePositiveInteger = (value: string | undefined, fallback: number) => {
 };
 
 export default async function AdminCouponsPage({ searchParams }: Props) {
-  await requireDashboardRoles(["ADMIN", "SUPER_ADMIN"]);
+  await requireDashboardRoles(['ADMIN', 'SUPER_ADMIN']);
   const query = await searchParams;
   const page = parsePositiveInteger(query.page, 1);
   const limit = parsePositiveInteger(query.limit, 50);
-  const searchTerm = query.searchTerm?.trim() ?? "";
+  const searchTerm = query.searchTerm?.trim() ?? '';
   const couponsResult = await getAllCoupons({ page, limit, searchTerm }).catch(
     () => null,
   );

@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Link from "next/link";
-import { ProductCard } from "@/components/ProductCard";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import type { Product } from "@/lib/storefront-types";
-import { useWishlistStore } from "@/lib/wishlist-store";
-import { removeWishlistItem } from "@/services/WishlistHistory";
-import { toast } from "sonner";
+import { useState } from 'react';
+import Link from 'next/link';
+import { ProductCard } from '@/components/ProductCard';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import type { Product } from '@/lib/storefront-types';
+import { useWishlistStore } from '@/lib/wishlist-store';
+import { removeWishlistItem } from '@/services/WishlistHistory';
+import { toast } from 'sonner';
 
 type Props = {
   authenticated: boolean;
@@ -57,10 +57,10 @@ export function WishlistPageClient({ authenticated, savedProducts }: Props) {
         </h1>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-foreground/65 sm:text-base">
           {hydrated && items.length > 0
-            ? `${items.length} saved product${items.length === 1 ? "" : "s"}.`
+            ? `${items.length} saved product${items.length === 1 ? '' : 's'}.`
             : backendProducts.length > 0
-              ? `${backendProducts.length} saved product${backendProducts.length === 1 ? "" : "s"}.`
-              : "Save products from product pages."}
+              ? `${backendProducts.length} saved product${backendProducts.length === 1 ? '' : 's'}.`
+              : 'Save products from product pages.'}
         </p>
       </Card>
 
@@ -83,7 +83,7 @@ export function WishlistPageClient({ authenticated, savedProducts }: Props) {
 
                       if (!product.id) {
                         toast.error(
-                          "Unable to remove this wishlist item right now.",
+                          'Unable to remove this wishlist item right now.',
                         );
                         return;
                       }
@@ -98,7 +98,7 @@ export function WishlistPageClient({ authenticated, savedProducts }: Props) {
                               : [product, ...current],
                           );
                           toast.error(
-                            result.message ?? "Unable to update wishlist.",
+                            result.message ?? 'Unable to update wishlist.',
                           );
                         }
                       });

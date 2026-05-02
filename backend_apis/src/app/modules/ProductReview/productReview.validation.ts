@@ -1,6 +1,9 @@
 import { z } from 'zod';
 
-const objectIdSchema = z.string({ error: 'ID is required!' }).trim().min(1, { message: 'ID is required!' });
+const objectIdSchema = z
+  .string({ error: 'ID is required!' })
+  .trim()
+  .min(1, { message: 'ID is required!' });
 const productRefSchema = z
   .string({ error: 'Product is required!' })
   .trim()
@@ -79,7 +82,11 @@ const updateReviewSchema = z.object({
         .min(1, { message: 'Display name is required!' })
         .max(100, { message: 'Display name cannot exceed 100 characters!' })
         .optional(),
-      displayImage: z.string().trim().min(1, { message: 'Display image is required!' }).optional(),
+      displayImage: z
+        .string()
+        .trim()
+        .min(1, { message: 'Display image is required!' })
+        .optional(),
       rating: z.coerce
         .number()
         .min(1, { message: 'Rating must be at least 1!' })
@@ -94,7 +101,9 @@ const updateReviewSchema = z.object({
       images: reviewImagesSchema,
       status: z.enum(['pending', 'approved', 'rejected', 'hidden']).optional(),
     })
-    .refine(data => Object.keys(data).length > 0, { message: 'At least one field is required!' }),
+    .refine((data) => Object.keys(data).length > 0, {
+      message: 'At least one field is required!',
+    }),
 });
 
 const adminReviewListSchema = z.object({
@@ -110,7 +119,14 @@ const adminReviewListSchema = z.object({
     createdFrom: z.string().trim().optional(),
     createdTo: z.string().trim().optional(),
     sort: z
-      .enum(['createdAt-desc', 'createdAt-asc', 'rating-desc', 'rating-asc', 'status-desc', 'status-asc'])
+      .enum([
+        'createdAt-desc',
+        'createdAt-asc',
+        'rating-desc',
+        'rating-asc',
+        'status-desc',
+        'status-asc',
+      ])
       .optional(),
   }),
 });
@@ -122,7 +138,9 @@ const publicReviewListSchema = z.object({
   query: z.object({
     page: z.coerce.number().int().min(1).optional(),
     limit: z.coerce.number().int().min(1).max(100).optional(),
-    sort: z.enum(['createdAt-desc', 'createdAt-asc', 'rating-desc', 'rating-asc']).optional(),
+    sort: z
+      .enum(['createdAt-desc', 'createdAt-asc', 'rating-desc', 'rating-asc'])
+      .optional(),
   }),
 });
 

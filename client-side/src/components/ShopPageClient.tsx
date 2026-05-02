@@ -67,7 +67,10 @@ function PriceRangeSlider({
 }) {
   const parsed = parsePriceRange(initialValue);
   const initialMin = Math.max(0, Number(parsed.min || '0') || 0);
-  const initialMax = Math.min(maxValue, Number(parsed.max || String(maxValue)) || maxValue);
+  const initialMax = Math.min(
+    maxValue,
+    Number(parsed.max || String(maxValue)) || maxValue,
+  );
   const [minPrice, setMinPrice] = useState(Math.min(initialMin, initialMax));
   const [maxPrice, setMaxPrice] = useState(Math.max(initialMin, initialMax));
   const range = Math.max(maxValue, 1);
@@ -105,7 +108,7 @@ function PriceRangeSlider({
           max={maxValue}
           step={500}
           value={minPrice}
-          onChange={event => {
+          onChange={(event) => {
             const nextMin = Math.min(Number(event.target.value), maxPrice);
             setMinPrice(nextMin);
           }}
@@ -120,7 +123,7 @@ function PriceRangeSlider({
           max={maxValue}
           step={500}
           value={maxPrice}
-          onChange={event => {
+          onChange={(event) => {
             const nextMax = Math.max(Number(event.target.value), minPrice);
             setMaxPrice(nextMax);
           }}
@@ -132,7 +135,12 @@ function PriceRangeSlider({
       </div>
 
       <div className="flex gap-2">
-        <Button type="button" size="sm" className="flex-1" onClick={() => commit(minPrice, maxPrice)}>
+        <Button
+          type="button"
+          size="sm"
+          className="flex-1"
+          onClick={() => commit(minPrice, maxPrice)}
+        >
           Apply range
         </Button>
         <Button type="button" size="sm" variant="outline" onClick={onReset}>
@@ -151,12 +159,15 @@ export function ShopPageClient({ products, categories, meta }: Props) {
   const totalPages = Math.max(meta.totalPages, 1);
   const page = Math.min(meta.page, totalPages);
   const maxProductPrice = products.reduce((highest, product) => {
-    const numericPrice = Number(String(product.price).replace(/[^\d.]/g, '')) || 0;
+    const numericPrice =
+      Number(String(product.price).replace(/[^\d.]/g, '')) || 0;
     return Math.max(highest, numericPrice);
   }, 0);
   const parsedFilterRange = parsePriceRange(filters.price);
   const activeMaxPrice = Number(parsedFilterRange.max || '0') || 0;
-  const sliderMax = roundRangeCeiling(Math.max(maxProductPrice, activeMaxPrice, 100000));
+  const sliderMax = roundRangeCeiling(
+    Math.max(maxProductPrice, activeMaxPrice, 100000),
+  );
 
   function updateFilter(key: string, value: string) {
     const params = new URLSearchParams(searchParams.toString());
@@ -165,9 +176,14 @@ export function ShopPageClient({ products, categories, meta }: Props) {
     else params.delete(key);
 
     params.delete('page');
-    router.replace((params.toString() ? `${pathname}?${params.toString()}` : pathname) as Route, {
-      scroll: false,
-    });
+    router.replace(
+      (params.toString()
+        ? `${pathname}?${params.toString()}`
+        : pathname) as Route,
+      {
+        scroll: false,
+      },
+    );
   }
 
   function updatePage(nextPage: number) {
@@ -213,11 +229,16 @@ export function ShopPageClient({ products, categories, meta }: Props) {
           <div>
             <div className="font-semibold text-foreground">Category</div>
             <div className="mt-2 grid gap-2">
-              {categories.map(category => (
+              {categories.map((category) => (
                 <button
                   key={category.slug}
                   type="button"
-                  onClick={() => updateFilter('c', filters.category === category.slug ? '' : category.slug)}
+                  onClick={() =>
+                    updateFilter(
+                      'c',
+                      filters.category === category.slug ? '' : category.slug,
+                    )
+                  }
                   className={`cursor-pointer text-left transition hover:text-primary ${filters.category === category.slug ? 'font-bold text-primary' : 'text-foreground/65'}`}
                 >
                   {category.name}
@@ -236,7 +257,9 @@ export function ShopPageClient({ products, categories, meta }: Props) {
                 <button
                   key={value}
                   type="button"
-                  onClick={() => updateFilter('stock', filters.stock === value ? '' : value)}
+                  onClick={() =>
+                    updateFilter('stock', filters.stock === value ? '' : value)
+                  }
                   className={`cursor-pointer text-left transition hover:text-primary ${filters.stock === value ? 'font-bold text-primary' : 'text-foreground/65'}`}
                 >
                   {label}
@@ -248,14 +271,16 @@ export function ShopPageClient({ products, categories, meta }: Props) {
             <div className="font-semibold text-foreground">Price range</div>
             <div className="mt-2 grid gap-2">
               {[
-    ['under-10000', 'Under ৳ 10k'],
-    ['10000-50000', '৳ 10k-50k'],
-    ['50000-plus', '৳ 50k+'],
+                ['under-10000', 'Under ৳ 10k'],
+                ['10000-50000', '৳ 10k-50k'],
+                ['50000-plus', '৳ 50k+'],
               ].map(([value, label]) => (
                 <button
                   key={value}
                   type="button"
-                  onClick={() => updateFilter('price', filters.price === value ? '' : value)}
+                  onClick={() =>
+                    updateFilter('price', filters.price === value ? '' : value)
+                  }
                   className={`cursor-pointer text-left transition hover:text-primary ${filters.price === value ? 'font-bold text-primary' : 'text-foreground/65'}`}
                 >
                   {label}
@@ -278,7 +303,8 @@ export function ShopPageClient({ products, categories, meta }: Props) {
         <Card className="p-4 shadow-sm">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="text-sm text-foreground/65">
-              Showing {products.length} of {meta.total} products across {categories.length} categories
+              Showing {products.length} of {meta.total} products across{' '}
+              {categories.length} categories
             </div>
             <div className="flex flex-wrap gap-2 text-xs font-semibold">
               {[
@@ -292,7 +318,9 @@ export function ShopPageClient({ products, categories, meta }: Props) {
                 <button
                   key={value}
                   type="button"
-                  onClick={() => updateFilter('tag', value === 'all' ? '' : value)}
+                  onClick={() =>
+                    updateFilter('tag', value === 'all' ? '' : value)
+                  }
                   className={`cursor-pointer rounded-full px-3 py-2 transition ${filters.tag === value || (value === 'all' && filters.tag === 'all') ? 'bg-secondary text-secondary-foreground' : 'bg-muted text-foreground/75 hover:bg-muted/70'}`}
                 >
                   {label}
@@ -304,7 +332,11 @@ export function ShopPageClient({ products, categories, meta }: Props) {
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {products.map((product, index) => (
-            <ProductCard key={product.sku} product={product} priority={index < 4} />
+            <ProductCard
+              key={product.sku}
+              product={product}
+              priority={index < 4}
+            />
           ))}
         </div>
 

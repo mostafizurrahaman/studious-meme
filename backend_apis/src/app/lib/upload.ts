@@ -201,11 +201,11 @@
 
 // export default multerUpload;
 
-import { v2 as cloudinary, ConfigOptions, UploadApiResponse } from "cloudinary";
-import multer from "multer";
-import config from "../config";
-import { Readable } from "stream";
-import type { Express } from "express";
+import { v2 as cloudinary, ConfigOptions, UploadApiResponse } from 'cloudinary';
+import multer from 'multer';
+import config from '../config';
+import { Readable } from 'stream';
+import type { Express } from 'express';
 
 export type MulterFile = Express.Multer.File;
 
@@ -220,8 +220,8 @@ export const uploadFilesAndInjectUrls = async <
 
   const toPathSegments = (fieldname: string) =>
     fieldname
-      .replace(/\[(\d+)\]/g, ".$1")
-      .split(".")
+      .replace(/\[(\d+)\]/g, '.$1')
+      .split('.')
       .map((segment) => segment.trim())
       .filter(Boolean);
 
@@ -247,7 +247,7 @@ export const uploadFilesAndInjectUrls = async <
         return;
       }
 
-      const shouldBeArray = /^\d+$/.test(nextSegment || "");
+      const shouldBeArray = /^\d+$/.test(nextSegment || '');
 
       if (Array.isArray(current) && isIndex) {
         if (current[Number(segment)] == null) {
@@ -262,7 +262,7 @@ export const uploadFilesAndInjectUrls = async <
 
       const existingValue = (current as Record<string, unknown>)[segment];
 
-      if (existingValue == null || typeof existingValue !== "object") {
+      if (existingValue == null || typeof existingValue !== 'object') {
         (current as Record<string, unknown>)[segment] = shouldBeArray ? [] : {};
       }
 
@@ -311,20 +311,20 @@ cloudinary.config(cloudinaryConfig);
 // remove file extension (.png, .jpg etc) and normalize name
 const removeExtension = (filename: string): string => {
   return filename
-    .split(".")
+    .split('.')
     .slice(0, -1)
-    .join(".")
-    .replace(/\s+/g, "-")
+    .join('.')
+    .replace(/\s+/g, '-')
     .toLowerCase();
 };
 
 // extract publicId (with folder) from cloudinary image url
 const getPublicIdFromUrl = (imageUrl: string): string => {
   const url = new URL(imageUrl);
-  const parts = url.pathname.split("/");
+  const parts = url.pathname.split('/');
   const filename = parts.pop() as string;
-  const folderPath = parts.slice(-2).join("/"); // uploads/images
-  return `${folderPath}/${filename.split(".")[0]}`;
+  const folderPath = parts.slice(-2).join('/'); // uploads/images
+  return `${folderPath}/${filename.split('.')[0]}`;
 };
 
 /* -------------------------------------------------------- */

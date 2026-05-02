@@ -1,5 +1,5 @@
-import { PageShell } from "@/components/PageShell";
-import type { BackendPage } from "@/lib/page-content";
+import { PageShell } from '@/components/PageShell';
+import type { BackendPage } from '@/lib/page-content';
 
 type ManagedPageContentProps = {
   page: BackendPage | null;
@@ -10,10 +10,10 @@ type ManagedPageContentProps = {
 
 function sanitizeManagedHtml(value: string) {
   return value
-    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "")
-    .replace(/\son\w+="[^"]*"/gi, "")
-    .replace(/\son\w+='[^']*'/gi, "")
-    .replace(/\shref=["']javascript:[^"']*["']/gi, "");
+    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
+    .replace(/\son\w+="[^"]*"/gi, '')
+    .replace(/\son\w+='[^']*'/gi, '')
+    .replace(/\shref=["']javascript:[^"']*["']/gi, '');
 }
 
 export function ManagedPageContent({

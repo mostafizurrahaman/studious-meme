@@ -3,11 +3,11 @@ export function getSafeRedirectPath(value?: string | null) {
     return null;
   }
 
-  if (!value.startsWith("/")) {
+  if (!value.startsWith('/')) {
     return null;
   }
 
-  if (value.startsWith("//")) {
+  if (value.startsWith('//')) {
     return null;
   }
 

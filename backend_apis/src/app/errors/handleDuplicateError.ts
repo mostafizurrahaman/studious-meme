@@ -1,4 +1,4 @@
-import { TErrorSources, TGenericErrorResponse } from "../interface/error";
+import { TErrorSources, TGenericErrorResponse } from '../interface/error';
 
 // if mongoose schema gets already used email(set-as-unique) to craete new document, it will throw error with this message
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -13,14 +13,14 @@ const handleDuplicateError = (err: any): TGenericErrorResponse => {
 
   const errorSources: TErrorSources = [
     {
-      path: "",
+      path: '',
       message: `${extractedMessage} is already exists!`,
     },
   ];
 
   return {
     statusCode,
-    message: "Duplicate Error!",
+    message: 'Duplicate Error!',
     errorSources,
   };
 };

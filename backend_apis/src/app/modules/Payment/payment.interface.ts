@@ -1,11 +1,11 @@
-import { Document, Types } from "mongoose";
+import { Document, Types } from 'mongoose';
 
 export type TPaymentRecordStatus =
-  | "INITIATED"
-  | "PAID"
-  | "FAILED"
-  | "CANCELLED"
-  | "REFUNDED";
+  | 'INITIATED'
+  | 'PAID'
+  | 'FAILED'
+  | 'CANCELLED'
+  | 'REFUNDED';
 export type TPaymentStatus = TPaymentRecordStatus;
 
 export interface IPayment extends Document {
@@ -15,7 +15,7 @@ export interface IPayment extends Document {
   currency: string;
   status: TPaymentRecordStatus;
 
-  gateway: "PORTPOS";
+  gateway: 'PORTPOS';
   invoiceId?: string;
   transactionId: string;
   gatewayUrl?: string;

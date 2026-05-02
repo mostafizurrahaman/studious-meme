@@ -207,7 +207,7 @@
       href="https://malamal.com.bd/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fmalamal.com.bd%2F&amp;format=xml"
     />
     <style id="wp-img-auto-sizes-contain-inline-css" type="text/css">
-      img:is([sizes="auto" i], [sizes^="auto," i]) {
+      img:is([sizes='auto' i], [sizes^='auto,' i]) {
         contain-intrinsic-size: 3000px 1500px;
       }
       /*# sourceURL=wp-img-auto-sizes-contain-inline-css */
@@ -1337,12 +1337,12 @@
     <script type="text/javascript" id="wc-add-to-cart-js-extra">
       /* <![CDATA[ */
       var wc_add_to_cart_params = {
-        ajax_url: "/wp-admin/admin-ajax.php",
-        wc_ajax_url: "/?wc-ajax=%%endpoint%%",
-        i18n_view_cart: "View cart",
-        cart_url: "https://malamal.com.bd/cart/",
-        is_cart: "",
-        cart_redirect_after_add: "no",
+        ajax_url: '/wp-admin/admin-ajax.php',
+        wc_ajax_url: '/?wc-ajax=%%endpoint%%',
+        i18n_view_cart: 'View cart',
+        cart_url: 'https://malamal.com.bd/cart/',
+        is_cart: '',
+        cart_redirect_after_add: 'no',
       };
       //# sourceURL=wc-add-to-cart-js-extra
       /* ]]> */
@@ -1364,10 +1364,10 @@
     <script type="text/javascript" id="woocommerce-js-extra">
       /* <![CDATA[ */
       var woocommerce_params = {
-        ajax_url: "/wp-admin/admin-ajax.php",
-        wc_ajax_url: "/?wc-ajax=%%endpoint%%",
-        i18n_password_show: "Show password",
-        i18n_password_hide: "Hide password",
+        ajax_url: '/wp-admin/admin-ajax.php',
+        wc_ajax_url: '/?wc-ajax=%%endpoint%%',
+        i18n_password_show: 'Show password',
+        i18n_password_hide: 'Hide password',
       };
       //# sourceURL=woocommerce-js-extra
       /* ]]> */
@@ -1382,7 +1382,7 @@
     <script type="text/javascript" id="ajax-script-js-extra">
       /* <![CDATA[ */
       var ajax_object = {
-        ajaxurl: "https://malamal.com.bd/wp-json/wpsms/v1/newsletter",
+        ajaxurl: 'https://malamal.com.bd/wp-json/wpsms/v1/newsletter',
       };
       //# sourceURL=ajax-script-js-extra
       /* ]]> */
@@ -1414,10 +1414,10 @@
       function gtag() {
         dataLayer.push(arguments);
       }
-      gtag("set", "linker", { domains: ["malamal.com.bd"] });
-      gtag("js", new Date());
-      gtag("set", "developer_id.dZTNiMT", true);
-      gtag("config", "GT-NSL7MZS");
+      gtag('set', 'linker', { domains: ['malamal.com.bd'] });
+      gtag('js', new Date());
+      gtag('set', 'developer_id.dZTNiMT', true);
+      gtag('config', 'GT-NSL7MZS');
       //# sourceURL=google_gtagjs-js-after
       /* ]]> */
     </script>
@@ -1458,8 +1458,8 @@
       function gtag() {
         dataLayer.push(arguments);
       }
-      gtag("js", new Date());
-      gtag("config", "AW-16591462160");
+      gtag('js', new Date());
+      gtag('config', 'AW-16591462160');
     </script>
     <meta name="onesignal-plugin" content="wordpress-3.8.1" />
     <script
@@ -1470,14 +1470,14 @@
       window.OneSignalDeferred = window.OneSignalDeferred || [];
       OneSignalDeferred.push(async function (OneSignal) {
         await OneSignal.init({
-          appId: "95d363dc-aa76-4a18-b462-c2c9b72284cc",
+          appId: '95d363dc-aa76-4a18-b462-c2c9b72284cc',
           serviceWorkerOverrideForTypical: true,
-          path: "https://malamal.com.bd/wp-content/plugins/onesignal-free-web-push-notifications/sdk_files/",
+          path: 'https://malamal.com.bd/wp-content/plugins/onesignal-free-web-push-notifications/sdk_files/',
           serviceWorkerParam: {
             scope:
-              "/wp-content/plugins/onesignal-free-web-push-notifications/sdk_files/push/onesignal/",
+              '/wp-content/plugins/onesignal-free-web-push-notifications/sdk_files/push/onesignal/',
           },
-          serviceWorkerPath: "OneSignalSDKWorker.js",
+          serviceWorkerPath: 'OneSignalSDKWorker.js',
         });
       });
 
@@ -1492,19 +1492,19 @@
               if (
                 registration.active &&
                 registration.active.scriptURL.includes(
-                  "OneSignalSDKWorker.js.php",
+                  'OneSignalSDKWorker.js.php',
                 )
               ) {
                 // Unregister the service worker
                 registration.unregister().then((success) => {
                   if (success) {
                     console.log(
-                      "OneSignalSW: Successfully unregistered:",
+                      'OneSignalSW: Successfully unregistered:',
                       registration.active.scriptURL,
                     );
                   } else {
                     console.log(
-                      "OneSignalSW: Failed to unregister:",
+                      'OneSignalSW: Failed to unregister:',
                       registration.active.scriptURL,
                     );
                   }
@@ -1514,7 +1514,7 @@
           })
           .catch((error) => {
             console.error(
-              "Error fetching service worker registrations:",
+              'Error fetching service worker registrations:',
               error,
             );
           });
@@ -1543,7 +1543,7 @@
       window.OneSignalDeferred = window.OneSignalDeferred || [];
       OneSignalDeferred.push(async function (OneSignal) {
         await OneSignal.init({
-          appId: "95d363dc-aa76-4a18-b462-c2c9b72284cc",
+          appId: '95d363dc-aa76-4a18-b462-c2c9b72284cc',
         });
       });
     </script>
@@ -1616,14 +1616,14 @@
 
       (function (w, d, s, l, i) {
         w[l] = w[l] || [];
-        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+        w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
         var f = d.getElementsByTagName(s)[0],
           j = d.createElement(s),
-          dl = l != "dataLayer" ? "&l=" + l : "";
+          dl = l != 'dataLayer' ? '&l=' + l : '';
         j.async = true;
-        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
         f.parentNode.insertBefore(j, f);
-      })(window, document, "script", "dataLayer", "GTM-NKR9WWV");
+      })(window, document, 'script', 'dataLayer', 'GTM-NKR9WWV');
 
       /* ]]> */
     </script>
@@ -1848,60 +1848,60 @@
       @font-face {
         font-weight: normal;
         font-style: normal;
-        font-family: "woodmart-font";
-        src: url("//malamal.com.bd/wp-content/themes/woodmart/fonts/woodmart-font-2-400.woff2?v=8.4.1")
-          format("woff2");
+        font-family: 'woodmart-font';
+        src: url('//malamal.com.bd/wp-content/themes/woodmart/fonts/woodmart-font-2-400.woff2?v=8.4.1')
+          format('woff2');
       }
 
       @font-face {
-        font-family: "star";
+        font-family: 'star';
         font-weight: 400;
         font-style: normal;
         src:
-          url("//malamal.com.bd/wp-content/plugins/woocommerce/assets/fonts/star.eot?#iefix")
-            format("embedded-opentype"),
-          url("//malamal.com.bd/wp-content/plugins/woocommerce/assets/fonts/star.woff")
-            format("woff"),
-          url("//malamal.com.bd/wp-content/plugins/woocommerce/assets/fonts/star.ttf")
-            format("truetype"),
-          url("//malamal.com.bd/wp-content/plugins/woocommerce/assets/fonts/star.svg#star")
-            format("svg");
+          url('//malamal.com.bd/wp-content/plugins/woocommerce/assets/fonts/star.eot?#iefix')
+            format('embedded-opentype'),
+          url('//malamal.com.bd/wp-content/plugins/woocommerce/assets/fonts/star.woff')
+            format('woff'),
+          url('//malamal.com.bd/wp-content/plugins/woocommerce/assets/fonts/star.ttf')
+            format('truetype'),
+          url('//malamal.com.bd/wp-content/plugins/woocommerce/assets/fonts/star.svg#star')
+            format('svg');
       }
 
       @font-face {
-        font-family: "WooCommerce";
+        font-family: 'WooCommerce';
         font-weight: 400;
         font-style: normal;
         src:
-          url("//malamal.com.bd/wp-content/plugins/woocommerce/assets/fonts/WooCommerce.eot?#iefix")
-            format("embedded-opentype"),
-          url("//malamal.com.bd/wp-content/plugins/woocommerce/assets/fonts/WooCommerce.woff")
-            format("woff"),
-          url("//malamal.com.bd/wp-content/plugins/woocommerce/assets/fonts/WooCommerce.ttf")
-            format("truetype"),
-          url("//malamal.com.bd/wp-content/plugins/woocommerce/assets/fonts/WooCommerce.svg#WooCommerce")
-            format("svg");
+          url('//malamal.com.bd/wp-content/plugins/woocommerce/assets/fonts/WooCommerce.eot?#iefix')
+            format('embedded-opentype'),
+          url('//malamal.com.bd/wp-content/plugins/woocommerce/assets/fonts/WooCommerce.woff')
+            format('woff'),
+          url('//malamal.com.bd/wp-content/plugins/woocommerce/assets/fonts/WooCommerce.ttf')
+            format('truetype'),
+          url('//malamal.com.bd/wp-content/plugins/woocommerce/assets/fonts/WooCommerce.svg#WooCommerce')
+            format('svg');
       }
 
       :root {
-        --wd-text-font: "Poppins", Arial, Helvetica, sans-serif;
+        --wd-text-font: 'Poppins', Arial, Helvetica, sans-serif;
         --wd-text-font-weight: 400;
         --wd-text-color: #777777;
         --wd-text-font-size: 15px;
-        --wd-title-font: "Poppins", Arial, Helvetica, sans-serif;
+        --wd-title-font: 'Poppins', Arial, Helvetica, sans-serif;
         --wd-title-font-weight: 500;
         --wd-title-color: #242424;
-        --wd-entities-title-font: "Poppins", Arial, Helvetica, sans-serif;
+        --wd-entities-title-font: 'Poppins', Arial, Helvetica, sans-serif;
         --wd-entities-title-font-weight: 500;
         --wd-entities-title-color: #333333;
         --wd-entities-title-color-hover: rgb(51 51 51 / 65%);
-        --wd-alternative-font: "Poppins", Arial, Helvetica, sans-serif;
-        --wd-widget-title-font: "Poppins", Arial, Helvetica, sans-serif;
+        --wd-alternative-font: 'Poppins', Arial, Helvetica, sans-serif;
+        --wd-widget-title-font: 'Poppins', Arial, Helvetica, sans-serif;
         --wd-widget-title-font-weight: 500;
         --wd-widget-title-transform: capitalize;
         --wd-widget-title-color: #333;
         --wd-widget-title-font-size: 16px;
-        --wd-header-el-font: "Poppins", Arial, Helvetica, sans-serif;
+        --wd-header-el-font: 'Poppins', Arial, Helvetica, sans-serif;
         --wd-header-el-font-weight: 600;
         --wd-header-el-transform: capitalize;
         --wd-header-el-font-size: 13px;
@@ -2003,9 +2003,9 @@
         background: rgb(14, 47, 86);
       }
       body,
-      [class*="color-scheme-light"],
-      [class*="color-scheme-dark"],
-      .wd-search-form[class*="wd-header-search-form"] form.searchform,
+      [class*='color-scheme-light'],
+      [class*='color-scheme-dark'],
+      .wd-search-form[class*='wd-header-search-form'] form.searchform,
       .wd-el-search .searchform {
         --wd-form-bg: rgb(255, 255, 255);
       }
@@ -2063,51 +2063,51 @@
       function gtag() {
         dataLayer.push(arguments);
       }
-      gtag("consent", "default", {
-        analytics_storage: "denied",
-        ad_storage: "denied",
-        ad_user_data: "denied",
-        ad_personalization: "denied",
+      gtag('consent', 'default', {
+        analytics_storage: 'denied',
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
         region: [
-          "AT",
-          "BE",
-          "BG",
-          "HR",
-          "CY",
-          "CZ",
-          "DK",
-          "EE",
-          "FI",
-          "FR",
-          "DE",
-          "GR",
-          "HU",
-          "IS",
-          "IE",
-          "IT",
-          "LV",
-          "LI",
-          "LT",
-          "LU",
-          "MT",
-          "NL",
-          "NO",
-          "PL",
-          "PT",
-          "RO",
-          "SK",
-          "SI",
-          "ES",
-          "SE",
-          "GB",
-          "CH",
+          'AT',
+          'BE',
+          'BG',
+          'HR',
+          'CY',
+          'CZ',
+          'DK',
+          'EE',
+          'FI',
+          'FR',
+          'DE',
+          'GR',
+          'HU',
+          'IS',
+          'IE',
+          'IT',
+          'LV',
+          'LI',
+          'LT',
+          'LU',
+          'MT',
+          'NL',
+          'NO',
+          'PL',
+          'PT',
+          'RO',
+          'SK',
+          'SI',
+          'ES',
+          'SE',
+          'GB',
+          'CH',
         ],
         wait_for_update: 500,
       });
-      gtag("js", new Date());
-      gtag("set", "developer_id.dOGY3NW", true);
-      gtag("config", "AW-16632341126", {
-        groups: "GLA",
+      gtag('js', new Date());
+      gtag('set', 'developer_id.dOGY3NW', true);
+      gtag('config', 'AW-16632341126', {
+        groups: 'GLA',
         send_page_view: false,
       });
     </script>
@@ -2563,7 +2563,7 @@
     </script>
     <script type="text/javascript">
       /* <![CDATA[ */
-      gtag("event", "page_view", { send_to: "GLA" });
+      gtag('event', 'page_view', { send_to: 'GLA' });
       /* ]]> */
     </script>
     <div class="wd-skip-links">
@@ -29033,1038 +29033,1038 @@
           p.parentNode.insertBefore(m, p));
       })(
         document,
-        "script",
-        "https://chimpstatic.com/mcjs-connected/js/users/2d5bcd0adc122c1f0610ed172/39d0d70c5e2a83ddbb230717d.js",
+        'script',
+        'https://chimpstatic.com/mcjs-connected/js/users/2d5bcd0adc122c1f0610ed172/39d0d70c5e2a83ddbb230717d.js',
       );
     </script>
     <script type="text/javascript">
       window.mcPixel = window.mcPixel || {};
       window.mcPixel._handled = {};
-      window.mcPixel.cartId = "t_63e77cd01f7d3848f20c3fae72e854";
+      window.mcPixel.cartId = 't_63e77cd01f7d3848f20c3fae72e854';
       window.mcPixel.data = {
         products: [
           {
-            id: "12166",
-            productId: "12166",
-            title: "TOTAL Mechanic Gloves TSP1806-XL",
+            id: '12166',
+            productId: '12166',
+            title: 'TOTAL Mechanic Gloves TSP1806-XL',
             price: 941,
-            currency: "BDT",
-            sku: "12166",
+            currency: 'BDT',
+            sku: '12166',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a14e018223.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a14e018223.png',
             productUrl:
-              "https://malamal.com.bd/product/total-mechanic-gloves-tsp1806-xl/",
-            vendor: "",
-            categories: ["Safety Workwear"],
+              'https://malamal.com.bd/product/total-mechanic-gloves-tsp1806-xl/',
+            vendor: '',
+            categories: ['Safety Workwear'],
           },
           {
-            id: "12890",
-            productId: "12890",
+            id: '12890',
+            productId: '12890',
             title:
-              "Lithium-Lon Vacuum Cleaner With Battery &amp; Charger Brand Ingco - CVL12001",
+              'Lithium-Lon Vacuum Cleaner With Battery &amp; Charger Brand Ingco - CVL12001',
             price: 6912,
-            currency: "BDT",
-            sku: "12890",
+            currency: 'BDT',
+            sku: '12890',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a163aad382.jpg",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a163aad382.jpg',
             productUrl:
-              "https://malamal.com.bd/product/lithium-lon-vacuum-cleaner-with-battery-charger-brand-ingco-cvl12001/",
-            vendor: "",
+              'https://malamal.com.bd/product/lithium-lon-vacuum-cleaner-with-battery-charger-brand-ingco-cvl12001/',
+            vendor: '',
             categories: [
-              "25L &amp; Below Vacuum Cleaner",
-              "Cleaning &amp; Maintenance",
-              "Vacuum Cleaner",
+              '25L &amp; Below Vacuum Cleaner',
+              'Cleaning &amp; Maintenance',
+              'Vacuum Cleaner',
             ],
           },
           {
-            id: "14018",
-            productId: "14018",
+            id: '14018',
+            productId: '14018',
             title: "235mm (9-1/4'') Circular Saw 2200W INGCO - CS23522",
             price: 9000,
-            currency: "BDT",
-            sku: "14018",
+            currency: 'BDT',
+            sku: '14018',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/Untitled-design-17.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/Untitled-design-17.png',
             productUrl:
-              "https://malamal.com.bd/product/235mm-9-14-circular-saw-2200w-ingco-cs23522/",
-            vendor: "",
-            categories: ["Circular Saw"],
+              'https://malamal.com.bd/product/235mm-9-14-circular-saw-2200w-ingco-cs23522/',
+            vendor: '',
+            categories: ['Circular Saw'],
           },
           {
-            id: "23557",
-            productId: "23557",
-            title: "Automatic Box Carton Taping Machine - PACKWELL FXC-4030",
+            id: '23557',
+            productId: '23557',
+            title: 'Automatic Box Carton Taping Machine - PACKWELL FXC-4030',
             price: 120000,
-            currency: "BDT",
-            sku: "047836",
+            currency: 'BDT',
+            sku: '047836',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2025/01/fxc-auto-carton-box-taping-machine.webp",
+              'https://malamal.com.bd/wp-content/uploads/2025/01/fxc-auto-carton-box-taping-machine.webp',
             productUrl:
-              "https://malamal.com.bd/product/automatic-box-carton-taping-machine-packwell-fxc-4030/",
-            vendor: "",
-            categories: ["Commercial Packaging Equipment"],
+              'https://malamal.com.bd/product/automatic-box-carton-taping-machine-packwell-fxc-4030/',
+            vendor: '',
+            categories: ['Commercial Packaging Equipment'],
           },
           {
-            id: "11922",
-            productId: "11922",
+            id: '11922',
+            productId: '11922',
             title:
-              "Fogger Machine MS/SY-5000 for HouseHold Use Bundle Offer - Fogger Machine + Chemical + Butane Gas Bottle",
+              'Fogger Machine MS/SY-5000 for HouseHold Use Bundle Offer - Fogger Machine + Chemical + Butane Gas Bottle',
             price: 11200,
-            currency: "BDT",
-            sku: "11922",
+            currency: 'BDT',
+            sku: '11922',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a14216ada7.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a14216ada7.png',
             productUrl:
-              "https://malamal.com.bd/product/fogger-machine-ms-5000-for-household-use-bundle-offer-fogger-machine-chemical-butane-gas-bottle/",
-            vendor: "",
+              'https://malamal.com.bd/product/fogger-machine-ms-5000-for-household-use-bundle-offer-fogger-machine-chemical-butane-gas-bottle/',
+            vendor: '',
             categories: [
-              "Cleaning &amp; Maintenance",
-              "Disinfection",
-              "Fogger Machines",
+              'Cleaning &amp; Maintenance',
+              'Disinfection',
+              'Fogger Machines',
             ],
           },
           {
-            id: "10916",
-            productId: "10916",
+            id: '10916',
+            productId: '10916',
             title:
-              "Mig Welding Machine MIG-250GS Brand- RIVCEN Input - 220Volt",
+              'Mig Welding Machine MIG-250GS Brand- RIVCEN Input - 220Volt',
             price: 54000,
-            currency: "BDT",
-            sku: "10916",
+            currency: 'BDT',
+            sku: '10916',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a0f82c3507.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a0f82c3507.png',
             productUrl:
-              "https://malamal.com.bd/product/mig-welding-machine-mig-250gs-brand-rivcen-input-220volt/",
-            vendor: "",
-            categories: ["MIG Welding Machine"],
+              'https://malamal.com.bd/product/mig-welding-machine-mig-250gs-brand-rivcen-input-220volt/',
+            vendor: '',
+            categories: ['MIG Welding Machine'],
           },
           {
-            id: "14090",
-            productId: "14090",
-            title: "23L Vacuum Cleaner 2100W SANFORD-SF23L-2100W (Malaysia)",
+            id: '14090',
+            productId: '14090',
+            title: '23L Vacuum Cleaner 2100W SANFORD-SF23L-2100W (Malaysia)',
             price: 10500,
-            currency: "BDT",
-            sku: "14090",
+            currency: 'BDT',
+            sku: '14090',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/sanford-23litre-vacuum-cleaner-bangladesh-bd.webp",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/sanford-23litre-vacuum-cleaner-bangladesh-bd.webp',
             productUrl:
-              "https://malamal.com.bd/product/23l-vacuum-cleaner-2100w-sanford-sf23l-2100w-malaysia/",
-            vendor: "",
+              'https://malamal.com.bd/product/23l-vacuum-cleaner-2100w-sanford-sf23l-2100w-malaysia/',
+            vendor: '',
             categories: [
-              "25L &amp; Below Vacuum Cleaner",
-              "Cleaning &amp; Maintenance",
-              "Vacuum Cleaner",
+              '25L &amp; Below Vacuum Cleaner',
+              'Cleaning &amp; Maintenance',
+              'Vacuum Cleaner',
             ],
           },
           {
-            id: "13981",
-            productId: "13981",
-            title: "Electric Mini Crane with Rope Hoist 500 Kg 50 Mtr Winch",
+            id: '13981',
+            productId: '13981',
+            title: 'Electric Mini Crane with Rope Hoist 500 Kg 50 Mtr Winch',
             price: 105000,
-            currency: "BDT",
-            sku: "13981",
+            currency: 'BDT',
+            sku: '13981',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a1875016c5.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a1875016c5.png',
             productUrl:
-              "https://malamal.com.bd/product/electric-mini-crane-with-rope-hoist-500-kg-50-mtr-winch/",
-            vendor: "",
+              'https://malamal.com.bd/product/electric-mini-crane-with-rope-hoist-500-kg-50-mtr-winch/',
+            vendor: '',
             categories: [
-              "Material Handling Equipment",
-              "Rope Hoist &amp; Mini Crane",
+              'Material Handling Equipment',
+              'Rope Hoist &amp; Mini Crane',
             ],
           },
           {
-            id: "25900",
-            productId: "25900",
-            title: "280L Portable Mini Cement Mixer Electric Machine",
+            id: '25900',
+            productId: '25900',
+            title: '280L Portable Mini Cement Mixer Electric Machine',
             price: 60000,
-            currency: "BDT",
-            sku: "196320-1",
+            currency: 'BDT',
+            sku: '196320-1',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2026/01/new-mixer-machine-280L.webp",
+              'https://malamal.com.bd/wp-content/uploads/2026/01/new-mixer-machine-280L.webp',
             productUrl:
-              "https://malamal.com.bd/product/280l-portable-mini-cement-mixer-electric-machine/",
-            vendor: "",
+              'https://malamal.com.bd/product/280l-portable-mini-cement-mixer-electric-machine/',
+            vendor: '',
             categories: [
-              "Concrete Mixer Machine",
-              "Construction Equipment &amp; Machinery",
+              'Concrete Mixer Machine',
+              'Construction Equipment &amp; Machinery',
             ],
           },
           {
-            id: "15064",
-            productId: "15064",
-            title: "Electric Hoop Bender Machine 6-25mm 3KW 380V Model - GF25",
+            id: '15064',
+            productId: '15064',
+            title: 'Electric Hoop Bender Machine 6-25mm 3KW 380V Model - GF25',
             price: 120000,
-            currency: "BDT",
-            sku: "15064",
+            currency: 'BDT',
+            sku: '15064',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-05-10-645b3044582eb.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-05-10-645b3044582eb.png',
             productUrl:
-              "https://malamal.com.bd/product/electric-hoop-bender-machine-6-25mm-3kw-380v-model-gf25/",
-            vendor: "",
-            categories: ["Steel Rod Benders"],
+              'https://malamal.com.bd/product/electric-hoop-bender-machine-6-25mm-3kw-380v-model-gf25/',
+            vendor: '',
+            categories: ['Steel Rod Benders'],
           },
           {
-            id: "26754",
-            productId: "26754",
+            id: '26754',
+            productId: '26754',
             title:
-              "20V Lithium-Ion Cordless Rotary Hammer Drill INGCO - CRHLI201681 with Battery and Charger",
+              '20V Lithium-Ion Cordless Rotary Hammer Drill INGCO - CRHLI201681 with Battery and Charger',
             price: 7750,
-            currency: "BDT",
-            sku: "14004-4005",
+            currency: 'BDT',
+            sku: '14004-4005',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a187c91d4e.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a187c91d4e.png',
             productUrl:
-              "https://malamal.com.bd/product/20v-lithium-ion-cordless-rotary-hammer-drill-ingco-crhli201681-with-battery-and-charger/",
-            vendor: "",
+              'https://malamal.com.bd/product/20v-lithium-ion-cordless-rotary-hammer-drill-ingco-crhli201681-with-battery-and-charger/',
+            vendor: '',
             categories: [
-              "Cordless Drill Machine",
-              "Cordless Power Tools",
-              "Power Tools",
+              'Cordless Drill Machine',
+              'Cordless Power Tools',
+              'Power Tools',
             ],
           },
           {
-            id: "26722",
-            productId: "26722",
-            title: "16mm Stand Drill Machine JT MAX - JT16K",
+            id: '26722',
+            productId: '26722',
+            title: '16mm Stand Drill Machine JT MAX - JT16K',
             price: 15500,
-            currency: "BDT",
-            sku: "",
+            currency: 'BDT',
+            sku: '',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2026/03/JT-MAX-JT13-Stand-Drill-Machine-13mm-Precision-Bench-Top-Drill-Press.webp",
+              'https://malamal.com.bd/wp-content/uploads/2026/03/JT-MAX-JT13-Stand-Drill-Machine-13mm-Precision-Bench-Top-Drill-Press.webp',
             productUrl:
-              "https://malamal.com.bd/product/16mm-stand-drill-machine-jt-max-jt16k/",
-            vendor: "",
+              'https://malamal.com.bd/product/16mm-stand-drill-machine-jt-max-jt16k/',
+            vendor: '',
             categories: [
-              "Drill Machine",
-              "Motorised Stand Bench Drill Machine",
-              "Power Tools",
+              'Drill Machine',
+              'Motorised Stand Bench Drill Machine',
+              'Power Tools',
             ],
           },
           {
-            id: "26719",
-            productId: "26719",
-            title: "13mm Stand Drill Maachine JT MAX - JT13",
+            id: '26719',
+            productId: '26719',
+            title: '13mm Stand Drill Maachine JT MAX - JT13',
             price: 7400,
-            currency: "BDT",
-            sku: "",
+            currency: 'BDT',
+            sku: '',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2026/03/JT-MAX-JT13-Stand-Drill-Machine-13mm-Precision-Bench-Top-Drill-Press.webp",
+              'https://malamal.com.bd/wp-content/uploads/2026/03/JT-MAX-JT13-Stand-Drill-Machine-13mm-Precision-Bench-Top-Drill-Press.webp',
             productUrl:
-              "https://malamal.com.bd/product/13mm-stand-drill-maachine-jt-max-jt13/",
-            vendor: "",
+              'https://malamal.com.bd/product/13mm-stand-drill-maachine-jt-max-jt13/',
+            vendor: '',
             categories: [
-              "Drill Machine",
-              "Motorised Stand Bench Drill Machine",
-              "Power Tools",
+              'Drill Machine',
+              'Motorised Stand Bench Drill Machine',
+              'Power Tools',
             ],
           },
           {
-            id: "26453",
-            productId: "26453",
-            title: "Air Washing Gun 750cc -WADFOW WGA3575",
+            id: '26453',
+            productId: '26453',
+            title: 'Air Washing Gun 750cc -WADFOW WGA3575',
             price: 750,
-            currency: "BDT",
-            sku: "",
+            currency: 'BDT',
+            sku: '',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2026/02/image-7.webp",
+              'https://malamal.com.bd/wp-content/uploads/2026/02/image-7.webp',
             productUrl:
-              "https://malamal.com.bd/product/air-washing-gun-750cc-wadfow-wga3575/",
-            vendor: "",
-            categories: ["Air Spray Gun", "Electric Spray Gun", "Spray Gun"],
+              'https://malamal.com.bd/product/air-washing-gun-750cc-wadfow-wga3575/',
+            vendor: '',
+            categories: ['Air Spray Gun', 'Electric Spray Gun', 'Spray Gun'],
           },
           {
-            id: "26449",
-            productId: "26449",
-            title: "Weight Scale 30KG Electronic Digital - WADFOW WEC1520",
+            id: '26449',
+            productId: '26449',
+            title: 'Weight Scale 30KG Electronic Digital - WADFOW WEC1520',
             price: 2625,
-            currency: "BDT",
-            sku: "",
+            currency: 'BDT',
+            sku: '',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2026/02/image-6.webp",
+              'https://malamal.com.bd/wp-content/uploads/2026/02/image-6.webp',
             productUrl:
-              "https://malamal.com.bd/product/weight-scale-30kg-electronic-digital-wadfow-wec1520/",
-            vendor: "",
-            categories: ["0 - 100 Kg", "Weighing Scale"],
+              'https://malamal.com.bd/product/weight-scale-30kg-electronic-digital-wadfow-wec1520/',
+            vendor: '',
+            categories: ['0 - 100 Kg', 'Weighing Scale'],
           },
           {
-            id: "15495",
-            productId: "15495",
-            title: "Car Washer Spray Nozzle set-4 pcs",
+            id: '15495',
+            productId: '15495',
+            title: 'Car Washer Spray Nozzle set-4 pcs',
             price: 600,
-            currency: "BDT",
-            sku: "15495",
+            currency: 'BDT',
+            sku: '15495',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-11-06-654876e1219f6.webp",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-11-06-654876e1219f6.webp',
             productUrl:
-              "https://malamal.com.bd/product/car-washer-spray-nozzle-set-4-pcs/",
-            vendor: "",
-            categories: ["Power Washer Gun &amp; Accessories"],
+              'https://malamal.com.bd/product/car-washer-spray-nozzle-set-4-pcs/',
+            vendor: '',
+            categories: ['Power Washer Gun &amp; Accessories'],
           },
           {
-            id: "12960",
-            productId: "12960",
+            id: '12960',
+            productId: '12960',
             title:
-              "2.5L Vacuum Cleaner Machine 2000W INGCO - VC20258 Best for Household Use",
+              '2.5L Vacuum Cleaner Machine 2000W INGCO - VC20258 Best for Household Use',
             price: 9900,
-            currency: "BDT",
-            sku: "12960",
+            currency: 'BDT',
+            sku: '12960',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a1666e712f.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a1666e712f.png',
             productUrl:
-              "https://malamal.com.bd/product/2-5l-vacuum-cleaner-machine-2000w-ingco-vc20258/",
-            vendor: "",
+              'https://malamal.com.bd/product/2-5l-vacuum-cleaner-machine-2000w-ingco-vc20258/',
+            vendor: '',
             categories: [
-              "25L &amp; Below Vacuum Cleaner",
-              "Cleaning &amp; Maintenance",
-              "Vacuum Cleaner",
+              '25L &amp; Below Vacuum Cleaner',
+              'Cleaning &amp; Maintenance',
+              'Vacuum Cleaner',
             ],
           },
           {
-            id: "13168",
-            productId: "13168",
-            title: "12V/24V Battery Charger Brand INGCO - ING-CB1601",
+            id: '13168',
+            productId: '13168',
+            title: '12V/24V Battery Charger Brand INGCO - ING-CB1601',
             price: 6525,
-            currency: "BDT",
-            sku: "13168",
+            currency: 'BDT',
+            sku: '13168',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/openart-image_nfp4GZgE_1771756212999_raw.webp",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/openart-image_nfp4GZgE_1771756212999_raw.webp',
             productUrl:
-              "https://malamal.com.bd/product/12v-24v-battery-charger-brand-ingco-ing-cb1601/",
-            vendor: "",
-            categories: ["Battery Charger"],
+              'https://malamal.com.bd/product/12v-24v-battery-charger-brand-ingco-ing-cb1601/',
+            vendor: '',
+            categories: ['Battery Charger'],
           },
           {
-            id: "15180",
-            productId: "15180",
+            id: '15180',
+            productId: '15180',
             title: "17'' Floor Polisher Cleaning Machine",
             price: 85000,
-            currency: "BDT",
-            sku: "15180",
+            currency: 'BDT',
+            sku: '15180',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-10-12-65279cc692ce0.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-10-12-65279cc692ce0.png',
             productUrl:
-              "https://malamal.com.bd/product/17-floor-polisher-cleaning-machine-model-sc-002/",
-            vendor: "",
+              'https://malamal.com.bd/product/17-floor-polisher-cleaning-machine-model-sc-002/',
+            vendor: '',
             categories: [
-              "Cleaning &amp; Maintenance",
-              "Cleaning Products",
-              "Polisher",
+              'Cleaning &amp; Maintenance',
+              'Cleaning Products',
+              'Polisher',
             ],
           },
           {
-            id: "24499",
-            productId: "24499",
-            title: "90L Vacuum Cleaner Machine 3600W - WADFOW WVR5A90",
+            id: '24499',
+            productId: '24499',
+            title: '90L Vacuum Cleaner Machine 3600W - WADFOW WVR5A90',
             price: 32000,
-            currency: "BDT",
-            sku: "",
+            currency: 'BDT',
+            sku: '',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2025/04/Malamal-1.webp",
+              'https://malamal.com.bd/wp-content/uploads/2025/04/Malamal-1.webp',
             productUrl:
-              "https://malamal.com.bd/product/90l-vacuum-cleaner-machine-3600w-wadfow-wvr5a90/",
-            vendor: "",
+              'https://malamal.com.bd/product/90l-vacuum-cleaner-machine-3600w-wadfow-wvr5a90/',
+            vendor: '',
             categories: [
-              "50L-90L Vacuum Cleaner",
-              "Cleaning &amp; Maintenance",
-              "Vacuum Cleaner",
+              '50L-90L Vacuum Cleaner',
+              'Cleaning &amp; Maintenance',
+              'Vacuum Cleaner',
             ],
           },
           {
-            id: "12086",
-            productId: "12086",
+            id: '12086',
+            productId: '12086',
             title:
-              "High Pressure Car Washer 1500W 100bar Brand TOTAL - TGT11236",
+              'High Pressure Car Washer 1500W 100bar Brand TOTAL - TGT11236',
             price: 12600,
-            currency: "BDT",
-            sku: "12086",
+            currency: 'BDT',
+            sku: '12086',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a1459eb89f.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a1459eb89f.png',
             productUrl:
-              "https://malamal.com.bd/product/high-pressure-car-washer-1500w-100bar-brand-total-tgt11236/",
-            vendor: "",
-            categories: ["Motorcycle Wash/ Light Home Garden Use"],
+              'https://malamal.com.bd/product/high-pressure-car-washer-1500w-100bar-brand-total-tgt11236/',
+            vendor: '',
+            categories: ['Motorcycle Wash/ Light Home Garden Use'],
           },
           {
-            id: "11918",
-            productId: "11918",
-            title: "Fogger Oil Machine Liquid Chemical 5litre - Good Quality",
+            id: '11918',
+            productId: '11918',
+            title: 'Fogger Oil Machine Liquid Chemical 5litre - Good Quality',
             price: 2000,
-            currency: "BDT",
-            sku: "11918",
+            currency: 'BDT',
+            sku: '11918',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-12-02-656af5a83d24d.webp",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-12-02-656af5a83d24d.webp',
             productUrl:
-              "https://malamal.com.bd/product/fogger-oil-machine-liquid-chemical-5litre-good-quality/",
-            vendor: "",
+              'https://malamal.com.bd/product/fogger-oil-machine-liquid-chemical-5litre-good-quality/',
+            vendor: '',
             categories: [
-              "Cleaning &amp; Maintenance",
-              "Disinfection",
-              "Disinfection Tools",
+              'Cleaning &amp; Maintenance',
+              'Disinfection',
+              'Disinfection Tools',
             ],
           },
           {
-            id: "11062",
-            productId: "11062",
+            id: '11062',
+            productId: '11062',
             title:
-              "80L Industrial Vacuum Cleaner 4500W CHINA WET & DRY BAOLYWUD Brand",
+              '80L Industrial Vacuum Cleaner 4500W CHINA WET & DRY BAOLYWUD Brand',
             price: 38000,
-            currency: "BDT",
-            sku: "11062",
+            currency: 'BDT',
+            sku: '11062',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a0fbed8f04.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a0fbed8f04.png',
             productUrl:
-              "https://malamal.com.bd/product/80l-industrial-vacuum-cleaner-4500w-china-wet-dry-baolywud-brand/",
-            vendor: "",
+              'https://malamal.com.bd/product/80l-industrial-vacuum-cleaner-4500w-china-wet-dry-baolywud-brand/',
+            vendor: '',
             categories: [
-              "50L-90L Vacuum Cleaner",
-              "Cleaning &amp; Maintenance",
-              "Vacuum Cleaner",
+              '50L-90L Vacuum Cleaner',
+              'Cleaning &amp; Maintenance',
+              'Vacuum Cleaner',
             ],
           },
           {
-            id: "15812",
-            productId: "15812",
+            id: '15812',
+            productId: '15812',
             title:
-              "Extendable Sliding Aluminum Ladder 15 feet 9inch 2x10 Steps Made in Bangladesh",
+              'Extendable Sliding Aluminum Ladder 15 feet 9inch 2x10 Steps Made in Bangladesh',
             price: 29445,
-            currency: "BDT",
-            sku: "15812",
+            currency: 'BDT',
+            sku: '15812',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-10-08-652274f74209e.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-10-08-652274f74209e.png',
             productUrl:
-              "https://malamal.com.bd/product/extendable-sliding-aluminum-ladder-15-feet-9inch-2x10-steps-made-in-bangladesh/",
-            vendor: "",
-            categories: ["Ladder"],
+              'https://malamal.com.bd/product/extendable-sliding-aluminum-ladder-15-feet-9inch-2x10-steps-made-in-bangladesh/',
+            vendor: '',
+            categories: ['Ladder'],
           },
           {
-            id: "15096",
-            productId: "15096",
+            id: '15096',
+            productId: '15096',
             title:
-              "Double Sided Aluminum Ladder 6 Steps 6 Feet Light Industrial Application \u2013 EVERBEST",
+              'Double Sided Aluminum Ladder 6 Steps 6 Feet Light Industrial Application \u2013 EVERBEST',
             price: 4547,
-            currency: "BDT",
-            sku: "15096",
+            currency: 'BDT',
+            sku: '15096',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-05-15-6462032b584a8.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-05-15-6462032b584a8.png',
             productUrl:
-              "https://malamal.com.bd/product/double-sided-aluminum-ladder-6-steps-6-feet-light-industrial-application-everbest/",
-            vendor: "",
-            categories: ["Ladder"],
+              'https://malamal.com.bd/product/double-sided-aluminum-ladder-6-steps-6-feet-light-industrial-application-everbest/',
+            vendor: '',
+            categories: ['Ladder'],
           },
           {
-            id: "15142",
-            productId: "15142",
+            id: '15142',
+            productId: '15142',
             title:
-              "Heavy Duty Aluminum Platform Ladder 4 Steps 3 Feet Household Application \u2013 EVERBEST TITAN",
+              'Heavy Duty Aluminum Platform Ladder 4 Steps 3 Feet Household Application \u2013 EVERBEST TITAN',
             price: 3077,
-            currency: "BDT",
-            sku: "15142",
+            currency: 'BDT',
+            sku: '15142',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-05-24-646dc53675edb.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-05-24-646dc53675edb.png',
             productUrl:
-              "https://malamal.com.bd/product/heavy-duty-aluminum-platform-ladder-4-steps-3-feet-household-application-everbest-titan-2/",
-            vendor: "",
-            categories: ["Ladder"],
+              'https://malamal.com.bd/product/heavy-duty-aluminum-platform-ladder-4-steps-3-feet-household-application-everbest-titan-2/',
+            vendor: '',
+            categories: ['Ladder'],
           },
           {
-            id: "15126",
-            productId: "15126",
+            id: '15126',
+            productId: '15126',
             title:
-              "Double Sided Aluminum Ladder 21 Steps 17 Feet Heavy Duty Industrial Application \u2013 EVERBEST",
+              'Double Sided Aluminum Ladder 21 Steps 17 Feet Heavy Duty Industrial Application \u2013 EVERBEST',
             price: 20440.18999999999869032762944698333740234375,
-            currency: "BDT",
-            sku: "15126",
+            currency: 'BDT',
+            sku: '15126',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-05-24-646d956a3db11.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-05-24-646d956a3db11.png',
             productUrl:
-              "https://malamal.com.bd/product/double-sided-aluminum-ladder-21-steps-17-feet-heavy-duty-industrial-application-everbest/",
-            vendor: "",
-            categories: ["Ladder"],
+              'https://malamal.com.bd/product/double-sided-aluminum-ladder-21-steps-17-feet-heavy-duty-industrial-application-everbest/',
+            vendor: '',
+            categories: ['Ladder'],
           },
           {
-            id: "15885",
-            productId: "15885",
+            id: '15885',
+            productId: '15885',
             title:
-              "Extendable Sliding Aluminum Ladder 31 Feet 8 Inch Model : ED - 18",
+              'Extendable Sliding Aluminum Ladder 31 Feet 8 Inch Model : ED - 18',
             price: 58825,
-            currency: "BDT",
-            sku: "15885",
+            currency: 'BDT',
+            sku: '15885',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-10-12-652784975154a.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-10-12-652784975154a.png',
             productUrl:
-              "https://malamal.com.bd/product/extendable-sliding-aluminum-ladder-31-feet-8-inch-model-ed-18/",
-            vendor: "",
-            categories: ["Ladder"],
+              'https://malamal.com.bd/product/extendable-sliding-aluminum-ladder-31-feet-8-inch-model-ed-18/',
+            vendor: '',
+            categories: ['Ladder'],
           },
           {
-            id: "15887",
-            productId: "15887",
+            id: '15887',
+            productId: '15887',
             title:
-              "Extendable Sliding Aluminum Ladder 35 Feet 5 Inch Model : ED - 20",
+              'Extendable Sliding Aluminum Ladder 35 Feet 5 Inch Model : ED - 20',
             price: 62140,
-            currency: "BDT",
-            sku: "15887",
+            currency: 'BDT',
+            sku: '15887',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-10-12-65278584031eb.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-10-12-65278584031eb.png',
             productUrl:
-              "https://malamal.com.bd/product/extendable-sliding-aluminum-ladder-35-feet-5-inch-model-ed-20/",
-            vendor: "",
-            categories: ["Ladder"],
+              'https://malamal.com.bd/product/extendable-sliding-aluminum-ladder-35-feet-5-inch-model-ed-20/',
+            vendor: '',
+            categories: ['Ladder'],
           },
           {
-            id: "15881",
-            productId: "15881",
+            id: '15881',
+            productId: '15881',
             title:
-              "Extendable Sliding Aluminum Ladder 27 Feet 9 Inch Model : ED - 16",
+              'Extendable Sliding Aluminum Ladder 27 Feet 9 Inch Model : ED - 16',
             price: 51220,
-            currency: "BDT",
-            sku: "15881",
+            currency: 'BDT',
+            sku: '15881',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-10-12-652782aa1f076.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-10-12-652782aa1f076.png',
             productUrl:
-              "https://malamal.com.bd/product/extendable-sliding-aluminum-ladder-27-feet-9-inch-model-ed-16/",
-            vendor: "",
-            categories: ["Ladder"],
+              'https://malamal.com.bd/product/extendable-sliding-aluminum-ladder-27-feet-9-inch-model-ed-16/',
+            vendor: '',
+            categories: ['Ladder'],
           },
           {
-            id: "15086",
-            productId: "15086",
+            id: '15086',
+            productId: '15086',
             title:
-              "Heavy Duty Aluminum Platform Ladder 6 Steps 4.5 Feet Household Application \u2013 EVERBEST TITAN",
+              'Heavy Duty Aluminum Platform Ladder 6 Steps 4.5 Feet Household Application \u2013 EVERBEST TITAN',
             price: 4300,
-            currency: "BDT",
-            sku: "15086",
+            currency: 'BDT',
+            sku: '15086',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-05-14-64609d8292ac9.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-05-14-64609d8292ac9.png',
             productUrl:
-              "https://malamal.com.bd/product/heavy-duty-aluminum-platform-ladder-6-steps-4-5-feet-household-application-everbest-titan/",
-            vendor: "",
-            categories: ["Ladder"],
+              'https://malamal.com.bd/product/heavy-duty-aluminum-platform-ladder-6-steps-4-5-feet-household-application-everbest-titan/',
+            vendor: '',
+            categories: ['Ladder'],
           },
           {
-            id: "14000",
-            productId: "14000",
+            id: '14000',
+            productId: '14000',
             title:
-              "20V Lithium-Ion Impact Drill Cordless Ingco - CIDLI200215 (Heavy)",
+              '20V Lithium-Ion Impact Drill Cordless Ingco - CIDLI200215 (Heavy)',
             price: 8415,
-            currency: "BDT",
-            sku: "14000",
+            currency: 'BDT',
+            sku: '14000',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a187b1891b.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a187b1891b.png',
             productUrl:
-              "https://malamal.com.bd/product/20v-lithium-ion-impact-drill-cordless-ingco-cidli200215-heavy/",
-            vendor: "",
-            categories: ["Cordless Drill Machine"],
+              'https://malamal.com.bd/product/20v-lithium-ion-impact-drill-cordless-ingco-cidli200215-heavy/',
+            vendor: '',
+            categories: ['Cordless Drill Machine'],
           },
           {
-            id: "12138",
-            productId: "12138",
-            title: "Electric Router 2200W Brand Total - TR11122",
+            id: '12138',
+            productId: '12138',
+            title: 'Electric Router 2200W Brand Total - TR11122',
             price: 7980,
-            currency: "BDT",
-            sku: "12138",
+            currency: 'BDT',
+            sku: '12138',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a14d561bd6.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a14d561bd6.png',
             productUrl:
-              "https://malamal.com.bd/product/electric-router-2200w-brand-total-tr11122/",
-            vendor: "",
-            categories: ["Router Machine"],
+              'https://malamal.com.bd/product/electric-router-2200w-brand-total-tr11122/',
+            vendor: '',
+            categories: ['Router Machine'],
           },
           {
-            id: "13947",
-            productId: "13947",
-            title: "Magnetic Drill 30mm Brand: DCK Model: KJC30",
+            id: '13947',
+            productId: '13947',
+            title: 'Magnetic Drill 30mm Brand: DCK Model: KJC30',
             price: 22000,
-            currency: "BDT",
-            sku: "13947",
+            currency: 'BDT',
+            sku: '13947',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a186796dda.jpg",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a186796dda.jpg',
             productUrl:
-              "https://malamal.com.bd/product/magnetic-drill-30mm-brand-dck-model-kjc30/",
-            vendor: "",
-            categories: ["Magnetic Drill Core Machine"],
+              'https://malamal.com.bd/product/magnetic-drill-30mm-brand-dck-model-kjc30/',
+            vendor: '',
+            categories: ['Magnetic Drill Core Machine'],
           },
           {
-            id: "11532",
-            productId: "11532",
-            title: "Crown 6.5mm Electric Drill 300W 3800rpm CT10069/CT10125",
+            id: '11532',
+            productId: '11532',
+            title: 'Crown 6.5mm Electric Drill 300W 3800rpm CT10069/CT10125',
             price: 2600,
-            currency: "BDT",
-            sku: "11532",
+            currency: 'BDT',
+            sku: '11532',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a127bc7ff2.jpg",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a127bc7ff2.jpg',
             productUrl:
-              "https://malamal.com.bd/product/crown-6-5mm-electric-drill-300w-3800rpm-ct10069-ct10125/",
-            vendor: "",
-            categories: ["Power Tools"],
+              'https://malamal.com.bd/product/crown-6-5mm-electric-drill-300w-3800rpm-ct10069-ct10125/',
+            vendor: '',
+            categories: ['Power Tools'],
           },
           {
-            id: "12152",
-            productId: "12152",
+            id: '12152',
+            productId: '12152',
             title: "400mm 16'' Cut off Machine KEN - 7316N",
             price: 20416,
-            currency: "BDT",
-            sku: "12152",
+            currency: 'BDT',
+            sku: '12152',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a14db0f147.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a14db0f147.png',
             productUrl:
-              "https://malamal.com.bd/product/400mm-16-cut-off-machine-ken-7316n/",
-            vendor: "",
-            categories: ["Cut Off Saw Machine"],
+              'https://malamal.com.bd/product/400mm-16-cut-off-machine-ken-7316n/',
+            vendor: '',
+            categories: ['Cut Off Saw Machine'],
           },
           {
-            id: "23034",
-            productId: "23034",
-            title: "13mm Stand Drill Press 350W INGCO - DP133505",
+            id: '23034',
+            productId: '23034',
+            title: '13mm Stand Drill Press 350W INGCO - DP133505',
             price: 9360,
-            currency: "BDT",
-            sku: "15379",
+            currency: 'BDT',
+            sku: '15379',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/11/Untitled-design-11.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/11/Untitled-design-11.png',
             productUrl:
-              "https://malamal.com.bd/product/13mm-stand-drill-press-350w-ingco-dp133505/",
-            vendor: "",
-            categories: ["Electric Drill"],
+              'https://malamal.com.bd/product/13mm-stand-drill-press-350w-ingco-dp133505/',
+            vendor: '',
+            categories: ['Electric Drill'],
           },
           {
-            id: "13748",
-            productId: "13748",
-            title: "13mm Impact Drill 750w Brand Total - TG108136",
+            id: '13748',
+            productId: '13748',
+            title: '13mm Impact Drill 750w Brand Total - TG108136',
             price: 2835,
-            currency: "BDT",
-            sku: "13748",
+            currency: 'BDT',
+            sku: '13748',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a18002fcd4.jpg",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a18002fcd4.jpg',
             productUrl:
-              "https://malamal.com.bd/product/13mm-impact-drill-750w-brand-total-tg108136/",
-            vendor: "",
-            categories: ["Impact Drill"],
+              'https://malamal.com.bd/product/13mm-impact-drill-750w-brand-total-tg108136/',
+            vendor: '',
+            categories: ['Impact Drill'],
           },
           {
-            id: "12788",
-            productId: "12788",
+            id: '12788',
+            productId: '12788',
             title: 'Bench Grinder Machine 8" 200mm 350W Brand INGCO - BG83502',
             price: 6300,
-            currency: "BDT",
-            sku: "12788",
+            currency: 'BDT',
+            sku: '12788',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a161667d96.jpg",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a161667d96.jpg',
             productUrl:
-              "https://malamal.com.bd/product/bench-grinder-machine-8-200mm-350w-brand-ingco-bg83502/",
-            vendor: "",
-            categories: ["Bench Grinder"],
+              'https://malamal.com.bd/product/bench-grinder-machine-8-200mm-350w-brand-ingco-bg83502/',
+            vendor: '',
+            categories: ['Bench Grinder'],
           },
           {
-            id: "22878",
-            productId: "22878",
-            title: "1.2mm SS MIG Wire - TAIWAN (12kg)",
+            id: '22878',
+            productId: '22878',
+            title: '1.2mm SS MIG Wire - TAIWAN (12kg)',
             price: 26500,
-            currency: "BDT",
-            sku: "11672-1-1",
+            currency: 'BDT',
+            sku: '11672-1-1',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a12e6e6cdf.jpg",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a12e6e6cdf.jpg',
             productUrl:
-              "https://malamal.com.bd/product/12mm-ss-mig-wire-taiwan-12kg/",
-            vendor: "",
-            categories: ["Welding Accessories"],
+              'https://malamal.com.bd/product/12mm-ss-mig-wire-taiwan-12kg/',
+            vendor: '',
+            categories: ['Welding Accessories'],
           },
           {
-            id: "15956",
-            productId: "15956",
-            title: "WINNER Heating Torch (Auto Ignition) 29 inch / 2.41 Feet",
+            id: '15956',
+            productId: '15956',
+            title: 'WINNER Heating Torch (Auto Ignition) 29 inch / 2.41 Feet',
             price: 2200,
-            currency: "BDT",
-            sku: "15956",
+            currency: 'BDT',
+            sku: '15956',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-10-14-652a3d68c48ab.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-10-14-652a3d68c48ab.png',
             productUrl:
-              "https://malamal.com.bd/product/winner-heating-torch-auto-ignition-29-inch-2-41-feet/",
-            vendor: "",
-            categories: ["Welding Accessories"],
+              'https://malamal.com.bd/product/winner-heating-torch-auto-ignition-29-inch-2-41-feet/',
+            vendor: '',
+            categories: ['Welding Accessories'],
           },
           {
-            id: "10944",
-            productId: "10944",
-            title: "Winner Welding Machine TIG/MMA-250C 220V",
+            id: '10944',
+            productId: '10944',
+            title: 'Winner Welding Machine TIG/MMA-250C 220V',
             price: 19500,
-            currency: "BDT",
-            sku: "10944",
+            currency: 'BDT',
+            sku: '10944',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a0f8d8607e.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a0f8d8607e.png',
             productUrl:
-              "https://malamal.com.bd/product/winner-welding-machine-tig-mma-250c-220v/",
-            vendor: "",
-            categories: ["TIG MMA Welding Machine"],
+              'https://malamal.com.bd/product/winner-welding-machine-tig-mma-250c-220v/',
+            vendor: '',
+            categories: ['TIG MMA Welding Machine'],
           },
           {
-            id: "11672",
-            productId: "11672",
-            title: "1mm SS MIG Wire - TAIWAN (12kg)",
+            id: '11672',
+            productId: '11672',
+            title: '1mm SS MIG Wire - TAIWAN (12kg)',
             price: 24000,
-            currency: "BDT",
-            sku: "11672",
+            currency: 'BDT',
+            sku: '11672',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a12e6e6cdf.jpg",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a12e6e6cdf.jpg',
             productUrl:
-              "https://malamal.com.bd/product/1mm-ss-mig-wire-taiwan/",
-            vendor: "",
-            categories: ["Welding Accessories"],
+              'https://malamal.com.bd/product/1mm-ss-mig-wire-taiwan/',
+            vendor: '',
+            categories: ['Welding Accessories'],
           },
           {
-            id: "10980",
-            productId: "10980",
+            id: '10980',
+            productId: '10980',
             title:
-              "RIVCEN Welding Machine ARC MMA 500/ZX7-500- MOSFET TYPE (380V)",
+              'RIVCEN Welding Machine ARC MMA 500/ZX7-500- MOSFET TYPE (380V)',
             price: 46000,
-            currency: "BDT",
-            sku: "10980",
+            currency: 'BDT',
+            sku: '10980',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-05-09-645a04ca72727.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-05-09-645a04ca72727.png',
             productUrl:
-              "https://malamal.com.bd/product/rivcen-welding-machine-arc-mma-500-zx7-500-mosfet-type-380v/",
-            vendor: "",
-            categories: ["ARC MMA Welding Machine"],
+              'https://malamal.com.bd/product/rivcen-welding-machine-arc-mma-500-zx7-500-mosfet-type-380v/',
+            vendor: '',
+            categories: ['ARC MMA Welding Machine'],
           },
           {
-            id: "12276",
-            productId: "12276",
-            title: "Riland MZ1000D Inverter Welding Machine",
+            id: '12276',
+            productId: '12276',
+            title: 'Riland MZ1000D Inverter Welding Machine',
             price: 488000,
-            currency: "BDT",
-            sku: "12276",
+            currency: 'BDT',
+            sku: '12276',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a150642b68.jpg",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a150642b68.jpg',
             productUrl:
-              "https://malamal.com.bd/product/riland-rilon-mz1000d-inverter-welding-machine/",
-            vendor: "",
-            categories: ["Welding Machine"],
+              'https://malamal.com.bd/product/riland-rilon-mz1000d-inverter-welding-machine/',
+            vendor: '',
+            categories: ['Welding Machine'],
           },
           {
-            id: "25050",
-            productId: "25050",
-            title: "Gasless Mig-250 Winner Inverter Mig Welding Machine",
+            id: '25050',
+            productId: '25050',
+            title: 'Gasless Mig-250 Winner Inverter Mig Welding Machine',
             price: 25000,
-            currency: "BDT",
-            sku: "",
+            currency: 'BDT',
+            sku: '',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2025/09/Gasless-Mig-250-Winner-Inverter-Mig-Welding-Machine.webp",
+              'https://malamal.com.bd/wp-content/uploads/2025/09/Gasless-Mig-250-Winner-Inverter-Mig-Welding-Machine.webp',
             productUrl:
-              "https://malamal.com.bd/product/gasless-mig-250-winner-inverter-mig-welding-machine/",
-            vendor: "",
+              'https://malamal.com.bd/product/gasless-mig-250-winner-inverter-mig-welding-machine/',
+            vendor: '',
             categories: [
-              "MIG Welding Machine",
-              "Welding &amp; Cutting",
-              "Welding Machine",
+              'MIG Welding Machine',
+              'Welding &amp; Cutting',
+              'Welding Machine',
             ],
           },
           {
-            id: "19062",
-            productId: "19062",
-            title: "0.8mm Mig Welding Wire Solid Core - BSRM - ER70S-6",
+            id: '19062',
+            productId: '19062',
+            title: '0.8mm Mig Welding Wire Solid Core - BSRM - ER70S-6',
             price: 3000,
-            currency: "BDT",
-            sku: "019570",
+            currency: 'BDT',
+            sku: '019570',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/02/0.8mm-Mig-Welding-Wire-Solid-Core-BSRM-ER70S-6-2.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/02/0.8mm-Mig-Welding-Wire-Solid-Core-BSRM-ER70S-6-2.png',
             productUrl:
-              "https://malamal.com.bd/product/0-8mm-mig-welding-wire-solid-core-bsrm-er70s-6/",
-            vendor: "",
+              'https://malamal.com.bd/product/0-8mm-mig-welding-wire-solid-core-bsrm-er70s-6/',
+            vendor: '',
             categories: [
-              "MIG Wire",
-              "Welding &amp; Cutting",
-              "Welding Accessories",
+              'MIG Wire',
+              'Welding &amp; Cutting',
+              'Welding Accessories',
             ],
           },
           {
-            id: "14112",
-            productId: "14112",
+            id: '14112',
+            productId: '14112',
             title:
-              "Small House Hold Vacuum Sealer Packaging Machine DZ-280/2SD",
+              'Small House Hold Vacuum Sealer Packaging Machine DZ-280/2SD',
             price: 8500,
-            currency: "BDT",
-            sku: "14112",
+            currency: 'BDT',
+            sku: '14112',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a18bfa3040.jpg",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a18bfa3040.jpg',
             productUrl:
-              "https://malamal.com.bd/product/small-house-hold-vacuum-sealer-packaging-machine-dz-280-2sd/",
-            vendor: "",
+              'https://malamal.com.bd/product/small-house-hold-vacuum-sealer-packaging-machine-dz-280-2sd/',
+            vendor: '',
             categories: [
-              "Commercial Packaging Equipment",
-              "Vacuum Sealer Packaging Machine",
+              'Commercial Packaging Equipment',
+              'Vacuum Sealer Packaging Machine',
             ],
           },
           {
-            id: "12770",
-            productId: "12770",
+            id: '12770',
+            productId: '12770',
             title:
-              "Semi Automatic Liquid Filling Machine 220V 50/60HZ 40W Digital Filler Single Nozzle",
+              'Semi Automatic Liquid Filling Machine 220V 50/60HZ 40W Digital Filler Single Nozzle',
             price: 15000,
-            currency: "BDT",
-            sku: "12770",
+            currency: 'BDT',
+            sku: '12770',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a160fbed1d.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a160fbed1d.png',
             productUrl:
-              "https://malamal.com.bd/product/semi-automatic-liquid-filling-machine/",
-            vendor: "",
+              'https://malamal.com.bd/product/semi-automatic-liquid-filling-machine/',
+            vendor: '',
             categories: [
-              "Commercial Packaging Equipment",
-              "Liquid Filling Machine",
+              'Commercial Packaging Equipment',
+              'Liquid Filling Machine',
             ],
           },
           {
-            id: "13983",
-            productId: "13983",
-            title: "Automatic Electric Cup Sealing Machine",
+            id: '13983',
+            productId: '13983',
+            title: 'Automatic Electric Cup Sealing Machine',
             price: 48000,
-            currency: "BDT",
-            sku: "13983",
+            currency: 'BDT',
+            sku: '13983',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a1875c4930.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a1875c4930.png',
             productUrl:
-              "https://malamal.com.bd/product/automatic-electric-cup-sealing-machine/",
-            vendor: "",
+              'https://malamal.com.bd/product/automatic-electric-cup-sealing-machine/',
+            vendor: '',
             categories: [
-              "Commercial Packaging Equipment",
-              "Plastic Bag Band Sealer Machine",
+              'Commercial Packaging Equipment',
+              'Plastic Bag Band Sealer Machine',
             ],
           },
           {
-            id: "10964",
-            productId: "10964",
-            title: "Vacuum Pack Sealer Machine Model - DDZP260",
+            id: '10964',
+            productId: '10964',
+            title: 'Vacuum Pack Sealer Machine Model - DDZP260',
             price: 65000,
-            currency: "BDT",
-            sku: "10964",
+            currency: 'BDT',
+            sku: '10964',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-05-09-6459ea7fb63b1.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-05-09-6459ea7fb63b1.png',
             productUrl:
-              "https://malamal.com.bd/product/vacuum-pack-sealer-machine-model-ddzp260/",
-            vendor: "",
+              'https://malamal.com.bd/product/vacuum-pack-sealer-machine-model-ddzp260/',
+            vendor: '',
             categories: [
-              "Commercial Packaging Equipment",
-              "Vacuum Sealer Packaging Machine",
+              'Commercial Packaging Equipment',
+              'Vacuum Sealer Packaging Machine',
             ],
           },
           {
-            id: "20527",
-            productId: "20527",
-            title: "L Sealer Attachment for Shrink Packaging",
+            id: '20527',
+            productId: '20527',
+            title: 'L Sealer Attachment for Shrink Packaging',
             price: 60000,
-            currency: "BDT",
-            sku: "10992-1",
+            currency: 'BDT',
+            sku: '10992-1',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/05/L-sealer-Manual-.jpeg",
+              'https://malamal.com.bd/wp-content/uploads/2024/05/L-sealer-Manual-.jpeg',
             productUrl:
-              "https://malamal.com.bd/product/l-sealer-attachment-for-shrink-packaging/",
-            vendor: "",
+              'https://malamal.com.bd/product/l-sealer-attachment-for-shrink-packaging/',
+            vendor: '',
             categories: [
-              "Commercial Packaging Equipment",
-              "Plastic Bag Band Sealer Machine",
-              "Shrink Wrapping Machine",
+              'Commercial Packaging Equipment',
+              'Plastic Bag Band Sealer Machine',
+              'Shrink Wrapping Machine',
             ],
           },
           {
-            id: "15293",
-            productId: "15293",
-            title: "20 inch Hand Sealer for Plastic Bag Band Sealing Machine",
+            id: '15293',
+            productId: '15293',
+            title: '20 inch Hand Sealer for Plastic Bag Band Sealing Machine',
             price: 7375,
-            currency: "BDT",
-            sku: "15293",
+            currency: 'BDT',
+            sku: '15293',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/06/20-inch-hand-sealer-plastic-bag-band-sealing-machine.webp",
+              'https://malamal.com.bd/wp-content/uploads/2024/06/20-inch-hand-sealer-plastic-bag-band-sealing-machine.webp',
             productUrl:
-              "https://malamal.com.bd/product/20-inch-hand-sealer-for-plastic-bag-band-sealing-machine/",
-            vendor: "",
+              'https://malamal.com.bd/product/20-inch-hand-sealer-for-plastic-bag-band-sealing-machine/',
+            vendor: '',
             categories: [
-              "Commercial Packaging Equipment",
-              "Plastic Bag Band Sealer Machine",
+              'Commercial Packaging Equipment',
+              'Plastic Bag Band Sealer Machine',
             ],
           },
           {
-            id: "15223",
-            productId: "15223",
+            id: '15223',
+            productId: '15223',
             title: "12'' Pedal Foot Band Sealer for Plastic Bag Sealing",
             price: 21999,
-            currency: "BDT",
-            sku: "15223",
+            currency: 'BDT',
+            sku: '15223',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-09-19-650978b3d9f81.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-09-19-650978b3d9f81.png',
             productUrl:
-              "https://malamal.com.bd/product/12-inch-pedal-foot-band-sealer-for-plastic-bag-sealing/",
-            vendor: "",
+              'https://malamal.com.bd/product/12-inch-pedal-foot-band-sealer-for-plastic-bag-sealing/',
+            vendor: '',
             categories: [
-              "Commercial Packaging Equipment",
-              "Plastic Bag Band Sealer Machine",
+              'Commercial Packaging Equipment',
+              'Plastic Bag Band Sealer Machine',
             ],
           },
           {
-            id: "15299",
-            productId: "15299",
-            title: "40 Inch Hand Sealer for Plastic Bag Band Sealing Machine",
+            id: '15299',
+            productId: '15299',
+            title: '40 Inch Hand Sealer for Plastic Bag Band Sealing Machine',
             price: 17500,
-            currency: "BDT",
-            sku: "15299",
+            currency: 'BDT',
+            sku: '15299',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/40-inch-hand-sealer-machine-1.webp",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/40-inch-hand-sealer-machine-1.webp',
             productUrl:
-              "https://malamal.com.bd/product/40-inch-hand-sealer-for-plastic-bag-band-sealing-machine/",
-            vendor: "",
+              'https://malamal.com.bd/product/40-inch-hand-sealer-for-plastic-bag-band-sealing-machine/',
+            vendor: '',
             categories: [
-              "Commercial Packaging Equipment",
-              "Plastic Bag Band Sealer Machine",
+              'Commercial Packaging Equipment',
+              'Plastic Bag Band Sealer Machine',
             ],
           },
           {
-            id: "17964",
-            productId: "17964",
+            id: '17964',
+            productId: '17964',
             title:
-              "Electric Wire Rope Hoist 1500Kg 40 Mtr Industrial Clutch Type WINNER 220V",
+              'Electric Wire Rope Hoist 1500Kg 40 Mtr Industrial Clutch Type WINNER 220V',
             price: 65000,
-            currency: "BDT",
-            sku: "229323",
+            currency: 'BDT',
+            sku: '229323',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/Electric-Wire-Rope-Hoist-1500Kg-50-Mtr-Industrial-Clutch-Type-WINNER-220V.jpg",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/Electric-Wire-Rope-Hoist-1500Kg-50-Mtr-Industrial-Clutch-Type-WINNER-220V.jpg',
             productUrl:
-              "https://malamal.com.bd/product/electric-wire-rope-hoist-1500kg-50-mtr-industrial-clutch-type-winner-220v/",
-            vendor: "",
+              'https://malamal.com.bd/product/electric-wire-rope-hoist-1500kg-50-mtr-industrial-clutch-type-winner-220v/',
+            vendor: '',
             categories: [
-              "Material Handling Equipment",
-              "Rope Hoist &amp; Mini Crane",
+              'Material Handling Equipment',
+              'Rope Hoist &amp; Mini Crane',
             ],
           },
           {
-            id: "25205",
-            productId: "25205",
-            title: "Hand Stacker 2TON 1.6MTR Electric Hoist Type 220V",
+            id: '25205',
+            productId: '25205',
+            title: 'Hand Stacker 2TON 1.6MTR Electric Hoist Type 220V',
             price: 170000,
-            currency: "BDT",
-            sku: "11026-1",
+            currency: 'BDT',
+            sku: '11026-1',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2025/10/openart-image_xGU3RKoq_1759838526383_raw.webp",
+              'https://malamal.com.bd/wp-content/uploads/2025/10/openart-image_xGU3RKoq_1759838526383_raw.webp',
             productUrl:
-              "https://malamal.com.bd/product/hand-stacker-2ton-1-6mtr-electric-hoist-type-220v/",
-            vendor: "",
-            categories: ["Hand Stackers"],
+              'https://malamal.com.bd/product/hand-stacker-2ton-1-6mtr-electric-hoist-type-220v/',
+            vendor: '',
+            categories: ['Hand Stackers'],
           },
           {
-            id: "15462",
-            productId: "15462",
+            id: '15462',
+            productId: '15462',
             title:
-              "2000 kg Permanent Magnetic Lifter Manufacturer Lifting Magnets",
+              '2000 kg Permanent Magnetic Lifter Manufacturer Lifting Magnets',
             price: 42000,
-            currency: "BDT",
-            sku: "15462",
+            currency: 'BDT',
+            sku: '15462',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-09-20-650a96052bce5.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-09-20-650a96052bce5.png',
             productUrl:
-              "https://malamal.com.bd/product/2000-kg-permanent-magnetic-lifter-manufacturer-lifting-magnets/",
-            vendor: "",
-            categories: ["Magnetic Lifter"],
+              'https://malamal.com.bd/product/2000-kg-permanent-magnetic-lifter-manufacturer-lifting-magnets/',
+            vendor: '',
+            categories: ['Magnetic Lifter'],
           },
           {
-            id: "13828",
-            productId: "13828",
+            id: '13828',
+            productId: '13828',
             title:
-              "Electric Mini Wire Rope Hoist 600Kg 20Mtr Winch with Movable Motor",
+              'Electric Mini Wire Rope Hoist 600Kg 20Mtr Winch with Movable Motor',
             price: 45000,
-            currency: "BDT",
-            sku: "13828",
+            currency: 'BDT',
+            sku: '13828',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a181cdcf29.jpg",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-04-27-644a181cdcf29.jpg',
             productUrl:
-              "https://malamal.com.bd/product/electric-mini-wire-rope-hoist-600kg-20mtr-winch-with-movable-motor/",
-            vendor: "",
+              'https://malamal.com.bd/product/electric-mini-wire-rope-hoist-600kg-20mtr-winch-with-movable-motor/',
+            vendor: '',
             categories: [
-              "Material Handling Equipment",
-              "Rope Hoist &amp; Mini Crane",
+              'Material Handling Equipment',
+              'Rope Hoist &amp; Mini Crane',
             ],
           },
           {
-            id: "18927",
-            productId: "18927",
+            id: '18927',
+            productId: '18927',
             title: "3'' Rubber Wheel China - Only Moving (Heavy)",
             price: 480,
-            currency: "BDT",
-            sku: "697747",
+            currency: 'BDT',
+            sku: '697747',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/02/3-Rubber-Wheel-China-Only-Moving-Heavy-1-1.png",
+              'https://malamal.com.bd/wp-content/uploads/2024/02/3-Rubber-Wheel-China-Only-Moving-Heavy-1-1.png',
             productUrl:
-              "https://malamal.com.bd/product/3-rubber-wheel-china-only-moving-heavy/",
-            vendor: "",
-            categories: ["Caster Wheel", "Material Handling Equipment"],
+              'https://malamal.com.bd/product/3-rubber-wheel-china-only-moving-heavy/',
+            vendor: '',
+            categories: ['Caster Wheel', 'Material Handling Equipment'],
           },
           {
-            id: "22912",
-            productId: "22912",
-            title: "Shopping Cart 150litre Metal Trolley \u2013 Nickel Colour",
+            id: '22912',
+            productId: '22912',
+            title: 'Shopping Cart 150litre Metal Trolley \u2013 Nickel Colour',
             price: 12500,
-            currency: "BDT",
-            sku: "303251",
+            currency: 'BDT',
+            sku: '303251',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/11/150l-european-style-shopping-cart-trolley.webp",
+              'https://malamal.com.bd/wp-content/uploads/2024/11/150l-european-style-shopping-cart-trolley.webp',
             productUrl:
-              "https://malamal.com.bd/product/shopping-cart-150litre-metal-trolley-nickel-colour/",
-            vendor: "",
-            categories: ["Trolley"],
+              'https://malamal.com.bd/product/shopping-cart-150litre-metal-trolley-nickel-colour/',
+            vendor: '',
+            categories: ['Trolley'],
           },
           {
-            id: "14351",
-            productId: "14351",
+            id: '14351',
+            productId: '14351',
             title:
-              "Power Stacker - Full Electric Double Cylinder Of Stacker - Fork Lifter",
+              'Power Stacker - Full Electric Double Cylinder Of Stacker - Fork Lifter',
             price: 900000,
-            currency: "BDT",
-            sku: "14351",
+            currency: 'BDT',
+            sku: '14351',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/image-7.webp",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/image-7.webp',
             productUrl:
-              "https://malamal.com.bd/product/power-stacker-full-electric-double-cylinder-of-stacker-fork-lifter/",
-            vendor: "",
-            categories: ["Stacker"],
+              'https://malamal.com.bd/product/power-stacker-full-electric-double-cylinder-of-stacker-fork-lifter/',
+            vendor: '',
+            categories: ['Stacker'],
           },
           {
-            id: "16548",
-            productId: "16548",
+            id: '16548',
+            productId: '16548',
             title:
-              "10 Ton 6 Meter Lifting Belt Flat Polyester Webbing Sling TOHO - 10T x 6M",
+              '10 Ton 6 Meter Lifting Belt Flat Polyester Webbing Sling TOHO - 10T x 6M',
             price: 7500,
-            currency: "BDT",
-            sku: "16548",
+            currency: 'BDT',
+            sku: '16548',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-11-09-654ca9c36de1c.webp",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-11-09-654ca9c36de1c.webp',
             productUrl:
-              "https://malamal.com.bd/product/10-ton-6-meter-lifting-belt-flat-polyester-webbing-sling-toho-10t-x-6m/",
-            vendor: "",
-            categories: ["Lifting Belt"],
+              'https://malamal.com.bd/product/10-ton-6-meter-lifting-belt-flat-polyester-webbing-sling-toho-10t-x-6m/',
+            vendor: '',
+            categories: ['Lifting Belt'],
           },
           {
-            id: "16587",
-            productId: "16587",
+            id: '16587',
+            productId: '16587',
             title: "(180mm) 7.2'' Electric Groove Cutter 1900W DCA - AZR180",
             price: 10000,
-            currency: "BDT",
-            sku: "16587",
+            currency: 'BDT',
+            sku: '16587',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-11-13-6551b3bf4b787.webp",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-11-13-6551b3bf4b787.webp',
             productUrl:
-              "https://malamal.com.bd/product/180mm-7-2-electric-groove-cutter-1900w-dca-azr180/",
-            vendor: "",
-            categories: ["Marble Cutter"],
+              'https://malamal.com.bd/product/180mm-7-2-electric-groove-cutter-1900w-dca-azr180/',
+            vendor: '',
+            categories: ['Marble Cutter'],
           },
           {
-            id: "16656",
-            productId: "16656",
-            title: "0-10mm 3 Digits Digital Thickness Guage Insize 2871-101",
+            id: '16656',
+            productId: '16656',
+            title: '0-10mm 3 Digits Digital Thickness Guage Insize 2871-101',
             price: 13700,
-            currency: "BDT",
-            sku: "16656",
+            currency: 'BDT',
+            sku: '16656',
             imageUrl:
-              "https://malamal.com.bd/wp-content/uploads/2024/01/2023-12-12-65783b42b9952.webp",
+              'https://malamal.com.bd/wp-content/uploads/2024/01/2023-12-12-65783b42b9952.webp',
             productUrl:
-              "https://malamal.com.bd/product/0-10mm-3-digits-digital-thickness-guage-insize-2871-101/",
-            vendor: "",
-            categories: ["Calipers", "Test &amp; Measurements"],
+              'https://malamal.com.bd/product/0-10mm-3-digits-digital-thickness-guage-insize-2871-101/',
+            vendor: '',
+            categories: ['Calipers', 'Test &amp; Measurements'],
           },
         ],
       };
@@ -30129,19 +30129,19 @@
               if (entry.isIntersecting) {
                 let lazyloadBackground = entry.target;
                 if (lazyloadBackground) {
-                  lazyloadBackground.classList.add("e-lazyloaded");
+                  lazyloadBackground.classList.add('e-lazyloaded');
                 }
                 lazyloadBackgroundObserver.unobserve(entry.target);
               }
             });
           },
-          { rootMargin: "200px 0px 200px 0px" },
+          { rootMargin: '200px 0px 200px 0px' },
         );
         lazyloadBackgrounds.forEach((lazyloadBackground) => {
           lazyloadBackgroundObserver.observe(lazyloadBackground);
         });
       };
-      const events = ["DOMContentLoaded", "elementor/lazyload/observe"];
+      const events = ['DOMContentLoaded', 'elementor/lazyload/observe'];
       events.forEach((event) => {
         document.addEventListener(event, lazyloadRunObserver);
       });
@@ -30149,7 +30149,7 @@
     <script type="text/javascript">
       (function () {
         var c = document.body.className;
-        c = c.replace(/woocommerce-no-js/, "woocommerce-js");
+        c = c.replace(/woocommerce-no-js/, 'woocommerce-js');
         document.body.className = c;
       })();
     </script>
@@ -30239,11 +30239,11 @@
     <script type="text/javascript" id="wd-update-cart-fragments-fix-js-extra">
       /* <![CDATA[ */
       var wd_cart_fragments_params = {
-        ajax_url: "/wp-admin/admin-ajax.php",
-        wc_ajax_url: "/?wc-ajax=%%endpoint%%",
-        cart_hash_key: "wc_cart_hash_40c1daa3adb161249a9f0c021bddd652",
-        fragment_name: "wc_fragments_40c1daa3adb161249a9f0c021bddd652",
-        request_timeout: "5000",
+        ajax_url: '/wp-admin/admin-ajax.php',
+        wc_ajax_url: '/?wc-ajax=%%endpoint%%',
+        cart_hash_key: 'wc_cart_hash_40c1daa3adb161249a9f0c021bddd652',
+        fragment_name: 'wc_fragments_40c1daa3adb161249a9f0c021bddd652',
+        request_timeout: '5000',
       };
       //# sourceURL=wd-update-cart-fragments-fix-js-extra
       /* ]]> */
@@ -30265,7 +30265,7 @@
     ></script>
     <script type="text/javascript" id="wp-i18n-js-after">
       /* <![CDATA[ */
-      wp.i18n.setLocaleData({ "text direction\u0004ltr": ["ltr"] });
+      wp.i18n.setLocaleData({ 'text direction\u0004ltr': ['ltr'] });
       //# sourceURL=wp-i18n-js-after
       /* ]]> */
     </script>
@@ -30278,8 +30278,8 @@
       /* <![CDATA[ */
       var wpcf7 = {
         api: {
-          root: "https:\/\/malamal.com.bd\/wp-json\/",
-          namespace: "contact-form-7\/v1",
+          root: 'https:\/\/malamal.com.bd\/wp-json\/',
+          namespace: 'contact-form-7\/v1',
         },
         cached: 1,
       };
@@ -30294,25 +30294,25 @@
     <script type="text/javascript" id="mailchimp-woocommerce-js-extra">
       /* <![CDATA[ */
       var mailchimp_public_data = {
-        site_url: "https://malamal.com.bd",
-        ajax_url: "https://malamal.com.bd/wp-admin/admin-ajax.php",
-        disable_carts: "",
-        subscribers_only: "",
-        language: "en",
-        allowed_to_set_cookies: "1",
+        site_url: 'https://malamal.com.bd',
+        ajax_url: 'https://malamal.com.bd/wp-admin/admin-ajax.php',
+        disable_carts: '',
+        subscribers_only: '',
+        language: 'en',
+        allowed_to_set_cookies: '1',
         sms_allowed_countries: [
-          "AU",
-          "AT",
-          "CA",
-          "FR",
-          "DE",
-          "IE",
-          "IT",
-          "ES",
-          "CH",
-          "NL",
-          "US",
-          "GB",
+          'AU',
+          'AT',
+          'CA',
+          'FR',
+          'DE',
+          'IE',
+          'IT',
+          'ES',
+          'CH',
+          'NL',
+          'US',
+          'GB',
         ],
       };
       //# sourceURL=mailchimp-woocommerce-js-extra
@@ -30330,7 +30330,7 @@
       /* <![CDATA[ */
       var mcPixelConfig = {
         restBase:
-          "https://malamal.com.bd/wp-json/mailchimp-for-woocommerce/v1/",
+          'https://malamal.com.bd/wp-json/mailchimp-for-woocommerce/v1/',
       };
       //# sourceURL=mailchimp-woocommerce-pixel-tracking-js-extra
       /* ]]> */
@@ -30360,64 +30360,64 @@
     <script type="text/javascript" id="chaty-front-end-js-extra">
       /* <![CDATA[ */
       var chaty_settings = {
-        ajax_url: "https://malamal.com.bd/wp-admin/admin-ajax.php",
-        analytics: "0",
-        capture_analytics: "0",
-        token: "30d23f18d0",
+        ajax_url: 'https://malamal.com.bd/wp-admin/admin-ajax.php',
+        analytics: '0',
+        capture_analytics: '0',
+        token: '30d23f18d0',
         chaty_widgets: [
           {
             id: 0,
             identifier: 0,
             settings: {
-              cta_type: "simple-view",
-              cta_body: "",
-              cta_head: "",
-              cta_head_bg_color: "",
-              cta_head_text_color: "",
+              cta_type: 'simple-view',
+              cta_body: '',
+              cta_head: '',
+              cta_head_bg_color: '',
+              cta_head_text_color: '',
               show_close_button: 1,
-              position: "right",
+              position: 'right',
               custom_position: 1,
-              bottom_spacing: "25",
-              side_spacing: "25",
-              icon_view: "vertical",
-              default_state: "click",
-              cta_text: "Contact us",
-              cta_text_color: "#333333",
-              cta_bg_color: "#ffffff",
-              show_cta: "first_click",
-              is_pending_mesg_enabled: "off",
-              pending_mesg_count: "1",
-              pending_mesg_count_color: "#ffffff",
-              pending_mesg_count_bgcolor: "#dd0000",
-              widget_icon: "chat-base",
-              widget_icon_url: "",
+              bottom_spacing: '25',
+              side_spacing: '25',
+              icon_view: 'vertical',
+              default_state: 'click',
+              cta_text: 'Contact us',
+              cta_text_color: '#333333',
+              cta_bg_color: '#ffffff',
+              show_cta: 'first_click',
+              is_pending_mesg_enabled: 'off',
+              pending_mesg_count: '1',
+              pending_mesg_count_color: '#ffffff',
+              pending_mesg_count_bgcolor: '#dd0000',
+              widget_icon: 'chat-base',
+              widget_icon_url: '',
               font_family:
-                "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
-              widget_size: "54",
-              custom_widget_size: "54",
+                '-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif',
+              widget_size: '54',
+              custom_widget_size: '54',
               is_google_analytics_enabled: 0,
-              close_text: "Hide",
-              widget_color: "#86CD91",
-              widget_icon_color: "#ffffff",
-              widget_rgb_color: "134,205,145",
+              close_text: 'Hide',
+              widget_color: '#86CD91',
+              widget_icon_color: '#ffffff',
+              widget_rgb_color: '134,205,145',
               has_custom_css: 0,
-              custom_css: "",
-              widget_token: "8a52b066a3",
-              widget_index: "",
-              attention_effect: "",
+              custom_css: '',
+              widget_token: '8a52b066a3',
+              widget_index: '',
+              attention_effect: '',
             },
             triggers: {
               has_time_delay: 1,
-              time_delay: "0",
+              time_delay: '0',
               exit_intent: 0,
               has_display_after_page_scroll: 0,
-              display_after_page_scroll: "0",
+              display_after_page_scroll: '0',
               auto_hide_widget: 0,
               hide_after: 0,
               show_on_pages_rules: [],
               time_diff: 0,
               has_date_scheduling_rules: 0,
-              date_scheduling_rules: { start_date_time: "", end_date_time: "" },
+              date_scheduling_rules: { start_date_time: '', end_date_time: '' },
               date_scheduling_rules_timezone: 0,
               day_hours_scheduling_rules_timezone: 0,
               has_day_hours_scheduling_rules: [],
@@ -30436,154 +30436,154 @@
             },
             channels: [
               {
-                channel: "Whatsapp",
-                value: "8801972525821",
-                hover_text: "WhatsApp",
-                chatway_position: "",
+                channel: 'Whatsapp',
+                value: '8801972525821',
+                hover_text: 'WhatsApp',
+                chatway_position: '',
                 svg_icon:
                   '\u003Csvg width="39" height="39" viewBox="0 0 39 39" fill="none" xmlns="http://www.w3.org/2000/svg"\u003E\u003Ccircle class="color-element" cx="19.4395" cy="19.4395" r="19.4395" fill="#49E670"/\u003E\u003Cpath d="M12.9821 10.1115C12.7029 10.7767 11.5862 11.442 10.7486 11.575C10.1902 11.7081 9.35269 11.8411 6.84003 10.7767C3.48981 9.44628 1.39593 6.25317 1.25634 6.12012C1.11674 5.85403 2.13001e-06 4.39053 2.13001e-06 2.92702C2.13001e-06 1.46351 0.83755 0.665231 1.11673 0.399139C1.39592 0.133046 1.8147 1.01506e-06 2.23348 1.01506e-06C2.37307 1.01506e-06 2.51267 1.01506e-06 2.65226 1.01506e-06C2.93144 1.01506e-06 3.21063 -2.02219e-06 3.35022 0.532183C3.62941 1.19741 4.32736 2.66092 4.32736 2.79397C4.46696 2.92702 4.46696 3.19311 4.32736 3.32616C4.18777 3.59225 4.18777 3.59224 3.90858 3.85834C3.76899 3.99138 3.6294 4.12443 3.48981 4.39052C3.35022 4.52357 3.21063 4.78966 3.35022 5.05576C3.48981 5.32185 4.18777 6.38622 5.16491 7.18449C6.42125 8.24886 7.39839 8.51496 7.81717 8.78105C8.09636 8.91409 8.37554 8.9141 8.65472 8.648C8.93391 8.38191 9.21309 7.98277 9.49228 7.58363C9.77146 7.31754 10.0507 7.1845 10.3298 7.31754C10.609 7.45059 12.2841 8.11582 12.5633 8.38191C12.8425 8.51496 13.1217 8.648 13.1217 8.78105C13.1217 8.78105 13.1217 9.44628 12.9821 10.1115Z" transform="translate(12.9597 12.9597)" fill="#FAFAFA"/\u003E\u003Cpath d="M0.196998 23.295L0.131434 23.4862L0.323216 23.4223L5.52771 21.6875C7.4273 22.8471 9.47325 23.4274 11.6637 23.4274C18.134 23.4274 23.4274 18.134 23.4274 11.6637C23.4274 5.19344 18.134 -0.1 11.6637 -0.1C5.19344 -0.1 -0.1 5.19344 -0.1 11.6637C-0.1 13.9996 0.624492 16.3352 1.93021 18.2398L0.196998 23.295ZM5.87658 19.8847L5.84025 19.8665L5.80154 19.8788L2.78138 20.8398L3.73978 17.9646L3.75932 17.906L3.71562 17.8623L3.43104 17.5777C2.27704 15.8437 1.55796 13.8245 1.55796 11.6637C1.55796 6.03288 6.03288 1.55796 11.6637 1.55796C17.2945 1.55796 21.7695 6.03288 21.7695 11.6637C21.7695 17.2945 17.2945 21.7695 11.6637 21.7695C9.64222 21.7695 7.76778 21.1921 6.18227 20.039L6.17557 20.0342L6.16817 20.0305L5.87658 19.8847Z" transform="translate(7.7758 7.77582)" fill="white" stroke="white" stroke-width="0.2"/\u003E\u003C/svg\u003E',
                 is_desktop: 1,
                 is_mobile: 1,
-                icon_color: "#49E670",
-                icon_rgb_color: "73,230,112",
-                channel_type: "Whatsapp",
-                custom_image_url: "",
-                order: "",
-                pre_set_message: "",
-                is_use_web_version: "1",
-                is_open_new_tab: "1",
-                is_default_open: "0",
-                has_welcome_message: "1",
-                emoji_picker: "1",
-                input_placeholder: "Write your message...",
+                icon_color: '#49E670',
+                icon_rgb_color: '73,230,112',
+                channel_type: 'Whatsapp',
+                custom_image_url: '',
+                order: '',
+                pre_set_message: '',
+                is_use_web_version: '1',
+                is_open_new_tab: '1',
+                is_default_open: '0',
+                has_welcome_message: '1',
+                emoji_picker: '1',
+                input_placeholder: 'Write your message...',
                 chat_welcome_message:
-                  "\u003Cp\u003EHow can I help you? :)\u003C/p\u003E",
-                wp_popup_headline: "Let&#039;s chat on WhatsApp",
-                wp_popup_nickname: "Mamamal Support",
-                wp_popup_profile: "",
-                wp_popup_head_bg_color: "#4AA485",
-                qr_code_image_url: "",
-                mail_subject: "",
-                channel_account_type: "personal",
+                  '\u003Cp\u003EHow can I help you? :)\u003C/p\u003E',
+                wp_popup_headline: 'Let&#039;s chat on WhatsApp',
+                wp_popup_nickname: 'Mamamal Support',
+                wp_popup_profile: '',
+                wp_popup_head_bg_color: '#4AA485',
+                qr_code_image_url: '',
+                mail_subject: '',
+                channel_account_type: 'personal',
                 contact_form_settings: [],
                 contact_fields: [],
-                url: "https://web.whatsapp.com/send?phone=8801972525821",
-                mobile_target: "",
-                desktop_target: "_blank",
-                target: "_blank",
+                url: 'https://web.whatsapp.com/send?phone=8801972525821',
+                mobile_target: '',
+                desktop_target: '_blank',
+                target: '_blank',
                 is_agent: 0,
                 agent_data: [],
-                header_text: "",
-                header_sub_text: "",
-                header_bg_color: "",
-                header_text_color: "",
-                widget_token: "8a52b066a3",
-                widget_index: "",
-                click_event: "",
-                viber_url: "",
+                header_text: '',
+                header_sub_text: '',
+                header_bg_color: '',
+                header_text_color: '',
+                widget_token: '8a52b066a3',
+                widget_index: '',
+                click_event: '',
+                viber_url: '',
               },
               {
-                channel: "Facebook_Messenger",
-                value: "https://m.me/malamalxyz",
-                hover_text: "Facebook Messenger",
-                chatway_position: "",
+                channel: 'Facebook_Messenger',
+                value: 'https://m.me/malamalxyz',
+                hover_text: 'Facebook Messenger',
+                chatway_position: '',
                 svg_icon:
                   '\u003Csvg width="39" height="39" viewBox="0 0 39 39" fill="none" xmlns="http://www.w3.org/2000/svg"\u003E\u003Ccircle class="color-element" cx="19.4395" cy="19.4395" r="19.4395" fill="#1E88E5"/\u003E\u003Cpath fill-rule="evenodd" clip-rule="evenodd" d="M0 9.63934C0 4.29861 4.68939 0 10.4209 0C16.1524 0 20.8418 4.29861 20.8418 9.63934C20.8418 14.98 16.1524 19.2787 10.4209 19.2787C9.37878 19.2787 8.33673 19.1484 7.42487 18.8879L3.90784 20.8418V17.1945C1.56311 15.3708 0 12.6353 0 9.63934ZM8.85779 10.1604L11.463 13.0261L17.1945 6.90384L12.1143 9.76959L9.37885 6.90384L3.64734 13.0261L8.85779 10.1604Z" transform="translate(9.01854 10.3146)" fill="white"/\u003E\u003C/svg\u003E',
                 is_desktop: 1,
                 is_mobile: 1,
-                icon_color: "#1E88E5",
-                icon_rgb_color: "30,136,229",
-                channel_type: "Facebook_Messenger",
-                custom_image_url: "",
-                order: "",
-                pre_set_message: "",
-                is_use_web_version: "1",
-                is_open_new_tab: "1",
-                is_default_open: "0",
-                has_welcome_message: "0",
-                emoji_picker: "1",
-                input_placeholder: "Write your message...",
-                chat_welcome_message: "",
-                wp_popup_headline: "",
-                wp_popup_nickname: "",
-                wp_popup_profile: "",
-                wp_popup_head_bg_color: "#4AA485",
-                qr_code_image_url: "",
-                mail_subject: "",
-                channel_account_type: "personal",
+                icon_color: '#1E88E5',
+                icon_rgb_color: '30,136,229',
+                channel_type: 'Facebook_Messenger',
+                custom_image_url: '',
+                order: '',
+                pre_set_message: '',
+                is_use_web_version: '1',
+                is_open_new_tab: '1',
+                is_default_open: '0',
+                has_welcome_message: '0',
+                emoji_picker: '1',
+                input_placeholder: 'Write your message...',
+                chat_welcome_message: '',
+                wp_popup_headline: '',
+                wp_popup_nickname: '',
+                wp_popup_profile: '',
+                wp_popup_head_bg_color: '#4AA485',
+                qr_code_image_url: '',
+                mail_subject: '',
+                channel_account_type: 'personal',
                 contact_form_settings: [],
                 contact_fields: [],
-                url: "https://m.me/malamalxyz",
-                mobile_target: "",
-                desktop_target: "_blank",
-                target: "_blank",
+                url: 'https://m.me/malamalxyz',
+                mobile_target: '',
+                desktop_target: '_blank',
+                target: '_blank',
                 is_agent: 0,
                 agent_data: [],
-                header_text: "",
-                header_sub_text: "",
-                header_bg_color: "",
-                header_text_color: "",
-                widget_token: "8a52b066a3",
-                widget_index: "",
-                click_event: "",
-                viber_url: "",
+                header_text: '',
+                header_sub_text: '',
+                header_bg_color: '',
+                header_text_color: '',
+                widget_token: '8a52b066a3',
+                widget_index: '',
+                click_event: '',
+                viber_url: '',
               },
               {
-                channel: "Phone",
-                value: "+8801972525821",
-                hover_text: "Phone",
-                chatway_position: "",
+                channel: 'Phone',
+                value: '+8801972525821',
+                hover_text: 'Phone',
+                chatway_position: '',
                 svg_icon:
                   '\u003Csvg width="39" height="39" viewBox="0 0 39 39" fill="none" xmlns="http://www.w3.org/2000/svg"\u003E\u003Ccircle class="color-element" cx="19.4395" cy="19.4395" r="19.4395" fill="#03E78B"/\u003E\u003Cpath d="M19.3929 14.9176C17.752 14.7684 16.2602 14.3209 14.7684 13.7242C14.0226 13.4259 13.1275 13.7242 12.8292 14.4701L11.7849 16.2602C8.65222 14.6193 6.11623 11.9341 4.47529 8.95057L6.41458 7.90634C7.16046 7.60799 7.45881 6.71293 7.16046 5.96705C6.56375 4.47529 6.11623 2.83435 5.96705 1.34259C5.96705 0.596704 5.22117 0 4.47529 0H0.745882C0.298353 0 5.69062e-07 0.298352 5.69062e-07 0.745881C5.69062e-07 3.72941 0.596704 6.71293 1.93929 9.3981C3.87858 13.575 7.30964 16.8569 11.3374 18.7962C14.0226 20.1388 17.0061 20.7355 19.9896 20.7355C20.4371 20.7355 20.7355 20.4371 20.7355 19.9896V16.4094C20.7355 15.5143 20.1388 14.9176 19.3929 14.9176Z" transform="translate(9.07179 9.07178)" fill="white"/\u003E\u003C/svg\u003E',
                 is_desktop: 1,
                 is_mobile: 1,
-                icon_color: "#03E78B",
-                icon_rgb_color: "3,231,139",
-                channel_type: "Phone",
-                custom_image_url: "",
-                order: "",
-                pre_set_message: "",
-                is_use_web_version: "1",
-                is_open_new_tab: "1",
-                is_default_open: "0",
-                has_welcome_message: "0",
-                emoji_picker: "1",
-                input_placeholder: "Write your message...",
-                chat_welcome_message: "",
-                wp_popup_headline: "",
-                wp_popup_nickname: "",
-                wp_popup_profile: "",
-                wp_popup_head_bg_color: "#4AA485",
-                qr_code_image_url: "",
-                mail_subject: "",
-                channel_account_type: "personal",
+                icon_color: '#03E78B',
+                icon_rgb_color: '3,231,139',
+                channel_type: 'Phone',
+                custom_image_url: '',
+                order: '',
+                pre_set_message: '',
+                is_use_web_version: '1',
+                is_open_new_tab: '1',
+                is_default_open: '0',
+                has_welcome_message: '0',
+                emoji_picker: '1',
+                input_placeholder: 'Write your message...',
+                chat_welcome_message: '',
+                wp_popup_headline: '',
+                wp_popup_nickname: '',
+                wp_popup_profile: '',
+                wp_popup_head_bg_color: '#4AA485',
+                qr_code_image_url: '',
+                mail_subject: '',
+                channel_account_type: 'personal',
                 contact_form_settings: [],
                 contact_fields: [],
-                url: "tel:+8801972525821",
-                mobile_target: "",
-                desktop_target: "",
-                target: "",
+                url: 'tel:+8801972525821',
+                mobile_target: '',
+                desktop_target: '',
+                target: '',
                 is_agent: 0,
                 agent_data: [],
-                header_text: "",
-                header_sub_text: "",
-                header_bg_color: "",
-                header_text_color: "",
-                widget_token: "8a52b066a3",
-                widget_index: "",
-                click_event: "",
-                viber_url: "",
+                header_text: '',
+                header_sub_text: '',
+                header_bg_color: '',
+                header_text_color: '',
+                widget_token: '8a52b066a3',
+                widget_index: '',
+                click_event: '',
+                viber_url: '',
               },
             ],
           },
         ],
-        data_analytics_settings: "off",
+        data_analytics_settings: 'off',
         lang: {
-          whatsapp_label: "WhatsApp Message",
-          hide_whatsapp_form: "Hide WhatsApp Form",
-          emoji_picker: "Show Emojis",
+          whatsapp_label: 'WhatsApp Message',
+          hide_whatsapp_form: 'Hide WhatsApp Form',
+          emoji_picker: 'Show Emojis',
         },
-        has_chatway: "",
+        has_chatway: '',
       };
       //# sourceURL=chaty-front-end-js-extra
       /* ]]> */
@@ -30616,27 +30616,27 @@
           lifetime: 1.0000000000000000818030539140313095458623138256371021270751953125e-5,
           session: 30,
           base64: false,
-          ajaxurl: "https://malamal.com.bd/wp-admin/admin-ajax.php",
-          prefix: "wc_order_attribution_",
+          ajaxurl: 'https://malamal.com.bd/wp-admin/admin-ajax.php',
+          prefix: 'wc_order_attribution_',
           allowTracking: true,
         },
         fields: {
-          source_type: "current.typ",
-          referrer: "current_add.rf",
-          utm_campaign: "current.cmp",
-          utm_source: "current.src",
-          utm_medium: "current.mdm",
-          utm_content: "current.cnt",
-          utm_id: "current.id",
-          utm_term: "current.trm",
-          utm_source_platform: "current.plt",
-          utm_creative_format: "current.fmt",
-          utm_marketing_tactic: "current.tct",
-          session_entry: "current_add.ep",
-          session_start_time: "current_add.fd",
-          session_pages: "session.pgs",
-          session_count: "udata.vst",
-          user_agent: "udata.uag",
+          source_type: 'current.typ',
+          referrer: 'current_add.rf',
+          utm_campaign: 'current.cmp',
+          utm_source: 'current.src',
+          utm_medium: 'current.mdm',
+          utm_content: 'current.cnt',
+          utm_id: 'current.id',
+          utm_term: 'current.trm',
+          utm_source_platform: 'current.plt',
+          utm_creative_format: 'current.fmt',
+          utm_marketing_tactic: 'current.tct',
+          session_entry: 'current_add.ep',
+          session_start_time: 'current_add.fd',
+          session_pages: 'session.pgs',
+          session_count: 'udata.vst',
+          user_agent: 'udata.uag',
         },
       };
       //# sourceURL=wc-order-attribution-js-extra
@@ -30655,10 +30655,10 @@
     <script type="text/javascript" id="wpcf7-recaptcha-js-before">
       /* <![CDATA[ */
       var wpcf7_recaptcha = {
-        sitekey: "6LevXDspAAAAAIC6x1gxGcHlGsSwyc630MTSOVxd",
+        sitekey: '6LevXDspAAAAAIC6x1gxGcHlGsSwyc630MTSOVxd',
         actions: {
-          homepage: "homepage",
-          contactform: "contactform",
+          homepage: 'homepage',
+          contactform: 'contactform',
         },
       };
       //# sourceURL=wpcf7-recaptcha-js-before
@@ -30693,124 +30693,124 @@
           isScriptDebug: false,
         },
         i18n: {
-          shareOnFacebook: "Share on Facebook",
-          shareOnTwitter: "Share on Twitter",
-          pinIt: "Pin it",
-          download: "Download",
-          downloadImage: "Download image",
-          fullscreen: "Fullscreen",
-          zoom: "Zoom",
-          share: "Share",
-          playVideo: "Play Video",
-          previous: "Previous",
-          next: "Next",
-          close: "Close",
-          a11yCarouselPrevSlideMessage: "Previous slide",
-          a11yCarouselNextSlideMessage: "Next slide",
-          a11yCarouselFirstSlideMessage: "This is the first slide",
-          a11yCarouselLastSlideMessage: "This is the last slide",
-          a11yCarouselPaginationBulletMessage: "Go to slide",
+          shareOnFacebook: 'Share on Facebook',
+          shareOnTwitter: 'Share on Twitter',
+          pinIt: 'Pin it',
+          download: 'Download',
+          downloadImage: 'Download image',
+          fullscreen: 'Fullscreen',
+          zoom: 'Zoom',
+          share: 'Share',
+          playVideo: 'Play Video',
+          previous: 'Previous',
+          next: 'Next',
+          close: 'Close',
+          a11yCarouselPrevSlideMessage: 'Previous slide',
+          a11yCarouselNextSlideMessage: 'Next slide',
+          a11yCarouselFirstSlideMessage: 'This is the first slide',
+          a11yCarouselLastSlideMessage: 'This is the last slide',
+          a11yCarouselPaginationBulletMessage: 'Go to slide',
         },
         is_rtl: false,
         breakpoints: { xs: 0, sm: 480, md: 768, lg: 1025, xl: 1440, xxl: 1600 },
         responsive: {
           breakpoints: {
             mobile: {
-              label: "Mobile Portrait",
+              label: 'Mobile Portrait',
               value: 768,
               default_value: 767,
-              direction: "max",
+              direction: 'max',
               is_enabled: true,
             },
             mobile_extra: {
-              label: "Mobile Landscape",
+              label: 'Mobile Landscape',
               value: 880,
               default_value: 880,
-              direction: "max",
+              direction: 'max',
               is_enabled: false,
             },
             tablet: {
-              label: "Tablet Portrait",
+              label: 'Tablet Portrait',
               value: 1024,
               default_value: 1024,
-              direction: "max",
+              direction: 'max',
               is_enabled: true,
             },
             tablet_extra: {
-              label: "Tablet Landscape",
+              label: 'Tablet Landscape',
               value: 1200,
               default_value: 1200,
-              direction: "max",
+              direction: 'max',
               is_enabled: false,
             },
             laptop: {
-              label: "Laptop",
+              label: 'Laptop',
               value: 1366,
               default_value: 1366,
-              direction: "max",
+              direction: 'max',
               is_enabled: false,
             },
             widescreen: {
-              label: "Widescreen",
+              label: 'Widescreen',
               value: 2400,
               default_value: 2400,
-              direction: "min",
+              direction: 'min',
               is_enabled: false,
             },
           },
           hasCustomBreakpoints: true,
         },
-        version: "4.0.1",
+        version: '4.0.1',
         is_static: false,
         experimentalFeatures: {
           e_font_icon_svg: true,
           additional_custom_breakpoints: true,
           container: true,
           theme_builder_v2: true,
-          "nested-elements": true,
+          'nested-elements': true,
           global_classes_should_enforce_capabilities: true,
           e_variables: true,
           e_opt_in_v4_page: true,
           e_components: true,
           e_interactions: true,
           e_widget_creation: true,
-          "import-export-customization": true,
-          "page-transitions": true,
+          'import-export-customization': true,
+          'page-transitions': true,
           notes: true,
-          "form-submissions": true,
+          'form-submissions': true,
           e_scroll_snap: true,
         },
         urls: {
           assets:
-            "https:\/\/malamal.com.bd\/wp-content\/plugins\/elementor\/assets\/",
-          ajaxurl: "https:\/\/malamal.com.bd\/wp-admin\/admin-ajax.php",
-          uploadUrl: "https:\/\/malamal.com.bd\/wp-content\/uploads",
+            'https:\/\/malamal.com.bd\/wp-content\/plugins\/elementor\/assets\/',
+          ajaxurl: 'https:\/\/malamal.com.bd\/wp-admin\/admin-ajax.php',
+          uploadUrl: 'https:\/\/malamal.com.bd\/wp-content\/uploads',
         },
         nonces: {
-          floatingButtonsClickTracking: "0f2f799201",
-          atomicFormsSendForm: "15540fa0b5",
+          floatingButtonsClickTracking: '0f2f799201',
+          atomicFormsSendForm: '15540fa0b5',
         },
-        swiperClass: "swiper",
+        swiperClass: 'swiper',
         settings: { page: [], editorPreferences: [] },
         kit: {
-          viewport_mobile: "768.98",
-          active_breakpoints: ["viewport_mobile", "viewport_tablet"],
-          global_image_lightbox: "yes",
-          lightbox_enable_counter: "yes",
-          lightbox_enable_fullscreen: "yes",
-          lightbox_enable_zoom: "yes",
-          lightbox_enable_share: "yes",
-          lightbox_title_src: "title",
-          lightbox_description_src: "description",
+          viewport_mobile: '768.98',
+          active_breakpoints: ['viewport_mobile', 'viewport_tablet'],
+          global_image_lightbox: 'yes',
+          lightbox_enable_counter: 'yes',
+          lightbox_enable_fullscreen: 'yes',
+          lightbox_enable_zoom: 'yes',
+          lightbox_enable_share: 'yes',
+          lightbox_title_src: 'title',
+          lightbox_description_src: 'description',
           woocommerce_notices_elements: [],
         },
         post: {
           id: 2025,
           title:
-            "Best%20Online%20Hardware%20Store%20in%20Bangladesh%20%7C%20Malamal.com.bd",
-          excerpt: "",
+            'Best%20Online%20Hardware%20Store%20in%20Bangladesh%20%7C%20Malamal.com.bd',
+          excerpt: '',
           featuredImage:
-            "https:\/\/i0.wp.com\/malamal.com.bd\/wp-content\/uploads\/2024\/02\/WhatsApp-Image-2024-02-01-at-9.40.16-PM.jpeg?fit=1024%2C1024&ssl=1",
+            'https:\/\/i0.wp.com\/malamal.com.bd\/wp-content\/uploads\/2024\/02\/WhatsApp-Image-2024-02-01-at-9.40.16-PM.jpeg?fit=1024%2C1024&ssl=1',
         },
       };
       var elementorFrontendConfig = {
@@ -30820,124 +30820,124 @@
           isScriptDebug: false,
         },
         i18n: {
-          shareOnFacebook: "Share on Facebook",
-          shareOnTwitter: "Share on Twitter",
-          pinIt: "Pin it",
-          download: "Download",
-          downloadImage: "Download image",
-          fullscreen: "Fullscreen",
-          zoom: "Zoom",
-          share: "Share",
-          playVideo: "Play Video",
-          previous: "Previous",
-          next: "Next",
-          close: "Close",
-          a11yCarouselPrevSlideMessage: "Previous slide",
-          a11yCarouselNextSlideMessage: "Next slide",
-          a11yCarouselFirstSlideMessage: "This is the first slide",
-          a11yCarouselLastSlideMessage: "This is the last slide",
-          a11yCarouselPaginationBulletMessage: "Go to slide",
+          shareOnFacebook: 'Share on Facebook',
+          shareOnTwitter: 'Share on Twitter',
+          pinIt: 'Pin it',
+          download: 'Download',
+          downloadImage: 'Download image',
+          fullscreen: 'Fullscreen',
+          zoom: 'Zoom',
+          share: 'Share',
+          playVideo: 'Play Video',
+          previous: 'Previous',
+          next: 'Next',
+          close: 'Close',
+          a11yCarouselPrevSlideMessage: 'Previous slide',
+          a11yCarouselNextSlideMessage: 'Next slide',
+          a11yCarouselFirstSlideMessage: 'This is the first slide',
+          a11yCarouselLastSlideMessage: 'This is the last slide',
+          a11yCarouselPaginationBulletMessage: 'Go to slide',
         },
         is_rtl: false,
         breakpoints: { xs: 0, sm: 480, md: 768, lg: 1025, xl: 1440, xxl: 1600 },
         responsive: {
           breakpoints: {
             mobile: {
-              label: "Mobile Portrait",
+              label: 'Mobile Portrait',
               value: 768,
               default_value: 767,
-              direction: "max",
+              direction: 'max',
               is_enabled: true,
             },
             mobile_extra: {
-              label: "Mobile Landscape",
+              label: 'Mobile Landscape',
               value: 880,
               default_value: 880,
-              direction: "max",
+              direction: 'max',
               is_enabled: false,
             },
             tablet: {
-              label: "Tablet Portrait",
+              label: 'Tablet Portrait',
               value: 1024,
               default_value: 1024,
-              direction: "max",
+              direction: 'max',
               is_enabled: true,
             },
             tablet_extra: {
-              label: "Tablet Landscape",
+              label: 'Tablet Landscape',
               value: 1200,
               default_value: 1200,
-              direction: "max",
+              direction: 'max',
               is_enabled: false,
             },
             laptop: {
-              label: "Laptop",
+              label: 'Laptop',
               value: 1366,
               default_value: 1366,
-              direction: "max",
+              direction: 'max',
               is_enabled: false,
             },
             widescreen: {
-              label: "Widescreen",
+              label: 'Widescreen',
               value: 2400,
               default_value: 2400,
-              direction: "min",
+              direction: 'min',
               is_enabled: false,
             },
           },
           hasCustomBreakpoints: true,
         },
-        version: "4.0.1",
+        version: '4.0.1',
         is_static: false,
         experimentalFeatures: {
           e_font_icon_svg: true,
           additional_custom_breakpoints: true,
           container: true,
           theme_builder_v2: true,
-          "nested-elements": true,
+          'nested-elements': true,
           global_classes_should_enforce_capabilities: true,
           e_variables: true,
           e_opt_in_v4_page: true,
           e_components: true,
           e_interactions: true,
           e_widget_creation: true,
-          "import-export-customization": true,
-          "page-transitions": true,
+          'import-export-customization': true,
+          'page-transitions': true,
           notes: true,
-          "form-submissions": true,
+          'form-submissions': true,
           e_scroll_snap: true,
         },
         urls: {
           assets:
-            "https:\/\/malamal.com.bd\/wp-content\/plugins\/elementor\/assets\/",
-          ajaxurl: "https:\/\/malamal.com.bd\/wp-admin\/admin-ajax.php",
-          uploadUrl: "https:\/\/malamal.com.bd\/wp-content\/uploads",
+            'https:\/\/malamal.com.bd\/wp-content\/plugins\/elementor\/assets\/',
+          ajaxurl: 'https:\/\/malamal.com.bd\/wp-admin\/admin-ajax.php',
+          uploadUrl: 'https:\/\/malamal.com.bd\/wp-content\/uploads',
         },
         nonces: {
-          floatingButtonsClickTracking: "0f2f799201",
-          atomicFormsSendForm: "15540fa0b5",
+          floatingButtonsClickTracking: '0f2f799201',
+          atomicFormsSendForm: '15540fa0b5',
         },
-        swiperClass: "swiper",
+        swiperClass: 'swiper',
         settings: { page: [], editorPreferences: [] },
         kit: {
-          viewport_mobile: "768.98",
-          active_breakpoints: ["viewport_mobile", "viewport_tablet"],
-          global_image_lightbox: "yes",
-          lightbox_enable_counter: "yes",
-          lightbox_enable_fullscreen: "yes",
-          lightbox_enable_zoom: "yes",
-          lightbox_enable_share: "yes",
-          lightbox_title_src: "title",
-          lightbox_description_src: "description",
+          viewport_mobile: '768.98',
+          active_breakpoints: ['viewport_mobile', 'viewport_tablet'],
+          global_image_lightbox: 'yes',
+          lightbox_enable_counter: 'yes',
+          lightbox_enable_fullscreen: 'yes',
+          lightbox_enable_zoom: 'yes',
+          lightbox_enable_share: 'yes',
+          lightbox_title_src: 'title',
+          lightbox_description_src: 'description',
           woocommerce_notices_elements: [],
         },
         post: {
           id: 2025,
           title:
-            "Best%20Online%20Hardware%20Store%20in%20Bangladesh%20%7C%20Malamal.com.bd",
-          excerpt: "",
+            'Best%20Online%20Hardware%20Store%20in%20Bangladesh%20%7C%20Malamal.com.bd',
+          excerpt: '',
           featuredImage:
-            "https:\/\/i0.wp.com\/malamal.com.bd\/wp-content\/uploads\/2024\/02\/WhatsApp-Image-2024-02-01-at-9.40.16-PM.jpeg?fit=1024%2C1024&ssl=1",
+            'https:\/\/i0.wp.com\/malamal.com.bd\/wp-content\/uploads\/2024\/02\/WhatsApp-Image-2024-02-01-at-9.40.16-PM.jpeg?fit=1024%2C1024&ssl=1',
         },
       };
       //# sourceURL=elementor-frontend-js-before
@@ -30957,85 +30957,85 @@
     <script type="text/javascript" id="elementor-pro-frontend-js-before">
       /* <![CDATA[ */
       var ElementorProFrontendConfig = {
-        ajaxurl: "https:\/\/malamal.com.bd\/wp-admin\/admin-ajax.php",
-        nonce: "902fed4307",
+        ajaxurl: 'https:\/\/malamal.com.bd\/wp-admin\/admin-ajax.php',
+        nonce: '902fed4307',
         urls: {
           assets:
-            "https:\/\/malamal.com.bd\/wp-content\/plugins\/elementor-pro\/assets\/",
-          rest: "https:\/\/malamal.com.bd\/wp-json\/",
+            'https:\/\/malamal.com.bd\/wp-content\/plugins\/elementor-pro\/assets\/',
+          rest: 'https:\/\/malamal.com.bd\/wp-json\/',
         },
         shareButtonsNetworks: {
-          facebook: { title: "Facebook", has_counter: true },
-          twitter: { title: "Twitter" },
-          linkedin: { title: "LinkedIn", has_counter: true },
-          pinterest: { title: "Pinterest", has_counter: true },
-          reddit: { title: "Reddit", has_counter: true },
-          vk: { title: "VK", has_counter: true },
-          odnoklassniki: { title: "OK", has_counter: true },
-          tumblr: { title: "Tumblr" },
-          digg: { title: "Digg" },
-          skype: { title: "Skype" },
-          stumbleupon: { title: "StumbleUpon", has_counter: true },
-          mix: { title: "Mix" },
-          telegram: { title: "Telegram" },
-          pocket: { title: "Pocket", has_counter: true },
-          xing: { title: "XING", has_counter: true },
-          whatsapp: { title: "WhatsApp" },
-          email: { title: "Email" },
-          print: { title: "Print" },
+          facebook: { title: 'Facebook', has_counter: true },
+          twitter: { title: 'Twitter' },
+          linkedin: { title: 'LinkedIn', has_counter: true },
+          pinterest: { title: 'Pinterest', has_counter: true },
+          reddit: { title: 'Reddit', has_counter: true },
+          vk: { title: 'VK', has_counter: true },
+          odnoklassniki: { title: 'OK', has_counter: true },
+          tumblr: { title: 'Tumblr' },
+          digg: { title: 'Digg' },
+          skype: { title: 'Skype' },
+          stumbleupon: { title: 'StumbleUpon', has_counter: true },
+          mix: { title: 'Mix' },
+          telegram: { title: 'Telegram' },
+          pocket: { title: 'Pocket', has_counter: true },
+          xing: { title: 'XING', has_counter: true },
+          whatsapp: { title: 'WhatsApp' },
+          email: { title: 'Email' },
+          print: { title: 'Print' },
         },
         woocommerce: {
           menu_cart: {
-            cart_page_url: "https:\/\/malamal.com.bd\/cart\/",
-            checkout_page_url: "https:\/\/malamal.com.bd\/checkout\/",
-            fragments_nonce: "0bcf2ff1b1",
+            cart_page_url: 'https:\/\/malamal.com.bd\/cart\/',
+            checkout_page_url: 'https:\/\/malamal.com.bd\/checkout\/',
+            fragments_nonce: '0bcf2ff1b1',
           },
         },
-        facebook_sdk: { lang: "en_US", app_id: "" },
+        facebook_sdk: { lang: 'en_US', app_id: '' },
         lottie: {
           defaultAnimationUrl:
-            "https:\/\/malamal.com.bd\/wp-content\/plugins\/elementor-pro\/modules\/lottie\/assets\/animations\/default.json",
+            'https:\/\/malamal.com.bd\/wp-content\/plugins\/elementor-pro\/modules\/lottie\/assets\/animations\/default.json',
         },
       };
       var ElementorProFrontendConfig = {
-        ajaxurl: "https:\/\/malamal.com.bd\/wp-admin\/admin-ajax.php",
-        nonce: "902fed4307",
+        ajaxurl: 'https:\/\/malamal.com.bd\/wp-admin\/admin-ajax.php',
+        nonce: '902fed4307',
         urls: {
           assets:
-            "https:\/\/malamal.com.bd\/wp-content\/plugins\/elementor-pro\/assets\/",
-          rest: "https:\/\/malamal.com.bd\/wp-json\/",
+            'https:\/\/malamal.com.bd\/wp-content\/plugins\/elementor-pro\/assets\/',
+          rest: 'https:\/\/malamal.com.bd\/wp-json\/',
         },
         shareButtonsNetworks: {
-          facebook: { title: "Facebook", has_counter: true },
-          twitter: { title: "Twitter" },
-          linkedin: { title: "LinkedIn", has_counter: true },
-          pinterest: { title: "Pinterest", has_counter: true },
-          reddit: { title: "Reddit", has_counter: true },
-          vk: { title: "VK", has_counter: true },
-          odnoklassniki: { title: "OK", has_counter: true },
-          tumblr: { title: "Tumblr" },
-          digg: { title: "Digg" },
-          skype: { title: "Skype" },
-          stumbleupon: { title: "StumbleUpon", has_counter: true },
-          mix: { title: "Mix" },
-          telegram: { title: "Telegram" },
-          pocket: { title: "Pocket", has_counter: true },
-          xing: { title: "XING", has_counter: true },
-          whatsapp: { title: "WhatsApp" },
-          email: { title: "Email" },
-          print: { title: "Print" },
+          facebook: { title: 'Facebook', has_counter: true },
+          twitter: { title: 'Twitter' },
+          linkedin: { title: 'LinkedIn', has_counter: true },
+          pinterest: { title: 'Pinterest', has_counter: true },
+          reddit: { title: 'Reddit', has_counter: true },
+          vk: { title: 'VK', has_counter: true },
+          odnoklassniki: { title: 'OK', has_counter: true },
+          tumblr: { title: 'Tumblr' },
+          digg: { title: 'Digg' },
+          skype: { title: 'Skype' },
+          stumbleupon: { title: 'StumbleUpon', has_counter: true },
+          mix: { title: 'Mix' },
+          telegram: { title: 'Telegram' },
+          pocket: { title: 'Pocket', has_counter: true },
+          xing: { title: 'XING', has_counter: true },
+          whatsapp: { title: 'WhatsApp' },
+          email: { title: 'Email' },
+          print: { title: 'Print' },
         },
         woocommerce: {
           menu_cart: {
-            cart_page_url: "https:\/\/malamal.com.bd\/cart\/",
-            checkout_page_url: "https:\/\/malamal.com.bd\/checkout\/",
-            fragments_nonce: "0bcf2ff1b1",
+            cart_page_url: 'https:\/\/malamal.com.bd\/cart\/',
+            checkout_page_url: 'https:\/\/malamal.com.bd\/checkout\/',
+            fragments_nonce: '0bcf2ff1b1',
           },
         },
-        facebook_sdk: { lang: "en_US", app_id: "" },
+        facebook_sdk: { lang: 'en_US', app_id: '' },
         lottie: {
           defaultAnimationUrl:
-            "https:\/\/malamal.com.bd\/wp-content\/plugins\/elementor-pro\/modules\/lottie\/assets\/animations\/default.json",
+            'https:\/\/malamal.com.bd\/wp-content\/plugins\/elementor-pro\/modules\/lottie\/assets\/animations\/default.json',
         },
       };
       //# sourceURL=elementor-pro-frontend-js-before
@@ -31055,331 +31055,331 @@
     <script type="text/javascript" id="woodmart-theme-js-extra">
       /* <![CDATA[ */
       var woodmart_settings = {
-        menu_storage_key: "woodmart_2238bc8b2571b43bc004f1d84554b16e",
-        ajax_dropdowns_save: "1",
-        photoswipe_close_on_scroll: "1",
-        woocommerce_ajax_add_to_cart: "yes",
-        variation_gallery_storage_method: "new",
-        elementor_no_gap: "enabled",
-        adding_to_cart: "Processing",
-        added_to_cart: "Product was successfully added to your cart.",
-        continue_shopping: "Continue shopping",
-        view_cart: "View Cart",
-        go_to_checkout: "Checkout",
-        loading: "Loading...",
-        countdown_days: "days",
-        countdown_hours: "hr",
-        countdown_mins: "min",
-        countdown_sec: "sc",
-        cart_url: "https://malamal.com.bd/cart/",
-        ajaxurl: "https://malamal.com.bd/wp-admin/admin-ajax.php",
-        add_to_cart_action: "widget",
-        added_popup: "no",
-        categories_toggle: "yes",
-        product_images_captions: "no",
-        ajax_add_to_cart: "1",
-        all_results: "View all results",
-        zoom_enable: "yes",
-        ajax_scroll: "yes",
-        ajax_scroll_class: ".wd-page-content",
-        ajax_scroll_offset: "100",
-        infinit_scroll_offset: "300",
-        product_slider_auto_height: "no",
-        price_filter_action: "click",
-        product_slider_autoplay: "",
-        close: "Close",
+        menu_storage_key: 'woodmart_2238bc8b2571b43bc004f1d84554b16e',
+        ajax_dropdowns_save: '1',
+        photoswipe_close_on_scroll: '1',
+        woocommerce_ajax_add_to_cart: 'yes',
+        variation_gallery_storage_method: 'new',
+        elementor_no_gap: 'enabled',
+        adding_to_cart: 'Processing',
+        added_to_cart: 'Product was successfully added to your cart.',
+        continue_shopping: 'Continue shopping',
+        view_cart: 'View Cart',
+        go_to_checkout: 'Checkout',
+        loading: 'Loading...',
+        countdown_days: 'days',
+        countdown_hours: 'hr',
+        countdown_mins: 'min',
+        countdown_sec: 'sc',
+        cart_url: 'https://malamal.com.bd/cart/',
+        ajaxurl: 'https://malamal.com.bd/wp-admin/admin-ajax.php',
+        add_to_cart_action: 'widget',
+        added_popup: 'no',
+        categories_toggle: 'yes',
+        product_images_captions: 'no',
+        ajax_add_to_cart: '1',
+        all_results: 'View all results',
+        zoom_enable: 'yes',
+        ajax_scroll: 'yes',
+        ajax_scroll_class: '.wd-page-content',
+        ajax_scroll_offset: '100',
+        infinit_scroll_offset: '300',
+        product_slider_auto_height: 'no',
+        price_filter_action: 'click',
+        product_slider_autoplay: '',
+        close: 'Close',
         close_markup:
           '\u003Cdiv class="wd-popup-close wd-action-btn wd-cross-icon wd-style-icon"\u003E\u003Ca title="Close" href="#" rel="nofollow"\u003E\u003Cspan class="wd-action-icon"\u003E\u003C/span\u003E\u003Cspan class="wd-action-text"\u003EClose\u003C/span\u003E\u003C/a\u003E\u003C/div\u003E',
-        share_fb: "Share on Facebook",
-        pin_it: "Pin it",
-        tweet: "Share on X",
-        download_image: "Download image",
-        off_canvas_column_close_btn_text: "Close",
-        cookies_version: "1",
-        header_banner_version: "1",
-        promo_version: "1",
-        header_banner_close_btn: "yes",
-        header_banner_enabled: "no",
+        share_fb: 'Share on Facebook',
+        pin_it: 'Pin it',
+        tweet: 'Share on X',
+        download_image: 'Download image',
+        off_canvas_column_close_btn_text: 'Close',
+        cookies_version: '1',
+        header_banner_version: '1',
+        promo_version: '1',
+        header_banner_close_btn: 'yes',
+        header_banner_enabled: 'no',
         whb_header_clone:
           '\n\t\u003Cdiv class="whb-sticky-header whb-clone whb-main-header {{wrapperClasses}}"\u003E\n\t\t\u003Cdiv class="{{cloneClass}}"\u003E\n\t\t\t\u003Cdiv class="container"\u003E\n\t\t\t\t\u003Cdiv class="whb-flex-row whb-general-header-inner"\u003E\n\t\t\t\t\t\u003Cdiv class="whb-column whb-col-left whb-visible-lg"\u003E\n\t\t\t\t\t\t{{.site-logo}}\n\t\t\t\t\t\u003C/div\u003E\n\t\t\t\t\t\u003Cdiv class="whb-column whb-col-center whb-visible-lg"\u003E\n\t\t\t\t\t\t{{.wd-header-main-nav}}\n\t\t\t\t\t\u003C/div\u003E\n\t\t\t\t\t\u003Cdiv class="whb-column whb-col-right whb-visible-lg"\u003E\n\t\t\t\t\t\t{{.wd-header-my-account}}\n\t\t\t\t\t\t{{.wd-header-search:not(.wd-header-search-mobile)}}\n\t\t\t\t\t\t{{.wd-header-wishlist}}\n\t\t\t\t\t\t{{.wd-header-compare}}\n\t\t\t\t\t\t{{.wd-header-cart}}\n\t\t\t\t\t\t{{.wd-header-fs-nav}}\n\t\t\t\t\t\u003C/div\u003E\n\t\t\t\t\t{{.whb-mobile-left}}\n\t\t\t\t\t{{.whb-mobile-center}}\n\t\t\t\t\t{{.whb-mobile-right}}\n\t\t\t\t\u003C/div\u003E\n\t\t\t\u003C/div\u003E\n\t\t\u003C/div\u003E\n\t\u003C/div\u003E\n',
-        pjax_timeout: "5000",
-        split_nav_fix: "",
-        shop_filters_close: "no",
-        woo_installed: "1",
-        base_hover_mobile_click: "no",
-        centered_gallery_start: "1",
-        quickview_in_popup_fix: "",
-        one_page_menu_offset: "150",
-        hover_width_small: "1",
-        max_recently_viewed_products: "12",
-        is_multisite: "",
-        current_blog_id: "1",
-        swatches_scroll_top_desktop: "no",
-        swatches_scroll_top_mobile: "no",
-        lazy_loading_offset: "0",
-        add_to_cart_action_timeout: "no",
-        add_to_cart_action_timeout_number: "3",
-        single_product_variations_price: "yes",
-        google_map_style_text: "Custom style",
-        quick_shop: "yes",
-        sticky_product_details_offset: "150",
-        sticky_add_to_cart_offset: "250",
-        sticky_product_details_different: "100",
-        preloader_delay: "300",
+        pjax_timeout: '5000',
+        split_nav_fix: '',
+        shop_filters_close: 'no',
+        woo_installed: '1',
+        base_hover_mobile_click: 'no',
+        centered_gallery_start: '1',
+        quickview_in_popup_fix: '',
+        one_page_menu_offset: '150',
+        hover_width_small: '1',
+        max_recently_viewed_products: '12',
+        is_multisite: '',
+        current_blog_id: '1',
+        swatches_scroll_top_desktop: 'no',
+        swatches_scroll_top_mobile: 'no',
+        lazy_loading_offset: '0',
+        add_to_cart_action_timeout: 'no',
+        add_to_cart_action_timeout_number: '3',
+        single_product_variations_price: 'yes',
+        google_map_style_text: 'Custom style',
+        quick_shop: 'yes',
+        sticky_product_details_offset: '150',
+        sticky_add_to_cart_offset: '250',
+        sticky_product_details_different: '100',
+        preloader_delay: '300',
         comment_images_upload_size_text:
-          "Some files are too large. Allowed file size is 1 MB.",
+          'Some files are too large. Allowed file size is 1 MB.',
         comment_images_count_text:
-          "You can upload up to 3 images to your review.",
-        single_product_comment_images_required: "yes",
-        comment_required_images_error_text: "Image is required.",
+          'You can upload up to 3 images to your review.',
+        single_product_comment_images_required: 'yes',
+        comment_required_images_error_text: 'Image is required.',
         comment_images_upload_mimes_text:
-          "You are allowed to upload images only in png, jpeg formats.",
-        comment_images_added_count_text: "Added %s image(s)",
-        comment_images_upload_size: "1048576",
-        comment_images_count: "3",
-        search_input_padding: "no",
+          'You are allowed to upload images only in png, jpeg formats.',
+        comment_images_added_count_text: 'Added %s image(s)',
+        comment_images_upload_size: '1048576',
+        comment_images_count: '3',
+        search_input_padding: 'no',
         comment_images_upload_mimes: {
-          "jpg|jpeg|jpe": "image/jpeg",
-          png: "image/png",
+          'jpg|jpeg|jpe': 'image/jpeg',
+          png: 'image/png',
         },
-        home_url: "https://malamal.com.bd/",
-        shop_url: "https://malamal.com.bd/shop/",
-        age_verify: "no",
-        banner_version_cookie_expires: "60",
-        promo_version_cookie_expires: "7",
-        age_verify_expires: "30",
-        countdown_timezone: "GMT",
-        cart_redirect_after_add: "no",
-        swatches_labels_name: "no",
-        product_categories_placeholder: "Select a category",
-        product_categories_no_results: "No matches found",
-        cart_hash_key: "wc_cart_hash_40c1daa3adb161249a9f0c021bddd652",
-        fragment_name: "wc_fragments_40c1daa3adb161249a9f0c021bddd652",
+        home_url: 'https://malamal.com.bd/',
+        shop_url: 'https://malamal.com.bd/shop/',
+        age_verify: 'no',
+        banner_version_cookie_expires: '60',
+        promo_version_cookie_expires: '7',
+        age_verify_expires: '30',
+        countdown_timezone: 'GMT',
+        cart_redirect_after_add: 'no',
+        swatches_labels_name: 'no',
+        product_categories_placeholder: 'Select a category',
+        product_categories_no_results: 'No matches found',
+        cart_hash_key: 'wc_cart_hash_40c1daa3adb161249a9f0c021bddd652',
+        fragment_name: 'wc_fragments_40c1daa3adb161249a9f0c021bddd652',
         photoswipe_template:
           '\u003Cdiv class="pswp" aria-hidden="true" role="dialog" tabindex="-1"\u003E\u003Cdiv class="pswp__bg"\u003E\u003C/div\u003E\u003Cdiv class="pswp__scroll-wrap"\u003E\u003Cdiv class="pswp__container"\u003E\u003Cdiv class="pswp__item"\u003E\u003C/div\u003E\u003Cdiv class="pswp__item"\u003E\u003C/div\u003E\u003Cdiv class="pswp__item"\u003E\u003C/div\u003E\u003C/div\u003E\u003Cdiv class="pswp__ui pswp__ui--hidden"\u003E\u003Cdiv class="pswp__top-bar"\u003E\u003Cdiv class="pswp__counter"\u003E\u003C/div\u003E\u003Cbutton class="pswp__button pswp__button--close" title="Close (Esc)"\u003E\u003C/button\u003E \u003Cbutton class="pswp__button pswp__button--share" title="Share"\u003E\u003C/button\u003E \u003Cbutton class="pswp__button pswp__button--fs" title="Toggle fullscreen"\u003E\u003C/button\u003E \u003Cbutton class="pswp__button pswp__button--zoom" title="Zoom in/out"\u003E\u003C/button\u003E\u003Cdiv class="pswp__preloader"\u003E\u003Cdiv class="pswp__preloader__icn"\u003E\u003Cdiv class="pswp__preloader__cut"\u003E\u003Cdiv class="pswp__preloader__donut"\u003E\u003C/div\u003E\u003C/div\u003E\u003C/div\u003E\u003C/div\u003E\u003C/div\u003E\u003Cdiv class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"\u003E\u003Cdiv class="pswp__share-tooltip"\u003E\u003C/div\u003E\u003C/div\u003E\u003Cbutton class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"\u003E\u003C/button\u003E \u003Cbutton class="pswp__button pswp__button--arrow--right" title="Next (arrow right)\u003E"\u003E\u003C/button\u003E\u003Cdiv class="pswp__caption"\u003E\u003Cdiv class="pswp__caption__center"\u003E\u003C/div\u003E\u003C/div\u003E\u003C/div\u003E\u003C/div\u003E\u003C/div\u003E',
-        load_more_button_page_url: "yes",
-        load_more_button_page_url_opt: "yes",
-        menu_item_hover_to_click_on_responsive: "no",
-        clear_menu_offsets_on_resize: "yes",
-        three_sixty_framerate: "60",
-        three_sixty_prev_next_frames: "5",
-        ajax_search_delay: "300",
-        animated_counter_speed: "3000",
-        site_width: "1400",
-        cookie_expires: "7",
-        cookie_secure_param: "1",
-        cookie_path: "/",
-        theme_dir: "https://malamal.com.bd/wp-content/themes/woodmart",
-        slider_distortion_effect: "sliderWithNoise",
-        current_page_builder: "elementor",
-        collapse_footer_widgets: "yes",
-        carousel_breakpoints: { 1025: "lg", 768.98: "md", 0: "sm" },
-        ajax_shop: "1",
-        add_to_cart_text: "Add to cart",
-        mobile_navigation_drilldown_back_to: "Back to %s",
-        mobile_navigation_drilldown_back_to_main_menu: "Back to menu",
-        mobile_navigation_drilldown_back_to_categories: "Back to categories",
-        search_history_title: "Search history",
-        search_history_clear_all: "Clear",
-        search_history_items_limit: "5",
-        swiper_prev_slide_msg: "Previous slide",
-        swiper_next_slide_msg: "Next slide",
-        swiper_first_slide_msg: "This is the first slide",
-        swiper_last_slide_msg: "This is the last slide",
-        swiper_pagination_bullet_msg: "Go to slide {{index}}",
-        swiper_slide_label_msg: "{{index}} / {{slidesLength}}",
-        on_this_page: "On this page:",
+        load_more_button_page_url: 'yes',
+        load_more_button_page_url_opt: 'yes',
+        menu_item_hover_to_click_on_responsive: 'no',
+        clear_menu_offsets_on_resize: 'yes',
+        three_sixty_framerate: '60',
+        three_sixty_prev_next_frames: '5',
+        ajax_search_delay: '300',
+        animated_counter_speed: '3000',
+        site_width: '1400',
+        cookie_expires: '7',
+        cookie_secure_param: '1',
+        cookie_path: '/',
+        theme_dir: 'https://malamal.com.bd/wp-content/themes/woodmart',
+        slider_distortion_effect: 'sliderWithNoise',
+        current_page_builder: 'elementor',
+        collapse_footer_widgets: 'yes',
+        carousel_breakpoints: { 1025: 'lg', 768.98: 'md', 0: 'sm' },
+        ajax_shop: '1',
+        add_to_cart_text: 'Add to cart',
+        mobile_navigation_drilldown_back_to: 'Back to %s',
+        mobile_navigation_drilldown_back_to_main_menu: 'Back to menu',
+        mobile_navigation_drilldown_back_to_categories: 'Back to categories',
+        search_history_title: 'Search history',
+        search_history_clear_all: 'Clear',
+        search_history_items_limit: '5',
+        swiper_prev_slide_msg: 'Previous slide',
+        swiper_next_slide_msg: 'Next slide',
+        swiper_first_slide_msg: 'This is the first slide',
+        swiper_last_slide_msg: 'This is the last slide',
+        swiper_pagination_bullet_msg: 'Go to slide {{index}}',
+        swiper_slide_label_msg: '{{index}} / {{slidesLength}}',
+        on_this_page: 'On this page:',
         tooltip_left_selector:
           '.wd-buttons[class*="wd-pos-r"] .wd-action-btn, .wd-portfolio-btns .portfolio-enlarge',
         tooltip_top_selector:
           '.wd-tooltip, .wd-buttons:not([class*="wd-pos-r"]) \u003E .wd-action-btn, body:not(.catalog-mode-on):not(.login-see-prices) .wd-hover-base .wd-bottom-actions .wd-action-btn.wd-style-icon, .wd-hover-base .wd-compare-btn, body:not(.logged-in) .wd-review-likes a',
         ajax_links:
           '.wd-nav-product-cat a, .wd-page-wrapper .widget_product_categories a, .widget_layered_nav_filters a, .woocommerce-widget-layered-nav a, .filters-area:not(.custom-content) a, body.post-type-archive-product:not(.woocommerce-account) .woocommerce-pagination a, body.tax-product_cat:not(.woocommerce-account) .woocommerce-pagination a, .wd-shop-tools a:not([rel="v:url"]), .woodmart-woocommerce-layered-nav a, .woodmart-price-filter a, .wd-clear-filters a, .woodmart-woocommerce-sort-by a, .woocommerce-widget-layered-nav-list a, .wd-widget-stock-status a, .widget_nav_mega_menu a, .wd-products-shop-view a, .wd-products-per-page a, .wd-cat a, body[class*="tax-pa_"] .woocommerce-pagination a, .wd-product-category-filter a, .widget_brand_nav a',
-        wishlist_expanded: "no",
-        wishlist_show_popup: "enable",
-        wishlist_page_nonce: "68a4570bb5",
-        wishlist_fragments_nonce: "ec48ab6496",
-        wishlist_remove_notice: "Do you really want to remove these products?",
+        wishlist_expanded: 'no',
+        wishlist_show_popup: 'enable',
+        wishlist_page_nonce: '68a4570bb5',
+        wishlist_fragments_nonce: 'ec48ab6496',
+        wishlist_remove_notice: 'Do you really want to remove these products?',
         wishlist_hash_name:
-          "woodmart_wishlist_hash_db3e514bb2a5548b42ceb45423626293",
+          'woodmart_wishlist_hash_db3e514bb2a5548b42ceb45423626293',
         wishlist_fragment_name:
-          "woodmart_wishlist_fragments_db3e514bb2a5548b42ceb45423626293",
-        wishlist_save_button_state: "no",
-        wishlist_cookie_expires: "7",
-        wishlist_add_button_text: "Add to wishlist",
-        wishlist_remove_button_text: "Remove from wishlist",
-        counter_visitor_live_duration: "10000",
-        counter_visitor_ajax_update: "yes",
-        counter_visitor_live_mode: "no",
-        is_criteria_enabled: "1",
-        summary_criteria_ids: "value_for_money,durability,delivery_speed",
-        review_likes_tooltip: "Please log in to rate reviews.",
+          'woodmart_wishlist_fragments_db3e514bb2a5548b42ceb45423626293',
+        wishlist_save_button_state: 'no',
+        wishlist_cookie_expires: '7',
+        wishlist_add_button_text: 'Add to wishlist',
+        wishlist_remove_button_text: 'Remove from wishlist',
+        counter_visitor_live_duration: '10000',
+        counter_visitor_ajax_update: 'yes',
+        counter_visitor_live_mode: 'no',
+        is_criteria_enabled: '1',
+        summary_criteria_ids: 'value_for_money,durability,delivery_speed',
+        review_likes_tooltip: 'Please log in to rate reviews.',
         vimeo_library_url:
-          "https://malamal.com.bd/wp-content/themes/woodmart/js/libs/vimeo-player.min.js",
-        compare_by_category: "yes",
-        compare_page_nonce: "fc3b11be1c",
-        compare_save_button_state: "no",
-        compare_origin_button_text: "Compare",
-        compare_added_button_text: "Compare products",
-        compare_removed_button_text: "Remove from compare",
-        reviews_criteria_rating_required: "no",
-        is_rating_summary_filter_enabled: "1",
+          'https://malamal.com.bd/wp-content/themes/woodmart/js/libs/vimeo-player.min.js',
+        compare_by_category: 'yes',
+        compare_page_nonce: 'fc3b11be1c',
+        compare_save_button_state: 'no',
+        compare_origin_button_text: 'Compare',
+        compare_added_button_text: 'Compare products',
+        compare_removed_button_text: 'Remove from compare',
+        reviews_criteria_rating_required: 'no',
+        is_rating_summary_filter_enabled: '1',
       };
       var woodmart_page_css = {
-        "wd-style-base-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/base.min.css",
-        "wd-helpers-wpb-elem-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/helpers-wpb-elem.min.css",
-        "wd-seo-plugins-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/int-seo-plugins.min.css",
-        "wd-elementor-base-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/int-elem-base.min.css",
-        "wd-elementor-pro-base-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/int-elementor-pro.min.css",
-        "wd-woocommerce-base-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woocommerce-base.min.css",
-        "wd-mod-star-rating-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/mod-star-rating.min.css",
-        "wd-woocommerce-block-notices-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-mod-block-notices.min.css",
-        "wd-woo-mod-shop-attributes-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-mod-shop-attributes.min.css",
-        "wd-wp-blocks-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/wp-blocks.min.css",
-        "wd-mod-nav-vertical-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/mod-nav-vertical.min.css",
-        "wd-sticky-nav-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/opt-sticky-nav.min.css",
-        "wd-header-base-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/header-base.min.css",
-        "wd-mod-tools-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/mod-tools.min.css",
-        "wd-header-search-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/header-el-search.min.css",
-        "wd-header-search-form-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/header-el-search-form.min.css",
-        "wd-wd-search-form-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/wd-search-form.min.css",
-        "wd-wd-search-results-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/wd-search-results.min.css",
-        "wd-wd-search-dropdown-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/wd-search-dropdown.min.css",
-        "wd-header-elements-base-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/header-el-base.min.css",
-        "wd-info-box-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/el-info-box.min.css",
-        "wd-header-mobile-nav-dropdown-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/header-el-mobile-nav-dropdown.min.css",
-        "wd-woo-mod-login-form-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-mod-login-form.min.css",
-        "wd-header-my-account-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/header-el-my-account.min.css",
-        "wd-mod-tools-design-8-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/mod-tools-design-8.min.css",
-        "wd-bg-navigation-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/bg-navigation.min.css",
-        "wd-mfp-popup-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/lib-magnific-popup.min.css",
-        "wd-mod-animations-transform-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/mod-animations-transform.min.css",
-        "wd-mod-transform-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/mod-transform.min.css",
-        "wd-button-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/el-button.min.css",
-        "wd-categories-loop-center-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-categories-loop-center-old.min.css",
-        "wd-woo-categories-loop-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-categories-loop.min.css",
-        "wd-categories-loop-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-categories-loop-old.min.css",
-        "wd-header-cart-side-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/header-el-cart-side.min.css",
-        "wd-woo-mod-quantity-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-mod-quantity.min.css",
-        "wd-header-cart-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/header-el-cart.min.css",
-        "wd-widget-shopping-cart-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-widget-shopping-cart.min.css",
-        "wd-widget-product-list-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-widget-product-list.min.css",
-        "wd-collapsible-content-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/elem-opt-collapsible-content.min.css",
-        "wd-marquee-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/el-marquee.min.css",
-        "wd-swiper-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/lib-swiper.min.css",
-        "wd-slider-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/el-slider.min.css",
-        "wd-slider-dots-style-3-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/el-slider-dots-style-3.min.css",
-        "wd-swiper-arrows-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/lib-swiper-arrows.min.css",
-        "wd-swiper-pagin-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/lib-swiper-pagin.min.css",
-        "wd-banner-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/el-banner.min.css",
-        "wd-banner-hover-zoom-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/el-banner-hover-zoom.min.css",
-        "wd-section-title-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/el-section-title.min.css",
-        "wd-product-loop-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-product-loop.min.css",
-        "wd-woo-loop-prod-el-base-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-loop-prod-el-base.min.css",
-        "wd-woo-loop-prod-predefined-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-loop-prod-predefined.min.css",
-        "wd-product-loop-fw-button-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-prod-loop-fw-button.min.css",
-        "wd-woo-mod-loop-prod-add-btn-replace-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-mod-loop-prod-add-btn-replace.min.css",
-        "wd-woo-mod-swatches-base-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-mod-swatches-base.min.css",
-        "wd-mod-more-description-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/mod-more-description.min.css",
-        "wd-woo-mod-loop-prod-hover-fade-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-mod-loop-prod-hover-fade.min.css",
-        "wd-woo-mod-loop-prod-hover-fade-predefined-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-mod-loop-prod-hover-fade-predefined.min.css",
-        "wd-woo-opt-title-limit-predefined-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-opt-title-limit-predefined.min.css",
-        "wd-woo-opt-stretch-cont-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-opt-stretch-cont.min.css",
-        "wd-woo-opt-stretch-cont-predefined-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-opt-stretch-cont-predefined.min.css",
-        "wd-woo-opt-products-bg-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-opt-products-bg.min.css",
-        "wd-woo-mod-product-labels-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-mod-product-labels.min.css",
-        "wd-woo-mod-stock-status-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-mod-stock-status.min.css",
-        "wd-woo-opt-grid-gallery-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-opt-grid-gallery.min.css",
-        "wd-brands-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/el-brand.min.css",
-        "wd-countdown-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/el-countdown-timer.min.css",
-        "wd-woo-prod-loop-small-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-prod-loop-small.min.css",
-        "wd-text-block-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/el-text-block.min.css",
-        "wd-widget-collapse-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/opt-widget-collapse.min.css",
-        "wd-footer-base-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/footer-base.min.css",
-        "wd-social-icons-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/el-social-icons.min.css",
-        "wd-social-icons-styles-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/el-social-styles.min.css",
-        "wd-mod-nav-menu-label-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/mod-nav-menu-label.min.css",
-        "wd-scroll-top-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/opt-scrolltotop.min.css",
-        "wd-header-my-account-sidebar-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/header-el-my-account-sidebar.min.css",
-        "wd-woo-opt-social-login-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-opt-social-login.min.css",
-        "wd-bottom-toolbar-css":
-          "https://malamal.com.bd/wp-content/themes/woodmart/css/parts/opt-bottom-toolbar.min.css",
+        'wd-style-base-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/base.min.css',
+        'wd-helpers-wpb-elem-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/helpers-wpb-elem.min.css',
+        'wd-seo-plugins-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/int-seo-plugins.min.css',
+        'wd-elementor-base-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/int-elem-base.min.css',
+        'wd-elementor-pro-base-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/int-elementor-pro.min.css',
+        'wd-woocommerce-base-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woocommerce-base.min.css',
+        'wd-mod-star-rating-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/mod-star-rating.min.css',
+        'wd-woocommerce-block-notices-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-mod-block-notices.min.css',
+        'wd-woo-mod-shop-attributes-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-mod-shop-attributes.min.css',
+        'wd-wp-blocks-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/wp-blocks.min.css',
+        'wd-mod-nav-vertical-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/mod-nav-vertical.min.css',
+        'wd-sticky-nav-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/opt-sticky-nav.min.css',
+        'wd-header-base-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/header-base.min.css',
+        'wd-mod-tools-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/mod-tools.min.css',
+        'wd-header-search-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/header-el-search.min.css',
+        'wd-header-search-form-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/header-el-search-form.min.css',
+        'wd-wd-search-form-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/wd-search-form.min.css',
+        'wd-wd-search-results-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/wd-search-results.min.css',
+        'wd-wd-search-dropdown-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/wd-search-dropdown.min.css',
+        'wd-header-elements-base-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/header-el-base.min.css',
+        'wd-info-box-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/el-info-box.min.css',
+        'wd-header-mobile-nav-dropdown-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/header-el-mobile-nav-dropdown.min.css',
+        'wd-woo-mod-login-form-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-mod-login-form.min.css',
+        'wd-header-my-account-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/header-el-my-account.min.css',
+        'wd-mod-tools-design-8-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/mod-tools-design-8.min.css',
+        'wd-bg-navigation-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/bg-navigation.min.css',
+        'wd-mfp-popup-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/lib-magnific-popup.min.css',
+        'wd-mod-animations-transform-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/mod-animations-transform.min.css',
+        'wd-mod-transform-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/mod-transform.min.css',
+        'wd-button-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/el-button.min.css',
+        'wd-categories-loop-center-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-categories-loop-center-old.min.css',
+        'wd-woo-categories-loop-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-categories-loop.min.css',
+        'wd-categories-loop-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-categories-loop-old.min.css',
+        'wd-header-cart-side-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/header-el-cart-side.min.css',
+        'wd-woo-mod-quantity-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-mod-quantity.min.css',
+        'wd-header-cart-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/header-el-cart.min.css',
+        'wd-widget-shopping-cart-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-widget-shopping-cart.min.css',
+        'wd-widget-product-list-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-widget-product-list.min.css',
+        'wd-collapsible-content-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/elem-opt-collapsible-content.min.css',
+        'wd-marquee-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/el-marquee.min.css',
+        'wd-swiper-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/lib-swiper.min.css',
+        'wd-slider-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/el-slider.min.css',
+        'wd-slider-dots-style-3-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/el-slider-dots-style-3.min.css',
+        'wd-swiper-arrows-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/lib-swiper-arrows.min.css',
+        'wd-swiper-pagin-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/lib-swiper-pagin.min.css',
+        'wd-banner-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/el-banner.min.css',
+        'wd-banner-hover-zoom-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/el-banner-hover-zoom.min.css',
+        'wd-section-title-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/el-section-title.min.css',
+        'wd-product-loop-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-product-loop.min.css',
+        'wd-woo-loop-prod-el-base-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-loop-prod-el-base.min.css',
+        'wd-woo-loop-prod-predefined-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-loop-prod-predefined.min.css',
+        'wd-product-loop-fw-button-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-prod-loop-fw-button.min.css',
+        'wd-woo-mod-loop-prod-add-btn-replace-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-mod-loop-prod-add-btn-replace.min.css',
+        'wd-woo-mod-swatches-base-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-mod-swatches-base.min.css',
+        'wd-mod-more-description-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/mod-more-description.min.css',
+        'wd-woo-mod-loop-prod-hover-fade-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-mod-loop-prod-hover-fade.min.css',
+        'wd-woo-mod-loop-prod-hover-fade-predefined-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-mod-loop-prod-hover-fade-predefined.min.css',
+        'wd-woo-opt-title-limit-predefined-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-opt-title-limit-predefined.min.css',
+        'wd-woo-opt-stretch-cont-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-opt-stretch-cont.min.css',
+        'wd-woo-opt-stretch-cont-predefined-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-opt-stretch-cont-predefined.min.css',
+        'wd-woo-opt-products-bg-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-opt-products-bg.min.css',
+        'wd-woo-mod-product-labels-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-mod-product-labels.min.css',
+        'wd-woo-mod-stock-status-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-mod-stock-status.min.css',
+        'wd-woo-opt-grid-gallery-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-opt-grid-gallery.min.css',
+        'wd-brands-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/el-brand.min.css',
+        'wd-countdown-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/el-countdown-timer.min.css',
+        'wd-woo-prod-loop-small-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-prod-loop-small.min.css',
+        'wd-text-block-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/el-text-block.min.css',
+        'wd-widget-collapse-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/opt-widget-collapse.min.css',
+        'wd-footer-base-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/footer-base.min.css',
+        'wd-social-icons-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/el-social-icons.min.css',
+        'wd-social-icons-styles-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/el-social-styles.min.css',
+        'wd-mod-nav-menu-label-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/mod-nav-menu-label.min.css',
+        'wd-scroll-top-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/opt-scrolltotop.min.css',
+        'wd-header-my-account-sidebar-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/header-el-my-account-sidebar.min.css',
+        'wd-woo-opt-social-login-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/woo-opt-social-login.min.css',
+        'wd-bottom-toolbar-css':
+          'https://malamal.com.bd/wp-content/themes/woodmart/css/parts/opt-bottom-toolbar.min.css',
       };
       //# sourceURL=woodmart-theme-js-extra
       /* ]]> */
@@ -31408,27 +31408,27 @@
     <script type="text/javascript" id="pwaforwp-js-js-extra">
       /* <![CDATA[ */
       var pwaforwp_js_obj = {
-        ajax_url: "https://malamal.com.bd/wp-admin/admin-ajax.php",
-        pwa_ms_prefix: "",
-        pwa_home_url: "https://malamal.com.bd/",
-        loader_desktop: "0",
-        loader_mobile: "1",
-        loader_admin: "0",
-        user_admin: "",
-        loader_only_pwa: "1",
-        reset_cookies: "0",
-        force_rememberme: "0",
-        swipe_navigation: "0",
-        pwa_manifest_name: "pwa-manifest.json",
-        is_desplay: "1",
+        ajax_url: 'https://malamal.com.bd/wp-admin/admin-ajax.php',
+        pwa_ms_prefix: '',
+        pwa_home_url: 'https://malamal.com.bd/',
+        loader_desktop: '0',
+        loader_mobile: '1',
+        loader_admin: '0',
+        user_admin: '',
+        loader_only_pwa: '1',
+        reset_cookies: '0',
+        force_rememberme: '0',
+        swipe_navigation: '0',
+        pwa_manifest_name: 'pwa-manifest.json',
+        is_desplay: '1',
         visibility_excludes: [],
-        utm_enabled: "1",
+        utm_enabled: '1',
         utm_details: {
-          utm_source: "pwa-app",
-          utm_medium: "pwa-app",
-          utm_campaign: "pwa-campaign",
-          utm_term: "pwa-term",
-          utm_content: "pwa-content",
+          utm_source: 'pwa-app',
+          utm_medium: 'pwa-app',
+          utm_campaign: 'pwa-campaign',
+          utm_term: 'pwa-term',
+          utm_content: 'pwa-content',
         },
       };
       //# sourceURL=pwaforwp-js-js-extra
@@ -31446,7 +31446,7 @@
     ></script>
     <script type="text/javascript" id="pwaforwp-download-js-js-extra">
       /* <![CDATA[ */
-      var pwaforwp_download_js_obj = { force_rememberme: "0" };
+      var pwaforwp_download_js_obj = { force_rememberme: '0' };
       //# sourceURL=pwaforwp-download-js-js-extra
       /* ]]> */
     </script>
@@ -31464,17 +31464,17 @@
       /* <![CDATA[ */
       _stq = window._stq || [];
       _stq.push([
-        "view",
+        'view',
         {
-          v: "ext",
-          blog: "229523210",
-          post: "2025",
-          tz: "6",
-          srv: "malamal.com.bd",
-          j: "1:15.7",
+          v: 'ext',
+          blog: '229523210',
+          post: '2025',
+          tz: '6',
+          srv: 'malamal.com.bd',
+          j: '1:15.7',
         },
       ]);
-      _stq.push(["clickTrackerInit", "229523210", "2025"]);
+      _stq.push(['clickTrackerInit', '229523210', '2025']);
       //# sourceURL=jetpack-stats-js-before
       /* ]]> */
     </script>
@@ -31607,7 +31607,7 @@
     ></script>
     <script type="text/javascript" id="wp-util-js-extra">
       /* <![CDATA[ */
-      var _wpUtilSettings = { ajax: { url: "/wp-admin/admin-ajax.php" } };
+      var _wpUtilSettings = { ajax: { url: '/wp-admin/admin-ajax.php' } };
       //# sourceURL=wp-util-js-extra
       /* ]]> */
     </script>
@@ -31619,15 +31619,15 @@
     <script type="text/javascript" id="wc-add-to-cart-variation-js-extra">
       /* <![CDATA[ */
       var wc_add_to_cart_variation_params = {
-        wc_ajax_url: "/?wc-ajax=%%endpoint%%",
+        wc_ajax_url: '/?wc-ajax=%%endpoint%%',
         i18n_no_matching_variations_text:
-          "Sorry, no products matched your selection. Please choose a different combination.",
+          'Sorry, no products matched your selection. Please choose a different combination.',
         i18n_make_a_selection_text:
-          "Please select some product options before adding this product to your cart.",
+          'Please select some product options before adding this product to your cart.',
         i18n_unavailable_text:
-          "Sorry, this product is unavailable. Please choose a different combination.",
+          'Sorry, this product is unavailable. Please choose a different combination.',
         i18n_reset_alert_text:
-          "Your selection has been reset. Please select some product options before adding this product to your cart.",
+          'Your selection has been reset. Please select some product options before adding this product to your cart.',
       };
       //# sourceURL=wc-add-to-cart-variation-js-extra
       /* ]]> */
@@ -31722,11 +31722,11 @@
     <script type="text/javascript" id="wc-cart-fragments-js-extra">
       /* <![CDATA[ */
       var wc_cart_fragments_params = {
-        ajax_url: "/wp-admin/admin-ajax.php",
-        wc_ajax_url: "/?wc-ajax=%%endpoint%%",
-        cart_hash_key: "wc_cart_hash_40c1daa3adb161249a9f0c021bddd652",
-        fragment_name: "wc_fragments_40c1daa3adb161249a9f0c021bddd652",
-        request_timeout: "5000",
+        ajax_url: '/wp-admin/admin-ajax.php',
+        wc_ajax_url: '/?wc-ajax=%%endpoint%%',
+        cart_hash_key: 'wc_cart_hash_40c1daa3adb161249a9f0c021bddd652',
+        fragment_name: 'wc_fragments_40c1daa3adb161249a9f0c021bddd652',
+        request_timeout: '5000',
       };
       //# sourceURL=wc-cart-fragments-js-extra
       /* ]]> */
@@ -31741,11 +31741,11 @@
     <script type="text/javascript" id="gla-gtag-events-js-extra">
       /* <![CDATA[ */
       var glaGtagData = {
-        currency_minor_unit: "2",
+        currency_minor_unit: '2',
         products: {
-          12166: { name: "TOTAL Mechanic Gloves TSP1806-XL", price: 941 },
+          12166: { name: 'TOTAL Mechanic Gloves TSP1806-XL', price: 941 },
           12890: {
-            name: "Lithium-Lon Vacuum Cleaner With Battery &amp; Charger Brand Ingco - CVL12001",
+            name: 'Lithium-Lon Vacuum Cleaner With Battery &amp; Charger Brand Ingco - CVL12001',
             price: 6912,
           },
           14018: {
@@ -31753,122 +31753,122 @@
             price: 9000,
           },
           23557: {
-            name: "Automatic Box Carton Taping Machine - PACKWELL FXC-4030",
+            name: 'Automatic Box Carton Taping Machine - PACKWELL FXC-4030',
             price: 120000,
           },
           11922: {
-            name: "Fogger Machine MS/SY-5000 for HouseHold Use Bundle Offer - Fogger Machine + Chemical + Butane Gas Bottle",
+            name: 'Fogger Machine MS/SY-5000 for HouseHold Use Bundle Offer - Fogger Machine + Chemical + Butane Gas Bottle',
             price: 11200,
           },
           10916: {
-            name: "Mig Welding Machine MIG-250GS Brand- RIVCEN Input - 220Volt",
+            name: 'Mig Welding Machine MIG-250GS Brand- RIVCEN Input - 220Volt',
             price: 54000,
           },
           14090: {
-            name: "23L Vacuum Cleaner 2100W SANFORD-SF23L-2100W (Malaysia)",
+            name: '23L Vacuum Cleaner 2100W SANFORD-SF23L-2100W (Malaysia)',
             price: 10500,
           },
           13981: {
-            name: "Electric Mini Crane with Rope Hoist 500 Kg 50 Mtr Winch",
+            name: 'Electric Mini Crane with Rope Hoist 500 Kg 50 Mtr Winch',
             price: 105000,
           },
           25900: {
-            name: "280L Portable Mini Cement Mixer Electric Machine",
+            name: '280L Portable Mini Cement Mixer Electric Machine',
             price: 60000,
           },
           15064: {
-            name: "Electric Hoop Bender Machine 6-25mm 3KW 380V Model - GF25",
+            name: 'Electric Hoop Bender Machine 6-25mm 3KW 380V Model - GF25',
             price: 120000,
           },
           26754: {
-            name: "20V Lithium-Ion Cordless Rotary Hammer Drill INGCO - CRHLI201681 with Battery and Charger",
+            name: '20V Lithium-Ion Cordless Rotary Hammer Drill INGCO - CRHLI201681 with Battery and Charger',
             price: 7750,
           },
           26722: {
-            name: "16mm Stand Drill Machine JT MAX - JT16K",
+            name: '16mm Stand Drill Machine JT MAX - JT16K',
             price: 15500,
           },
           26719: {
-            name: "13mm Stand Drill Maachine JT MAX - JT13",
+            name: '13mm Stand Drill Maachine JT MAX - JT13',
             price: 7400,
           },
-          26453: { name: "Air Washing Gun 750cc -WADFOW WGA3575", price: 750 },
+          26453: { name: 'Air Washing Gun 750cc -WADFOW WGA3575', price: 750 },
           26449: {
-            name: "Weight Scale 30KG Electronic Digital - WADFOW WEC1520",
+            name: 'Weight Scale 30KG Electronic Digital - WADFOW WEC1520',
             price: 2625,
           },
-          15495: { name: "Car Washer Spray Nozzle set-4 pcs", price: 600 },
+          15495: { name: 'Car Washer Spray Nozzle set-4 pcs', price: 600 },
           12960: {
-            name: "2.5L Vacuum Cleaner Machine 2000W INGCO - VC20258 Best for Household Use",
+            name: '2.5L Vacuum Cleaner Machine 2000W INGCO - VC20258 Best for Household Use',
             price: 9900,
           },
           13168: {
-            name: "12V/24V Battery Charger Brand INGCO - ING-CB1601",
+            name: '12V/24V Battery Charger Brand INGCO - ING-CB1601',
             price: 6525,
           },
           15180: { name: "17'' Floor Polisher Cleaning Machine", price: 85000 },
           24499: {
-            name: "90L Vacuum Cleaner Machine 3600W - WADFOW WVR5A90",
+            name: '90L Vacuum Cleaner Machine 3600W - WADFOW WVR5A90',
             price: 32000,
           },
           12086: {
-            name: "High Pressure Car Washer 1500W 100bar Brand TOTAL - TGT11236",
+            name: 'High Pressure Car Washer 1500W 100bar Brand TOTAL - TGT11236',
             price: 12600,
           },
           11918: {
-            name: "Fogger Oil Machine Liquid Chemical 5litre - Good Quality",
+            name: 'Fogger Oil Machine Liquid Chemical 5litre - Good Quality',
             price: 2000,
           },
           11062: {
-            name: "80L Industrial Vacuum Cleaner 4500W CHINA WET & DRY BAOLYWUD Brand",
+            name: '80L Industrial Vacuum Cleaner 4500W CHINA WET & DRY BAOLYWUD Brand',
             price: 38000,
           },
           15812: {
-            name: "Extendable Sliding Aluminum Ladder 15 feet 9inch 2x10 Steps Made in Bangladesh",
+            name: 'Extendable Sliding Aluminum Ladder 15 feet 9inch 2x10 Steps Made in Bangladesh',
             price: 29445,
           },
           15096: {
-            name: "Double Sided Aluminum Ladder 6 Steps 6 Feet Light Industrial Application \u2013 EVERBEST",
+            name: 'Double Sided Aluminum Ladder 6 Steps 6 Feet Light Industrial Application \u2013 EVERBEST',
             price: 4547,
           },
           15142: {
-            name: "Heavy Duty Aluminum Platform Ladder 4 Steps 3 Feet Household Application \u2013 EVERBEST TITAN",
+            name: 'Heavy Duty Aluminum Platform Ladder 4 Steps 3 Feet Household Application \u2013 EVERBEST TITAN',
             price: 3077,
           },
           15126: {
-            name: "Double Sided Aluminum Ladder 21 Steps 17 Feet Heavy Duty Industrial Application \u2013 EVERBEST",
+            name: 'Double Sided Aluminum Ladder 21 Steps 17 Feet Heavy Duty Industrial Application \u2013 EVERBEST',
             price: 20440.18999999999869032762944698333740234375,
           },
           15885: {
-            name: "Extendable Sliding Aluminum Ladder 31 Feet 8 Inch Model : ED - 18",
+            name: 'Extendable Sliding Aluminum Ladder 31 Feet 8 Inch Model : ED - 18',
             price: 58825,
           },
           15887: {
-            name: "Extendable Sliding Aluminum Ladder 35 Feet 5 Inch Model : ED - 20",
+            name: 'Extendable Sliding Aluminum Ladder 35 Feet 5 Inch Model : ED - 20',
             price: 62140,
           },
           15881: {
-            name: "Extendable Sliding Aluminum Ladder 27 Feet 9 Inch Model : ED - 16",
+            name: 'Extendable Sliding Aluminum Ladder 27 Feet 9 Inch Model : ED - 16',
             price: 51220,
           },
           15086: {
-            name: "Heavy Duty Aluminum Platform Ladder 6 Steps 4.5 Feet Household Application \u2013 EVERBEST TITAN",
+            name: 'Heavy Duty Aluminum Platform Ladder 6 Steps 4.5 Feet Household Application \u2013 EVERBEST TITAN',
             price: 4300,
           },
           14000: {
-            name: "20V Lithium-Ion Impact Drill Cordless Ingco - CIDLI200215 (Heavy)",
+            name: '20V Lithium-Ion Impact Drill Cordless Ingco - CIDLI200215 (Heavy)',
             price: 8415,
           },
           12138: {
-            name: "Electric Router 2200W Brand Total - TR11122",
+            name: 'Electric Router 2200W Brand Total - TR11122',
             price: 7980,
           },
           13947: {
-            name: "Magnetic Drill 30mm Brand: DCK Model: KJC30",
+            name: 'Magnetic Drill 30mm Brand: DCK Model: KJC30',
             price: 22000,
           },
           11532: {
-            name: "Crown 6.5mm Electric Drill 300W 3800rpm CT10069/CT10125",
+            name: 'Crown 6.5mm Electric Drill 300W 3800rpm CT10069/CT10125',
             price: 2600,
           },
           12152: {
@@ -31876,65 +31876,65 @@
             price: 20416,
           },
           23034: {
-            name: "13mm Stand Drill Press 350W INGCO - DP133505",
+            name: '13mm Stand Drill Press 350W INGCO - DP133505',
             price: 9360,
           },
           13748: {
-            name: "13mm Impact Drill 750w Brand Total - TG108136",
+            name: '13mm Impact Drill 750w Brand Total - TG108136',
             price: 2835,
           },
           12788: {
             name: 'Bench Grinder Machine 8" 200mm 350W Brand INGCO - BG83502',
             price: 6300,
           },
-          22878: { name: "1.2mm SS MIG Wire - TAIWAN (12kg)", price: 26500 },
+          22878: { name: '1.2mm SS MIG Wire - TAIWAN (12kg)', price: 26500 },
           15956: {
-            name: "WINNER Heating Torch (Auto Ignition) 29 inch / 2.41 Feet",
+            name: 'WINNER Heating Torch (Auto Ignition) 29 inch / 2.41 Feet',
             price: 2200,
           },
           10944: {
-            name: "Winner Welding Machine TIG/MMA-250C 220V",
+            name: 'Winner Welding Machine TIG/MMA-250C 220V',
             price: 19500,
           },
-          11672: { name: "1mm SS MIG Wire - TAIWAN (12kg)", price: 24000 },
+          11672: { name: '1mm SS MIG Wire - TAIWAN (12kg)', price: 24000 },
           10980: {
-            name: "RIVCEN Welding Machine ARC MMA 500/ZX7-500- MOSFET TYPE (380V)",
+            name: 'RIVCEN Welding Machine ARC MMA 500/ZX7-500- MOSFET TYPE (380V)',
             price: 46000,
           },
           12276: {
-            name: "Riland MZ1000D Inverter Welding Machine",
+            name: 'Riland MZ1000D Inverter Welding Machine',
             price: 488000,
           },
           25050: {
-            name: "Gasless Mig-250 Winner Inverter Mig Welding Machine",
+            name: 'Gasless Mig-250 Winner Inverter Mig Welding Machine',
             price: 25000,
           },
           19062: {
-            name: "0.8mm Mig Welding Wire Solid Core - BSRM - ER70S-6",
+            name: '0.8mm Mig Welding Wire Solid Core - BSRM - ER70S-6',
             price: 3000,
           },
           14112: {
-            name: "Small House Hold Vacuum Sealer Packaging Machine DZ-280/2SD",
+            name: 'Small House Hold Vacuum Sealer Packaging Machine DZ-280/2SD',
             price: 8500,
           },
           12770: {
-            name: "Semi Automatic Liquid Filling Machine 220V 50/60HZ 40W Digital Filler Single Nozzle",
+            name: 'Semi Automatic Liquid Filling Machine 220V 50/60HZ 40W Digital Filler Single Nozzle',
             price: 15000,
           },
           13983: {
-            name: "Automatic Electric Cup Sealing Machine",
+            name: 'Automatic Electric Cup Sealing Machine',
             price: 48000,
           },
           10964: {
-            name: "Vacuum Pack Sealer Machine Model - DDZP260",
+            name: 'Vacuum Pack Sealer Machine Model - DDZP260',
             price: 65000,
           },
           20527: {
-            name: "L Sealer Attachment for Shrink Packaging",
+            name: 'L Sealer Attachment for Shrink Packaging',
             price: 60000,
           },
           15293: {
-            name: "20 inch Hand Sealer for Plastic Bag Band Sealing Machine",
+            name: '20 inch Hand Sealer for Plastic Bag Band Sealing Machine',
             price: 7375,
           },
           15223: {
@@ -31942,23 +31942,23 @@
             price: 21999,
           },
           15299: {
-            name: "40 Inch Hand Sealer for Plastic Bag Band Sealing Machine",
+            name: '40 Inch Hand Sealer for Plastic Bag Band Sealing Machine',
             price: 17500,
           },
           17964: {
-            name: "Electric Wire Rope Hoist 1500Kg 40 Mtr Industrial Clutch Type WINNER 220V",
+            name: 'Electric Wire Rope Hoist 1500Kg 40 Mtr Industrial Clutch Type WINNER 220V',
             price: 65000,
           },
           25205: {
-            name: "Hand Stacker 2TON 1.6MTR Electric Hoist Type 220V",
+            name: 'Hand Stacker 2TON 1.6MTR Electric Hoist Type 220V',
             price: 170000,
           },
           15462: {
-            name: "2000 kg Permanent Magnetic Lifter Manufacturer Lifting Magnets",
+            name: '2000 kg Permanent Magnetic Lifter Manufacturer Lifting Magnets',
             price: 42000,
           },
           13828: {
-            name: "Electric Mini Wire Rope Hoist 600Kg 20Mtr Winch with Movable Motor",
+            name: 'Electric Mini Wire Rope Hoist 600Kg 20Mtr Winch with Movable Motor',
             price: 45000,
           },
           18927: {
@@ -31966,15 +31966,15 @@
             price: 480,
           },
           22912: {
-            name: "Shopping Cart 150litre Metal Trolley \u2013 Nickel Colour",
+            name: 'Shopping Cart 150litre Metal Trolley \u2013 Nickel Colour',
             price: 12500,
           },
           14351: {
-            name: "Power Stacker - Full Electric Double Cylinder Of Stacker - Fork Lifter",
+            name: 'Power Stacker - Full Electric Double Cylinder Of Stacker - Fork Lifter',
             price: 900000,
           },
           16548: {
-            name: "10 Ton 6 Meter Lifting Belt Flat Polyester Webbing Sling TOHO - 10T x 6M",
+            name: '10 Ton 6 Meter Lifting Belt Flat Polyester Webbing Sling TOHO - 10T x 6M',
             price: 7500,
           },
           16587: {
@@ -31982,7 +31982,7 @@
             price: 10000,
           },
           16656: {
-            name: "0-10mm 3 Digits Digital Thickness Guage Insize 2871-101",
+            name: '0-10mm 3 Digits Digital Thickness Guage Insize 2871-101',
             price: 13700,
           },
         },
@@ -32002,11 +32002,11 @@
 
         // Set the assets URL for webpack to find the split assets.
         wcAnalytics.assets_url =
-          "https://malamal.com.bd/wp-content/plugins/jetpack/jetpack_vendor/automattic/woocommerce-analytics/src/../build/";
+          'https://malamal.com.bd/wp-content/plugins/jetpack/jetpack_vendor/automattic/woocommerce-analytics/src/../build/';
 
         // Set the REST API tracking endpoint URL.
         wcAnalytics.trackEndpoint =
-          "https://malamal.com.bd/wp-json/woocommerce-analytics/v1/track";
+          'https://malamal.com.bd/wp-json/woocommerce-analytics/v1/track';
 
         // Set common properties for all events.
         wcAnalytics.commonProps = {
@@ -32015,22 +32015,22 @@
           is_engaged: null,
           ui: 0,
           blog_id: 229523210,
-          store_id: "579f9d68-6950-4786-94ad-9e6bd7cb7436",
-          url: "https://malamal.com.bd",
-          woo_version: "10.6.2",
-          wp_version: "6.9.4",
+          store_id: '579f9d68-6950-4786-94ad-9e6bd7cb7436',
+          url: 'https://malamal.com.bd',
+          woo_version: '10.6.2',
+          wp_version: '6.9.4',
           store_admin: 0,
-          device: "desktop",
-          store_currency: "BDT",
-          timezone: "+06:00",
+          device: 'desktop',
+          store_currency: 'BDT',
+          timezone: '+06:00',
           is_guest: 1,
           _via_ua:
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
-          _via_ip: "163.223.75.5",
-          _lg: "en-US",
-          _dr: "",
-          _dl: "https://malamal.com.bd/",
-          _via_ref: "",
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36',
+          _via_ip: '163.223.75.5',
+          _lg: 'en-US',
+          _dr: '',
+          _dl: 'https://malamal.com.bd/',
+          _via_ref: '',
         };
 
         // Set the event queue.
@@ -32043,7 +32043,7 @@
           proxy: false,
         };
 
-        wcAnalytics.breadcrumbs = ["Home"];
+        wcAnalytics.breadcrumbs = ['Home'];
 
         // Page context flags.
         wcAnalytics.pages = {

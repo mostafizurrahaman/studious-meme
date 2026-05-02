@@ -69,20 +69,20 @@ so that I can find relevant markets even without exact keywords.
 For each user journey, create comprehensive test cases:
 
 ```typescript
-describe("Semantic Search", () => {
-  it("returns relevant markets for query", async () => {
+describe('Semantic Search', () => {
+  it('returns relevant markets for query', async () => {
     // Test implementation
   });
 
-  it("handles empty query gracefully", async () => {
+  it('handles empty query gracefully', async () => {
     // Test edge case
   });
 
-  it("falls back to substring search when Redis unavailable", async () => {
+  it('falls back to substring search when Redis unavailable', async () => {
     // Test fallback behavior
   });
 
-  it("sorts results by similarity score", async () => {
+  it('sorts results by similarity score', async () => {
     // Test sorting logic
   });
 });
@@ -162,12 +162,12 @@ describe('Button Component', () => {
 ### API Integration Test Pattern
 
 ```typescript
-import { NextRequest } from "next/server";
-import { GET } from "./route";
+import { NextRequest } from 'next/server';
+import { GET } from './route';
 
-describe("GET /api/markets", () => {
-  it("returns markets successfully", async () => {
-    const request = new NextRequest("http://localhost/api/markets");
+describe('GET /api/markets', () => {
+  it('returns markets successfully', async () => {
+    const request = new NextRequest('http://localhost/api/markets');
     const response = await GET(request);
     const data = await response.json();
 
@@ -176,18 +176,18 @@ describe("GET /api/markets", () => {
     expect(Array.isArray(data.data)).toBe(true);
   });
 
-  it("validates query parameters", async () => {
+  it('validates query parameters', async () => {
     const request = new NextRequest(
-      "http://localhost/api/markets?limit=invalid",
+      'http://localhost/api/markets?limit=invalid',
     );
     const response = await GET(request);
 
     expect(response.status).toBe(400);
   });
 
-  it("handles database errors gracefully", async () => {
+  it('handles database errors gracefully', async () => {
     // Mock database failure
-    const request = new NextRequest("http://localhost/api/markets");
+    const request = new NextRequest('http://localhost/api/markets');
     // Test error handling
   });
 });
@@ -196,18 +196,18 @@ describe("GET /api/markets", () => {
 ### E2E Test Pattern (Playwright)
 
 ```typescript
-import { test, expect } from "@playwright/test";
+import { test, expect } from '@playwright/test';
 
-test("user can search and filter markets", async ({ page }) => {
+test('user can search and filter markets', async ({ page }) => {
   // Navigate to markets page
-  await page.goto("/");
+  await page.goto('/');
   await page.click('a[href="/markets"]');
 
   // Verify page loaded
-  await expect(page.locator("h1")).toContainText("Markets");
+  await expect(page.locator('h1')).toContainText('Markets');
 
   // Search for markets
-  await page.fill('input[placeholder="Search markets"]', "election");
+  await page.fill('input[placeholder="Search markets"]', 'election');
 
   // Wait for debounce and results
   await page.waitForTimeout(600);
@@ -218,7 +218,7 @@ test("user can search and filter markets", async ({ page }) => {
 
   // Verify results contain search term
   const firstResult = results.first();
-  await expect(firstResult).toContainText("election", { ignoreCase: true });
+  await expect(firstResult).toContainText('election', { ignoreCase: true });
 
   // Filter by status
   await page.click('button:has-text("Active")');
@@ -227,20 +227,20 @@ test("user can search and filter markets", async ({ page }) => {
   await expect(results).toHaveCount(3);
 });
 
-test("user can create a new market", async ({ page }) => {
+test('user can create a new market', async ({ page }) => {
   // Login first
-  await page.goto("/creator-dashboard");
+  await page.goto('/creator-dashboard');
 
   // Fill market creation form
-  await page.fill('input[name="name"]', "Test Market");
-  await page.fill('textarea[name="description"]', "Test description");
-  await page.fill('input[name="endDate"]', "2025-12-31");
+  await page.fill('input[name="name"]', 'Test Market');
+  await page.fill('textarea[name="description"]', 'Test description');
+  await page.fill('input[name="endDate"]', '2025-12-31');
 
   // Submit form
   await page.click('button[type="submit"]');
 
   // Verify success message
-  await expect(page.locator("text=Market created successfully")).toBeVisible();
+  await expect(page.locator('text=Market created successfully')).toBeVisible();
 
   // Verify redirect to market page
   await expect(page).toHaveURL(/\/markets\/test-market/);
@@ -275,13 +275,13 @@ src/
 ### Supabase Mock
 
 ```typescript
-jest.mock("@/lib/supabase", () => ({
+jest.mock('@/lib/supabase', () => ({
   supabase: {
     from: jest.fn(() => ({
       select: jest.fn(() => ({
         eq: jest.fn(() =>
           Promise.resolve({
-            data: [{ id: 1, name: "Test Market" }],
+            data: [{ id: 1, name: 'Test Market' }],
             error: null,
           }),
         ),
@@ -294,9 +294,9 @@ jest.mock("@/lib/supabase", () => ({
 ### Redis Mock
 
 ```typescript
-jest.mock("@/lib/redis", () => ({
+jest.mock('@/lib/redis', () => ({
   searchMarketsByVector: jest.fn(() =>
-    Promise.resolve([{ slug: "test-market", similarity_score: 0.95 }]),
+    Promise.resolve([{ slug: 'test-market', similarity_score: 0.95 }]),
   ),
   checkRedisHealth: jest.fn(() => Promise.resolve({ connected: true })),
 }));
@@ -305,7 +305,7 @@ jest.mock("@/lib/redis", () => ({
 ### OpenAI Mock
 
 ```typescript
-jest.mock("@/lib/openai", () => ({
+jest.mock('@/lib/openai', () => ({
   generateEmbedding: jest.fn(() =>
     Promise.resolve(
       new Array(1536).fill(0.1), // Mock 1536-dim embedding
@@ -352,14 +352,14 @@ expect(component.state.count).toBe(5);
 
 ```typescript
 // Test what users see
-expect(screen.getByText("Count: 5")).toBeInTheDocument();
+expect(screen.getByText('Count: 5')).toBeInTheDocument();
 ```
 
 ### FAIL: WRONG: Brittle Selectors
 
 ```typescript
 // Breaks easily
-await page.click(".css-class-xyz");
+await page.click('.css-class-xyz');
 ```
 
 ### PASS: CORRECT: Semantic Selectors
@@ -374,10 +374,10 @@ await page.click('[data-testid="submit-button"]');
 
 ```typescript
 // Tests depend on each other
-test("creates user", () => {
+test('creates user', () => {
   /* ... */
 });
-test("updates same user", () => {
+test('updates same user', () => {
   /* depends on previous test */
 });
 ```
@@ -386,12 +386,12 @@ test("updates same user", () => {
 
 ```typescript
 // Each test sets up its own data
-test("creates user", () => {
+test('creates user', () => {
   const user = createTestUser();
   // Test logic
 });
 
-test("updates user", () => {
+test('updates user', () => {
   const user = createTestUser();
   // Update logic
 });

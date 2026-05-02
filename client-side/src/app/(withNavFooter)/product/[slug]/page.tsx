@@ -28,9 +28,9 @@ export async function generateStaticParams() {
 
   return Array.isArray(productsResult?.data)
     ? productsResult.data
-        .map(product => product.slug)
+        .map((product) => product.slug)
         .filter((slug): slug is string => Boolean(slug))
-        .map(slug => ({ slug }))
+        .map((slug) => ({ slug }))
     : [];
 }
 
@@ -40,7 +40,9 @@ export async function generateMetadata({ params }: Props) {
   const productResult = await getActiveProductBySlug(slug).catch(() => null);
   const backendProduct = productResult?.data;
 
-  const product = backendProduct ? await mapBackendProductToStorefrontProduct(backendProduct) : null;
+  const product = backendProduct
+    ? await mapBackendProductToStorefrontProduct(backendProduct)
+    : null;
 
   if (!product) {
     return {
@@ -58,7 +60,9 @@ export default async function ProductPage({ params }: Props) {
   const productResult = await getActiveProductBySlug(slug).catch(() => null);
   const backendProduct = productResult?.data;
 
-  const product = backendProduct ? await mapBackendProductToStorefrontProduct(backendProduct) : null;
+  const product = backendProduct
+    ? await mapBackendProductToStorefrontProduct(backendProduct)
+    : null;
 
   if (!backendProduct || !product) notFound();
 
@@ -68,7 +72,9 @@ export default async function ProductPage({ params }: Props) {
     excludeSlug: product.slug,
   }).catch(() => null);
   const related = productsResult?.data?.length
-    ? await Promise.all(productsResult.data.map(mapBackendProductToStorefrontProduct))
+    ? await Promise.all(
+        productsResult.data.map(mapBackendProductToStorefrontProduct),
+      )
     : [];
 
   const productId = backendProduct._id ?? product.id;
@@ -87,12 +93,14 @@ export default async function ProductPage({ params }: Props) {
     limit: reviewsResult?.meta?.limit ?? 5,
     total: reviewsResult?.meta?.total ?? approvedReviews.length,
     totalPages:
-      reviewsResult?.meta?.totalPages ?? (Math.ceil(approvedReviews.length / 5) || 1),
+      reviewsResult?.meta?.totalPages ??
+      (Math.ceil(approvedReviews.length / 5) || 1),
   };
   const reviewSummary = {
     total: reviewsResult?.summary?.total ?? approvedReviews.length,
     averageRating: reviewsResult?.summary?.averageRating ?? 0,
-    productRating: reviewsResult?.summary?.productRating ?? Number(product.rating),
+    productRating:
+      reviewsResult?.summary?.productRating ?? Number(product.rating),
   };
 
   const productQuestionsResult = productId
@@ -149,9 +157,11 @@ export default async function ProductPage({ params }: Props) {
           </div>
 
           <section className="mt-8">
-            <h2 className="text-2xl font-bold text-secondary">Related Products</h2>
+            <h2 className="text-2xl font-bold text-secondary">
+              Related Products
+            </h2>
             <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5 xl:gap-4">
-              {related.map(item => (
+              {related.map((item) => (
                 <ProductCard key={item.sku} product={item} />
               ))}
             </div>

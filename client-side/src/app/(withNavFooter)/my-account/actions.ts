@@ -1,6 +1,6 @@
-"use server";
+'use server';
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath } from 'next/cache';
 import {
   forgotPassword,
   logOut,
@@ -11,11 +11,11 @@ import {
   signUpUser,
   verifyOtpForForgotPassword,
   verifySignupOtp,
-} from "@/services/Auth";
-import { addCartItem, getMyCart, updateCartItem } from "@/services/Cart";
-import { decodeAuthToken } from "@/lib/auth/session";
-import type { CartItem } from "@/lib/cart";
-import { mapBackendCartItemsToStoreItems } from "@/lib/cart-hydration";
+} from '@/services/Auth';
+import { addCartItem, getMyCart, updateCartItem } from '@/services/Cart';
+import { decodeAuthToken } from '@/lib/auth/session';
+import type { CartItem } from '@/lib/cart';
+import { mapBackendCartItemsToStoreItems } from '@/lib/cart-hydration';
 
 type GuestCartItem = {
   productId: string;
@@ -31,13 +31,13 @@ export type ForgotPasswordState =
       ok: false;
       message: string;
       email?: string;
-      step?: "email" | "otp" | "reset";
+      step?: 'email' | 'otp' | 'reset';
     }
   | {
       ok: true;
       message: string;
       email?: string;
-      step: "otp" | "reset" | "done";
+      step: 'otp' | 'reset' | 'done';
     };
 
 export type SignUpState =
@@ -52,17 +52,17 @@ export type SignUpState =
       ok: true;
       message: string;
       email: string;
-      step: "otp" | "done";
+      step: 'otp' | 'done';
       role?: string;
       cartItems?: CartItem[];
     };
 
 function readValue(formData: FormData, key: string) {
-  return String(formData.get(key) ?? "").trim();
+  return String(formData.get(key) ?? '').trim();
 }
 
 function readGuestCartItems(formData: FormData): GuestCartItem[] {
-  const raw = readValue(formData, "guestCartJson");
+  const raw = readValue(formData, 'guestCartJson');
 
   if (!raw) {
     return [];
@@ -72,12 +72,13 @@ function readGuestCartItems(formData: FormData): GuestCartItem[] {
     const parsed = JSON.parse(raw) as unknown[];
 
     return parsed.reduce<GuestCartItem[]>((acc, item) => {
-      if (!item || typeof item !== "object") {
+      if (!item || typeof item !== 'object') {
         return acc;
       }
 
       const record = item as Record<string, unknown>;
-      const productId = typeof record.productId === "string" ? record.productId : "";
+      const productId =
+        typeof record.productId === 'string' ? record.productId : '';
       const quantity = Number(record.quantity);
 
       if (!productId || !Number.isInteger(quantity) || quantity <= 0) {
@@ -93,8 +94,8 @@ function readGuestCartItems(formData: FormData): GuestCartItem[] {
 }
 
 function getBackendProductId(product: unknown) {
-  if (!product || typeof product !== "object") {
-    return typeof product === "string" ? product : undefined;
+  if (!product || typeof product !== 'object') {
+    return typeof product === 'string' ? product : undefined;
   }
 
   const record = product as { _id?: string; id?: string };
@@ -148,17 +149,17 @@ export async function submitSignIn(
   _prevState: SignInState,
   formData: FormData,
 ): Promise<SignInState> {
-  const email = readValue(formData, "email").toLowerCase();
-  const password = readValue(formData, "password");
+  const email = readValue(formData, 'email').toLowerCase();
+  const password = readValue(formData, 'password');
 
   if (!email || !password) {
-    return { ok: false, message: "Email and password are required." };
+    return { ok: false, message: 'Email and password are required.' };
   }
 
   const result = await signInUser({ email, password });
 
   if (!result?.success) {
-    return { ok: false, message: result?.message ?? "Failed to sign in." };
+    return { ok: false, message: result?.message ?? 'Failed to sign in.' };
   }
 
   const cartItems = await hydrateBackendCartFromGuestCart(formData);
@@ -166,12 +167,12 @@ export async function submitSignIn(
     ? decodeAuthToken(result.data.accessToken)
     : null;
 
-  revalidatePath("/my-account");
-  revalidatePath("/dashboard");
+  revalidatePath('/my-account');
+  revalidatePath('/dashboard');
 
   return {
     ok: true,
-    message: result.message ?? "Signed in successfully.",
+    message: result.message ?? 'Signed in successfully.',
     role: user?.role,
     cartItems,
   };
@@ -189,12 +190,12 @@ export async function submitSignOut(
   void formData;
 
   await logOut();
-  revalidatePath("/my-account");
-  revalidatePath("/dashboard");
+  revalidatePath('/my-account');
+  revalidatePath('/dashboard');
 
   return {
     ok: true,
-    message: "Signed out successfully.",
+    message: 'Signed out successfully.',
   };
 }
 
@@ -202,24 +203,24 @@ export async function submitSignUp(
   _prevState: SignUpState,
   formData: FormData,
 ): Promise<SignUpState> {
-  const name = readValue(formData, "name");
-  const email = readValue(formData, "email").toLowerCase();
-  const password = readValue(formData, "password");
-  const confirmPassword = readValue(formData, "confirmPassword");
+  const name = readValue(formData, 'name');
+  const email = readValue(formData, 'email').toLowerCase();
+  const password = readValue(formData, 'password');
+  const confirmPassword = readValue(formData, 'confirmPassword');
 
   if (!name || !email || !password || !confirmPassword) {
-    return { ok: false, message: "All signup fields are required.", email };
+    return { ok: false, message: 'All signup fields are required.', email };
   }
 
   if (password !== confirmPassword) {
-    return { ok: false, message: "Passwords must match.", email };
+    return { ok: false, message: 'Passwords must match.', email };
   }
 
   const result = await signUpUser({ name, email, password });
   if (!result?.success) {
     return {
       ok: false,
-      message: result?.message ?? "Failed to create account.",
+      message: result?.message ?? 'Failed to create account.',
       email,
     };
   }
@@ -227,8 +228,8 @@ export async function submitSignUp(
   return {
     ok: true,
     email: result.data?.userEmail ?? email,
-    step: "otp",
-    message: result.message ?? "OTP sent successfully.",
+    step: 'otp',
+    message: result.message ?? 'OTP sent successfully.',
   };
 }
 
@@ -236,13 +237,13 @@ export async function submitSignupOtp(
   _prevState: SignUpState,
   formData: FormData,
 ): Promise<SignUpState> {
-  const userEmail = readValue(formData, "otp-email").toLowerCase();
-  const otp = readValue(formData, "otp");
+  const userEmail = readValue(formData, 'otp-email').toLowerCase();
+  const otp = readValue(formData, 'otp');
 
   if (!userEmail || !otp) {
     return {
       ok: false,
-      message: "Email and OTP are required.",
+      message: 'Email and OTP are required.',
       email: userEmail,
     };
   }
@@ -251,7 +252,7 @@ export async function submitSignupOtp(
   if (!result?.success) {
     return {
       ok: false,
-      message: result?.message ?? "Failed to verify OTP.",
+      message: result?.message ?? 'Failed to verify OTP.',
       email: userEmail,
     };
   }
@@ -261,14 +262,14 @@ export async function submitSignupOtp(
     ? decodeAuthToken(result.data.accessToken)
     : null;
 
-  revalidatePath("/my-account");
-  revalidatePath("/dashboard");
+  revalidatePath('/my-account');
+  revalidatePath('/dashboard');
 
   return {
     ok: true,
     email: userEmail,
-    step: "done",
-    message: result.message ?? "Account verified successfully.",
+    step: 'done',
+    message: result.message ?? 'Account verified successfully.',
     role: user?.role,
     cartItems,
   };
@@ -282,10 +283,10 @@ export async function submitForgotPassword(
   _prevState: ForgotPasswordState,
   formData: FormData,
 ): Promise<ForgotPasswordState> {
-  const email = readValue(formData, "email").toLowerCase();
+  const email = readValue(formData, 'email').toLowerCase();
 
   if (!email) {
-    return { ok: false, message: "Email is required.", step: "email" };
+    return { ok: false, message: 'Email is required.', step: 'email' };
   }
 
   const result = await forgotPassword(email);
@@ -293,17 +294,17 @@ export async function submitForgotPassword(
   if (!result?.success) {
     return {
       ok: false,
-      message: result?.message ?? "Failed to start password reset.",
+      message: result?.message ?? 'Failed to start password reset.',
       email,
-      step: "email",
+      step: 'email',
     };
   }
 
   return {
     ok: true,
-    message: result.message ?? "OTP sent successfully.",
+    message: result.message ?? 'OTP sent successfully.',
     email,
-    step: "otp",
+    step: 'otp',
   };
 }
 
@@ -311,10 +312,10 @@ export async function submitForgotPasswordOtp(
   _prevState: ForgotPasswordState,
   formData: FormData,
 ): Promise<ForgotPasswordState> {
-  const otp = readValue(formData, "otp");
+  const otp = readValue(formData, 'otp');
 
   if (!otp) {
-    return { ok: false, message: "OTP is required.", step: "otp" };
+    return { ok: false, message: 'OTP is required.', step: 'otp' };
   }
 
   const result = await verifyOtpForForgotPassword(otp);
@@ -322,15 +323,15 @@ export async function submitForgotPasswordOtp(
   if (!result?.success) {
     return {
       ok: false,
-      message: result?.message ?? "Failed to verify OTP.",
-      step: "otp",
+      message: result?.message ?? 'Failed to verify OTP.',
+      step: 'otp',
     };
   }
 
   return {
     ok: true,
-    message: result.message ?? "OTP verified successfully.",
-    step: "reset",
+    message: result.message ?? 'OTP verified successfully.',
+    step: 'reset',
   };
 }
 
@@ -342,19 +343,19 @@ export async function submitResetPassword(
   _prevState: ForgotPasswordState,
   formData: FormData,
 ): Promise<ForgotPasswordState> {
-  const newPassword = readValue(formData, "newPassword");
-  const confirmPassword = readValue(formData, "confirmPassword");
+  const newPassword = readValue(formData, 'newPassword');
+  const confirmPassword = readValue(formData, 'confirmPassword');
 
   if (!newPassword || !confirmPassword) {
     return {
       ok: false,
-      message: "All password fields are required.",
-      step: "reset",
+      message: 'All password fields are required.',
+      step: 'reset',
     };
   }
 
   if (newPassword !== confirmPassword) {
-    return { ok: false, message: "Passwords must match.", step: "reset" };
+    return { ok: false, message: 'Passwords must match.', step: 'reset' };
   }
 
   const result = await setNewPasswordIntoDB(newPassword);
@@ -362,16 +363,16 @@ export async function submitResetPassword(
   if (!result?.success) {
     return {
       ok: false,
-      message: result?.message ?? "Failed to reset password.",
-      step: "reset",
+      message: result?.message ?? 'Failed to reset password.',
+      step: 'reset',
     };
   }
 
-  revalidatePath("/my-account");
+  revalidatePath('/my-account');
 
   return {
     ok: true,
-    message: result.message ?? "Password reset successfully.",
-    step: "done",
+    message: result.message ?? 'Password reset successfully.',
+    step: 'done',
   };
 }

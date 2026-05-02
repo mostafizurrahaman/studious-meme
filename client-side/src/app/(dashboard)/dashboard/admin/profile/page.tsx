@@ -1,20 +1,20 @@
-import type { Metadata } from "next";
+import type { Metadata } from 'next';
 
-import { RoleProfilePage } from "@/components/dashboard/RoleProfilePage";
-import { requireRoleSegment } from "@/lib/dashboard-auth";
-import { buildMetadata } from "@/lib/seo";
+import { RoleProfilePage } from '@/components/dashboard/RoleProfilePage';
+import { requireRoleSegment } from '@/lib/dashboard-auth';
+import { buildMetadata } from '@/lib/seo';
 
 export const metadata: Metadata = buildMetadata({
-  title: "Admin profile",
-  description: "Update your admin profile.",
-  path: "/dashboard/admin/profile",
+  title: 'Admin profile',
+  description: 'Update your admin profile.',
+  path: '/dashboard/admin/profile',
   noindex: true,
 });
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 export default async function AdminProfilePage() {
-  const user = await requireRoleSegment("admin");
+  const user = await requireRoleSegment('admin');
   return (
     <RoleProfilePage
       role={user.role}

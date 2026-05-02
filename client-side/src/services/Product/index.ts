@@ -22,7 +22,9 @@ type BackendEnvelope<T> = {
   };
 };
 
-type BackendProductRef = { _id?: string; name?: string; slug?: string } | string;
+type BackendProductRef =
+  | { _id?: string; name?: string; slug?: string }
+  | string;
 
 export type BackendProduct = {
   _id?: string;
@@ -79,7 +81,8 @@ export async function mapBackendProductToStorefrontProduct(
     features: product.features ?? '',
     description: product.description ?? '',
     price: String(product.price),
-    oldPrice: product.oldPrice === undefined ? undefined : String(product.oldPrice),
+    oldPrice:
+      product.oldPrice === undefined ? undefined : String(product.oldPrice),
     badge: product.badge,
     sellingUnit: product.sellingUnit,
     youtubeVideoUrl: product.youtubeVideoUrl,
@@ -122,9 +125,11 @@ const buildProductSearchParams = (params: GetAllProductsParams) => {
 
   if (params.page) searchParams.set('page', String(params.page));
   if (params.limit) searchParams.set('limit', String(params.limit));
-  if (params.searchTerm?.trim()) searchParams.set('searchTerm', params.searchTerm.trim());
+  if (params.searchTerm?.trim())
+    searchParams.set('searchTerm', params.searchTerm.trim());
   if (params.c?.trim()) searchParams.set('c', params.c.trim());
-  if (params.category?.trim()) searchParams.set('category', params.category.trim());
+  if (params.category?.trim())
+    searchParams.set('category', params.category.trim());
   if (params.stock?.trim()) searchParams.set('stock', params.stock.trim());
   if (params.s?.trim()) searchParams.set('s', params.s.trim());
   if (params.tag?.trim()) searchParams.set('tag', params.tag.trim());
@@ -133,12 +138,15 @@ const buildProductSearchParams = (params: GetAllProductsParams) => {
   if (params.brand?.trim()) searchParams.set('brand', params.brand.trim());
   if (params.b?.trim()) searchParams.set('b', params.b.trim());
   if (params.sort?.trim()) searchParams.set('sort', params.sort.trim());
-  if (params.subCategorySlug?.trim()) searchParams.set('subCategorySlug', params.subCategorySlug.trim());
-  if (params.subCategory?.trim()) searchParams.set('subCategory', params.subCategory.trim());
+  if (params.subCategorySlug?.trim())
+    searchParams.set('subCategorySlug', params.subCategorySlug.trim());
+  if (params.subCategory?.trim())
+    searchParams.set('subCategory', params.subCategory.trim());
   if (typeof params.includeInactive === 'boolean') {
     searchParams.set('includeInactive', String(params.includeInactive));
   }
-  if (params.excludeSlug?.trim()) searchParams.set('excludeSlug', params.excludeSlug.trim());
+  if (params.excludeSlug?.trim())
+    searchParams.set('excludeSlug', params.excludeSlug.trim());
 
   return searchParams;
 };
@@ -153,12 +161,17 @@ export const getAllProducts = async (
     `/product/products${query ? `?${query}` : ''}`,
     {
       method: 'GET',
-      next: { revalidate: CACHE_REVALIDATE.DEFAULT, tags: [CACHE_TAGS.PRODUCTS] },
+      next: {
+        revalidate: CACHE_REVALIDATE.DEFAULT,
+        tags: [CACHE_TAGS.PRODUCTS],
+      },
     },
   );
 };
 
-const fetchActiveProductsPage = async (pageParams: Omit<GetAllProductsParams, 'includeInactive'>) => {
+const fetchActiveProductsPage = async (
+  pageParams: Omit<GetAllProductsParams, 'includeInactive'>,
+) => {
   const searchParams = buildProductSearchParams(pageParams);
   const query = searchParams.toString();
 
@@ -166,14 +179,18 @@ const fetchActiveProductsPage = async (pageParams: Omit<GetAllProductsParams, 'i
     `/product/products/active${query ? `?${query}` : ''}`,
     {
       method: 'GET',
-      next: { revalidate: CACHE_REVALIDATE.DEFAULT, tags: [CACHE_TAGS.PRODUCTS] },
+      next: {
+        revalidate: CACHE_REVALIDATE.DEFAULT,
+        tags: [CACHE_TAGS.PRODUCTS],
+      },
     },
   );
 };
 
 export const getAllActiveProducts = async (
   params: Omit<GetAllProductsParams, 'includeInactive'> = {},
-): Promise<BackendEnvelope<BackendProduct[]>> => fetchActiveProductsPage(params);
+): Promise<BackendEnvelope<BackendProduct[]>> =>
+  fetchActiveProductsPage(params);
 
 export const getAllActiveProductsAcrossPages = async (
   params: Omit<GetAllProductsParams, 'includeInactive' | 'page'> = {},
@@ -190,12 +207,17 @@ export const getAllActiveProductsAcrossPages = async (
     };
   }
 
-  const remainingPages = Array.from({ length: totalPages - 1 }, (_, index) => index + 2);
+  const remainingPages = Array.from(
+    { length: totalPages - 1 },
+    (_, index) => index + 2,
+  );
   const remainingResults = await Promise.all(
-    remainingPages.map(page => fetchActiveProductsPage({ ...params, page, ...(limit ? { limit } : {}) })),
+    remainingPages.map((page) =>
+      fetchActiveProductsPage({ ...params, page, ...(limit ? { limit } : {}) }),
+    ),
   );
 
-  remainingResults.forEach(result => {
+  remainingResults.forEach((result) => {
     if (Array.isArray(result.data)) {
       products.push(...result.data);
     }
@@ -214,26 +236,34 @@ export const getAllActiveProductsAcrossPages = async (
   };
 };
 
-export const getProductBySlug = async (slug: string): Promise<BackendEnvelope<BackendProduct>> => {
-  return requestBackendJson<BackendEnvelope<BackendProduct>>(`/product/products/${slug}`, {
-    method: 'GET',
-    next: {
-      revalidate: CACHE_REVALIDATE.DEFAULT,
-      tags: [CACHE_TAGS.PRODUCTS, CACHE_TAGS.PRODUCT(slug)],
+export const getProductBySlug = async (
+  slug: string,
+): Promise<BackendEnvelope<BackendProduct>> => {
+  return requestBackendJson<BackendEnvelope<BackendProduct>>(
+    `/product/products/${slug}`,
+    {
+      method: 'GET',
+      next: {
+        revalidate: CACHE_REVALIDATE.DEFAULT,
+        tags: [CACHE_TAGS.PRODUCTS, CACHE_TAGS.PRODUCT(slug)],
+      },
     },
-  });
+  );
 };
 
 export const getActiveProductBySlug = async (
   slug: string,
 ): Promise<BackendEnvelope<BackendProduct | null>> => {
-  return requestBackendJson<BackendEnvelope<BackendProduct | null>>(`/product/products/active/${slug}`, {
-    method: 'GET',
-    next: {
-      revalidate: CACHE_REVALIDATE.DEFAULT,
-      tags: [CACHE_TAGS.PRODUCTS, CACHE_TAGS.PRODUCT(slug)],
+  return requestBackendJson<BackendEnvelope<BackendProduct | null>>(
+    `/product/products/active/${slug}`,
+    {
+      method: 'GET',
+      next: {
+        revalidate: CACHE_REVALIDATE.DEFAULT,
+        tags: [CACHE_TAGS.PRODUCTS, CACHE_TAGS.PRODUCT(slug)],
+      },
     },
-  });
+  );
 };
 
 export const getProductsByCategorySlug = async (
@@ -256,7 +286,11 @@ export const getProductsByCategorySlug = async (
       method: 'GET',
       next: {
         revalidate: CACHE_REVALIDATE.DEFAULT,
-        tags: [CACHE_TAGS.PRODUCTS, CACHE_TAGS.CATEGORIES, CACHE_TAGS.CATEGORY(slug)],
+        tags: [
+          CACHE_TAGS.PRODUCTS,
+          CACHE_TAGS.CATEGORIES,
+          CACHE_TAGS.CATEGORY(slug),
+        ],
       },
     },
   );
@@ -282,7 +316,11 @@ export const getProductsBySubCategorySlug = async (
       method: 'GET',
       next: {
         revalidate: CACHE_REVALIDATE.DEFAULT,
-        tags: [CACHE_TAGS.PRODUCTS, CACHE_TAGS.CATEGORIES, CACHE_TAGS.CATEGORY(slug)],
+        tags: [
+          CACHE_TAGS.PRODUCTS,
+          CACHE_TAGS.CATEGORIES,
+          CACHE_TAGS.CATEGORY(slug),
+        ],
       },
     },
   );
@@ -330,7 +368,7 @@ function toFormData(payload: Record<string, unknown>) {
     }),
   );
 
-  (images ?? []).forEach(item => {
+  (images ?? []).forEach((item) => {
     if (item instanceof File) {
       formData.append('images', item);
     }
@@ -343,14 +381,17 @@ export const createProduct = async (
   payload: ProductMutationPayload,
 ): Promise<BackendEnvelope<BackendProduct>> => {
   const accessToken = await getValidAccessTokenForServerActions();
-  const result = await requestBackendJson<BackendEnvelope<BackendProduct>>('/product/products', {
-    method: 'POST',
-    body: toFormData({
-      ...payload,
-      slug: slugify(payload.slug),
-    }),
-    token: accessToken ?? undefined,
-  });
+  const result = await requestBackendJson<BackendEnvelope<BackendProduct>>(
+    '/product/products',
+    {
+      method: 'POST',
+      body: toFormData({
+        ...payload,
+        slug: slugify(payload.slug),
+      }),
+      token: accessToken ?? undefined,
+    },
+  );
 
   revalidateTag(CACHE_TAGS.PRODUCTS, 'max');
   revalidateTag(CACHE_TAGS.SEARCH, 'max');
@@ -363,14 +404,17 @@ export const updateProduct = async (
 ): Promise<BackendEnvelope<BackendProduct>> => {
   const accessToken = await getValidAccessTokenForServerActions();
   const nextSlug = payload.slug ? slugify(payload.slug) : slug;
-  const result = await requestBackendJson<BackendEnvelope<BackendProduct>>(`/product/products/${slug}`, {
-    method: 'PATCH',
-    body: toFormData({
-      ...payload,
-      slug: payload.slug ? nextSlug : payload.slug,
-    }),
-    token: accessToken ?? undefined,
-  });
+  const result = await requestBackendJson<BackendEnvelope<BackendProduct>>(
+    `/product/products/${slug}`,
+    {
+      method: 'PATCH',
+      body: toFormData({
+        ...payload,
+        slug: payload.slug ? nextSlug : payload.slug,
+      }),
+      token: accessToken ?? undefined,
+    },
+  );
 
   revalidateTag(CACHE_TAGS.PRODUCTS, 'max');
   revalidateTag(CACHE_TAGS.SEARCH, 'max');
@@ -383,12 +427,17 @@ export const updateProduct = async (
   return result;
 };
 
-export const deleteProduct = async (slug: string): Promise<BackendEnvelope<BackendProduct>> => {
+export const deleteProduct = async (
+  slug: string,
+): Promise<BackendEnvelope<BackendProduct>> => {
   const accessToken = await getValidAccessTokenForServerActions();
-  const result = await requestBackendJson<BackendEnvelope<BackendProduct>>(`/product/products/${slug}`, {
-    method: 'DELETE',
-    token: accessToken ?? undefined,
-  });
+  const result = await requestBackendJson<BackendEnvelope<BackendProduct>>(
+    `/product/products/${slug}`,
+    {
+      method: 'DELETE',
+      token: accessToken ?? undefined,
+    },
+  );
 
   revalidateTag(CACHE_TAGS.PRODUCTS, 'max');
   revalidateTag(CACHE_TAGS.SEARCH, 'max');
@@ -410,16 +459,25 @@ export type SearchResult = {
   }[];
 };
 
-export const searchProducts = async (searchTerm: string, limit = 10): Promise<SearchResult> => {
+export const searchProducts = async (
+  searchTerm: string,
+  limit = 10,
+): Promise<SearchResult> => {
   const params = new URLSearchParams({
     query: searchTerm,
     limit: String(limit),
   });
 
-  const result = await requestBackendJson<BackendEnvelope<SearchResult>>(`/product/search?${params}`, {
-    method: 'GET',
-    next: { revalidate: CACHE_REVALIDATE.SHORT, tags: [CACHE_TAGS.PRODUCTS, CACHE_TAGS.SEARCH] },
-  });
+  const result = await requestBackendJson<BackendEnvelope<SearchResult>>(
+    `/product/search?${params}`,
+    {
+      method: 'GET',
+      next: {
+        revalidate: CACHE_REVALIDATE.SHORT,
+        tags: [CACHE_TAGS.PRODUCTS, CACHE_TAGS.SEARCH],
+      },
+    },
+  );
 
   return result.data ?? { products: [], suggestions: [] };
 };

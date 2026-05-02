@@ -1,20 +1,24 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { TablePagination } from "@/components/ui/table-pagination";
-import { formatMoney, formatPriceLabelWithUnit, type CartItem } from "@/lib/cart";
-import { formatDashboardDate } from "@/lib/formatDate";
-import { useCartStore } from "@/lib/cart-store";
-import type { BackendOrder } from "@/services/Order";
-import { OrderReviewDialog } from "@/components/OrderReviewDialog";
-import { useRouter } from "next/navigation";
+import Link from 'next/link';
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { TablePagination } from '@/components/ui/table-pagination';
+import {
+  formatMoney,
+  formatPriceLabelWithUnit,
+  type CartItem,
+} from '@/lib/cart';
+import { formatDashboardDate } from '@/lib/formatDate';
+import { useCartStore } from '@/lib/cart-store';
+import type { BackendOrder } from '@/services/Order';
+import { OrderReviewDialog } from '@/components/OrderReviewDialog';
+import { useRouter } from 'next/navigation';
 
 export function OrdersPageClient({
   orders,
-  baseHref = "/dashboard/user",
+  baseHref = '/dashboard/user',
   paginationMeta,
 }: {
   orders: BackendOrder[];
@@ -34,11 +38,14 @@ export function OrdersPageClient({
     order.items.map((item) => ({
       sku: item.sku,
       title: item.title,
-      href: "/shop",
+      href: '/shop',
       image: item.image,
       brand: item.brand,
       unitPrice: item.unitPrice,
-      unitPriceLabel: formatPriceLabelWithUnit(item.unitPrice, item.sellingUnit),
+      unitPriceLabel: formatPriceLabelWithUnit(
+        item.unitPrice,
+        item.sellingUnit,
+      ),
       sellingUnit: item.sellingUnit,
       quantity: item.quantity,
       weightKg: item.weightKg as number,
@@ -155,7 +162,7 @@ export function OrdersPageClient({
             ))
           ) : (
             <Card className="p-6 text-sm text-foreground/65 shadow-sm">
-              No saved orders yet.{" "}
+              No saved orders yet.{' '}
               <Link className="font-semibold text-primary" href="/shop">
                 Start shopping
               </Link>
@@ -170,7 +177,9 @@ export function OrdersPageClient({
             limit={paginationMeta.limit}
             total={paginationMeta.total}
             onPageChange={(page) =>
-              router.push(`${baseHref}/orders?page=${page}&limit=${paginationMeta.limit}`)
+              router.push(
+                `${baseHref}/orders?page=${page}&limit=${paginationMeta.limit}`,
+              )
             }
             onLimitChange={(limit) =>
               router.push(`${baseHref}/orders?page=1&limit=${limit}`)

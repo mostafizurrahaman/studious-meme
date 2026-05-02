@@ -1,11 +1,11 @@
-import { ProductCard } from "@/components/ProductCard";
-import { SeoScripts } from "@/components/SeoScripts";
-import { Card, CardContent } from "@/components/ui/card";
-import { buildPromotionsSchemas, promotionsMetadata } from "@/lib/seo";
+import { ProductCard } from '@/components/ProductCard';
+import { SeoScripts } from '@/components/SeoScripts';
+import { Card, CardContent } from '@/components/ui/card';
+import { buildPromotionsSchemas, promotionsMetadata } from '@/lib/seo';
 import {
   getAllActiveProducts,
   mapBackendProductToStorefrontProduct,
-} from "@/services/Product";
+} from '@/services/Product';
 
 export const metadata = promotionsMetadata;
 
@@ -17,7 +17,7 @@ const DEFAULT_PROMOTIONS_LIMIT = 24;
 
 export default async function PromotionsPage({ searchParams }: Props) {
   const query = await searchParams;
-  const page = Math.max(Number(query.page ?? "1") || 1, 1);
+  const page = Math.max(Number(query.page ?? '1') || 1, 1);
   const limit = Math.max(
     Number(query.limit ?? String(DEFAULT_PROMOTIONS_LIMIT)) ||
       DEFAULT_PROMOTIONS_LIMIT,
@@ -26,7 +26,7 @@ export default async function PromotionsPage({ searchParams }: Props) {
   const productsResult = await getAllActiveProducts({
     page,
     limit,
-    tag: "sale",
+    tag: 'sale',
   }).catch(() => null);
   const products = productsResult?.data?.length
     ? await Promise.all(
@@ -37,11 +37,11 @@ export default async function PromotionsPage({ searchParams }: Props) {
   const promotionStats = [
     [
       String(productsResult?.meta?.total ?? products.length),
-      "Promotion products",
+      'Promotion products',
     ],
-    [String(products.length), "Shown on this page"],
-    [String(productsResult?.meta?.page ?? page), "Current page"],
-    [String(totalPages), "Total pages"],
+    [String(products.length), 'Shown on this page'],
+    [String(productsResult?.meta?.page ?? page), 'Current page'],
+    [String(totalPages), 'Total pages'],
   ];
 
   return (

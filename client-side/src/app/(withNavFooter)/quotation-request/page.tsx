@@ -1,8 +1,8 @@
-import { SeoScripts } from "@/components/SeoScripts";
-import { QuotationRequestFormClient } from "@/components/QuotationRequestFormClient";
-import { Card, CardHeader } from "@/components/ui/card";
-import { quotationRequestMetadata, quotationRequestSchemas } from "@/lib/seo";
-import { getActiveBrands } from "@/services/Brand";
+import { SeoScripts } from '@/components/SeoScripts';
+import { QuotationRequestFormClient } from '@/components/QuotationRequestFormClient';
+import { Card, CardHeader } from '@/components/ui/card';
+import { quotationRequestMetadata, quotationRequestSchemas } from '@/lib/seo';
+import { getActiveBrands } from '@/services/Brand';
 
 export const metadata = quotationRequestMetadata;
 
@@ -43,10 +43,10 @@ export default async function QuotationRequestPage() {
                 </h2>
                 <div className="mt-4 grid gap-3 text-sm text-foreground/65">
                   {[
-                    "Product names or item links",
-                    "Required quantity and delivery area",
-                    "Budget range or target pricing",
-                    "Preferred brand or alternative brands",
+                    'Product names or item links',
+                    'Required quantity and delivery area',
+                    'Budget range or target pricing',
+                    'Preferred brand or alternative brands',
                   ].map((item) => (
                     <div key={item} className="rounded-2xl bg-muted px-4 py-3">
                       {item}

@@ -1,8 +1,8 @@
-import ContactModel from "./contact.model";
-import { IContact } from "./contact.interface";
-import { AppError } from "../../utils";
-import httpStatus from "http-status";
-import { TMeta } from "../../utils/sendResponse";
+import ContactModel from './contact.model';
+import { IContact } from './contact.interface';
+import { AppError } from '../../utils';
+import httpStatus from 'http-status';
+import { TMeta } from '../../utils/sendResponse';
 
 const DEFAULT_CONTACT_LIMIT = 50;
 
@@ -20,19 +20,19 @@ const adminGetAllContactsFromDB = async (
 
   if (searchTerm) {
     filters.$or = [
-      { name: { $regex: searchTerm, $options: "i" } },
-      { company: { $regex: searchTerm, $options: "i" } },
-      { email: { $regex: searchTerm, $options: "i" } },
-      { subject: { $regex: searchTerm, $options: "i" } },
-      { products: { $regex: searchTerm, $options: "i" } },
-      { brand: { $regex: searchTerm, $options: "i" } },
-      { message: { $regex: searchTerm, $options: "i" } },
+      { name: { $regex: searchTerm, $options: 'i' } },
+      { company: { $regex: searchTerm, $options: 'i' } },
+      { email: { $regex: searchTerm, $options: 'i' } },
+      { subject: { $regex: searchTerm, $options: 'i' } },
+      { products: { $regex: searchTerm, $options: 'i' } },
+      { brand: { $regex: searchTerm, $options: 'i' } },
+      { message: { $regex: searchTerm, $options: 'i' } },
     ];
   }
 
   const [contacts, total] = await Promise.all([
     ContactModel.find(filters)
-      .select("-updatedAt")
+      .select('-updatedAt')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limitNumber),
@@ -54,7 +54,7 @@ const createContactInDB = async (contactData: IContact) => {
   const contact = await ContactModel.create(contactData);
 
   if (!contact) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Failed to create message!");
+    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create message!');
   }
 
   return null;

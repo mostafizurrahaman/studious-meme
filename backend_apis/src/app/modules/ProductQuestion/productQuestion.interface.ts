@@ -1,6 +1,6 @@
-import { Types } from "mongoose";
+import { Types } from 'mongoose';
 
-export type ProductQuestionStatus = "pending" | "answered" | "hidden";
+export type ProductQuestionStatus = 'pending' | 'answered' | 'hidden';
 
 export interface IProductQuestion {
   product: Types.ObjectId;

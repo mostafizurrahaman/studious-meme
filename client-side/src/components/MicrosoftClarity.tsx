@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
-import Script from "next/script";
-import { usePathname } from "next/navigation";
-import { getClarityId, isClarityEnabled } from "@/lib/clarity";
+import { useEffect, useRef } from 'react';
+import Script from 'next/script';
+import { usePathname } from 'next/navigation';
+import { getClarityId, isClarityEnabled } from '@/lib/clarity';
 
 export function MicrosoftClarity() {
   const clarityId = getClarityId();
@@ -20,8 +20,8 @@ export function MicrosoftClarity() {
       return;
     }
 
-    if (typeof window.clarity === "function") {
-      window.clarity("track");
+    if (typeof window.clarity === 'function') {
+      window.clarity('track');
     }
   }, [pathname]);
 

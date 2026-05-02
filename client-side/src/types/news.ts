@@ -1,4 +1,4 @@
-import { TCategory } from "./category";
+import { TCategory } from './category';
 
 export type TNews = {
   _id: string;
@@ -38,7 +38,7 @@ export type TNews = {
 };
 
 export enum PictureAlignment {
-  Left = "left",
-  Center = "center",
-  Right = "right",
+  Left = 'left',
+  Center = 'center',
+  Right = 'right',
 }

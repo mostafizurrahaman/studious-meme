@@ -1,6 +1,6 @@
-import httpStatus from "http-status";
-import { asyncHandler, sendResponse } from "../../utils";
-import { AdminService } from "./admin.service";
+import httpStatus from 'http-status';
+import { asyncHandler, sendResponse } from '../../utils';
+import { AdminService } from './admin.service';
 
 const getSingleParam = (value: string | string[]) =>
   Array.isArray(value) ? value[0] : value;
@@ -11,7 +11,7 @@ const createAdmin = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
-    message: "Admin created successfully!",
+    message: 'Admin created successfully!',
     data: result,
   });
 });
@@ -22,7 +22,7 @@ const getAllAdmins = asyncHandler(async (_req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Admins fetched successfully!",
+    message: 'Admins fetched successfully!',
     data: result,
   });
 });
@@ -35,7 +35,7 @@ const getAdmin = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Admin fetched successfully!",
+    message: 'Admin fetched successfully!',
     data: result,
   });
 });
@@ -50,7 +50,7 @@ const updateAdmin = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Admin updated successfully!",
+    message: 'Admin updated successfully!',
     data: result,
   });
 });
@@ -63,7 +63,7 @@ const deleteAdmin = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Admin deleted successfully!",
+    message: 'Admin deleted successfully!',
     data: result,
   });
 });

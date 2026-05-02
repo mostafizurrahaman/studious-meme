@@ -47,7 +47,8 @@ const productReviewSchema = new Schema<IProductReview>(
       type: [String],
       default: [],
       validate: {
-        validator: (value: string[]) => Array.isArray(value) && value.length <= 5,
+        validator: (value: string[]) =>
+          Array.isArray(value) && value.length <= 5,
         message: 'You can upload up to 5 review images!',
       },
     },
@@ -100,10 +101,22 @@ productReviewSchema.index(
   { product: 1, status: 1, createdAt: -1 },
   { name: 'product_review_product_status_createdAt_idx' },
 );
-productReviewSchema.index({ user: 1, product: 1 }, { name: 'product_review_user_product_idx' });
-productReviewSchema.index({ source: 1, createdAt: -1 }, { name: 'product_review_source_createdAt_idx' });
-productReviewSchema.index({ status: 1, createdAt: -1 }, { name: 'product_review_status_createdAt_idx' });
-productReviewSchema.index({ rating: 1, createdAt: -1 }, { name: 'product_review_rating_createdAt_idx' });
+productReviewSchema.index(
+  { user: 1, product: 1 },
+  { name: 'product_review_user_product_idx' },
+);
+productReviewSchema.index(
+  { source: 1, createdAt: -1 },
+  { name: 'product_review_source_createdAt_idx' },
+);
+productReviewSchema.index(
+  { status: 1, createdAt: -1 },
+  { name: 'product_review_status_createdAt_idx' },
+);
+productReviewSchema.index(
+  { rating: 1, createdAt: -1 },
+  { name: 'product_review_rating_createdAt_idx' },
+);
 productReviewSchema.index(
   { product: 1, user: 1, source: 1 },
   {
@@ -113,4 +126,7 @@ productReviewSchema.index(
   },
 );
 
-export const ProductReviewModel = model<IProductReview>('ProductReview', productReviewSchema);
+export const ProductReviewModel = model<IProductReview>(
+  'ProductReview',
+  productReviewSchema,
+);

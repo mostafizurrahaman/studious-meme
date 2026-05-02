@@ -1,28 +1,28 @@
-import { Router } from "express";
+import { Router } from 'express';
 import {
   adminLimiter,
   auth,
   burstProtection,
   publicLimiter,
   validateRequestFromFormData,
-} from "../../middlewares";
-import { multerUpload } from "../../lib";
-import { ROLE } from "../User/user.constant";
-import { HeroSectionController } from "./heroSection.controller";
-import { HeroSectionValidation } from "./heroSection.validation";
+} from '../../middlewares';
+import { multerUpload } from '../../lib';
+import { ROLE } from '../User/user.constant';
+import { HeroSectionController } from './heroSection.controller';
+import { HeroSectionValidation } from './heroSection.validation';
 
 const router = Router();
 
 // 1. getHomeContent
-router.route("/home").get(publicLimiter, HeroSectionController.getHomeContent);
+router.route('/home').get(publicLimiter, HeroSectionController.getHomeContent);
 
 // 2. createHeroSection, getAllHeroSections
 router
-  .route("/heroes")
+  .route('/heroes')
   .post(
     auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
     adminLimiter,
-    burstProtection("admin", 10_000, 15),
+    burstProtection('admin', 10_000, 15),
     multerUpload.any(),
     validateRequestFromFormData(HeroSectionValidation.heroSectionCreateSchema),
     HeroSectionController.createHeroSection,
@@ -31,12 +31,12 @@ router
 
 // 3. getHeroSection, updateHeroSection, deleteHeroSection
 router
-  .route("/heroes/:heroSectionId")
+  .route('/heroes/:heroSectionId')
   .get(publicLimiter, HeroSectionController.getHeroSection)
   .patch(
     auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
     adminLimiter,
-    burstProtection("admin", 10_000, 15),
+    burstProtection('admin', 10_000, 15),
     multerUpload.any(),
     validateRequestFromFormData(HeroSectionValidation.heroSectionUpdateSchema),
     HeroSectionController.updateHeroSection,

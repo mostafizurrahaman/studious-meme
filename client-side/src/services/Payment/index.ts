@@ -1,10 +1,10 @@
-"use server";
+'use server';
 
-import { requestBackendJson } from "@/lib/backend-api";
+import { requestBackendJson } from '@/lib/backend-api';
 import {
   getValidAccessTokenForServerActions,
   getValidAccessTokenForServerHandlerGet,
-} from "@/lib/getValidAccessToken";
+} from '@/lib/getValidAccessToken';
 
 type BackendEnvelope<T> = {
   success?: boolean;
@@ -20,7 +20,7 @@ export type BackendPayment = {
   transactionId: string;
   order: string | { orderId: string };
   amount: number;
-  status: "PENDING" | "SUCCEEDED" | "FAILED" | "CANCELED";
+  status: 'PENDING' | 'SUCCEEDED' | 'FAILED' | 'CANCELED';
   createdAt: string;
   bankTranId?: string;
   valId?: string;
@@ -37,7 +37,7 @@ export const initiatePortPosPayment = async (
   return requestBackendJson<
     BackendEnvelope<{ url?: string; transactionId?: string }>
   >(`/payment/portpos/init/${orderId}`, {
-    method: "POST",
+    method: 'POST',
     token: accessToken ?? undefined,
   });
 };
@@ -50,11 +50,11 @@ type UserListParams = {
 const buildUserListQuery = (params: UserListParams = {}) => {
   const searchParams = new URLSearchParams();
 
-  if (params.page) searchParams.set("page", String(params.page));
-  if (params.limit) searchParams.set("limit", String(params.limit));
+  if (params.page) searchParams.set('page', String(params.page));
+  if (params.limit) searchParams.set('limit', String(params.limit));
 
   const query = searchParams.toString();
-  return query ? `?${query}` : "";
+  return query ? `?${query}` : '';
 };
 
 export const getMyPayments = async (
@@ -64,7 +64,7 @@ export const getMyPayments = async (
   return requestBackendJson<PaginatedBackendEnvelope<BackendPayment[]>>(
     `/payment/my-payments${buildUserListQuery(params)}`,
     {
-      method: "GET",
+      method: 'GET',
       token: accessToken ?? undefined,
     },
   );
@@ -81,15 +81,15 @@ export const getAllPaymentsForAdmin = async (
   const accessToken = await getValidAccessTokenForServerHandlerGet();
   const searchParams = new URLSearchParams();
 
-  if (params.page) searchParams.set("page", String(params.page));
-  if (params.limit) searchParams.set("limit", String(params.limit));
+  if (params.page) searchParams.set('page', String(params.page));
+  if (params.limit) searchParams.set('limit', String(params.limit));
 
   const query = searchParams.toString();
 
   return requestBackendJson<BackendEnvelope<BackendPayment[]>>(
-    `/payment/admin${query ? `?${query}` : ""}`,
+    `/payment/admin${query ? `?${query}` : ''}`,
     {
-      method: "GET",
+      method: 'GET',
       token: accessToken ?? undefined,
     },
   );

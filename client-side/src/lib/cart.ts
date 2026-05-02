@@ -1,10 +1,10 @@
-import { getProductPrimaryImage, type Product } from "@/lib/storefront-types";
+import { getProductPrimaryImage, type Product } from '@/lib/storefront-types';
 
 export type CartItem = {
   productId?: string;
   sku: string;
   title: string;
-  href: Product["href"];
+  href: Product['href'];
   image: string;
   brand: string;
   unitPrice: number;
@@ -18,11 +18,11 @@ export type CartItem = {
 };
 
 export function parseMoney(value: string) {
-  return Number(value.replace(/[^0-9.]/g, ""));
+  return Number(value.replace(/[^0-9.]/g, ''));
 }
 
 export function formatMoney(value: number) {
-  return `৳ ${value.toLocaleString("en-BD")}`;
+  return `৳ ${value.toLocaleString('en-BD')}`;
 }
 
 export function formatPrice(amount: number) {
@@ -31,12 +31,15 @@ export function formatPrice(amount: number) {
 
 export function resolveSellingUnitLabel(value?: string) {
   const normalized = value?.trim();
-  return normalized || "pcs";
+  return normalized || 'pcs';
 }
 
-export function formatPriceLabelWithUnit(value: string | number, sellingUnit?: string) {
+export function formatPriceLabelWithUnit(
+  value: string | number,
+  sellingUnit?: string,
+) {
   const label =
-    typeof value === "number"
+    typeof value === 'number'
       ? formatMoney(value)
       : Number.isFinite(Number(value))
         ? formatMoney(Number(value))
@@ -45,7 +48,10 @@ export function formatPriceLabelWithUnit(value: string | number, sellingUnit?: s
   return `${label} / ${resolveSellingUnitLabel(sellingUnit)}`;
 }
 
-export function formatPriceWithUnit(value: string | number, sellingUnit?: string) {
+export function formatPriceWithUnit(
+  value: string | number,
+  sellingUnit?: string,
+) {
   return formatPriceLabelWithUnit(value, sellingUnit);
 }
 
@@ -58,7 +64,10 @@ export function toCartItem(product: Product): CartItem {
     image: getProductPrimaryImage(product),
     brand: product.brand,
     unitPrice: parseMoney(product.price),
-    unitPriceLabel: formatPriceLabelWithUnit(product.price, product.sellingUnit),
+    unitPriceLabel: formatPriceLabelWithUnit(
+      product.price,
+      product.sellingUnit,
+    ),
     oldPriceLabel: product.oldPrice
       ? formatMoney(parseMoney(product.oldPrice))
       : undefined,

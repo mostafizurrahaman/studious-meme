@@ -74,12 +74,12 @@ Do not use this skill as the primary source for:
 
 ```typescript
 // PASS: GOOD: Descriptive names
-const marketSearchQuery = "election";
+const marketSearchQuery = 'election';
 const isUserAuthenticated = true;
 const totalRevenue = 1000;
 
 // FAIL: BAD: Unclear names
-const q = "election";
+const q = 'election';
 const flag = true;
 const x = 1000;
 ```
@@ -104,13 +104,13 @@ function email(e) {}
 // PASS: ALWAYS use spread operator
 const updatedUser = {
   ...user,
-  name: "New Name",
+  name: 'New Name',
 };
 
 const updatedArray = [...items, newItem];
 
 // FAIL: NEVER mutate directly
-user.name = "New Name"; // BAD
+user.name = 'New Name'; // BAD
 items.push(newItem); // BAD
 ```
 
@@ -128,8 +128,8 @@ async function fetchData(url: string) {
 
     return await response.json();
   } catch (error) {
-    console.error("Fetch failed:", error);
-    throw new Error("Failed to fetch data");
+    console.error('Fetch failed:', error);
+    throw new Error('Failed to fetch data');
   }
 }
 
@@ -163,7 +163,7 @@ const stats = await fetchStats();
 interface Market {
   id: string;
   name: string;
-  status: "active" | "resolved" | "closed";
+  status: 'active' | 'resolved' | 'closed';
   created_at: Date;
 }
 
@@ -302,7 +302,7 @@ return NextResponse.json({
 return NextResponse.json(
   {
     success: false,
-    error: "Invalid request",
+    error: 'Invalid request',
   },
   { status: 400 },
 );
@@ -311,7 +311,7 @@ return NextResponse.json(
 ### Input Validation
 
 ```typescript
-import { z } from "zod";
+import { z } from 'zod';
 
 // PASS: GOOD: Schema validation
 const CreateMarketSchema = z.object({
@@ -332,7 +332,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           success: false,
-          error: "Validation failed",
+          error: 'Validation failed',
           details: error.errors,
         },
         { status: 400 },
@@ -424,7 +424,7 @@ export async function searchMarkets(
 ### Memoization
 
 ```typescript
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback } from 'react';
 
 // PASS: GOOD: Memoize expensive computations
 const sortedMarkets = useMemo(() => {
@@ -459,12 +459,12 @@ export function Dashboard() {
 ```typescript
 // PASS: GOOD: Select only needed columns
 const { data } = await supabase
-  .from("markets")
-  .select("id, name, status")
+  .from('markets')
+  .select('id, name, status')
   .limit(10);
 
 // FAIL: BAD: Select everything
-const { data } = await supabase.from("markets").select("*");
+const { data } = await supabase.from('markets').select('*');
 ```
 
 ## Testing Standards
@@ -472,7 +472,7 @@ const { data } = await supabase.from("markets").select("*");
 ### Test Structure (AAA Pattern)
 
 ```typescript
-test("calculates similarity correctly", () => {
+test('calculates similarity correctly', () => {
   // Arrange
   const vector1 = [1, 0, 0];
   const vector2 = [0, 1, 0];
@@ -489,13 +489,13 @@ test("calculates similarity correctly", () => {
 
 ```typescript
 // PASS: GOOD: Descriptive test names
-test("returns empty array when no markets match query", () => {});
-test("throws error when OpenAI API key is missing", () => {});
-test("falls back to substring search when Redis unavailable", () => {});
+test('returns empty array when no markets match query', () => {});
+test('throws error when OpenAI API key is missing', () => {});
+test('falls back to substring search when Redis unavailable', () => {});
 
 // FAIL: BAD: Vague test names
-test("works", () => {});
-test("test search", () => {});
+test('works', () => {});
+test('test search', () => {});
 ```
 
 ## Code Smell Detection

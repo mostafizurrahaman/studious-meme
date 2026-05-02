@@ -1,5 +1,5 @@
-import type { FieldErrors, FieldValues, Resolver } from "react-hook-form";
-import { z } from "zod";
+import type { FieldErrors, FieldValues, Resolver } from 'react-hook-form';
+import { z } from 'zod';
 
 export function makeZodResolver<
   TValues extends FieldValues,
@@ -18,7 +18,7 @@ export function makeZodResolver<
     const errors = {} as FieldErrors<TValues>;
 
     for (const issue of parsed.error.issues) {
-      const path = issue.path.join(".");
+      const path = issue.path.join('.');
 
       if (!path || errors[path]) {
         continue;
@@ -50,12 +50,12 @@ const requiredText = (label: string, minLength = 1) =>
 
 const optionalText = () => z.string().trim().optional();
 
-const requiredEmail = (label = "Email") =>
+const requiredEmail = (label = 'Email') =>
   z
     .string({ error: `${label} is required!` })
     .trim()
     .min(1, { message: `${label} is required!` })
-    .email({ message: "Invalid email format!" })
+    .email({ message: 'Invalid email format!' })
     .transform((value) => value.toLowerCase());
 
 const requiredPassword = (label: string) =>
@@ -63,24 +63,24 @@ const requiredPassword = (label: string) =>
     .string({ error: `${label} is required!` })
     .trim()
     .min(6, {
-      message: "Password must be at least 6 characters long.",
+      message: 'Password must be at least 6 characters long.',
     })
-    .max(20, { message: "Password must be between 6 and 20 characters." });
+    .max(20, { message: 'Password must be between 6 and 20 characters.' });
 
 const requiredPhone = () =>
   z
-    .string({ error: "Phone is required!" })
+    .string({ error: 'Phone is required!' })
     .trim()
-    .min(1, { message: "Phone is required!" })
-    .regex(/^[0-9+]+$/, { message: "Invalid phone number format!" })
-    .min(10, { message: "Phone must be at least 10 digits long!" });
+    .min(1, { message: 'Phone is required!' })
+    .regex(/^[0-9+]+$/, { message: 'Invalid phone number format!' })
+    .min(10, { message: 'Phone must be at least 10 digits long!' });
 
 const requiredDate = () =>
   z
-    .string({ error: "Date of birth is required!" })
+    .string({ error: 'Date of birth is required!' })
     .trim()
-    .min(1, { message: "Date of birth is required!" })
-    .regex(/^\d{4}-\d{2}-\d{2}$/, { message: "Invalid date format!" })
+    .min(1, { message: 'Date of birth is required!' })
+    .regex(/^\d{4}-\d{2}-\d{2}$/, { message: 'Invalid date format!' })
     .transform((value) => new Date(`${value}T00:00:00.000Z`).toISOString());
 
 const requiredNumber = (
@@ -112,144 +112,144 @@ const requiredNumber = (
 export const authFormSchemas = {
   signIn: z.object({
     email: requiredEmail(),
-    password: requiredPassword("Password"),
+    password: requiredPassword('Password'),
   }),
   forgotPassword: z.object({
     email: requiredEmail(),
   }),
   forgotPasswordOtp: z.object({
     otp: z
-      .string({ error: "OTP is required!" })
+      .string({ error: 'OTP is required!' })
       .trim()
-      .min(6, { message: "OTP must be 6 digits long!" })
-      .max(6, { message: "OTP must be 6 digits long!" }),
+      .min(6, { message: 'OTP must be 6 digits long!' })
+      .max(6, { message: 'OTP must be 6 digits long!' }),
   }),
   forgotPasswordReset: z
     .object({
-      newPassword: requiredPassword("New password"),
+      newPassword: requiredPassword('New password'),
       confirmPassword: z
-        .string({ error: "Confirm password is required!" })
+        .string({ error: 'Confirm password is required!' })
         .trim()
         .min(1, {
-          message: "Confirm password is required!",
+          message: 'Confirm password is required!',
         }),
     })
     .superRefine(({ newPassword, confirmPassword }, ctx) => {
       if (newPassword !== confirmPassword) {
         ctx.addIssue({
-          code: "custom",
-          path: ["confirmPassword"],
-          message: "Passwords must match!",
+          code: 'custom',
+          path: ['confirmPassword'],
+          message: 'Passwords must match!',
         });
       }
     }),
   signUp: z
     .object({
-      name: requiredText("Name", 2),
+      name: requiredText('Name', 2),
       email: requiredEmail(),
-      password: requiredPassword("Password"),
+      password: requiredPassword('Password'),
       confirmPassword: z
-        .string({ error: "Confirm password is required!" })
+        .string({ error: 'Confirm password is required!' })
         .trim()
         .min(1, {
-          message: "Confirm password is required!",
+          message: 'Confirm password is required!',
         }),
     })
     .superRefine(({ password, confirmPassword }, ctx) => {
       if (password !== confirmPassword) {
         ctx.addIssue({
-          code: "custom",
-          path: ["confirmPassword"],
-          message: "Passwords must match!",
+          code: 'custom',
+          path: ['confirmPassword'],
+          message: 'Passwords must match!',
         });
       }
     }),
   otp: z.object({
     otp: z
-      .string({ error: "OTP is required!" })
+      .string({ error: 'OTP is required!' })
       .trim()
-      .min(6, { message: "OTP must be 6 digits long!" })
-      .max(6, { message: "OTP must be 6 digits long!" }),
+      .min(6, { message: 'OTP must be 6 digits long!' })
+      .max(6, { message: 'OTP must be 6 digits long!' }),
   }),
 };
 
 export const profileFormSchemas = {
   profile: z.object({
-    name: requiredText("Name", 3),
+    name: requiredText('Name', 3),
     phone: requiredPhone(),
     dob: requiredDate(),
   }),
   password: z.object({
-    oldPassword: requiredPassword("Old password"),
-    newPassword: requiredPassword("New password"),
+    oldPassword: requiredPassword('Old password'),
+    newPassword: requiredPassword('New password'),
   }),
 };
 
 export const dashboardFormSchemas = {
   product: z.object({
-    title: requiredText("Title"),
-    slug: requiredText("Slug"),
-    sku: requiredText("SKU"),
-    price: requiredNumber("Price", { min: 0 }),
+    title: requiredText('Title'),
+    slug: requiredText('Slug'),
+    sku: requiredText('SKU'),
+    price: requiredNumber('Price', { min: 0 }),
     oldPrice: z
-      .union([z.literal(""), z.string().trim().min(1)])
-      .transform((value) => (value === "" ? undefined : Number(value)))
+      .union([z.literal(''), z.string().trim().min(1)])
+      .transform((value) => (value === '' ? undefined : Number(value)))
       .refine(
         (value) => value === undefined || (!Number.isNaN(value) && value >= 0),
         {
-          message: "Old price must be a valid non-negative number!",
+          message: 'Old price must be a valid non-negative number!',
         },
       ),
     badge: optionalText(),
-    brand: requiredText("Brand"),
-    category: requiredText("Category"),
+    brand: requiredText('Brand'),
+    category: requiredText('Category'),
     subCategorySlug: optionalText(),
     stock: z
       .string()
       .trim()
-      .refine((value) => value === "" || /^\d+$/.test(value), {
-        message: "Stock must be a valid non-negative whole number!",
+      .refine((value) => value === '' || /^\d+$/.test(value), {
+        message: 'Stock must be a valid non-negative whole number!',
       }),
-    rating: requiredNumber("Rating", { min: 0 }),
+    rating: requiredNumber('Rating', { min: 0 }),
     isFeatured: z.boolean().default(false),
     isActive: z.boolean().default(true),
   }),
   admin: z
     .object({
-      name: requiredText("Name", 3),
+      name: requiredText('Name', 3),
       email: requiredEmail(),
       phone: requiredPhone(),
-      password: requiredPassword("Password"),
+      password: requiredPassword('Password'),
       confirmPassword: z
-        .string({ error: "Confirm password is required!" })
+        .string({ error: 'Confirm password is required!' })
         .trim()
         .min(1, {
-          message: "Confirm password is required!",
+          message: 'Confirm password is required!',
         }),
       role: z
-        .string({ error: "Role is required!" })
+        .string({ error: 'Role is required!' })
         .trim()
-        .min(1, { message: "Role is required!" }),
+        .min(1, { message: 'Role is required!' }),
     })
     .superRefine(({ password, confirmPassword }, ctx) => {
       if (password !== confirmPassword) {
         ctx.addIssue({
-          code: "custom",
-          path: ["confirmPassword"],
-          message: "Passwords must match!",
+          code: 'custom',
+          path: ['confirmPassword'],
+          message: 'Passwords must match!',
         });
       }
     }),
   category: z.object({
-    name: requiredText("Category name", 1),
-    slug: requiredText("Category slug", 1),
-    description: requiredText("Category description", 1),
+    name: requiredText('Category name', 1),
+    slug: requiredText('Category slug', 1),
+    description: requiredText('Category description', 1),
     accent: optionalText(),
   }),
   brand: z.object({
-    name: requiredText("Brand name", 3),
-    slug: requiredText("Brand slug", 3),
-    description: requiredText("Brand description", 1),
+    name: requiredText('Brand name', 3),
+    slug: requiredText('Brand slug', 3),
+    description: requiredText('Brand description', 1),
     isActive: z.boolean().default(true),
   }),
 };

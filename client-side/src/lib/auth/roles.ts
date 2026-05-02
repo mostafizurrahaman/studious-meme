@@ -1,15 +1,15 @@
-import type { AuthRole, DashboardRouteSegment } from "@/types";
+import type { AuthRole, DashboardRouteSegment } from '@/types';
 
 const ROLE_TO_SEGMENT: Record<AuthRole, DashboardRouteSegment> = {
-  SUPER_ADMIN: "super-admin",
-  ADMIN: "admin",
-  USER: "user",
+  SUPER_ADMIN: 'super-admin',
+  ADMIN: 'admin',
+  USER: 'user',
 };
 
 const SEGMENT_TO_ROLE: Record<DashboardRouteSegment, AuthRole> = {
-  "super-admin": "SUPER_ADMIN",
-  admin: "ADMIN",
-  user: "USER",
+  'super-admin': 'SUPER_ADMIN',
+  admin: 'ADMIN',
+  user: 'USER',
 };
 
 export function normalizeRole(
@@ -17,7 +17,7 @@ export function normalizeRole(
 ): AuthRole | null {
   if (!role) return null;
 
-  const normalized = role.trim().toUpperCase().replace(/-/g, "_") as AuthRole;
+  const normalized = role.trim().toUpperCase().replace(/-/g, '_') as AuthRole;
   return normalized in ROLE_TO_SEGMENT ? normalized : null;
 }
 
@@ -29,7 +29,7 @@ export function normalizeRoleSegment(
   const normalized = segment
     .trim()
     .toLowerCase()
-    .replace(/_/g, "-") as DashboardRouteSegment;
+    .replace(/_/g, '-') as DashboardRouteSegment;
   return normalized in SEGMENT_TO_ROLE ? normalized : null;
 }
 
@@ -57,13 +57,13 @@ export function getProfilePathByRole(
 export function getAdminsPathByRole(
   role: string | null | undefined,
 ): string | null {
-  return normalizeRole(role) === "SUPER_ADMIN"
-    ? "/dashboard/super-admin/admins"
+  return normalizeRole(role) === 'SUPER_ADMIN'
+    ? '/dashboard/super-admin/admins'
     : null;
 }
 
 export function isDashboardRootPath(pathname: string): boolean {
-  return pathname === "/dashboard" || pathname === "/dashboard/";
+  return pathname === '/dashboard' || pathname === '/dashboard/';
 }
 
 export function isDashboardPathForRole(
@@ -111,13 +111,13 @@ export function getRoleLabel(role: string | null | undefined): string {
   const normalized = normalizeRole(role);
 
   switch (normalized) {
-    case "SUPER_ADMIN":
-      return "Super admin";
-    case "ADMIN":
-      return "Admin";
-    case "USER":
-      return "User";
+    case 'SUPER_ADMIN':
+      return 'Super admin';
+    case 'ADMIN':
+      return 'Admin';
+    case 'USER':
+      return 'User';
     default:
-      return "Guest";
+      return 'Guest';
   }
 }

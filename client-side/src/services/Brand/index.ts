@@ -1,12 +1,12 @@
-"use server";
+'use server';
 
-import { revalidatePath, revalidateTag } from "next/cache";
-import { requestBackendJson } from "@/lib/backend-api";
-import { CACHE_REVALIDATE } from "@/lib/cache-revalidate";
-import { CACHE_TAGS } from "@/lib/cache-tags";
-import { getValidAccessTokenForServerActions } from "@/lib/getValidAccessToken";
-import type { Brand as StorefrontBrand } from "@/lib/storefront-types";
-import { slugify } from "@/lib/slug";
+import { revalidatePath, revalidateTag } from 'next/cache';
+import { requestBackendJson } from '@/lib/backend-api';
+import { CACHE_REVALIDATE } from '@/lib/cache-revalidate';
+import { CACHE_TAGS } from '@/lib/cache-tags';
+import { getValidAccessTokenForServerActions } from '@/lib/getValidAccessToken';
+import type { Brand as StorefrontBrand } from '@/lib/storefront-types';
+import { slugify } from '@/lib/slug';
 
 type BackendEnvelope<T> = {
   success?: boolean;
@@ -49,24 +49,24 @@ export const getAllBrands = async (
 ): Promise<BackendEnvelope<BackendBrand[]>> => {
   const searchParams = new URLSearchParams();
 
-  if (params.page) searchParams.set("page", String(params.page));
-  if (params.limit) searchParams.set("limit", String(params.limit));
+  if (params.page) searchParams.set('page', String(params.page));
+  if (params.limit) searchParams.set('limit', String(params.limit));
   if (params.searchTerm?.trim())
-    searchParams.set("searchTerm", params.searchTerm.trim());
+    searchParams.set('searchTerm', params.searchTerm.trim());
 
   const query = searchParams.toString();
 
   return requestBackendJson<BackendEnvelope<BackendBrand[]>>(
-    `/brand/brands${query ? `?${query}` : ""}`,
+    `/brand/brands${query ? `?${query}` : ''}`,
     {
-      method: "GET",
+      method: 'GET',
       next: { revalidate: CACHE_REVALIDATE.LONG, tags: [CACHE_TAGS.BRANDS] },
     },
   );
 };
 
 export const getAllBrandsAcrossPages = async (
-  params: Omit<GetAllBrandsParams, "page"> = {},
+  params: Omit<GetAllBrandsParams, 'page'> = {},
 ): Promise<BackendEnvelope<BackendBrand[]>> => {
   const firstPage = await getAllBrands({ ...params, page: 1 });
   const brands = [...(firstPage.data ?? [])];
@@ -106,9 +106,9 @@ export const getActiveBrands = async (): Promise<
   BackendEnvelope<BackendBrand[]>
 > => {
   return requestBackendJson<BackendEnvelope<BackendBrand[]>>(
-    "/brand/brands/active",
+    '/brand/brands/active',
     {
-      method: "GET",
+      method: 'GET',
       next: { revalidate: CACHE_REVALIDATE.LONG, tags: [CACHE_TAGS.BRANDS] },
     },
   );
@@ -120,7 +120,7 @@ export const getBrandBySlug = async (
   return requestBackendJson<BackendEnvelope<BackendBrand>>(
     `/brand/brands/${slug}`,
     {
-      method: "GET",
+      method: 'GET',
       next: {
         revalidate: CACHE_REVALIDATE.LONG,
         tags: [CACHE_TAGS.BRANDS, CACHE_TAGS.BRAND(slug)],
@@ -135,7 +135,7 @@ export const getActiveBrandBySlug = async (
   return requestBackendJson<BackendEnvelope<BackendBrand | null>>(
     `/brand/brands/active/${slug}`,
     {
-      method: "GET",
+      method: 'GET',
       next: {
         revalidate: CACHE_REVALIDATE.LONG,
         tags: [CACHE_TAGS.BRANDS, CACHE_TAGS.BRAND(slug)],
@@ -160,15 +160,15 @@ function toFormData(payload: Record<string, unknown>) {
   };
 
   formData.set(
-    "data",
+    'data',
     JSON.stringify({
       ...rest,
-      ...(typeof image === "string" && image ? { image } : {}),
+      ...(typeof image === 'string' && image ? { image } : {}),
     }),
   );
 
   if (image instanceof File) {
-    formData.append("image", image);
+    formData.append('image', image);
   }
 
   return formData;
@@ -180,9 +180,9 @@ export const createBrand = async (
   const accessToken = await getValidAccessTokenForServerActions();
 
   const result = await requestBackendJson<BackendEnvelope<BackendBrand>>(
-    "/brand/brands",
+    '/brand/brands',
     {
-      method: "POST",
+      method: 'POST',
       body: toFormData({
         ...payload,
         slug: slugify(payload.slug),
@@ -205,7 +205,7 @@ export const updateBrand = async (
   const result = await requestBackendJson<BackendEnvelope<BackendBrand>>(
     `/brand/brands/${slug}`,
     {
-      method: "PATCH",
+      method: 'PATCH',
       body: toFormData({
         ...payload,
         slug: payload.slug ? slugify(payload.slug) : payload.slug,
@@ -225,7 +225,7 @@ export const deleteBrand = async (
   const result = await requestBackendJson<BackendEnvelope<BackendBrand>>(
     `/brand/brands/${slug}`,
     {
-      method: "DELETE",
+      method: 'DELETE',
       token: accessToken ?? undefined,
     },
   );

@@ -71,14 +71,22 @@ const sendOtpEmail = async ({
     // Log the error and throw a custom error with a message
     // eslint-disable-next-line no-console
     console.log(error);
-    throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to send email');
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      'Failed to send email',
+    );
   }
 };
 
 export default sendOtpEmail;
 
 // Utility function to generate the email HTML content dynamically
-const generateEmailHTML = (otp: string, name: string, logoCid: string, customMessage: string = '') => {
+const generateEmailHTML = (
+  otp: string,
+  name: string,
+  logoCid: string,
+  customMessage: string = '',
+) => {
   return `
 <!DOCTYPE html>
 <html lang="en">

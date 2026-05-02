@@ -1,8 +1,8 @@
-import { requestBackendJson } from "@/lib/backend-api";
+import { requestBackendJson } from '@/lib/backend-api';
 import type {
   CouponVerificationPayload,
   CouponVerificationSummary,
-} from "@/lib/coupons";
+} from '@/lib/coupons';
 
 type BackendEnvelope<T> = {
   success?: boolean;
@@ -15,9 +15,9 @@ export const verifyCoupon = async (
   payload: CouponVerificationPayload,
 ): Promise<BackendEnvelope<CouponVerificationSummary>> => {
   return requestBackendJson<BackendEnvelope<CouponVerificationSummary>>(
-    "/coupon/verify",
+    '/coupon/verify',
     {
-      method: "POST",
+      method: 'POST',
       body: payload,
     },
   );

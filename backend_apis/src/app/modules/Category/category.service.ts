@@ -1,9 +1,9 @@
-import httpStatus from "http-status";
-import { AppError } from "../../utils";
-import { deleteImageFromCloudinary, sendImageToCloudinary } from "../../lib";
-import { CategoryModel } from "./category.model";
-import { ICategory, ISubCategoryItem } from "./category.interface";
-import { MulterFile } from "../../lib/upload";
+import httpStatus from 'http-status';
+import { AppError } from '../../utils';
+import { deleteImageFromCloudinary, sendImageToCloudinary } from '../../lib';
+import { CategoryModel } from './category.model';
+import { ICategory, ISubCategoryItem } from './category.interface';
+import { MulterFile } from '../../lib/upload';
 
 // 1. createCategoryIntoDB
 const createCategoryIntoDB = async (
@@ -11,7 +11,7 @@ const createCategoryIntoDB = async (
   imageFile?: MulterFile,
 ) => {
   if (!imageFile) {
-    throw new AppError(httpStatus.NOT_FOUND, "Category image is required!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Category image is required!');
   }
 
   const { secure_url } = await sendImageToCloudinary(imageFile);
@@ -49,14 +49,14 @@ const getActiveCategoriesFromDB = async () =>
 // 3. getCategoryBySlugFromDB
 const getCategoryBySlugFromDB = async (slug: string) => {
   const doc = await CategoryModel.findOne({ slug }).lean();
-  if (!doc) throw new AppError(httpStatus.NOT_FOUND, "Category not found!");
+  if (!doc) throw new AppError(httpStatus.NOT_FOUND, 'Category not found!');
   return doc;
 };
 
 // 4. getActiveCategoryBySlugFromDB
 const getActiveCategoryBySlugFromDB = async (slug: string) => {
   const doc = await CategoryModel.findOne({ slug, isActive: true }).lean();
-  if (!doc) throw new AppError(httpStatus.NOT_FOUND, "Category not found!");
+  if (!doc) throw new AppError(httpStatus.NOT_FOUND, 'Category not found!');
 
   return {
     ...doc,
@@ -72,11 +72,11 @@ const updateCategoryIntoDB = async (
   imageFile?: MulterFile,
 ) => {
   const existingCategory = await CategoryModel.findOne({ slug }).select(
-    "image",
+    'image',
   );
 
   if (!existingCategory) {
-    throw new AppError(httpStatus.NOT_FOUND, "Category not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Category not found!');
   }
 
   let uploadedImage: string | undefined;
@@ -90,14 +90,14 @@ const updateCategoryIntoDB = async (
     const updated = await CategoryModel.findOneAndUpdate(
       { slug },
       { ...payload, ...(uploadedImage ? { image: uploadedImage } : {}) },
-      { returnDocument: "after", runValidators: true },
+      { returnDocument: 'after', runValidators: true },
     );
 
     if (!updated) {
       if (uploadedImage) {
         await deleteImageFromCloudinary(uploadedImage);
       }
-      throw new AppError(httpStatus.NOT_FOUND, "Category not found!");
+      throw new AppError(httpStatus.NOT_FOUND, 'Category not found!');
     }
 
     if (
@@ -130,7 +130,7 @@ const createCategorySubCategoryIntoDB = async (
 ) => {
   const category = await CategoryModel.findOne({ slug: categorySlug });
   if (!category)
-    throw new AppError(httpStatus.NOT_FOUND, "Category not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Category not found!');
 
   let uploadedImage: string | undefined;
 
@@ -163,11 +163,11 @@ const updateCategorySubCategoryIntoDB = async (
 ) => {
   const category = await CategoryModel.findOne({ slug: categorySlug });
   if (!category)
-    throw new AppError(httpStatus.NOT_FOUND, "Category not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Category not found!');
   const item = category.subCategories.find(
     (item) => item.slug === subCategorySlug,
   );
-  if (!item) throw new AppError(httpStatus.NOT_FOUND, "Subcategory not found!");
+  if (!item) throw new AppError(httpStatus.NOT_FOUND, 'Subcategory not found!');
 
   const previousImage = item.image;
   let uploadedImage: string | undefined;
@@ -202,12 +202,12 @@ const deleteCategorySubCategoryFromDB = async (
 ) => {
   const category = await CategoryModel.findOne({ slug: categorySlug });
   if (!category)
-    throw new AppError(httpStatus.NOT_FOUND, "Category not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Category not found!');
   const next = category.subCategories.filter(
     (item) => item.slug !== subCategorySlug,
   );
   if (next.length === category.subCategories.length)
-    throw new AppError(httpStatus.NOT_FOUND, "Subcategory not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Subcategory not found!');
   category.subCategories = next;
   return category.save();
 };

@@ -1,41 +1,41 @@
-import httpStatus from "http-status";
-import { AppError } from "../../utils";
-import { CouponModel } from "./coupon.model";
+import httpStatus from 'http-status';
+import { AppError } from '../../utils';
+import { CouponModel } from './coupon.model';
 import {
   buildCouponCheckoutBase,
   buildCouponInvalidSummary,
   normalizeCouponCode,
   resolveCouponSummary,
   serializeCoupon,
-} from "./coupon.utils";
+} from './coupon.utils';
 import type {
   TCouponCheckoutInput,
   TCouponCheckoutSummary,
   TCouponCreatePayload,
-} from "./coupon.interface";
+} from './coupon.interface';
 
 type CouponQuery = Record<string, unknown>;
 
 const buildCouponFilter = (query: CouponQuery) => {
   const filter: Record<string, unknown> = {};
   const searchTerm =
-    typeof query.searchTerm === "string" ? query.searchTerm.trim() : "";
+    typeof query.searchTerm === 'string' ? query.searchTerm.trim() : '';
   const isActive =
-    typeof query.isActive === "string" ? query.isActive.trim() : "";
+    typeof query.isActive === 'string' ? query.isActive.trim() : '';
   const discountType =
-    typeof query.discountType === "string" ? query.discountType.trim() : "";
+    typeof query.discountType === 'string' ? query.discountType.trim() : '';
 
   if (searchTerm) {
     filter.$or = [
-      { code: { $regex: searchTerm, $options: "i" } },
-      { label: { $regex: searchTerm, $options: "i" } },
-      { description: { $regex: searchTerm, $options: "i" } },
+      { code: { $regex: searchTerm, $options: 'i' } },
+      { label: { $regex: searchTerm, $options: 'i' } },
+      { description: { $regex: searchTerm, $options: 'i' } },
     ];
   }
 
-  if (isActive === "true") {
+  if (isActive === 'true') {
     filter.isActive = true;
-  } else if (isActive === "false") {
+  } else if (isActive === 'false') {
     filter.isActive = false;
   }
 
@@ -56,34 +56,34 @@ const ensureUniqueCouponCode = async (code: string, couponId?: string) => {
   const duplicate = await CouponModel.findOne(query).lean();
 
   if (duplicate) {
-    throw new AppError(httpStatus.CONFLICT, "Coupon code already exists!");
+    throw new AppError(httpStatus.CONFLICT, 'Coupon code already exists!');
   }
 };
 
 const normalizeCouponPayload = (payload: Partial<TCouponCreatePayload>) => {
   const normalized: Partial<TCouponCreatePayload> = {};
 
-  if (typeof payload.code === "string") {
+  if (typeof payload.code === 'string') {
     normalized.code = normalizeCouponCode(payload.code);
   }
 
-  if (typeof payload.label === "string") {
+  if (typeof payload.label === 'string') {
     normalized.label = payload.label.trim();
   }
 
-  if (typeof payload.description === "string") {
+  if (typeof payload.description === 'string') {
     normalized.description = payload.description.trim();
   }
 
-  if (typeof payload.discountType === "string") {
+  if (typeof payload.discountType === 'string') {
     normalized.discountType = payload.discountType;
   }
 
-  if (typeof payload.discountValue === "number") {
+  if (typeof payload.discountValue === 'number') {
     normalized.discountValue = payload.discountValue;
   }
 
-  if (typeof payload.minSubtotal === "number") {
+  if (typeof payload.minSubtotal === 'number') {
     normalized.minSubtotal = payload.minSubtotal;
   }
 
@@ -91,7 +91,7 @@ const normalizeCouponPayload = (payload: Partial<TCouponCreatePayload>) => {
     normalized.expiresAt = payload.expiresAt;
   }
 
-  if (typeof payload.isActive === "boolean") {
+  if (typeof payload.isActive === 'boolean') {
     normalized.isActive = payload.isActive;
   }
 
@@ -106,7 +106,7 @@ const createCouponIntoDB = async (payload: TCouponCreatePayload) => {
   const coupon = await CouponModel.create({
     ...normalized,
     discountValue:
-      normalized.discountType === "FREE_SHIPPING"
+      normalized.discountType === 'FREE_SHIPPING'
         ? 0
         : normalized.discountValue,
     minSubtotal: normalized.minSubtotal ?? 0,
@@ -146,7 +146,7 @@ const getCouponByIdFromDB = async (couponId: string) => {
   const coupon = await CouponModel.findById(couponId).lean();
 
   if (!coupon) {
-    throw new AppError(httpStatus.NOT_FOUND, "Coupon not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Coupon not found!');
   }
 
   return serializeCoupon(coupon);
@@ -159,7 +159,7 @@ const updateCouponIntoDB = async (
   const existingCoupon = await CouponModel.findById(couponId).lean();
 
   if (!existingCoupon) {
-    throw new AppError(httpStatus.NOT_FOUND, "Coupon not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Coupon not found!');
   }
 
   const normalized = normalizeCouponPayload(payload);
@@ -171,7 +171,7 @@ const updateCouponIntoDB = async (
   const nextDiscountType =
     normalized.discountType ?? existingCoupon.discountType;
   const nextDiscountValue =
-    typeof normalized.discountValue === "number"
+    typeof normalized.discountValue === 'number'
       ? normalized.discountValue
       : existingCoupon.discountValue;
 
@@ -180,32 +180,32 @@ const updateCouponIntoDB = async (
     {
       ...(normalized.code ? { code: normalized.code } : {}),
       ...(normalized.label ? { label: normalized.label } : {}),
-      ...(typeof normalized.description === "string"
+      ...(typeof normalized.description === 'string'
         ? { description: normalized.description }
         : {}),
       ...(normalized.discountType
         ? { discountType: normalized.discountType }
         : {}),
       ...(normalized.discountType ||
-      typeof normalized.discountValue === "number"
+      typeof normalized.discountValue === 'number'
         ? {
             discountValue:
-              nextDiscountType === "FREE_SHIPPING" ? 0 : nextDiscountValue,
+              nextDiscountType === 'FREE_SHIPPING' ? 0 : nextDiscountValue,
           }
         : {}),
-      ...(typeof normalized.minSubtotal === "number"
+      ...(typeof normalized.minSubtotal === 'number'
         ? { minSubtotal: normalized.minSubtotal }
         : {}),
       ...(normalized.expiresAt ? { expiresAt: normalized.expiresAt } : {}),
-      ...(typeof normalized.isActive === "boolean"
+      ...(typeof normalized.isActive === 'boolean'
         ? { isActive: normalized.isActive }
         : {}),
     },
-    { returnDocument: "after", runValidators: true },
+    { returnDocument: 'after', runValidators: true },
   ).lean();
 
   if (!coupon) {
-    throw new AppError(httpStatus.NOT_FOUND, "Coupon not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Coupon not found!');
   }
 
   return serializeCoupon(coupon);
@@ -218,7 +218,7 @@ const deleteCouponFromDB = async (couponId: string) => {
   const coupon = await CouponModel.findByIdAndDelete(couponId).lean();
 
   if (!coupon) {
-    throw new AppError(httpStatus.NOT_FOUND, "Coupon not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Coupon not found!');
   }
 
   return serializeCoupon(coupon);
@@ -236,7 +236,7 @@ const calculateCouponCheckoutSummary = async (
   const couponCode = payload.couponCode?.trim();
 
   if (!couponCode) {
-    return invalidCouponSummary(base, "Coupon code is required!");
+    return invalidCouponSummary(base, 'Coupon code is required!');
   }
 
   const coupon = await CouponModel.findOne({
@@ -244,21 +244,21 @@ const calculateCouponCheckoutSummary = async (
   }).lean();
 
   if (!coupon) {
-    return invalidCouponSummary(base, "Coupon code was not recognized.");
+    return invalidCouponSummary(base, 'Coupon code was not recognized.');
   }
 
   if (!coupon.isActive) {
-    return invalidCouponSummary(base, "This coupon is disabled.");
+    return invalidCouponSummary(base, 'This coupon is disabled.');
   }
 
   if (new Date(coupon.expiresAt).getTime() <= Date.now()) {
-    return invalidCouponSummary(base, "This coupon has expired.");
+    return invalidCouponSummary(base, 'This coupon has expired.');
   }
 
   if (coupon.minSubtotal && base.subtotal < coupon.minSubtotal) {
     return invalidCouponSummary(
       base,
-      `This coupon requires a minimum subtotal of ৳${coupon.minSubtotal.toLocaleString("en-US")}.`,
+      `This coupon requires a minimum subtotal of ৳${coupon.minSubtotal.toLocaleString('en-US')}.`,
     );
   }
 
@@ -273,7 +273,7 @@ const calculateCouponCheckoutSummary = async (
   return {
     coupon: serializeCoupon(coupon),
     isValid: true,
-    message: "Coupon applied successfully.",
+    message: 'Coupon applied successfully.',
     subtotal: base.subtotal,
     discount: summary.discount,
     shippingCharge: summary.shippingCharge,

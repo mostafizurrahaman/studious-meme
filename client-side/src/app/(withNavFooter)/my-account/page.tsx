@@ -37,8 +37,12 @@ export default async function MyAccountPage({ searchParams }: Props) {
       <main className="flex-1 bg-background pb-16">
         <div className="px-4 py-6 lg:px-6">
           <Card className="p-6 shadow-sm sm:p-8">
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">Account access</p>
-            <h1 className="mt-4 text-3xl font-black text-secondary sm:text-4xl">Sign in</h1>
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">
+              Account access
+            </p>
+            <h1 className="mt-4 text-3xl font-black text-secondary sm:text-4xl">
+              Sign in
+            </h1>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-foreground/65 sm:text-base">
               Sign in to continue to your account or return to checkout.
             </p>

@@ -4,15 +4,25 @@ import { asyncHandler, sendResponse } from '../../utils';
 import { uploadFilesAndInjectUrls } from '../../lib';
 import { ProductReviewService } from './productReview.service';
 
-const getParam = (value: string | string[]) => (Array.isArray(value) ? value[0] : value);
+const getParam = (value: string | string[]) =>
+  Array.isArray(value) ? value[0] : value;
 
 const flattenUploadedFiles = (
-  files: Express.Multer.File[] | Record<string, Express.Multer.File[]> | undefined,
+  files:
+    | Express.Multer.File[]
+    | Record<string, Express.Multer.File[]>
+    | undefined,
 ) => (Array.isArray(files) ? files : Object.values(files ?? {}).flat());
 
 const createCustomerReview = asyncHandler(async (req, res) => {
-  const payload = await uploadFilesAndInjectUrls(req.body, flattenUploadedFiles(req.files));
-  const result = await ProductReviewService.createCustomerReviewIntoDB(req.user, payload);
+  const payload = await uploadFilesAndInjectUrls(
+    req.body,
+    flattenUploadedFiles(req.files),
+  );
+  const result = await ProductReviewService.createCustomerReviewIntoDB(
+    req.user,
+    payload,
+  );
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -22,8 +32,14 @@ const createCustomerReview = asyncHandler(async (req, res) => {
 });
 
 const createManualReview = asyncHandler(async (req, res) => {
-  const payload = await uploadFilesAndInjectUrls(req.body, flattenUploadedFiles(req.files));
-  const result = await ProductReviewService.createManualReviewIntoDB(req.user, payload);
+  const payload = await uploadFilesAndInjectUrls(
+    req.body,
+    flattenUploadedFiles(req.files),
+  );
+  const result = await ProductReviewService.createManualReviewIntoDB(
+    req.user,
+    payload,
+  );
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -60,8 +76,15 @@ const getAllReviews = asyncHandler(async (req, res) => {
 });
 
 const updateReview = asyncHandler(async (req, res) => {
-  const payload = await uploadFilesAndInjectUrls(req.body, flattenUploadedFiles(req.files));
-  const result = await ProductReviewService.updateReviewIntoDB(getParam(req.params.id), payload, req.user);
+  const payload = await uploadFilesAndInjectUrls(
+    req.body,
+    flattenUploadedFiles(req.files),
+  );
+  const result = await ProductReviewService.updateReviewIntoDB(
+    getParam(req.params.id),
+    payload,
+    req.user,
+  );
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -85,7 +108,9 @@ const updateReviewStatus = asyncHandler(async (req, res) => {
 });
 
 const deleteReview = asyncHandler(async (req, res) => {
-  const result = await ProductReviewService.deleteReviewFromDB(getParam(req.params.id));
+  const result = await ProductReviewService.deleteReviewFromDB(
+    getParam(req.params.id),
+  );
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

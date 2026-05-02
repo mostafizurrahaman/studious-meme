@@ -123,7 +123,7 @@ Remotion turns editing problems into composable code. Use it for things that tra
 ### Basic Remotion composition
 
 ```tsx
-import { AbsoluteFill, Sequence, Video, useCurrentFrame } from "remotion";
+import { AbsoluteFill, Sequence, Video, useCurrentFrame } from 'remotion';
 
 export const VlogComposition: React.FC = () => {
   const frame = useCurrentFrame();
@@ -139,15 +139,15 @@ export const VlogComposition: React.FC = () => {
       <Sequence from={30} durationInFrames={90}>
         <AbsoluteFill
           style={{
-            justifyContent: "center",
-            alignItems: "center",
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
         >
           <h1
             style={{
               fontSize: 72,
-              color: "white",
-              textShadow: "2px 2px 8px rgba(0,0,0,0.8)",
+              color: 'white',
+              textShadow: '2px 2px 8px rgba(0,0,0,0.8)',
             }}
           >
             The AI Editing Stack

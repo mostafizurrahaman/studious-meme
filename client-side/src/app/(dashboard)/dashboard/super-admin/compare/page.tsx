@@ -1,20 +1,20 @@
-import type { Metadata } from "next";
+import type { Metadata } from 'next';
 import {
   DashboardComparisonManager,
   type DashboardComparisonRecord,
-} from "@/components/dashboard/DashboardEngagementManager";
-import { requireDashboardRoles } from "@/lib/dashboard-auth";
-import { buildMetadata } from "@/lib/seo";
-import { getAllComparisonHistory } from "@/services/ComparisonHistory";
+} from '@/components/dashboard/DashboardEngagementManager';
+import { requireDashboardRoles } from '@/lib/dashboard-auth';
+import { buildMetadata } from '@/lib/seo';
+import { getAllComparisonHistory } from '@/services/ComparisonHistory';
 
 export const metadata: Metadata = buildMetadata({
-  title: "Comparison History",
-  description: "Review backend-saved product comparison activity.",
-  path: "/dashboard/super-admin/compare",
+  title: 'Comparison History',
+  description: 'Review backend-saved product comparison activity.',
+  path: '/dashboard/super-admin/compare',
   noindex: true,
 });
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 type Props = {
   searchParams: Promise<{ page?: string; limit?: string }>;
@@ -27,7 +27,7 @@ const parsePositiveInteger = (value: string | undefined, fallback: number) => {
 };
 
 export default async function SuperAdminComparePage({ searchParams }: Props) {
-  await requireDashboardRoles(["SUPER_ADMIN"]);
+  await requireDashboardRoles(['SUPER_ADMIN']);
   const query = await searchParams;
   const page = parsePositiveInteger(query.page, 1);
   const limit = parsePositiveInteger(query.limit, 50);

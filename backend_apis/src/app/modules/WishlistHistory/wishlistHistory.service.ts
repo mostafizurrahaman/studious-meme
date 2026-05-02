@@ -1,15 +1,18 @@
-import httpStatus from "http-status";
-import { Types } from "mongoose";
-import { AppError } from "../../utils";
-import { IUser } from "../User/user.interface";
-import { ProductModel } from "../Product/product.model";
-import { DEFAULT_SELLING_UNIT, normalizeSellingUnit } from "../Product/selling-unit";
-import { WishlistHistoryModel } from "./wishlistHistory.model";
-import { WishlistHistoryEventModel } from "./wishlistHistoryEvent.model";
+import httpStatus from 'http-status';
+import { Types } from 'mongoose';
+import { AppError } from '../../utils';
+import { IUser } from '../User/user.interface';
+import { ProductModel } from '../Product/product.model';
+import {
+  DEFAULT_SELLING_UNIT,
+  normalizeSellingUnit,
+} from '../Product/selling-unit';
+import { WishlistHistoryModel } from './wishlistHistory.model';
+import { WishlistHistoryEventModel } from './wishlistHistoryEvent.model';
 
 const toObjectId = (value: string) => {
   if (!Types.ObjectId.isValid(value)) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Invalid product ID!");
+    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid product ID!');
   }
 
   return new Types.ObjectId(value);
@@ -20,12 +23,12 @@ const getActiveProductSnapshot = async (productId: string) => {
     _id: toObjectId(productId),
     isActive: true,
   })
-    .populate({ path: "brand", match: { isActive: true } })
-    .populate({ path: "category", match: { isActive: true } })
+    .populate({ path: 'brand', match: { isActive: true } })
+    .populate({ path: 'category', match: { isActive: true } })
     .lean();
 
   if (!product || !product.brand || !product.category) {
-    throw new AppError(httpStatus.NOT_FOUND, "Product not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Product not found!');
   }
 
   return {
@@ -39,7 +42,8 @@ const getActiveProductSnapshot = async (productId: string) => {
       sku: product.sku,
       slug: product.slug,
       price: product.price,
-       sellingUnit: normalizeSellingUnit(product.sellingUnit) ?? DEFAULT_SELLING_UNIT,
+      sellingUnit:
+        normalizeSellingUnit(product.sellingUnit) ?? DEFAULT_SELLING_UNIT,
       stock: product.stock,
       weightKg: product.weightKg,
       isNoCOD: product.isNoCOD,
@@ -60,7 +64,7 @@ const addWishlistItemIntoDB = async (user: IUser, productId: string) => {
     user: user._id,
     product: product._id,
     productSnapshot: snapshot,
-    action: "add",
+    action: 'add',
   });
 
   return result;
@@ -82,7 +86,7 @@ const removeWishlistItemFromDB = async (user: IUser, productId: string) => {
       user: user._id,
       product: productObjectId,
       productSnapshot: existing.productSnapshot,
-      action: "remove",
+      action: 'remove',
     });
   }
 
@@ -91,7 +95,7 @@ const removeWishlistItemFromDB = async (user: IUser, productId: string) => {
 
 const getMyWishlistFromDB = async (user: IUser) =>
   WishlistHistoryModel.find({ user: user._id })
-    .populate("product")
+    .populate('product')
     .sort({ updatedAt: -1 })
     .lean();
 
@@ -100,17 +104,17 @@ const getAllWishlistFromDB = async (query: Record<string, unknown>) => {
   const limit = Number(query.limit) || 50;
   const skip = (page - 1) * limit;
   const category =
-    typeof query.category === "string" ? query.category.trim() : "";
-  const user = typeof query.user === "string" ? query.user.trim() : "";
+    typeof query.category === 'string' ? query.category.trim() : '';
+  const user = typeof query.user === 'string' ? query.user.trim() : '';
 
   const filter: Record<string, unknown> = {};
-  if (category) filter["productSnapshot.category"] = category;
+  if (category) filter['productSnapshot.category'] = category;
   if (user) filter.user = toObjectId(user);
 
   const [data, total] = await Promise.all([
     WishlistHistoryEventModel.find(filter)
-      .populate("user", "name email phone image role isActive")
-      .populate("product")
+      .populate('user', 'name email phone image role isActive')
+      .populate('product')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
@@ -135,17 +139,17 @@ const getWishlistInsightsFromDB = async () => {
       WishlistHistoryEventModel.aggregate([
         {
           $group: {
-            _id: "$productSnapshot.category",
+            _id: '$productSnapshot.category',
             count: { $sum: 1 },
-            users: { $addToSet: "$user" },
+            users: { $addToSet: '$user' },
           },
         },
         {
           $project: {
             _id: 0,
-            category: "$_id",
+            category: '$_id',
             count: 1,
-            userCount: { $size: "$users" },
+            userCount: { $size: '$users' },
           },
         },
         { $sort: { count: -1 } },
@@ -153,18 +157,18 @@ const getWishlistInsightsFromDB = async () => {
       WishlistHistoryEventModel.aggregate([
         {
           $group: {
-            _id: "$productSnapshot.title",
+            _id: '$productSnapshot.title',
             count: { $sum: 1 },
-            category: { $first: "$productSnapshot.category" },
+            category: { $first: '$productSnapshot.category' },
           },
         },
-        { $project: { _id: 0, product: "$_id", count: 1, category: 1 } },
+        { $project: { _id: 0, product: '$_id', count: 1, category: 1 } },
         { $sort: { count: -1 } },
         { $limit: 10 },
       ]),
       WishlistHistoryEventModel.aggregate([
-        { $group: { _id: "$user", count: { $sum: 1 } } },
-        { $project: { _id: 0, user: "$_id", count: 1 } },
+        { $group: { _id: '$user', count: { $sum: 1 } } },
+        { $project: { _id: 0, user: '$_id', count: 1 } },
         { $sort: { count: -1 } },
         { $limit: 10 },
       ]),

@@ -1,5 +1,5 @@
-import { Document, Model } from "mongoose";
-import { TRole } from "./user.constant";
+import { Document, Model } from 'mongoose';
+import { TRole } from './user.constant';
 
 // Instance methods
 export interface IUser extends Document {

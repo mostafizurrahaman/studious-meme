@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
-import type { CartItem } from "@/lib/cart";
-import { toCartItem } from "@/lib/cart";
-import type { Coupon, CouponVerificationSummary } from "@/lib/coupons";
-import { verifyCoupon } from "@/services/Coupon";
-import type { Product } from "@/lib/storefront-types";
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
+import type { CartItem } from '@/lib/cart';
+import { toCartItem } from '@/lib/cart';
+import type { Coupon, CouponVerificationSummary } from '@/lib/coupons';
+import { verifyCoupon } from '@/services/Coupon';
+import type { Product } from '@/lib/storefront-types';
 
 type CheckoutForm = {
   name: string;
@@ -18,7 +18,7 @@ type CheckoutForm = {
   payment: string;
 };
 
-export type OrderStatus = "Placed" | "Processing" | "Delivered" | "Cancelled";
+export type OrderStatus = 'Placed' | 'Processing' | 'Delivered' | 'Cancelled';
 
 export type OrderRecord = {
   id: string;
@@ -70,16 +70,16 @@ type CartState = {
 };
 
 const defaultCheckout: CheckoutForm = {
-  name: "",
-  phone: "",
-  email: "",
-  address: "",
-  city: "",
-  note: "",
-  payment: "Cash on delivery",
+  name: '',
+  phone: '',
+  email: '',
+  address: '',
+  city: '',
+  note: '',
+  payment: 'Cash on delivery',
 };
 
-function getItemKey(item: Pick<CartItem, "productId" | "sku">) {
+function getItemKey(item: Pick<CartItem, 'productId' | 'sku'>) {
   return item.productId ?? item.sku;
 }
 
@@ -94,7 +94,7 @@ export const useCartStore = create<CartState>()(
     (set, get) => ({
       items: [],
       hydrated: false,
-      couponCode: "",
+      couponCode: '',
       appliedCoupon: null,
       couponVerification: null,
       isApplyingCoupon: false,
@@ -170,7 +170,7 @@ export const useCartStore = create<CartState>()(
       clear: () =>
         set({
           items: [],
-          couponCode: "",
+          couponCode: '',
           ...resetCouponState,
         }),
       setCouponCode: (code) =>
@@ -195,13 +195,13 @@ export const useCartStore = create<CartState>()(
         });
 
         if (!couponCode) {
-          return { success: false, message: "Enter a coupon code first." };
+          return { success: false, message: 'Enter a coupon code first.' };
         }
 
         if (state.items.length === 0) {
           return {
             success: false,
-            message: "Add items to cart before applying a coupon.",
+            message: 'Add items to cart before applying a coupon.',
           };
         }
 
@@ -245,7 +245,7 @@ export const useCartStore = create<CartState>()(
             return {
               success: false,
               message:
-                "Cart details changed while verifying the coupon. Please try again.",
+                'Cart details changed while verifying the coupon. Please try again.',
             };
           }
 
@@ -261,8 +261,8 @@ export const useCartStore = create<CartState>()(
               verification?.message ??
               result?.message ??
               (success
-                ? "Coupon applied successfully."
-                : "Coupon code was not recognized."),
+                ? 'Coupon applied successfully.'
+                : 'Coupon code was not recognized.'),
           };
         } catch {
           set({
@@ -273,13 +273,13 @@ export const useCartStore = create<CartState>()(
 
           return {
             success: false,
-            message: "Failed to verify coupon code. Please try again.",
+            message: 'Failed to verify coupon code. Please try again.',
           };
         }
       },
       clearCoupon: () =>
         set({
-          couponCode: "",
+          couponCode: '',
           ...resetCouponState,
         }),
       updateCheckout: (key, value) =>
@@ -288,7 +288,7 @@ export const useCartStore = create<CartState>()(
             ...state.checkout,
             [key]: value,
           },
-          ...(key === "city" || key === "address" ? resetCouponState : {}),
+          ...(key === 'city' || key === 'address' ? resetCouponState : {}),
         })),
       addItems: (items) =>
         set((state) => ({
@@ -324,7 +324,7 @@ export const useCartStore = create<CartState>()(
       setHydrated: (hydrated) => set({ hydrated }),
     }),
     {
-      name: "malamal-cart-v1",
+      name: 'malamal-cart-v1',
       storage: createJSONStorage(() => localStorage),
       onRehydrateStorage: () => (state) => {
         state?.setHydrated(true);

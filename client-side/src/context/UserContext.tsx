@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { getCurrentUser } from "@/services/Auth";
-import { AuthUser } from "@/types";
+import { getCurrentUser } from '@/services/Auth';
+import { AuthUser } from '@/types';
 import {
   createContext,
   Dispatch,
@@ -9,7 +9,7 @@ import {
   useContext,
   useEffect,
   useState,
-} from "react";
+} from 'react';
 
 interface IUserProv {
   user: AuthUser | null;
@@ -29,7 +29,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
       const currentUser = await getCurrentUser();
       setUser(currentUser);
     } catch (error) {
-      console.error("Failed to fetch current user:", error);
+      console.error('Failed to fetch current user:', error);
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -63,7 +63,7 @@ export const useUser = () => {
   const context = useContext(UserContext);
 
   if (context === undefined) {
-    throw new Error("useUser must be used within the UserProvider context!");
+    throw new Error('useUser must be used within the UserProvider context!');
   }
 
   return context;

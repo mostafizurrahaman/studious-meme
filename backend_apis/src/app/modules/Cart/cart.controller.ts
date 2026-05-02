@@ -1,6 +1,6 @@
-import httpStatus from "http-status";
-import { asyncHandler, sendResponse } from "../../utils";
-import { CartService } from "./cart.service";
+import httpStatus from 'http-status';
+import { asyncHandler, sendResponse } from '../../utils';
+import { CartService } from './cart.service';
 
 const getSingleParam = (value: string | string[]) =>
   Array.isArray(value) ? value[0] : value;
@@ -10,7 +10,7 @@ const getMyCart = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Cart fetched successfully!",
+    message: 'Cart fetched successfully!',
     data: result,
   });
 });
@@ -24,7 +24,7 @@ const addCartItem = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Added to cart successfully!",
+    message: 'Added to cart successfully!',
     data: result,
   });
 });
@@ -38,7 +38,7 @@ const updateCartItem = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Cart item updated successfully!",
+    message: 'Cart item updated successfully!',
     data: result,
   });
 });
@@ -51,7 +51,7 @@ const removeCartItem = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Cart item removed successfully!",
+    message: 'Cart item removed successfully!',
     data: result,
   });
 });
@@ -61,7 +61,7 @@ const clearCart = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Cart cleared successfully!",
+    message: 'Cart cleared successfully!',
     data: result,
   });
 });
@@ -71,7 +71,7 @@ const getAllCarts = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Cart records fetched successfully!",
+    message: 'Cart records fetched successfully!',
     data: result.data,
     meta: result.meta,
   });
@@ -82,7 +82,7 @@ const getCartInsights = asyncHandler(async (_req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Cart insights fetched successfully!",
+    message: 'Cart insights fetched successfully!',
     data: result,
   });
 });

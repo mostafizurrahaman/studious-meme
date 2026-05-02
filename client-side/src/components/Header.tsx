@@ -29,20 +29,30 @@ export function Header({ categories }: Props) {
   const headerRef = useRef<HTMLElement>(null);
   const lastScrollYRef = useRef(0);
   const scrollTickRef = useRef(false);
-  const compareCount = useCompareStore(state => state.items.length);
-  const wishlistCount = useWishlistStore(state => state.items.length);
-  const [mobileDrawerTab, setMobileDrawerTab] = useState<'categories' | 'menu'>('categories');
-  const [activeCategorySlug, setActiveCategorySlug] = useState(categories[0]?.slug ?? '');
+  const compareCount = useCompareStore((state) => state.items.length);
+  const wishlistCount = useWishlistStore((state) => state.items.length);
+  const [mobileDrawerTab, setMobileDrawerTab] = useState<'categories' | 'menu'>(
+    'categories',
+  );
+  const [activeCategorySlug, setActiveCategorySlug] = useState(
+    categories[0]?.slug ?? '',
+  );
   const [isHidden, setIsHidden] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(0);
   const activeCategory =
-    categories.find(category => category.slug === activeCategorySlug) ?? categories[0] ?? null;
+    categories.find((category) => category.slug === activeCategorySlug) ??
+    categories[0] ??
+    null;
 
   useEffect(() => {
     const handlePointerDown = (event: PointerEvent) => {
       const target = event.target as Node | null;
 
-      if (categoriesRef.current && target && !categoriesRef.current.contains(target)) {
+      if (
+        categoriesRef.current &&
+        target &&
+        !categoriesRef.current.contains(target)
+      ) {
         categoriesRef.current.open = false;
       }
 
@@ -62,9 +72,14 @@ export function Header({ categories }: Props) {
 
   useEffect(() => {
     const syncHeaderHeight = () => {
-      const nextHeight = Math.ceil(headerRef.current?.getBoundingClientRect().height ?? 0);
-      document.documentElement.style.setProperty('--storefront-header-height', `${nextHeight}px`);
-      setHeaderHeight(prev => (prev === nextHeight ? prev : nextHeight));
+      const nextHeight = Math.ceil(
+        headerRef.current?.getBoundingClientRect().height ?? 0,
+      );
+      document.documentElement.style.setProperty(
+        '--storefront-header-height',
+        `${nextHeight}px`,
+      );
+      setHeaderHeight((prev) => (prev === nextHeight ? prev : nextHeight));
     };
 
     window.requestAnimationFrame(syncHeaderHeight);
@@ -124,16 +139,22 @@ export function Header({ categories }: Props) {
 
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/';
-    if (href === '/shop') return pathname === '/shop' || pathname.startsWith('/product/');
+    if (href === '/shop')
+      return pathname === '/shop' || pathname.startsWith('/product/');
     if (href === '/main-categories')
-      return pathname === '/main-categories' || pathname.startsWith('/category/');
-    if (href === '/my-account') return pathname === '/my-account' || pathname.startsWith('/my-account/');
+      return (
+        pathname === '/main-categories' || pathname.startsWith('/category/')
+      );
+    if (href === '/my-account')
+      return pathname === '/my-account' || pathname.startsWith('/my-account/');
     return pathname === href || pathname.startsWith(`${href}/`);
   };
 
   const navLinkClass = (href: string) =>
     `inline-flex items-center rounded-full px-3 py-1.5 transition ${
-      isActive(href) ? 'bg-primary text-white' : 'text-foreground hover:!bg-primary hover:!text-white'
+      isActive(href)
+        ? 'bg-primary text-white'
+        : 'text-foreground hover:!bg-primary hover:!text-white'
     }`;
 
   const drawerLinkClass = (href: string) =>
@@ -144,7 +165,9 @@ export function Header({ categories }: Props) {
     }`;
 
   const activeStyle = (href: string) =>
-    isActive(href) ? { backgroundColor: 'var(--primary)', color: '#ffffff' } : undefined;
+    isActive(href)
+      ? { backgroundColor: 'var(--primary)', color: '#ffffff' }
+      : undefined;
 
   const activeDrawerStyle = (href: string) =>
     isActive(href)
@@ -156,7 +179,9 @@ export function Header({ categories }: Props) {
       : undefined;
 
   const activePillStyle = (href: string) =>
-    isActive(href) ? { backgroundColor: 'var(--primary)', color: '#ffffff' } : undefined;
+    isActive(href)
+      ? { backgroundColor: 'var(--primary)', color: '#ffffff' }
+      : undefined;
 
   return (
     <header
@@ -172,7 +197,11 @@ export function Header({ categories }: Props) {
                 <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background text-lg leading-none text-foreground">
                   ☰
                 </span>
-                <Link href="/" className="flex justify-center" aria-label="Malamal Home">
+                <Link
+                  href="/"
+                  className="flex justify-center"
+                  aria-label="Malamal Home"
+                >
                   <Image
                     src="/logo.png"
                     alt={siteConfig.name}
@@ -207,7 +236,7 @@ export function Header({ categories }: Props) {
               <div className="max-h-[70vh] overflow-y-auto">
                 {mobileDrawerTab === 'categories' ? (
                   <div className="grid">
-                    {categories.map(category => (
+                    {categories.map((category) => (
                       <Link
                         key={category.name}
                         href={category.href}
@@ -222,7 +251,14 @@ export function Header({ categories }: Props) {
                   <div className="grid">
                     {(
                       [
-                        ...(user ? [['Dashboard', getDashboardPath(user.role)] as const] : []),
+                        ...(user
+                          ? [
+                              [
+                                'Dashboard',
+                                getDashboardPath(user.role),
+                              ] as const,
+                            ]
+                          : []),
                         ['Hardware Store', '/main-categories'],
                         ['Our Contacts', '/our-contacts'],
                         ['Return Policy', '/return-policy'],
@@ -250,7 +286,11 @@ export function Header({ categories }: Props) {
         </div>
 
         <div className="hidden min-h-18 items-center gap-4 py-2.5 lg:flex lg:min-h-18 lg:py-3">
-          <Link href="/" className="flex shrink-0 items-center" aria-label="Malamal Home">
+          <Link
+            href="/"
+            className="flex shrink-0 items-center"
+            aria-label="Malamal Home"
+          >
             <Image
               src="/logo.png"
               alt={siteConfig.name}
@@ -274,15 +314,19 @@ export function Header({ categories }: Props) {
                       Top categories
                     </div>
                     <div className="mt-4 grid gap-2">
-                      {categories.map(category => (
+                      {categories.map((category) => (
                         <Link
                           key={category.name}
                           href={category.href}
-                          onMouseEnter={() => setActiveCategorySlug(category.slug)}
+                          onMouseEnter={() =>
+                            setActiveCategorySlug(category.slug)
+                          }
                           onFocus={() => setActiveCategorySlug(category.slug)}
                           className={`rounded-2xl border px-4 py-3 transition ${activeCategorySlug === category.slug ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30 hover:bg-primary/5'}`}
                         >
-                          <div className="text-sm font-bold text-foreground">{category.name}</div>
+                          <div className="text-sm font-bold text-foreground">
+                            {category.name}
+                          </div>
                           <div className="mt-1 text-xs font-normal text-foreground/55">
                             {category.description}
                           </div>
@@ -293,17 +337,21 @@ export function Header({ categories }: Props) {
                   <div>
                     <div className="flex items-center justify-between text-xs font-bold uppercase tracking-[0.28em] text-primary">
                       <span>Sub categories</span>
-                      <span className="text-foreground/45">{activeCategory?.name ?? 'Hover a category'}</span>
+                      <span className="text-foreground/45">
+                        {activeCategory?.name ?? 'Hover a category'}
+                      </span>
                     </div>
                     <div className="mt-4 grid gap-2">
                       {activeCategory?.subCategories?.length ? (
-                        activeCategory.subCategories.map(subCategory => (
+                        activeCategory.subCategories.map((subCategory) => (
                           <Link
                             key={subCategory.slug}
                             href={`/category/${activeCategory.slug}?subCategorySlug=${subCategory.slug}`}
                             className="rounded-2xl border border-border px-4 py-3 transition hover:border-primary/30 hover:bg-primary/5"
                           >
-                            <div className="text-sm font-bold text-foreground">{subCategory.name}</div>
+                            <div className="text-sm font-bold text-foreground">
+                              {subCategory.name}
+                            </div>
                             {subCategory.description ? (
                               <div className="mt-1 text-xs font-normal text-foreground/55">
                                 {subCategory.description}
@@ -377,7 +425,11 @@ export function Header({ categories }: Props) {
               >
                 Categories
               </Link>
-              <Link className={navLinkClass('/shop')} href="/shop" style={activeStyle('/shop')}>
+              <Link
+                className={navLinkClass('/shop')}
+                href="/shop"
+                style={activeStyle('/shop')}
+              >
                 Shop
               </Link>
               <Link
@@ -420,8 +472,13 @@ export function Header({ categories }: Props) {
             {/* right part */}
             <div className="flex flex-wrap items-center gap-5">
               <div className="text-sm leading-tight text-right">
-                <div className="font-semibold text-foreground">Dedicated Support</div>
-                <a className="font-semibold text-secondary" href="tel:+8809638212121">
+                <div className="font-semibold text-foreground">
+                  Dedicated Support
+                </div>
+                <a
+                  className="font-semibold text-secondary"
+                  href="tel:+8809638212121"
+                >
                   +880 9638212121
                 </a>
               </div>
@@ -461,9 +518,11 @@ export function Header({ categories }: Props) {
                 ))}
               </div>
               <div className="mt-4">
-                <div className="text-xs font-bold uppercase tracking-[0.28em] text-primary">Categories</div>
+                <div className="text-xs font-bold uppercase tracking-[0.28em] text-primary">
+                  Categories
+                </div>
                 <div className="mt-3 grid gap-2">
-                  {categories.map(category => (
+                  {categories.map((category) => (
                     <Link
                       key={category.name}
                       href={category.href}

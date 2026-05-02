@@ -10,10 +10,16 @@ type Props = {
   actionLabel?: string;
 };
 
-export function SectionHeading({ title, actionHref, actionLabel = 'More Products' }: Props) {
+export function SectionHeading({
+  title,
+  actionHref,
+  actionLabel = 'More Products',
+}: Props) {
   return (
     <div className="flex items-end justify-between gap-4">
-      <h2 className="text-lg font-semibold tracking-tight text-secondary sm:text-xl">{title}</h2>
+      <h2 className="text-lg font-semibold tracking-tight text-secondary sm:text-xl">
+        {title}
+      </h2>
       {actionHref ? (
         <Button
           asChild

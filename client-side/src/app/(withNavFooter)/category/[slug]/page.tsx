@@ -1,24 +1,24 @@
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { Suspense } from "react";
-import { CategoryPageClient } from "@/components/CategoryPageClient";
-import { SeoScripts } from "@/components/SeoScripts";
-import { Card } from "@/components/ui/card";
-import { buildCategoryMetadata, buildCategorySchemas } from "@/lib/seo";
-import { getActiveBrands } from "@/services/Brand";
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
+import { CategoryPageClient } from '@/components/CategoryPageClient';
+import { SeoScripts } from '@/components/SeoScripts';
+import { Card } from '@/components/ui/card';
+import { buildCategoryMetadata, buildCategorySchemas } from '@/lib/seo';
+import { getActiveBrands } from '@/services/Brand';
 import {
   getActiveCategories,
   getActiveCategoryBySlug,
-} from "@/services/Category";
+} from '@/services/Category';
 import {
   mapBackendCategoryToCategoryPageEntry,
   type BackendCategory,
-} from "@/services/Category/mappers";
+} from '@/services/Category/mappers';
 import {
   getProductsByCategorySlug,
   getProductsBySubCategorySlug,
   mapBackendProductToStorefrontProduct,
-} from "@/services/Product";
+} from '@/services/Product';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -54,7 +54,7 @@ export async function generateMetadata({ params }: Props) {
 
   if (!category) {
     return {
-      title: "Category not found",
+      title: 'Category not found',
       robots: { index: false, follow: false },
     };
   }
@@ -67,7 +67,7 @@ const DEFAULT_CATEGORY_LIMIT = 24;
 export default async function CategoryPage({ params, searchParams }: Props) {
   const { slug } = await params;
   const query = await searchParams;
-  const page = Math.max(Number(query.page ?? "1") || 1, 1);
+  const page = Math.max(Number(query.page ?? '1') || 1, 1);
   const limit = Math.max(
     Number(query.limit ?? String(DEFAULT_CATEGORY_LIMIT)) ||
       DEFAULT_CATEGORY_LIMIT,
@@ -82,10 +82,10 @@ export default async function CategoryPage({ params, searchParams }: Props) {
     notFound();
   }
 
-  const title = "name" in category ? category.name : category.title;
-  const subCategorySlug = query.subCategorySlug?.trim() ?? "";
+  const title = 'name' in category ? category.name : category.title;
+  const subCategorySlug = query.subCategorySlug?.trim() ?? '';
   const selectedSubCategory =
-    "subCategories" in category
+    'subCategories' in category
       ? (category.subCategories?.find(
           (item) => item.slug === subCategorySlug,
         ) ?? null)

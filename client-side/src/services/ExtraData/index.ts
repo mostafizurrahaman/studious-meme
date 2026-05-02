@@ -1,10 +1,10 @@
-"use server";
+'use server';
 
-import { revalidateTag } from "next/cache";
-import { requestBackendJson } from "@/lib/backend-api";
-import { CACHE_REVALIDATE } from "@/lib/cache-revalidate";
-import { CACHE_TAGS } from "@/lib/cache-tags";
-import { getValidAccessTokenForServerActions } from "@/lib/getValidAccessToken";
+import { revalidateTag } from 'next/cache';
+import { requestBackendJson } from '@/lib/backend-api';
+import { CACHE_REVALIDATE } from '@/lib/cache-revalidate';
+import { CACHE_TAGS } from '@/lib/cache-tags';
+import { getValidAccessTokenForServerActions } from '@/lib/getValidAccessToken';
 
 type BackendEnvelope<T> = {
   success?: boolean;
@@ -14,9 +14,12 @@ type BackendEnvelope<T> = {
 };
 
 export const getAllUrls = async (): Promise<BackendEnvelope<unknown>> => {
-  return requestBackendJson<BackendEnvelope<unknown>>("/data", {
-    method: "GET",
-    next: { revalidate: CACHE_REVALIDATE.LONG, tags: [CACHE_TAGS.EXTRA_DATA_URLS, CACHE_TAGS.MARKETING_CONTENT] },
+  return requestBackendJson<BackendEnvelope<unknown>>('/data', {
+    method: 'GET',
+    next: {
+      revalidate: CACHE_REVALIDATE.LONG,
+      tags: [CACHE_TAGS.EXTRA_DATA_URLS, CACHE_TAGS.MARKETING_CONTENT],
+    },
   });
 };
 
@@ -25,9 +28,9 @@ export const updateSponsorLogoUrl = async (
 ): Promise<BackendEnvelope<unknown>> => {
   const accessToken = await getValidAccessTokenForServerActions();
   const result = await requestBackendJson<BackendEnvelope<unknown>>(
-    "/data/sponsorLogoUrl",
+    '/data/sponsorLogoUrl',
     {
-      method: "PUT",
+      method: 'PUT',
       body: data,
       token: accessToken ?? undefined,
     },
@@ -46,7 +49,7 @@ export const updateSingleLink = async (
   const result = await requestBackendJson<BackendEnvelope<unknown>>(
     `/data/${platform}`,
     {
-      method: "PUT",
+      method: 'PUT',
       body: { url: link },
       token: accessToken ?? undefined,
     },
@@ -62,9 +65,9 @@ export const updatePrintStory = async (
 ): Promise<BackendEnvelope<unknown>> => {
   const accessToken = await getValidAccessTokenForServerActions();
   const result = await requestBackendJson<BackendEnvelope<unknown>>(
-    "/data/print-story",
+    '/data/print-story',
     {
-      method: "PUT",
+      method: 'PUT',
       body: data,
       token: accessToken ?? undefined,
     },

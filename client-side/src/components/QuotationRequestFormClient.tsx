@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useActionState, useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
+import { useActionState, useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
 import {
   submitQuotationRequest,
   type QuotationRequestState,
-} from "@/app/(withNavFooter)/quotation-request/actions";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+} from '@/app/(withNavFooter)/quotation-request/actions';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 
 type QuotationRequestFormClientProps = {
   brands: string[];
@@ -16,7 +16,7 @@ type QuotationRequestFormClientProps = {
 
 const initialState: QuotationRequestState = {
   ok: false,
-  message: "",
+  message: '',
 };
 
 function FieldError({ message }: { message?: string }) {
@@ -33,13 +33,13 @@ export function QuotationRequestFormClient({
     initialState,
   );
   const [values, setValues] = useState({
-    name: "",
-    company: "",
-    email: "",
-    phone: "",
-    products: "",
-    brand: "",
-    message: "",
+    name: '',
+    company: '',
+    email: '',
+    phone: '',
+    products: '',
+    brand: '',
+    message: '',
   });
   const [touchedFields, setTouchedFields] = useState<
     Record<keyof typeof values, boolean>
@@ -63,13 +63,13 @@ export function QuotationRequestFormClient({
       toast.success(state.message);
       queueMicrotask(() => {
         setValues({
-          name: "",
-          company: "",
-          email: "",
-          phone: "",
-          products: "",
-          brand: "",
-          message: "",
+          name: '',
+          company: '',
+          email: '',
+          phone: '',
+          products: '',
+          brand: '',
+          message: '',
         });
         setTouchedFields({
           name: false,
@@ -97,35 +97,35 @@ export function QuotationRequestFormClient({
   }
 
   function getLocalFieldError(
-    field: "name" | "email" | "phone" | "products" | "message",
+    field: 'name' | 'email' | 'phone' | 'products' | 'message',
   ) {
     const value = values[field].trim();
 
-    if (field === "name")
-      return value ? undefined : "Please enter your full name.";
-    if (field === "email")
+    if (field === 'name')
+      return value ? undefined : 'Please enter your full name.';
+    if (field === 'email')
       return value
-        ? value.includes("@")
+        ? value.includes('@')
           ? undefined
-          : "Please enter a valid email address."
-        : "Please enter your email address.";
-    if (field === "phone")
-      return value ? undefined : "Please enter your phone number.";
-    if (field === "products")
+          : 'Please enter a valid email address.'
+        : 'Please enter your email address.';
+    if (field === 'phone')
+      return value ? undefined : 'Please enter your phone number.';
+    if (field === 'products')
       return value
         ? undefined
-        : "Please list the products or specifications you need.";
-    if (field === "message") {
+        : 'Please list the products or specifications you need.';
+    if (field === 'message') {
       return value.length >= 20
         ? undefined
-        : "Please add project details or delivery requirements (minimum 20 characters).";
+        : 'Please add project details or delivery requirements (minimum 20 characters).';
     }
 
     return undefined;
   }
 
   function getFieldError(
-    field: "name" | "email" | "phone" | "products" | "message",
+    field: 'name' | 'email' | 'phone' | 'products' | 'message',
   ) {
     if (touchedFields[field]) {
       return getLocalFieldError(field);
@@ -134,11 +134,11 @@ export function QuotationRequestFormClient({
     return state.errors?.[field];
   }
 
-  const nameError = getFieldError("name");
-  const emailError = getFieldError("email");
-  const phoneError = getFieldError("phone");
-  const productsError = getFieldError("products");
-  const messageError = getFieldError("message");
+  const nameError = getFieldError('name');
+  const emailError = getFieldError('email');
+  const phoneError = getFieldError('phone');
+  const productsError = getFieldError('products');
+  const messageError = getFieldError('message');
 
   return (
     <form
@@ -165,8 +165,8 @@ export function QuotationRequestFormClient({
             placeholder="Your name"
             value={values.name}
             aria-invalid={Boolean(nameError)}
-            onBlur={() => markTouched("name")}
-            onChange={(event) => updateValue("name", event.target.value)}
+            onBlur={() => markTouched('name')}
+            onChange={(event) => updateValue('name', event.target.value)}
           />
           <FieldError message={nameError} />
         </label>
@@ -176,8 +176,8 @@ export function QuotationRequestFormClient({
             name="company"
             placeholder="Company / organization"
             value={values.company}
-            onBlur={() => markTouched("company")}
-            onChange={(event) => updateValue("company", event.target.value)}
+            onBlur={() => markTouched('company')}
+            onChange={(event) => updateValue('company', event.target.value)}
           />
         </label>
       </div>
@@ -190,8 +190,8 @@ export function QuotationRequestFormClient({
             placeholder="name@company.com"
             value={values.email}
             aria-invalid={Boolean(emailError)}
-            onBlur={() => markTouched("email")}
-            onChange={(event) => updateValue("email", event.target.value)}
+            onBlur={() => markTouched('email')}
+            onChange={(event) => updateValue('email', event.target.value)}
           />
           <FieldError message={emailError} />
         </label>
@@ -202,8 +202,8 @@ export function QuotationRequestFormClient({
             placeholder="01XXXXXXXXX"
             value={values.phone}
             aria-invalid={Boolean(phoneError)}
-            onBlur={() => markTouched("phone")}
-            onChange={(event) => updateValue("phone", event.target.value)}
+            onBlur={() => markTouched('phone')}
+            onChange={(event) => updateValue('phone', event.target.value)}
           />
           <FieldError message={phoneError} />
         </label>
@@ -216,8 +216,8 @@ export function QuotationRequestFormClient({
           className="min-h-32"
           value={values.products}
           aria-invalid={Boolean(productsError)}
-          onBlur={() => markTouched("products")}
-          onChange={(event) => updateValue("products", event.target.value)}
+          onBlur={() => markTouched('products')}
+          onChange={(event) => updateValue('products', event.target.value)}
         />
         <FieldError message={productsError} />
       </label>
@@ -226,8 +226,8 @@ export function QuotationRequestFormClient({
         <select
           name="brand"
           value={values.brand}
-          onBlur={() => markTouched("brand")}
-          onChange={(event) => updateValue("brand", event.target.value)}
+          onBlur={() => markTouched('brand')}
+          onChange={(event) => updateValue('brand', event.target.value)}
           className="h-11 rounded-2xl border border-input bg-background px-4 outline-none"
         >
           <option value="">Any suitable brand</option>
@@ -246,8 +246,8 @@ export function QuotationRequestFormClient({
           className="min-h-36"
           value={values.message}
           aria-invalid={Boolean(messageError)}
-          onBlur={() => markTouched("message")}
-          onChange={(event) => updateValue("message", event.target.value)}
+          onBlur={() => markTouched('message')}
+          onChange={(event) => updateValue('message', event.target.value)}
         />
         <FieldError message={messageError} />
       </label>
@@ -256,7 +256,7 @@ export function QuotationRequestFormClient({
         disabled={isPending}
         className="h-11 w-fit rounded-full px-6 text-sm font-bold shadow-sm"
       >
-        {isPending ? "Submitting..." : "Request quotation"}
+        {isPending ? 'Submitting...' : 'Request quotation'}
       </Button>
     </form>
   );

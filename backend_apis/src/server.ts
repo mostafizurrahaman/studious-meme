@@ -82,12 +82,12 @@
 // }
 
 /* eslint-disable no-console */
-import { Server } from "http";
-import mongoose from "mongoose";
-import app from "./app";
-import config from "./app/config";
-import seedSuperAdmin from "./app/seed";
-import colors from "colors";
+import { Server } from 'http';
+import mongoose from 'mongoose';
+import app from './app';
+import config from './app/config';
+import seedSuperAdmin from './app/seed';
+import colors from 'colors';
 
 let server: Server | null = null;
 
@@ -96,13 +96,13 @@ async function connectToDatabase() {
   try {
     await mongoose.connect(config.db_url as string);
     console.log(
-      colors.green(" ✅ Database connected successfully!  🛢 ").bgGreen,
+      colors.green(' ✅ Database connected successfully!  🛢 ').bgGreen,
     );
 
     // Enable query logging in development
     // mongoose.set('debug', config.NODE_ENV === 'development');
   } catch (err) {
-    console.error(colors.red("Failed to connect to database:"), err);
+    console.error(colors.red('Failed to connect to database:'), err);
     process.exit(1);
   }
 }
@@ -112,7 +112,7 @@ function gracefulShutdown(signal: string) {
   console.log(colors.red(`Received ${signal}. Closing server... 🤷‍♂️ `));
   if (server) {
     server.close(() => {
-      console.log(colors.red("Server closed gracefully! ✅"));
+      console.log(colors.red('Server closed gracefully! ✅'));
       process.exit(0);
     });
   } else {
@@ -138,22 +138,22 @@ async function main() {
     });
 
     // Listen for OS termination signals (Ctrl+C or server stop)
-    process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
-    process.on("SIGINT", () => gracefulShutdown("SIGINT"));
+    process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+    process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
     // Handling uncaught exceptions
-    process.on("uncaughtException", (error: unknown) => {
-      console.error(colors.red("😈 Uncaught Exception:"), error);
-      gracefulShutdown("uncaughtException");
+    process.on('uncaughtException', (error: unknown) => {
+      console.error(colors.red('😈 Uncaught Exception:'), error);
+      gracefulShutdown('uncaughtException');
     });
 
     // Handling unhandled promise rejections
-    process.on("unhandledRejection", (error: unknown) => {
-      console.error(colors.red("😈 Unhandled Rejection:"), error);
-      gracefulShutdown("unhandledRejection");
+    process.on('unhandledRejection', (error: unknown) => {
+      console.error(colors.red('😈 Unhandled Rejection:'), error);
+      gracefulShutdown('unhandledRejection');
     });
   } catch (error) {
-    console.error(colors.red("😈 Error during bootstrap:"), error);
+    console.error(colors.red('😈 Error during bootstrap:'), error);
     process.exit(1);
   }
 }

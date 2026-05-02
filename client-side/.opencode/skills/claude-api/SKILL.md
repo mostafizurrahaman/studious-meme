@@ -85,14 +85,14 @@ npm install @anthropic-ai/sdk
 ### Basic Message
 
 ```typescript
-import Anthropic from "@anthropic-ai/sdk";
+import Anthropic from '@anthropic-ai/sdk';
 
 const client = new Anthropic(); // reads ANTHROPIC_API_KEY from env
 
 const message = await client.messages.create({
-  model: "claude-sonnet-4-6",
+  model: 'claude-sonnet-4-6',
   max_tokens: 1024,
-  messages: [{ role: "user", content: "Explain async/await in TypeScript" }],
+  messages: [{ role: 'user', content: 'Explain async/await in TypeScript' }],
 });
 console.log(message.content[0].text);
 ```
@@ -101,15 +101,15 @@ console.log(message.content[0].text);
 
 ```typescript
 const stream = client.messages.stream({
-  model: "claude-sonnet-4-6",
+  model: 'claude-sonnet-4-6',
   max_tokens: 1024,
-  messages: [{ role: "user", content: "Write a haiku" }],
+  messages: [{ role: 'user', content: 'Write a haiku' }],
 });
 
 for await (const event of stream) {
   if (
-    event.type === "content_block_delta" &&
-    event.delta.type === "text_delta"
+    event.type === 'content_block_delta' &&
+    event.delta.type === 'text_delta'
   ) {
     process.stdout.write(event.delta.text);
   }

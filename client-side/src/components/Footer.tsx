@@ -1,9 +1,9 @@
-import Link from "next/link";
-import { Separator } from "@/components/ui/separator";
-import { Container } from "@/components/Container";
-import { contactChannels } from "@/lib/static-site-content";
-import { siteConfig } from "@/lib/seo";
-import type { Brand, Category } from "@/lib/storefront-types";
+import Link from 'next/link';
+import { Separator } from '@/components/ui/separator';
+import { Container } from '@/components/Container';
+import { contactChannels } from '@/lib/static-site-content';
+import { siteConfig } from '@/lib/seo';
+import type { Brand, Category } from '@/lib/storefront-types';
 
 type Props = {
   categories: Category[];
@@ -37,7 +37,7 @@ export function Footer({ categories, brands }: Props) {
               </a>
               <a
                 className="block text-secondary-foreground/90 hover:text-secondary-foreground"
-                href={`tel:${siteConfig.phone.replace(/\s+/g, "")}`}
+                href={`tel:${siteConfig.phone.replace(/\s+/g, '')}`}
               >
                 Hotline: {siteConfig.phone} (10am to 7pm)
               </a>

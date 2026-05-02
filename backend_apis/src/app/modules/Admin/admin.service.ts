@@ -1,14 +1,14 @@
-import httpStatus from "http-status";
-import { AppError, sendOtpEmail } from "../../utils";
+import httpStatus from 'http-status';
+import { AppError, sendOtpEmail } from '../../utils';
 import {
   deleteImageFromCloudinary,
   generateOtp,
   sendImageToCloudinary,
-} from "../../lib";
-import { OTP_EXPIRY_MINUTES, ROLE } from "../User/user.constant";
-import UserModel from "../User/user.model";
-import { IAdminCreatePayload } from "./admin.interface";
-import { MulterFile } from "../../lib/upload";
+} from '../../lib';
+import { OTP_EXPIRY_MINUTES, ROLE } from '../User/user.constant';
+import UserModel from '../User/user.model';
+import { IAdminCreatePayload } from './admin.interface';
+import { MulterFile } from '../../lib/upload';
 
 // 1. createAdminIntoDB
 const createAdminIntoDB = async (
@@ -20,7 +20,7 @@ const createAdminIntoDB = async (
   );
 
   if (existing) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Email already exists!");
+    throw new AppError(httpStatus.BAD_REQUEST, 'Email already exists!');
   }
 
   const otp = generateOtp();
@@ -60,7 +60,7 @@ const createAdminIntoDB = async (
 // 2. getAllAdminsFromDB
 const getAllAdminsFromDB = async () => {
   return UserModel.find({ role: ROLE.ADMIN })
-    .select("name email phone image isActive createdAt updatedAt")
+    .select('name email phone image isActive createdAt updatedAt')
     .sort({ createdAt: -1 })
     .lean();
 };
@@ -68,11 +68,11 @@ const getAllAdminsFromDB = async () => {
 // 3. getAdminByIdFromDB
 const getAdminByIdFromDB = async (userId: string) => {
   const admin = await UserModel.findOne({ _id: userId, role: ROLE.ADMIN })
-    .select("name email phone image isActive createdAt updatedAt")
+    .select('name email phone image isActive createdAt updatedAt')
     .lean();
 
   if (!admin) {
-    throw new AppError(httpStatus.NOT_FOUND, "Admin not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Admin not found!');
   }
 
   return admin;
@@ -87,10 +87,10 @@ const updateAdminIntoDB = async (
   const existingAdmin = await UserModel.findOne({
     _id: userId,
     role: ROLE.ADMIN,
-  }).select("image");
+  }).select('image');
 
   if (!existingAdmin) {
-    throw new AppError(httpStatus.NOT_FOUND, "Admin not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Admin not found!');
   }
 
   let uploadedImage: string | undefined;
@@ -104,14 +104,14 @@ const updateAdminIntoDB = async (
     const admin = await UserModel.findOneAndUpdate(
       { _id: userId, role: ROLE.ADMIN },
       { ...payload, ...(uploadedImage ? { image: uploadedImage } : {}) },
-      { returnDocument: "after", runValidators: true },
-    ).select("name email phone image isActive createdAt updatedAt");
+      { returnDocument: 'after', runValidators: true },
+    ).select('name email phone image isActive createdAt updatedAt');
 
     if (!admin) {
       if (uploadedImage) {
         await deleteImageFromCloudinary(uploadedImage);
       }
-      throw new AppError(httpStatus.NOT_FOUND, "Admin not found!");
+      throw new AppError(httpStatus.NOT_FOUND, 'Admin not found!');
     }
 
     if (
@@ -137,11 +137,11 @@ const deleteAdminFromDB = async (userId: string) => {
   const admin = await UserModel.findOneAndUpdate(
     { _id: userId, role: ROLE.ADMIN },
     { isDeleted: true, isActive: false },
-    { returnDocument: "after" },
-  ).select("name email phone image isActive isDeleted createdAt updatedAt");
+    { returnDocument: 'after' },
+  ).select('name email phone image isActive isDeleted createdAt updatedAt');
 
   if (!admin) {
-    throw new AppError(httpStatus.NOT_FOUND, "Admin not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Admin not found!');
   }
 
   return admin;

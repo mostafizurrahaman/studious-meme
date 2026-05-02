@@ -1,12 +1,12 @@
-"use server";
+'use server';
 
-import { revalidateTag } from "next/cache";
-import { requestBackendJson } from "@/lib/backend-api";
-import { CACHE_TAGS } from "@/lib/cache-tags";
+import { revalidateTag } from 'next/cache';
+import { requestBackendJson } from '@/lib/backend-api';
+import { CACHE_TAGS } from '@/lib/cache-tags';
 import {
   getValidAccessTokenForServerActions,
   getValidAccessTokenForServerHandlerGet,
-} from "@/lib/getValidAccessToken";
+} from '@/lib/getValidAccessToken';
 
 type BackendEnvelope<T> = {
   success?: boolean;
@@ -20,20 +20,20 @@ export type ComparisonHistoryRecord = {
   _id?: string;
   user?: unknown;
   product?: unknown;
-    productSnapshot?: {
-      title: string;
-      brand: string;
-      category: string;
-      categorySlug?: string;
-      subCategorySlug?: string;
-      image: string;
-      sku: string;
-      slug: string;
-      price: number;
-      sellingUnit?: string;
-      stock?: number | null;
-      rating: number;
-      oldPrice?: number;
+  productSnapshot?: {
+    title: string;
+    brand: string;
+    category: string;
+    categorySlug?: string;
+    subCategorySlug?: string;
+    image: string;
+    sku: string;
+    slug: string;
+    price: number;
+    sellingUnit?: string;
+    stock?: number | null;
+    rating: number;
+    oldPrice?: number;
     isFeatured: boolean;
     weightKg?: number;
     isNoCOD?: boolean;
@@ -50,14 +50,14 @@ export const addCompareItem = async (
   if (!accessToken) {
     return {
       success: false,
-      message: "Sign in to save comparison items to your account.",
+      message: 'Sign in to save comparison items to your account.',
     };
   }
 
   const result = await requestBackendJson<
     BackendEnvelope<ComparisonHistoryRecord | null>
-  >("/compare", {
-    method: "POST",
+  >('/compare', {
+    method: 'POST',
     body: { productId },
     token: accessToken,
   });
@@ -74,14 +74,14 @@ export const removeCompareItem = async (
   if (!accessToken) {
     return {
       success: false,
-      message: "Sign in to update comparison items on your account.",
+      message: 'Sign in to update comparison items on your account.',
     };
   }
 
   const result = await requestBackendJson<BackendEnvelope<null>>(
     `/compare/${productId}`,
     {
-      method: "DELETE",
+      method: 'DELETE',
       token: accessToken,
     },
   );
@@ -100,9 +100,9 @@ export const getMyComparisonHistory = async (): Promise<
   }
 
   return requestBackendJson<BackendEnvelope<ComparisonHistoryRecord[]>>(
-    "/compare/my-items",
+    '/compare/my-items',
     {
-      method: "GET",
+      method: 'GET',
       token: accessToken,
       next: { tags: [CACHE_TAGS.COMPARISON_HISTORY] },
     },
@@ -117,11 +117,11 @@ type HistoryListParams = {
 const buildHistoryQuery = (params: HistoryListParams = {}) => {
   const searchParams = new URLSearchParams();
 
-  if (params.page) searchParams.set("page", String(params.page));
-  if (params.limit) searchParams.set("limit", String(params.limit));
+  if (params.page) searchParams.set('page', String(params.page));
+  if (params.limit) searchParams.set('limit', String(params.limit));
 
   const query = searchParams.toString();
-  return query ? `?${query}` : "";
+  return query ? `?${query}` : '';
 };
 
 export const getAllComparisonHistory = async (
@@ -132,7 +132,7 @@ export const getAllComparisonHistory = async (
   return requestBackendJson<BackendEnvelope<ComparisonHistoryRecord[]>>(
     `/compare/admin${buildHistoryQuery(params)}`,
     {
-      method: "GET",
+      method: 'GET',
       token: accessToken ?? undefined,
       next: { tags: [CACHE_TAGS.COMPARISON_HISTORY] },
     },
@@ -156,9 +156,9 @@ export const getComparisonInsights = async (): Promise<
   const accessToken = await getValidAccessTokenForServerHandlerGet();
 
   return requestBackendJson<BackendEnvelope<ComparisonInsightSummary>>(
-    "/compare/admin/summary",
+    '/compare/admin/summary',
     {
-      method: "GET",
+      method: 'GET',
       token: accessToken ?? undefined,
       next: { tags: [CACHE_TAGS.COMPARISON_HISTORY] },
     },

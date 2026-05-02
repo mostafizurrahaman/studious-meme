@@ -1,15 +1,15 @@
-import { model, Schema } from "mongoose";
-import { IHeroCard, IHeroSection } from "./heroSection.interface";
+import { model, Schema } from 'mongoose';
+import { IHeroCard, IHeroSection } from './heroSection.interface';
 
 const heroCardSchema = new Schema<IHeroCard>(
   {
-    image: { type: String, required: [true, "Image is required!"] },
-    imageAlt: { type: String, required: [true, "Image alt is required!"] },
-    title: { type: String, required: [true, "Title is required!"] },
-    description: { type: String, required: [true, "Description is required!"] },
+    image: { type: String, required: [true, 'Image is required!'] },
+    imageAlt: { type: String, required: [true, 'Image alt is required!'] },
+    title: { type: String, required: [true, 'Title is required!'] },
+    description: { type: String, required: [true, 'Description is required!'] },
     clickUrl: {
       type: String,
-      required: [true, "Click URL is required!"],
+      required: [true, 'Click URL is required!'],
       index: true,
     },
   },
@@ -26,6 +26,6 @@ const heroSectionSchema = new Schema<IHeroSection>(
 );
 
 export const HeroSectionModel = model<IHeroSection>(
-  "HeroSection",
+  'HeroSection',
   heroSectionSchema,
 );

@@ -1,8 +1,8 @@
-import { SeoScripts } from "@/components/SeoScripts";
-import { Card } from "@/components/ui/card";
-import { contactChannels } from "@/lib/static-site-content";
-import { siteConfig } from "@/lib/seo";
-import { ourContactsMetadata, ourContactsSchemas } from "@/lib/seo";
+import { SeoScripts } from '@/components/SeoScripts';
+import { Card } from '@/components/ui/card';
+import { contactChannels } from '@/lib/static-site-content';
+import { siteConfig } from '@/lib/seo';
+import { ourContactsMetadata, ourContactsSchemas } from '@/lib/seo';
 export const metadata = ourContactsMetadata;
 
 export default function OurContactsPage() {

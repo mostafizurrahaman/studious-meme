@@ -23,7 +23,10 @@ describe('Product Validation - Critical Paths', () => {
       });
 
       if (!result.success) {
-        console.log('Validation errors:', JSON.stringify(result.error?.issues, null, 2));
+        console.log(
+          'Validation errors:',
+          JSON.stringify(result.error?.issues, null, 2),
+        );
       }
 
       expect(result.success).toBe(true);
@@ -52,7 +55,10 @@ describe('Product Validation - Critical Paths', () => {
       });
 
       if (!result.success) {
-        console.log('oldPrice errors:', JSON.stringify(result.error?.issues, null, 2));
+        console.log(
+          'oldPrice errors:',
+          JSON.stringify(result.error?.issues, null, 2),
+        );
       }
 
       expect(result.success).toBe(true);
@@ -63,7 +69,10 @@ describe('Product Validation - Critical Paths', () => {
 
     it('should reject invalid YouTube video URL', () => {
       const result = ProductValidation.productCreateSchema.safeParse({
-        body: { ...validProductBase, youtubeVideoUrl: 'https://invalid-url.com' },
+        body: {
+          ...validProductBase,
+          youtubeVideoUrl: 'https://invalid-url.com',
+        },
       });
 
       expect(result.success).toBe(false);

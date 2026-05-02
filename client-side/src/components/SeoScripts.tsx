@@ -1,5 +1,5 @@
-import Script from "next/script";
-import { serializeJsonLd } from "@/lib/seo";
+import Script from 'next/script';
+import { serializeJsonLd } from '@/lib/seo';
 
 type Props = {
   data: unknown | unknown[];

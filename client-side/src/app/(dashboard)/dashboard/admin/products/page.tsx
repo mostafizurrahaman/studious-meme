@@ -1,24 +1,24 @@
-import type { Metadata } from "next";
-import { DashboardProductsManager } from "@/components/dashboard/DashboardProductsManager";
-import { requireDashboardRoles } from "@/lib/dashboard-auth";
-import { buildMetadata } from "@/lib/seo";
-import { getAllProducts } from "@/services/Product";
-import { getAllBrandsAcrossPages } from "@/services/Brand";
-import { getAllCategories } from "@/services/Category";
-import type { BackendCategory } from "@/services/Category/mappers";
+import type { Metadata } from 'next';
+import { DashboardProductsManager } from '@/components/dashboard/DashboardProductsManager';
+import { requireDashboardRoles } from '@/lib/dashboard-auth';
+import { buildMetadata } from '@/lib/seo';
+import { getAllProducts } from '@/services/Product';
+import { getAllBrandsAcrossPages } from '@/services/Brand';
+import { getAllCategories } from '@/services/Category';
+import type { BackendCategory } from '@/services/Category/mappers';
 
 type Props = {
   searchParams: Promise<{ page?: string; limit?: string; searchTerm?: string }>;
 };
 
 export const metadata: Metadata = buildMetadata({
-  title: "Products",
-  description: "Manage product catalog entries and inventory status.",
-  path: "/dashboard/admin/products",
+  title: 'Products',
+  description: 'Manage product catalog entries and inventory status.',
+  path: '/dashboard/admin/products',
   noindex: true,
 });
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 const parsePositiveInteger = (value: string | undefined, fallback: number) => {
   const parsed = Number(value);
@@ -27,11 +27,11 @@ const parsePositiveInteger = (value: string | undefined, fallback: number) => {
 };
 
 export default async function AdminProductsPage({ searchParams }: Props) {
-  await requireDashboardRoles(["ADMIN", "SUPER_ADMIN"]);
+  await requireDashboardRoles(['ADMIN', 'SUPER_ADMIN']);
   const query = await searchParams;
   const page = parsePositiveInteger(query.page, 1);
   const limit = parsePositiveInteger(query.limit, 50);
-  const searchTerm = query.searchTerm?.trim() ?? "";
+  const searchTerm = query.searchTerm?.trim() ?? '';
 
   const [productsResult, brandsResult, categoriesResult] = await Promise.all([
     getAllProducts({ page, limit, searchTerm, includeInactive: true }).catch(

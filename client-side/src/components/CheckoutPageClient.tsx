@@ -11,7 +11,10 @@ import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { formatMoney } from '@/lib/cart';
 import { useCartStore } from '@/lib/cart-store';
-import { mergeBackendCartIntoLocalItems, mapBackendCartItemsToStoreItems } from '@/lib/cart-hydration';
+import {
+  mergeBackendCartIntoLocalItems,
+  mapBackendCartItemsToStoreItems,
+} from '@/lib/cart-hydration';
 import { BANGLADESH_DISTRICTS } from '@/lib/bangladesh-districts';
 import {
   CASH_ON_DELIVERY_LABEL,
@@ -21,7 +24,10 @@ import {
 } from '@/lib/payment-method';
 import { submitCheckoutAction } from '@/app/(withNavFooter)/checkout/actions';
 import type { CheckoutActionState } from '@/app/(withNavFooter)/checkout/actions';
-import { calculateFulfillmentSummary, formatShippingZoneLabel } from '@/lib/fulfillment';
+import {
+  calculateFulfillmentSummary,
+  formatShippingZoneLabel,
+} from '@/lib/fulfillment';
 import { getMyCart } from '@/services/Cart';
 
 const CHECKOUT_LOGIN_MESSAGE = 'Sign in to place your order.';
@@ -66,7 +72,9 @@ function getCheckoutFieldError(
     const email = values.email.trim();
 
     if (!email) return 'Please enter your email address.';
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? undefined : 'Please enter a valid email address.';
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+      ? undefined
+      : 'Please enter a valid email address.';
   }
 
   if (field === 'city') {
@@ -74,25 +82,30 @@ function getCheckoutFieldError(
   }
 
   if (field === 'address') {
-    return values.address.trim() ? undefined : 'Please enter your delivery address.';
+    return values.address.trim()
+      ? undefined
+      : 'Please enter your delivery address.';
   }
 
   return undefined;
 }
 
 export function CheckoutPageClient() {
-  const items = useCartStore(state => state.items);
-  const hydrated = useCartStore(state => state.hydrated);
-  const checkout = useCartStore(state => state.checkout);
-  const appliedCoupon = useCartStore(state => state.appliedCoupon);
-  const couponVerification = useCartStore(state => state.couponVerification);
-  const updateCheckout = useCartStore(state => state.updateCheckout);
-  const clear = useCartStore(state => state.clear);
-  const replaceItems = useCartStore(state => state.replaceItems);
+  const items = useCartStore((state) => state.items);
+  const hydrated = useCartStore((state) => state.hydrated);
+  const checkout = useCartStore((state) => state.checkout);
+  const appliedCoupon = useCartStore((state) => state.appliedCoupon);
+  const couponVerification = useCartStore((state) => state.couponVerification);
+  const updateCheckout = useCartStore((state) => state.updateCheckout);
+  const clear = useCartStore((state) => state.clear);
+  const replaceItems = useCartStore((state) => state.replaceItems);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [result, formAction, pending] = useActionState<CheckoutActionState, FormData>(submitCheckoutAction, {
+  const [result, formAction, pending] = useActionState<
+    CheckoutActionState,
+    FormData
+  >(submitCheckoutAction, {
     ok: false,
     error: '',
   });
@@ -105,7 +118,9 @@ export function CheckoutPageClient() {
   });
   const paymentValue = getCheckoutPaymentLabel(checkout.payment);
   const selectedPayment =
-    paymentValue === CASH_ON_DELIVERY_LABEL && !fulfillment.codEligible ? PORTPOS_LABEL : paymentValue;
+    paymentValue === CASH_ON_DELIVERY_LABEL && !fulfillment.codEligible
+      ? PORTPOS_LABEL
+      : paymentValue;
   const discount = fulfillment.discount;
   const delivery = fulfillment.shippingCharge;
   const total = fulfillment.total;
@@ -115,7 +130,11 @@ export function CheckoutPageClient() {
   const phoneError = getCheckoutFieldError('phone', checkout, submitAttempted);
   const emailError = getCheckoutFieldError('email', checkout, submitAttempted);
   const cityError = getCheckoutFieldError('city', checkout, submitAttempted);
-  const addressError = getCheckoutFieldError('address', checkout, submitAttempted);
+  const addressError = getCheckoutFieldError(
+    'address',
+    checkout,
+    submitAttempted,
+  );
 
   useEffect(() => {
     if (fulfillment.codEligible || paymentValue !== CASH_ON_DELIVERY_LABEL) {
@@ -129,13 +148,23 @@ export function CheckoutPageClient() {
     let active = true;
 
     getMyCart()
-      .then(result => {
-        if (!active || !result.success || !Array.isArray(result.data?.items) || result.data.items.length === 0) {
+      .then((result) => {
+        if (
+          !active ||
+          !result.success ||
+          !Array.isArray(result.data?.items) ||
+          result.data.items.length === 0
+        ) {
           return;
         }
 
         const backendItems = mapBackendCartItemsToStoreItems(result.data.items);
-        replaceItems(mergeBackendCartIntoLocalItems(useCartStore.getState().items, backendItems));
+        replaceItems(
+          mergeBackendCartIntoLocalItems(
+            useCartStore.getState().items,
+            backendItems,
+          ),
+        );
       })
       .catch(() => null);
 
@@ -148,7 +177,9 @@ export function CheckoutPageClient() {
     if (!result.ok) {
       if (isCheckoutLoginRequired(result.error)) {
         const currentPath = `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
-        router.replace(`/my-account?redirect=${encodeURIComponent(currentPath)}`);
+        router.replace(
+          `/my-account?redirect=${encodeURIComponent(currentPath)}`,
+        );
       }
 
       return;
@@ -156,7 +187,9 @@ export function CheckoutPageClient() {
 
     clear();
     toast.success(
-      result.gatewayUrl ? 'Redirecting to PortPOS payment gateway...' : 'Order submitted successfully.',
+      result.gatewayUrl
+        ? 'Redirecting to PortPOS payment gateway...'
+        : 'Order submitted successfully.',
     );
 
     if (result.gatewayUrl) {
@@ -185,8 +218,12 @@ export function CheckoutPageClient() {
     <main className="flex-1 bg-background pb-16">
       <div className="mx-auto w-full max-w-310 px-4 py-6 lg:px-0">
         <Card className="p-6 shadow-sm sm:p-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">Checkout</p>
-          <h1 className="mt-4 text-3xl font-black text-secondary sm:text-4xl">Place order</h1>
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">
+            Checkout
+          </p>
+          <h1 className="mt-4 text-3xl font-black text-secondary sm:text-4xl">
+            Place order
+          </h1>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-foreground/65 sm:text-base">
             Complete your order with cash on delivery or PortPOS online payment.
           </p>
@@ -211,7 +248,9 @@ export function CheckoutPageClient() {
               noValidate
               onSubmit={() => setSubmitAttempted(true)}
             >
-              {!result.ok && result.error && !isCheckoutLoginRequired(result.error) ? (
+              {!result.ok &&
+              result.error &&
+              !isCheckoutLoginRequired(result.error) ? (
                 <div className="rounded-2xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive">
                   {result.error}
                 </div>
@@ -223,7 +262,10 @@ export function CheckoutPageClient() {
                   ['phone', 'Phone number', checkout.phone],
                   ['email', 'Email address', checkout.email],
                 ].map(([key, label, value]) => (
-                  <label key={key} className="grid gap-2 text-sm font-semibold text-foreground">
+                  <label
+                    key={key}
+                    className="grid gap-2 text-sm font-semibold text-foreground"
+                  >
                     {label}
                     <Input
                       className="text-gray-500"
@@ -242,8 +284,11 @@ export function CheckoutPageClient() {
                       inputMode={key === 'phone' ? 'numeric' : undefined}
                       maxLength={key === 'phone' ? 11 : undefined}
                       placeholder={key === 'phone' ? '01XXXXXXXXX' : undefined}
-                      onChange={event =>
-                        updateCheckout(key as 'name' | 'phone' | 'email' | 'city', event.target.value)
+                      onChange={(event) =>
+                        updateCheckout(
+                          key as 'name' | 'phone' | 'email' | 'city',
+                          event.target.value,
+                        )
                       }
                     />
                     <FieldError
@@ -265,13 +310,15 @@ export function CheckoutPageClient() {
                     name="city"
                     value={checkout.city}
                     aria-invalid={Boolean(cityError)}
-                    onChange={event => updateCheckout('city', event.target.value)}
+                    onChange={(event) =>
+                      updateCheckout('city', event.target.value)
+                    }
                     className={`h-11 rounded-2xl border bg-background px-4 outline-none text-gray-500 ${cityError ? 'border-destructive/50 ring-2 ring-destructive/15' : 'border-input'}`}
                   >
                     <option value="" disabled>
                       Select district
                     </option>
-                    {BANGLADESH_DISTRICTS.map(district => (
+                    {BANGLADESH_DISTRICTS.map((district) => (
                       <option key={district} value={district}>
                         {district}
                       </option>
@@ -281,8 +328,16 @@ export function CheckoutPageClient() {
                 </label>
               </div>
 
-              <input type="hidden" name="cartItemsJson" value={JSON.stringify(items)} />
-              <input type="hidden" name="couponCode" value={appliedCoupon?.code ?? ''} />
+              <input
+                type="hidden"
+                name="cartItemsJson"
+                value={JSON.stringify(items)}
+              />
+              <input
+                type="hidden"
+                name="couponCode"
+                value={appliedCoupon?.code ?? ''}
+              />
 
               <label className="grid gap-2 text-sm font-semibold text-foreground">
                 Delivery address
@@ -290,25 +345,33 @@ export function CheckoutPageClient() {
                   name="address"
                   value={checkout.address}
                   aria-invalid={Boolean(addressError)}
-                  onChange={event => updateCheckout('address', event.target.value)}
-                    className={`${addressError ? 'border-destructive/50 ring-2 ring-destructive/15' : ''} text-gray-500`}
+                  onChange={(event) =>
+                    updateCheckout('address', event.target.value)
+                  }
+                  className={`${addressError ? 'border-destructive/50 ring-2 ring-destructive/15' : ''} text-gray-500`}
                 />
                 <FieldError message={addressError} />
               </label>
-                <label className="grid gap-2 text-sm font-semibold text-foreground">
-                  Order note
-                  <Textarea
-                    name="note"
-                    value={checkout.note}
-                    onChange={event => updateCheckout('note', event.target.value)}
-                    className="text-gray-500"
-                  />
-                </label>
+              <label className="grid gap-2 text-sm font-semibold text-foreground">
+                Order note
+                <Textarea
+                  name="note"
+                  value={checkout.note}
+                  onChange={(event) =>
+                    updateCheckout('note', event.target.value)
+                  }
+                  className="text-gray-500"
+                />
+              </label>
               <fieldset className="grid gap-3">
-                <legend className="text-sm font-semibold text-foreground pb-2">Payment method</legend>
+                <legend className="text-sm font-semibold text-foreground pb-2">
+                  Payment method
+                </legend>
                 <div className="grid gap-3">
-                  {CHECKOUT_PAYMENT_OPTIONS.map(option => {
-                    const disabled = option === CASH_ON_DELIVERY_LABEL && !fulfillment.codEligible;
+                  {CHECKOUT_PAYMENT_OPTIONS.map((option) => {
+                    const disabled =
+                      option === CASH_ON_DELIVERY_LABEL &&
+                      !fulfillment.codEligible;
 
                     return (
                       <label
@@ -327,7 +390,9 @@ export function CheckoutPageClient() {
                           value={option}
                           checked={selectedPayment === option}
                           disabled={disabled}
-                          onChange={event => updateCheckout('payment', event.target.value)}
+                          onChange={(event) =>
+                            updateCheckout('payment', event.target.value)
+                          }
                           className="h-4 w-4 accent-primary"
                         />
                         <span className="font-medium">{option}</span>
@@ -400,14 +465,16 @@ export function CheckoutPageClient() {
             <Card className="mt-6 space-y-3 bg-white/10 p-4 text-secondary-foreground">
               <div className="text-sm font-semibold">Item breakdown</div>
               {summaryItems.length > 0 ? (
-                summaryItems.map(item => (
+                summaryItems.map((item) => (
                   <div
                     key={item.sku}
                     className="flex items-start justify-between gap-4 rounded-2xl border border-white/10 bg-white/5 p-3 text-sm text-secondary-foreground/80"
                   >
                     <div className="min-w-0 flex-1 line-clamp-2 font-medium text-secondary-foreground">
                       {item.quantity} *{' '}
-                      <span className="font-semibold tracking-tight text-primary">{item.title}</span>
+                      <span className="font-semibold tracking-tight text-primary">
+                        {item.title}
+                      </span>
                     </div>
                     <span className="shrink-0 rounded-full bg-white/10 px-3 py-1 font-semibold text-secondary-foreground">
                       {formatMoney(item.unitPrice * item.quantity)}
@@ -415,7 +482,9 @@ export function CheckoutPageClient() {
                   </div>
                 ))
               ) : (
-                <div className="text-sm text-secondary-foreground/70">No items yet.</div>
+                <div className="text-sm text-secondary-foreground/70">
+                  No items yet.
+                </div>
               )}
               {items.length > summaryItems.length ? (
                 <div className="text-xs text-secondary-foreground/65">

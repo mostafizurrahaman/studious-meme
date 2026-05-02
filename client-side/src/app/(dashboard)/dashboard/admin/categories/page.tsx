@@ -1,20 +1,20 @@
-import type { Metadata } from "next";
-import { DashboardCategoriesManager } from "@/components/dashboard/DashboardCategoriesManager";
-import { requireDashboardRoles } from "@/lib/dashboard-auth";
-import { buildMetadata } from "@/lib/seo";
-import { getAllCategories } from "@/services/Category";
+import type { Metadata } from 'next';
+import { DashboardCategoriesManager } from '@/components/dashboard/DashboardCategoriesManager';
+import { requireDashboardRoles } from '@/lib/dashboard-auth';
+import { buildMetadata } from '@/lib/seo';
+import { getAllCategories } from '@/services/Category';
 
 export const metadata: Metadata = buildMetadata({
-  title: "Categories",
-  description: "Manage storefront category structure and counts.",
-  path: "/dashboard/admin/categories",
+  title: 'Categories',
+  description: 'Manage storefront category structure and counts.',
+  path: '/dashboard/admin/categories',
   noindex: true,
 });
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 export default async function AdminCategoriesPage() {
-  await requireDashboardRoles(["ADMIN", "SUPER_ADMIN"]);
+  await requireDashboardRoles(['ADMIN', 'SUPER_ADMIN']);
   const categoriesResult = await getAllCategories().catch(() => null);
   const categories = Array.isArray(categoriesResult?.data)
     ? (categoriesResult.data as Array<{

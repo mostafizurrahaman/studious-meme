@@ -1,22 +1,22 @@
-import httpStatus from "http-status";
-import { AppError } from "../../utils";
-import { BrandModel } from "../Brand/brand.model";
-import { CategoryModel } from "../Category/category.model";
-import { HeroSectionModel } from "./heroSection.model";
-import { ProductModel } from "../Product/product.model";
-import { IHeroSection } from "./heroSection.interface";
-import { deleteImageFromCloudinary, uploadFilesAndInjectUrls } from "../../lib";
-import { MulterFile } from "../../lib/upload";
+import httpStatus from 'http-status';
+import { AppError } from '../../utils';
+import { BrandModel } from '../Brand/brand.model';
+import { CategoryModel } from '../Category/category.model';
+import { HeroSectionModel } from './heroSection.model';
+import { ProductModel } from '../Product/product.model';
+import { IHeroSection } from './heroSection.interface';
+import { deleteImageFromCloudinary, uploadFilesAndInjectUrls } from '../../lib';
+import { MulterFile } from '../../lib/upload';
 
 const getHeroSectionImages = (
-  heroSection: Pick<IHeroSection, "slides" | "features">,
+  heroSection: Pick<IHeroSection, 'slides' | 'features'>,
 ) =>
   [...(heroSection.slides || []), ...(heroSection.features || [])]
     .map((card) => card.image)
     .filter(Boolean);
 
 const deleteHeroSectionImages = async (
-  heroSection: Pick<IHeroSection, "slides" | "features">,
+  heroSection: Pick<IHeroSection, 'slides' | 'features'>,
 ) => {
   await Promise.all(
     getHeroSectionImages(heroSection).map((image) =>
@@ -55,7 +55,7 @@ const ensureHeroSectionImages = (payload: Partial<IHeroSection>) => {
   if (missing) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      "Hero section image is required for every slide and feature card!",
+      'Hero section image is required for every slide and feature card!',
     );
   }
 };
@@ -63,8 +63,8 @@ const ensureHeroSectionImages = (payload: Partial<IHeroSection>) => {
 // 2. getHomeContentFromDB
 const getHomeContentFromDB = async () => {
   const [activeBrandIds, activeCategoryIds] = await Promise.all([
-    BrandModel.find({ isActive: true }).distinct("_id"),
-    CategoryModel.find({ isActive: true }).distinct("_id"),
+    BrandModel.find({ isActive: true }).distinct('_id'),
+    CategoryModel.find({ isActive: true }).distinct('_id'),
   ]);
   const activeProductFilter = {
     isActive: true,
@@ -78,14 +78,14 @@ const getHomeContentFromDB = async () => {
       BrandModel.find({ isActive: true }).sort({ name: 1 }).lean(),
       CategoryModel.find({ isActive: true }).sort({ name: 1 }).lean(),
       ProductModel.find({ ...activeProductFilter, isFeatured: true })
-        .populate("brand")
-        .populate("category")
+        .populate('brand')
+        .populate('category')
         .sort({ createdAt: -1 })
         .limit(12)
         .lean(),
       ProductModel.find(activeProductFilter)
-        .populate("brand")
-        .populate("category")
+        .populate('brand')
+        .populate('category')
         .sort({ createdAt: -1 })
         .limit(20)
         .lean(),
@@ -127,7 +127,7 @@ const createHeroSectionIntoDB = async (
     if (!created) {
       throw new AppError(
         httpStatus.INTERNAL_SERVER_ERROR,
-        "Failed to create hero section!",
+        'Failed to create hero section!',
       );
     }
 
@@ -140,13 +140,13 @@ const createHeroSectionIntoDB = async (
     existing._id,
     nextPayload,
     {
-      returnDocument: "after",
+      returnDocument: 'after',
       runValidators: true,
     },
   );
 
   if (!updated) {
-    throw new AppError(httpStatus.NOT_FOUND, "Hero section not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Hero section not found!');
   }
 
   await Promise.all(
@@ -170,7 +170,7 @@ const getAllHeroSectionsFromDB = async () => {
 // 5. getHeroSectionByIdFromDB
 const getHeroSectionByIdFromDB = async (id: string) => {
   const doc = await HeroSectionModel.findById(id).lean();
-  if (!doc) throw new AppError(httpStatus.NOT_FOUND, "Hero section not found!");
+  if (!doc) throw new AppError(httpStatus.NOT_FOUND, 'Hero section not found!');
   return doc;
 };
 
@@ -186,7 +186,7 @@ const updateHeroSectionIntoDB = async (
   });
 
   if (!singleton) {
-    throw new AppError(httpStatus.NOT_FOUND, "Hero section not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Hero section not found!');
   }
 
   const targetId = singleton._id.toString() || id;
@@ -204,13 +204,13 @@ const updateHeroSectionIntoDB = async (
       targetId,
       updatedPayload,
       {
-        returnDocument: "after",
+        returnDocument: 'after',
         runValidators: true,
       },
     );
 
     if (!updated) {
-      throw new AppError(httpStatus.NOT_FOUND, "Hero section not found!");
+      throw new AppError(httpStatus.NOT_FOUND, 'Hero section not found!');
     }
 
     const nextImages = getHeroSectionImages(updated.toObject());

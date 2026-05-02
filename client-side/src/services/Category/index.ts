@@ -1,12 +1,12 @@
-"use server";
+'use server';
 
-import { revalidatePath, revalidateTag } from "next/cache";
-import { requestBackendJson } from "@/lib/backend-api";
-import { CACHE_REVALIDATE } from "@/lib/cache-revalidate";
-import { CACHE_TAGS } from "@/lib/cache-tags";
-import { getValidAccessTokenForServerActions } from "@/lib/getValidAccessToken";
-import { slugify } from "@/lib/slug";
-import type { BackendCategory } from "./mappers";
+import { revalidatePath, revalidateTag } from 'next/cache';
+import { requestBackendJson } from '@/lib/backend-api';
+import { CACHE_REVALIDATE } from '@/lib/cache-revalidate';
+import { CACHE_TAGS } from '@/lib/cache-tags';
+import { getValidAccessTokenForServerActions } from '@/lib/getValidAccessToken';
+import { slugify } from '@/lib/slug';
+import type { BackendCategory } from './mappers';
 
 type BackendEnvelope<T> = {
   success?: boolean;
@@ -33,15 +33,15 @@ function toFormData(payload: Record<string, unknown>) {
   };
 
   formData.set(
-    "data",
+    'data',
     JSON.stringify({
       ...rest,
-      ...(typeof image === "string" && image ? { image } : {}),
+      ...(typeof image === 'string' && image ? { image } : {}),
     }),
   );
 
   if (image instanceof File) {
-    formData.append("image", image);
+    formData.append('image', image);
   }
 
   return formData;
@@ -57,8 +57,8 @@ type CategoryMutationPayload = {
 };
 
 export const getAllCategories = async (): Promise<BackendEnvelope<unknown>> => {
-  return requestBackendJson<BackendEnvelope<unknown>>("/category/categories", {
-    method: "GET",
+  return requestBackendJson<BackendEnvelope<unknown>>('/category/categories', {
+    method: 'GET',
     next: { revalidate: CACHE_REVALIDATE.LONG, tags: [CACHE_TAGS.CATEGORIES] },
   });
 };
@@ -67,10 +67,13 @@ export const getActiveCategories = async (): Promise<
   BackendEnvelope<BackendCategory[]>
 > => {
   return requestBackendJson<BackendEnvelope<BackendCategory[]>>(
-    "/category/categories/active",
+    '/category/categories/active',
     {
-      method: "GET",
-      next: { revalidate: CACHE_REVALIDATE.LONG, tags: [CACHE_TAGS.CATEGORIES] },
+      method: 'GET',
+      next: {
+        revalidate: CACHE_REVALIDATE.LONG,
+        tags: [CACHE_TAGS.CATEGORIES],
+      },
     },
   );
 };
@@ -78,8 +81,8 @@ export const getActiveCategories = async (): Promise<
 export const getAllCategoriesNameAndId = async (): Promise<
   BackendEnvelope<unknown>
 > => {
-  return requestBackendJson<BackendEnvelope<unknown>>("/category/categories", {
-    method: "GET",
+  return requestBackendJson<BackendEnvelope<unknown>>('/category/categories', {
+    method: 'GET',
     next: { revalidate: CACHE_REVALIDATE.LONG, tags: [CACHE_TAGS.CATEGORIES] },
   });
 };
@@ -90,7 +93,7 @@ export const getCategoryBySlug = async (
   return requestBackendJson<BackendEnvelope<BackendCategory>>(
     `/category/categories/${slug}`,
     {
-      method: "GET",
+      method: 'GET',
       next: {
         revalidate: CACHE_REVALIDATE.LONG,
         tags: [CACHE_TAGS.CATEGORIES, CACHE_TAGS.CATEGORY(slug)],
@@ -105,7 +108,7 @@ export const getActiveCategoryBySlug = async (
   return requestBackendJson<BackendEnvelope<BackendCategory | null>>(
     `/category/categories/active/${slug}`,
     {
-      method: "GET",
+      method: 'GET',
       next: {
         revalidate: CACHE_REVALIDATE.LONG,
         tags: [CACHE_TAGS.CATEGORIES, CACHE_TAGS.CATEGORY(slug)],
@@ -119,9 +122,9 @@ export const createCategory = async (
 ): Promise<BackendEnvelope<unknown>> => {
   const accessToken = await getValidAccessTokenForServerActions();
   const result = await requestBackendJson<BackendEnvelope<unknown>>(
-    "/category/categories",
+    '/category/categories',
     {
-      method: "POST",
+      method: 'POST',
       body: toFormData({
         name: payload.name.trim(),
         slug: slugify(payload.slug ?? payload.name),
@@ -148,7 +151,7 @@ export const updateCategory = async (
   const result = await requestBackendJson<BackendEnvelope<unknown>>(
     `/category/categories/${id}`,
     {
-      method: "PATCH",
+      method: 'PATCH',
       body: toFormData({
         name: payload.name.trim(),
         slug: slugify(payload.slug ?? payload.name),
@@ -172,7 +175,7 @@ export const deleteCategory = async (
   const result = await requestBackendJson<BackendEnvelope<unknown>>(
     `/category/categories/${id}`,
     {
-      method: "DELETE",
+      method: 'DELETE',
       token: accessToken ?? undefined,
     },
   );
@@ -189,7 +192,7 @@ export const createCategorySubCategory = async (
   const result = await requestBackendJson<BackendEnvelope<unknown>>(
     `/category/categories/${categorySlug}/sub-categories`,
     {
-      method: "POST",
+      method: 'POST',
       body: toFormData({
         ...payload,
         slug: slugify(payload.slug),
@@ -211,7 +214,7 @@ export const updateCategorySubCategory = async (
   const result = await requestBackendJson<BackendEnvelope<unknown>>(
     `/category/categories/${categorySlug}/sub-categories/${subCategorySlug}`,
     {
-      method: "PATCH",
+      method: 'PATCH',
       body: toFormData({
         ...payload,
         slug: payload.slug ? slugify(payload.slug) : payload.slug,
@@ -232,7 +235,7 @@ export const deleteCategorySubCategory = async (
   const result = await requestBackendJson<BackendEnvelope<unknown>>(
     `/category/categories/${categorySlug}/sub-categories/${subCategorySlug}`,
     {
-      method: "DELETE",
+      method: 'DELETE',
       token: accessToken ?? undefined,
     },
   );

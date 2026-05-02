@@ -264,8 +264,15 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { UserDropdownMenu } from '@/components/account/UserDropdownMenu';
-import { getRoleLabel, normalizeRole, normalizeRoleSegment } from '@/lib/auth/roles';
-import { getDashboardNavigationItems, getDashboardRoleConfig } from '@/lib/dashboard-navigation';
+import {
+  getRoleLabel,
+  normalizeRole,
+  normalizeRoleSegment,
+} from '@/lib/auth/roles';
+import {
+  getDashboardNavigationItems,
+  getDashboardRoleConfig,
+} from '@/lib/dashboard-navigation';
 import { dashboardPageSlugs, pageLabels } from '@/lib/page-content';
 import { cn } from '@/lib/utils';
 
@@ -310,13 +317,13 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
     Cart: ShoppingCart,
     Profile: Settings,
   };
-  const navItems = getDashboardNavigationItems(role).map(item => ({
+  const navItems = getDashboardNavigationItems(role).map((item) => ({
     ...item,
     icon: iconByLabel[item.label] ?? LayoutDashboard,
   }));
   const canManagePages = role === 'ADMIN' || role === 'SUPER_ADMIN';
   const pageBasePath = `/dashboard/${normalizedRole}/pages`;
-  const pageManagementItems = dashboardPageSlugs.map(slug => ({
+  const pageManagementItems = dashboardPageSlugs.map((slug) => ({
     label: pageLabels[slug],
     href: `${pageBasePath}/${slug}`,
   }));
@@ -324,11 +331,11 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
   const navSections = [
     {
       label: 'Overview',
-      items: navItems.filter(item => ['Dashboard'].includes(item.label)),
+      items: navItems.filter((item) => ['Dashboard'].includes(item.label)),
     },
     {
       label: 'Management',
-      items: navItems.filter(item =>
+      items: navItems.filter((item) =>
         [
           'Admins',
           'Hero Sections',
@@ -349,15 +356,22 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
     },
     {
       label: 'Sales',
-      items: navItems.filter(item =>
-        ['Orders', 'Payments', 'Quotations', 'Wishlist', 'Compare', 'Cart'].includes(item.label),
+      items: navItems.filter((item) =>
+        [
+          'Orders',
+          'Payments',
+          'Quotations',
+          'Wishlist',
+          'Compare',
+          'Cart',
+        ].includes(item.label),
       ),
     },
     {
       label: 'Account',
-      items: navItems.filter(item => ['Profile'].includes(item.label)),
+      items: navItems.filter((item) => ['Profile'].includes(item.label)),
     },
-  ].filter(section => section.items.length > 0);
+  ].filter((section) => section.items.length > 0);
 
   return (
     <SidebarProvider defaultOpen>
@@ -380,8 +394,12 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
               className="size-12 shrink-0 object-contain transition group-data-[collapsible=icon]:size-8"
             />
             <div className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
-              <p className="truncate text-sm font-bold text-sidebar-foreground">Malamal Dashboard</p>
-              <p className="truncate text-xs font-medium text-sidebar-foreground/65">{roleConfig.eyebrow}</p>
+              <p className="truncate text-sm font-bold text-sidebar-foreground">
+                Malamal Dashboard
+              </p>
+              <p className="truncate text-xs font-medium text-sidebar-foreground/65">
+                {roleConfig.eyebrow}
+              </p>
             </div>
           </Link>
           <div className="flex items-center gap-2 rounded-lg border border-primary/15 bg-primary/8 px-3 py-2 text-primary group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2">
@@ -429,13 +447,19 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
                               >
                                 <FileText className="size-4" />
                               </span>
-                              <span className="truncate group-data-[collapsible=icon]:hidden">Pages</span>
+                              <span className="truncate group-data-[collapsible=icon]:hidden">
+                                Pages
+                              </span>
                               <ChevronDown className="ml-auto size-4 opacity-70 group-data-[collapsible=icon]:hidden" />
                             </span>
                           </SidebarMenuButton>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start" side="right" className="w-52">
-                          {pageManagementItems.map(item => (
+                        <DropdownMenuContent
+                          align="start"
+                          side="right"
+                          className="w-52"
+                        >
+                          {pageManagementItems.map((item) => (
                             <DropdownMenuItem key={item.href} asChild>
                               <Link href={item.href}>{item.label}</Link>
                             </DropdownMenuItem>
@@ -444,10 +468,11 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
                       </DropdownMenu>
                     </SidebarMenuItem>
                   ) : null}
-                  {section.items.map(item => {
+                  {section.items.map((item) => {
                     const active =
                       pathname === item.href ||
-                      (item.href !== `/dashboard/${normalizedRole}` && pathname.startsWith(`${item.href}/`));
+                      (item.href !== `/dashboard/${normalizedRole}` &&
+                        pathname.startsWith(`${item.href}/`));
 
                     return (
                       <SidebarMenuItem key={item.href}>
@@ -462,7 +487,10 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
                               : 'text-sidebar-foreground/75 hover:border-sidebar-border/70 hover:bg-sidebar-accent/70 hover:text-sidebar-foreground',
                           )}
                         >
-                          <Link href={item.href} className="flex items-center gap-3">
+                          <Link
+                            href={item.href}
+                            className="flex items-center gap-3"
+                          >
                             <span
                               className={cn(
                                 'flex size-8 shrink-0 items-center justify-center rounded-md transition',
@@ -514,12 +542,16 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
                 </span>
               </div>
               <h1 className="mt-1 truncate text-base font-semibold text-foreground">{`${getRoleLabel(role)} dashboard`}</h1>
-              <p className="truncate text-sm text-muted-foreground">{roleConfig.description}</p>
+              <p className="truncate text-sm text-muted-foreground">
+                {roleConfig.description}
+              </p>
             </div>
           </div>
         </header>
 
-        <div className="min-h-[calc(100vh-4rem)] bg-muted/20 px-4 py-6 md:px-6">{children}</div>
+        <div className="min-h-[calc(100vh-4rem)] bg-muted/20 px-4 py-6 md:px-6">
+          {children}
+        </div>
       </SidebarInset>
     </SidebarProvider>
   );

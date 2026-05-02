@@ -1,13 +1,13 @@
-"use server";
+'use server';
 
-import { revalidateTag } from "next/cache";
-import { requestBackendJson } from "@/lib/backend-api";
-import { CACHE_TAGS } from "@/lib/cache-tags";
+import { revalidateTag } from 'next/cache';
+import { requestBackendJson } from '@/lib/backend-api';
+import { CACHE_TAGS } from '@/lib/cache-tags';
 import {
   getValidAccessTokenForServerActions,
   getValidAccessTokenForServerHandlerGet,
-} from "@/lib/getValidAccessToken";
-import type { Coupon, CouponDiscountType } from "@/lib/coupons";
+} from '@/lib/getValidAccessToken';
+import type { Coupon, CouponDiscountType } from '@/lib/coupons';
 
 type BackendEnvelope<T> = {
   success?: boolean;
@@ -53,15 +53,15 @@ const toIsoDateString = (value: string | Date) => {
 const normalizeCouponPayload = (payload: Partial<CouponMutationPayload>) => {
   const normalized: Record<string, unknown> = {};
 
-  if (typeof payload.code === "string") {
+  if (typeof payload.code === 'string') {
     normalized.code = payload.code.trim().toUpperCase();
   }
 
-  if (typeof payload.label === "string") {
+  if (typeof payload.label === 'string') {
     normalized.label = payload.label.trim();
   }
 
-  if (typeof payload.description === "string") {
+  if (typeof payload.description === 'string') {
     const description = normalizeOptionalText(payload.description);
 
     if (description) {
@@ -69,19 +69,19 @@ const normalizeCouponPayload = (payload: Partial<CouponMutationPayload>) => {
     }
   }
 
-  if (typeof payload.discountType === "string") {
+  if (typeof payload.discountType === 'string') {
     normalized.discountType = payload.discountType;
   }
 
   if (
-    typeof payload.discountValue === "number" &&
+    typeof payload.discountValue === 'number' &&
     Number.isFinite(payload.discountValue)
   ) {
     normalized.discountValue = payload.discountValue;
   }
 
   if (
-    typeof payload.minSubtotal === "number" &&
+    typeof payload.minSubtotal === 'number' &&
     Number.isFinite(payload.minSubtotal)
   ) {
     normalized.minSubtotal = payload.minSubtotal;
@@ -89,7 +89,7 @@ const normalizeCouponPayload = (payload: Partial<CouponMutationPayload>) => {
 
   if (
     payload.expiresAt instanceof Date ||
-    typeof payload.expiresAt === "string"
+    typeof payload.expiresAt === 'string'
   ) {
     const expiresAt = toIsoDateString(payload.expiresAt);
 
@@ -98,7 +98,7 @@ const normalizeCouponPayload = (payload: Partial<CouponMutationPayload>) => {
     }
   }
 
-  if (typeof payload.isActive === "boolean") {
+  if (typeof payload.isActive === 'boolean') {
     normalized.isActive = payload.isActive;
   }
 
@@ -111,21 +111,21 @@ export const getAllCoupons = async (
   const accessToken = await getValidAccessTokenForServerHandlerGet();
   const searchParams = new URLSearchParams();
 
-  if (params.page) searchParams.set("page", String(params.page));
-  if (params.limit) searchParams.set("limit", String(params.limit));
+  if (params.page) searchParams.set('page', String(params.page));
+  if (params.limit) searchParams.set('limit', String(params.limit));
   if (params.searchTerm?.trim())
-    searchParams.set("searchTerm", params.searchTerm.trim());
-  if (typeof params.isActive === "boolean")
-    searchParams.set("isActive", String(params.isActive));
+    searchParams.set('searchTerm', params.searchTerm.trim());
+  if (typeof params.isActive === 'boolean')
+    searchParams.set('isActive', String(params.isActive));
   if (params.discountType)
-    searchParams.set("discountType", params.discountType);
+    searchParams.set('discountType', params.discountType);
 
   const query = searchParams.toString();
 
   return requestBackendJson<BackendEnvelope<Coupon[]>>(
-    `/coupon/admin${query ? `?${query}` : ""}`,
+    `/coupon/admin${query ? `?${query}` : ''}`,
     {
-      method: "GET",
+      method: 'GET',
       token: accessToken ?? undefined,
     },
   );
@@ -139,7 +139,7 @@ export const getCouponById = async (
   return requestBackendJson<BackendEnvelope<Coupon>>(
     `/coupon/admin/${couponId}`,
     {
-      method: "GET",
+      method: 'GET',
       token: accessToken ?? undefined,
     },
   );
@@ -150,9 +150,9 @@ export const createCoupon = async (
 ): Promise<BackendEnvelope<Coupon>> => {
   const accessToken = await getValidAccessTokenForServerActions();
   const result = await requestBackendJson<BackendEnvelope<Coupon>>(
-    "/coupon/admin",
+    '/coupon/admin',
     {
-      method: "POST",
+      method: 'POST',
       body: normalizeCouponPayload(payload),
       token: accessToken ?? undefined,
     },
@@ -170,7 +170,7 @@ export const updateCoupon = async (
   const result = await requestBackendJson<BackendEnvelope<Coupon>>(
     `/coupon/admin/${couponId}`,
     {
-      method: "PATCH",
+      method: 'PATCH',
       body: normalizeCouponPayload(payload),
       token: accessToken ?? undefined,
     },
@@ -188,7 +188,7 @@ export const updateCouponStatus = async (
   const result = await requestBackendJson<BackendEnvelope<Coupon>>(
     `/coupon/admin/${couponId}/status`,
     {
-      method: "PATCH",
+      method: 'PATCH',
       body: { isActive },
       token: accessToken ?? undefined,
     },
@@ -205,7 +205,7 @@ export const deleteCoupon = async (
   const result = await requestBackendJson<BackendEnvelope<Coupon>>(
     `/coupon/admin/${couponId}`,
     {
-      method: "DELETE",
+      method: 'DELETE',
       token: accessToken ?? undefined,
     },
   );

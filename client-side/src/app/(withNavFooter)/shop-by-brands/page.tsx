@@ -1,13 +1,13 @@
-import Image from "next/image";
-import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
-import { Card } from "@/components/ui/card";
-import { SeoScripts } from "@/components/SeoScripts";
-import { buildShopByBrandsSchemas, shopByBrandsMetadata } from "@/lib/seo";
+import Image from 'next/image';
+import Link from 'next/link';
+import { ArrowUpRight } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { SeoScripts } from '@/components/SeoScripts';
+import { buildShopByBrandsSchemas, shopByBrandsMetadata } from '@/lib/seo';
 import {
   getActiveBrands,
   mapBackendBrandToStorefrontBrand,
-} from "@/services/Brand";
+} from '@/services/Brand';
 
 export const metadata = shopByBrandsMetadata;
 

@@ -1,4 +1,4 @@
-import { formatPriceLabelWithUnit, type CartItem } from "@/lib/cart";
+import { formatPriceLabelWithUnit, type CartItem } from '@/lib/cart';
 
 type BackendCartItemLike = {
   product?: unknown;
@@ -21,8 +21,8 @@ type BackendCartItemLike = {
 };
 
 function getProductId(product: unknown) {
-  if (!product || typeof product !== "object") {
-    return typeof product === "string" ? product : undefined;
+  if (!product || typeof product !== 'object') {
+    return typeof product === 'string' ? product : undefined;
   }
 
   const value = product as { _id?: string; id?: string };
@@ -40,7 +40,7 @@ function mapBackendCartItem(item: BackendCartItemLike): CartItem | null {
     productId,
     sku: item.productSnapshot.sku,
     title: item.productSnapshot.title,
-    href: "/shop",
+    href: '/shop',
     image: item.productSnapshot.image,
     brand: item.productSnapshot.brand,
     unitPrice: item.priceSnapshot,
@@ -57,7 +57,7 @@ function mapBackendCartItem(item: BackendCartItemLike): CartItem | null {
   };
 }
 
-function getItemKey(item: Pick<CartItem, "productId" | "sku">) {
+function getItemKey(item: Pick<CartItem, 'productId' | 'sku'>) {
   return item.productId ?? item.sku;
 }
 
@@ -75,7 +75,7 @@ export function mergeBackendCartIntoLocalItems(
     return localItems;
   }
 
-  const localMap = new Map(localItems.map(item => [getItemKey(item), item]));
+  const localMap = new Map(localItems.map((item) => [getItemKey(item), item]));
   const merged: CartItem[] = [];
   const handled = new Set<string>();
 

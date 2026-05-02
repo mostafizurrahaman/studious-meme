@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useActionState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { useUser } from "@/context/UserContext";
+import { useActionState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { useUser } from '@/context/UserContext';
 import {
   submitSignOut,
   type SignOutState,
-} from "@/app/(withNavFooter)/my-account/actions";
-import { Button } from "@/components/ui/button";
+} from '@/app/(withNavFooter)/my-account/actions';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,13 +16,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
 import {
   getDashboardPathByRole,
   getProfilePathByRole,
   getRoleLabel,
-} from "@/lib/auth/roles";
-import { UserAvatar } from "@/components/UserAvatar";
+} from '@/lib/auth/roles';
+import { UserAvatar } from '@/components/UserAvatar';
 
 type UserDropdownMenuProps = {
   compact?: boolean;
@@ -37,7 +37,7 @@ export function UserDropdownMenu({ compact = false }: UserDropdownMenuProps) {
     FormData
   >(submitSignOut, {
     ok: false,
-    message: "",
+    message: '',
   });
 
   useEffect(() => {
@@ -47,7 +47,7 @@ export function UserDropdownMenu({ compact = false }: UserDropdownMenuProps) {
 
     setUser(null);
     setIsLoading(false);
-    router.replace("/my-account");
+    router.replace('/my-account');
   }, [logoutState, router, setIsLoading, setUser]);
 
   const user = contextUser;
@@ -57,21 +57,21 @@ export function UserDropdownMenu({ compact = false }: UserDropdownMenuProps) {
       <Button
         asChild
         variant="secondary"
-        className={compact ? "h-10 w-10 rounded-full p-0" : "rounded-full px-4"}
+        className={compact ? 'h-10 w-10 rounded-full p-0' : 'rounded-full px-4'}
       >
         <Link
           href="/my-account"
           aria-label="My account"
           className="text-white!"
         >
-          {compact ? "👤" : "Sign in"}
+          {compact ? '👤' : 'Sign in'}
         </Link>
       </Button>
     );
   }
 
-  const dashboardPath = getDashboardPathByRole(user.role) ?? "/dashboard";
-  const profilePath = getProfilePathByRole(user.role) ?? "/my-account";
+  const dashboardPath = getDashboardPathByRole(user.role) ?? '/dashboard';
+  const profilePath = getProfilePathByRole(user.role) ?? '/my-account';
 
   return (
     <DropdownMenu>
@@ -80,8 +80,8 @@ export function UserDropdownMenu({ compact = false }: UserDropdownMenuProps) {
           variant="ghost"
           className={
             compact
-              ? "h-10 w-10 rounded-full p-0"
-              : "h-auto rounded-full px-2 py-1.5"
+              ? 'h-10 w-10 rounded-full p-0'
+              : 'h-auto rounded-full px-2 py-1.5'
           }
         >
           <UserAvatar name={user.name} image={user.image} className="size-8" />
@@ -126,7 +126,7 @@ export function UserDropdownMenu({ compact = false }: UserDropdownMenuProps) {
           disabled={logoutPending}
           className="w-full rounded-md px-2 py-1.5 text-left text-xs text-destructive hover:bg-destructive/10 disabled:opacity-60"
         >
-          {logoutPending ? "Logging out..." : "Logout"}
+          {logoutPending ? 'Logging out...' : 'Logout'}
         </button>
         <form
           ref={logoutFormRef}

@@ -1,26 +1,26 @@
-import { Router } from "express";
+import { Router } from 'express';
 import {
   adminLimiter,
   auth,
   burstProtection,
   publicLimiter,
   validateRequestFromFormData,
-} from "../../middlewares";
-import { multerUpload } from "../../lib";
-import { ROLE } from "../User/user.constant";
-import { CategoryController } from "./category.controller";
-import { CategoryValidation } from "./category.validation";
+} from '../../middlewares';
+import { multerUpload } from '../../lib';
+import { ROLE } from '../User/user.constant';
+import { CategoryController } from './category.controller';
+import { CategoryValidation } from './category.validation';
 
 const router = Router();
 
 // 1. createCategory
 router
-  .route("/categories")
+  .route('/categories')
   .post(
     auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
     adminLimiter,
-    burstProtection("admin", 10_000, 15),
-    multerUpload.single("image"),
+    burstProtection('admin', 10_000, 15),
+    multerUpload.single('image'),
     validateRequestFromFormData(CategoryValidation.categoryCreateSchema),
     CategoryController.createCategory,
   )
@@ -28,21 +28,21 @@ router
 
 // 2. public active categories
 router
-  .route("/categories/active")
+  .route('/categories/active')
   .get(publicLimiter, CategoryController.getActiveCategories);
 router
-  .route("/categories/active/:slug")
+  .route('/categories/active/:slug')
   .get(publicLimiter, CategoryController.getActiveCategory);
 
 // 2. getCategory, updateCategory, deleteCategory
 router
-  .route("/categories/:slug")
+  .route('/categories/:slug')
   .get(publicLimiter, CategoryController.getCategory)
   .patch(
     auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
     adminLimiter,
-    burstProtection("admin", 10_000, 15),
-    multerUpload.single("image"),
+    burstProtection('admin', 10_000, 15),
+    multerUpload.single('image'),
     validateRequestFromFormData(CategoryValidation.categoryUpdateSchema),
     CategoryController.updateCategory,
   )
@@ -54,12 +54,12 @@ router
 
 // 3. createCategorySubCategory
 router
-  .route("/categories/:slug/sub-categories")
+  .route('/categories/:slug/sub-categories')
   .post(
     auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
     adminLimiter,
-    burstProtection("admin", 10_000, 15),
-    multerUpload.single("image"),
+    burstProtection('admin', 10_000, 15),
+    multerUpload.single('image'),
     validateRequestFromFormData(
       CategoryValidation.categorySubCategoryCreateSchema,
     ),
@@ -68,12 +68,12 @@ router
 
 // 4. updateCategorySubCategory, deleteCategorySubCategory
 router
-  .route("/categories/:slug/sub-categories/:subCategorySlug")
+  .route('/categories/:slug/sub-categories/:subCategorySlug')
   .patch(
     auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
     adminLimiter,
-    burstProtection("admin", 10_000, 15),
-    multerUpload.single("image"),
+    burstProtection('admin', 10_000, 15),
+    multerUpload.single('image'),
     validateRequestFromFormData(
       CategoryValidation.categorySubCategoryUpdateSchema,
     ),

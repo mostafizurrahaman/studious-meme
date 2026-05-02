@@ -15,7 +15,10 @@ export type CodEligibilityInput = {
 };
 
 const normalizeDeliveryArea = (value?: TShippingZone | TDeliveryArea) => {
-  if (value === DELIVERY_AREA.INSIDE_DHAKA || value === SHIPPING_ZONE.INSIDE_DHAKA) {
+  if (
+    value === DELIVERY_AREA.INSIDE_DHAKA ||
+    value === SHIPPING_ZONE.INSIDE_DHAKA
+  ) {
     return SHIPPING_ZONE.INSIDE_DHAKA;
   }
 
@@ -29,7 +32,9 @@ export function normalizeText(value?: string) {
 export function deriveShippingZone(city?: string): TShippingZone {
   const selectedDistrict = normalizeText(city);
 
-  return selectedDistrict === 'dhaka' ? SHIPPING_ZONE.INSIDE_DHAKA : SHIPPING_ZONE.OUTSIDE_DHAKA;
+  return selectedDistrict === 'dhaka'
+    ? SHIPPING_ZONE.INSIDE_DHAKA
+    : SHIPPING_ZONE.OUTSIDE_DHAKA;
 }
 
 export function calculateShippingCharge({
@@ -55,7 +60,10 @@ export function calculateShippingCharge({
   return rules.baseCharge + extraKg * rules.additionalCharge;
 }
 
-export function calculateCodEligibility({ subtotal, itemBlocksCod }: CodEligibilityInput) {
+export function calculateCodEligibility({
+  subtotal,
+  itemBlocksCod,
+}: CodEligibilityInput) {
   const reasons: string[] = [];
 
   if (!Number.isFinite(subtotal) || subtotal <= COD_MIN_SUBTOTAL_BDT) {

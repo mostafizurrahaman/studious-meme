@@ -1,10 +1,21 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, type ComponentProps } from 'react';
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ComponentProps,
+} from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
-import { Controller, useForm, type FieldErrors, type FieldValues } from 'react-hook-form';
+import {
+  Controller,
+  useForm,
+  type FieldErrors,
+  type FieldValues,
+} from 'react-hook-form';
 import { type z } from 'zod';
 import { OTPInput, type SlotProps, REGEXP_ONLY_DIGITS } from 'input-otp';
 import {
@@ -33,10 +44,18 @@ type SignInValues = z.infer<typeof authFormSchemas.signIn>;
 type SignUpValues = z.infer<typeof authFormSchemas.signUp>;
 type OtpValues = z.infer<typeof authFormSchemas.otp>;
 type ForgotPasswordValues = z.infer<typeof authFormSchemas.forgotPassword>;
-type ForgotPasswordOtpValues = z.infer<typeof authFormSchemas.forgotPasswordOtp>;
-type ForgotPasswordResetValues = z.infer<typeof authFormSchemas.forgotPasswordReset>;
+type ForgotPasswordOtpValues = z.infer<
+  typeof authFormSchemas.forgotPasswordOtp
+>;
+type ForgotPasswordResetValues = z.infer<
+  typeof authFormSchemas.forgotPasswordReset
+>;
 
-function LabeledInput({ id, label, ...props }: ComponentProps<typeof Input> & { id: string; label: string }) {
+function LabeledInput({
+  id,
+  label,
+  ...props
+}: ComponentProps<typeof Input> & { id: string; label: string }) {
   return (
     <div className="grid gap-2">
       <label htmlFor={id} className="text-sm font-medium">
@@ -134,7 +153,9 @@ function OtpSlot(props: SlotProps) {
           : 'border-border/80 bg-background text-secondary'
       }`}
     >
-      <span className={props.char ? 'opacity-100' : 'opacity-35'}>{props.char ?? props.placeholderChar}</span>
+      <span className={props.char ? 'opacity-100' : 'opacity-35'}>
+        {props.char ?? props.placeholderChar}
+      </span>
       {props.hasFakeCaret ? (
         <span className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <span className="h-8 w-px animate-pulse bg-primary" />
@@ -170,7 +191,7 @@ function OtpInputField({
         onComplete={onComplete}
         inputMode="numeric"
         pattern={REGEXP_ONLY_DIGITS}
-        pasteTransformer={pasted => pasted.replace(/\D/g, '').slice(0, 6)}
+        pasteTransformer={(pasted) => pasted.replace(/\D/g, '').slice(0, 6)}
         containerClassName="group mx-auto flex w-fit items-center justify-center gap-2 sm:gap-3"
         render={({ slots }) => (
           <>
@@ -180,7 +201,9 @@ function OtpInputField({
           </>
         )}
       />
-      <p className="text-center text-xs text-foreground/50">Paste the full code or type it digit by digit.</p>
+      <p className="text-center text-xs text-foreground/50">
+        Paste the full code or type it digit by digit.
+      </p>
     </div>
   );
 }
@@ -190,26 +213,33 @@ export function MyAccountAuthForm() {
   const searchParams = useSearchParams();
   const { setIsLoading } = useUser();
   const [view, setView] = useState<
-    'signin' | 'signup' | 'signup-otp' | 'forgot-email' | 'forgot-otp' | 'forgot-reset'
+    | 'signin'
+    | 'signup'
+    | 'signup-otp'
+    | 'forgot-email'
+    | 'forgot-otp'
+    | 'forgot-reset'
   >('signin');
   const [showSigninPassword, setShowSigninPassword] = useState(false);
   const [showSignupPassword, setShowSignupPassword] = useState(false);
-  const [showSignupConfirmPassword, setShowSignupConfirmPassword] = useState(false);
+  const [showSignupConfirmPassword, setShowSignupConfirmPassword] =
+    useState(false);
   const [showResetPassword, setShowResetPassword] = useState(false);
-  const [showResetConfirmPassword, setShowResetConfirmPassword] = useState(false);
+  const [showResetConfirmPassword, setShowResetConfirmPassword] =
+    useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [signupEmail, setSignupEmail] = useState('');
   const [forgotEmail, setForgotEmail] = useState('');
   const authNoticeShownRef = useRef('');
   const checkoutNoticeShownRef = useRef('');
-  const guestCartItems = useCartStore(state => state.items);
-  const replaceItems = useCartStore(state => state.replaceItems);
+  const guestCartItems = useCartStore((state) => state.items);
+  const replaceItems = useCartStore((state) => state.replaceItems);
   const guestCartJson = useMemo(
     () =>
       JSON.stringify(
         guestCartItems
-          .map(item => {
+          .map((item) => {
             const syncedQuantity = item.syncedQuantity ?? 0;
             const quantity = item.quantity - syncedQuantity;
 
@@ -302,7 +332,10 @@ export function MyAccountAuthForm() {
       }
     }
 
-    if (safeRedirect?.startsWith('/checkout') && checkoutNoticeShownRef.current !== safeRedirect) {
+    if (
+      safeRedirect?.startsWith('/checkout') &&
+      checkoutNoticeShownRef.current !== safeRedirect
+    ) {
       checkoutNoticeShownRef.current = safeRedirect;
       toast.info('Sign in to place your order.');
     }
@@ -352,7 +385,7 @@ export function MyAccountAuthForm() {
             <form
               key="signin-form"
               className="grid gap-4"
-              onSubmit={signInForm.handleSubmit(async values => {
+              onSubmit={signInForm.handleSubmit(async (values) => {
                 setIsSubmitting(true);
                 const result = await submitSignIn(
                   initialState,
@@ -362,7 +395,9 @@ export function MyAccountAuthForm() {
 
                 if (!result.ok) {
                   toast.error(result.message);
-                  if (result.message.toLowerCase().includes('verify your account')) {
+                  if (
+                    result.message.toLowerCase().includes('verify your account')
+                  ) {
                     setSignupEmail(values.email);
                     setView('signup-otp');
                   }
@@ -372,7 +407,9 @@ export function MyAccountAuthForm() {
                 toast.success(result.message);
                 applyAuthResultCart(result.cartItems);
                 setIsLoading(true);
-                router.push(safeRedirect ?? getPostAuthDestination(result.role));
+                router.push(
+                  safeRedirect ?? getPostAuthDestination(result.role),
+                );
               })}
             >
               <LabeledInput
@@ -390,11 +427,13 @@ export function MyAccountAuthForm() {
                 label="Password"
                 placeholder="Password"
                 autoComplete="current-password"
-                onToggle={() => setShowSigninPassword(value => !value)}
+                onToggle={() => setShowSigninPassword((value) => !value)}
                 visible={showSigninPassword}
                 {...signInForm.register('password')}
               />
-              <ErrorText message={signInForm.formState.errors.password?.message} />
+              <ErrorText
+                message={signInForm.formState.errors.password?.message}
+              />
               <div className="flex flex-wrap items-center gap-3">
                 <Button
                   type="submit"
@@ -417,23 +456,23 @@ export function MyAccountAuthForm() {
             <form
               key="signup-form"
               className="grid gap-4"
-              onSubmit={signUpForm.handleSubmit(
-                async values => {
-                  setIsSubmitting(true);
-                  const result = await submitSignUp(initialState, toFormData(values));
-                  setIsSubmitting(false);
+              onSubmit={signUpForm.handleSubmit(async (values) => {
+                setIsSubmitting(true);
+                const result = await submitSignUp(
+                  initialState,
+                  toFormData(values),
+                );
+                setIsSubmitting(false);
 
-                  if (!result.ok) {
-                    toast.error(result.message);
-                    return;
-                  }
+                if (!result.ok) {
+                  toast.error(result.message);
+                  return;
+                }
 
-                  toast.success(result.message);
-                  setSignupEmail(result.email);
-                  setView('signup-otp');
-                },
-                showFirstFormError,
-              )}
+                toast.success(result.message);
+                setSignupEmail(result.email);
+                setView('signup-otp');
+              }, showFirstFormError)}
             >
               <LabeledInput
                 id="signup-name"
@@ -458,21 +497,25 @@ export function MyAccountAuthForm() {
                 label="Password"
                 placeholder="Password"
                 autoComplete="new-password"
-                onToggle={() => setShowSignupPassword(value => !value)}
+                onToggle={() => setShowSignupPassword((value) => !value)}
                 visible={showSignupPassword}
                 {...signUpForm.register('password')}
               />
-              <ErrorText message={signUpForm.formState.errors.password?.message} />
+              <ErrorText
+                message={signUpForm.formState.errors.password?.message}
+              />
               <PasswordField
                 id="signup-confirm-password"
                 label="Confirm password"
                 placeholder="Confirm password"
                 autoComplete="new-password"
-                onToggle={() => setShowSignupConfirmPassword(value => !value)}
+                onToggle={() => setShowSignupConfirmPassword((value) => !value)}
                 visible={showSignupConfirmPassword}
                 {...signUpForm.register('confirmPassword')}
               />
-              <ErrorText message={signUpForm.formState.errors.confirmPassword?.message} />
+              <ErrorText
+                message={signUpForm.formState.errors.confirmPassword?.message}
+              />
               <Button
                 type="submit"
                 disabled={isSubmitting}
@@ -485,7 +528,7 @@ export function MyAccountAuthForm() {
             <form
               key="signup-otp-form"
               className="grid gap-4"
-              onSubmit={otpForm.handleSubmit(async values => {
+              onSubmit={otpForm.handleSubmit(async (values) => {
                 setIsSubmitting(true);
                 const result = await submitSignupOtp(
                   initialState,
@@ -505,7 +548,9 @@ export function MyAccountAuthForm() {
                 toast.success(result.message);
                 applyAuthResultCart(result.cartItems);
                 setIsLoading(true);
-                router.push(safeRedirect ?? getPostAuthDestination(result.role));
+                router.push(
+                  safeRedirect ?? getPostAuthDestination(result.role),
+                );
               })}
             >
               <LabeledInput
@@ -521,7 +566,11 @@ export function MyAccountAuthForm() {
                 control={otpForm.control}
                 name="otp"
                 render={({ field }) => (
-                  <OtpInputField label="OTP code" value={field.value} onChange={field.onChange} />
+                  <OtpInputField
+                    label="OTP code"
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
                 )}
               />
               <ErrorText message={otpForm.formState.errors.otp?.message} />
@@ -546,13 +595,19 @@ export function MyAccountAuthForm() {
                         toast.error(result?.message ?? 'Failed to resend OTP.');
                         return;
                       }
-                      toast.success(result.message ?? 'OTP sent again successfully.');
+                      toast.success(
+                        result.message ?? 'OTP sent again successfully.',
+                      );
                     })();
                   }}
                 >
                   {isResending ? 'Sending...' : 'Resend OTP'}
                 </Button>
-                <Button type="button" variant="ghost" onClick={() => setView('signin')}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setView('signin')}
+                >
                   Back to login
                 </Button>
               </div>
@@ -561,7 +616,7 @@ export function MyAccountAuthForm() {
             <form
               key="forgot-email-form"
               className="grid gap-4"
-              onSubmit={forgotPasswordForm.handleSubmit(async values => {
+              onSubmit={forgotPasswordForm.handleSubmit(async (values) => {
                 setIsSubmitting(true);
                 const result = await submitForgotPassword(
                   { ok: false, message: '', step: 'email' },
@@ -570,7 +625,11 @@ export function MyAccountAuthForm() {
                 setIsSubmitting(false);
 
                 if (!result.ok) {
-                  if (result.message.toLowerCase().includes('last otp is valid till now')) {
+                  if (
+                    result.message
+                      .toLowerCase()
+                      .includes('last otp is valid till now')
+                  ) {
                     toast.info(result.message);
                     setForgotEmail(values.email);
                     setView('forgot-otp');
@@ -595,7 +654,9 @@ export function MyAccountAuthForm() {
                 autoComplete="email"
                 className="h-11 px-4 text-sm"
               />
-              <ErrorText message={forgotPasswordForm.formState.errors.email?.message} />
+              <ErrorText
+                message={forgotPasswordForm.formState.errors.email?.message}
+              />
               <div className="flex flex-wrap gap-3">
                 <Button
                   type="submit"
@@ -604,7 +665,11 @@ export function MyAccountAuthForm() {
                 >
                   {isSubmitting ? 'Sending OTP...' : 'Send OTP'}
                 </Button>
-                <Button type="button" variant="ghost" onClick={() => setView('signin')}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setView('signin')}
+                >
                   Back to login
                 </Button>
               </div>
@@ -613,7 +678,7 @@ export function MyAccountAuthForm() {
             <form
               key="forgot-otp-form"
               className="grid gap-4"
-              onSubmit={forgotPasswordOtpForm.handleSubmit(async values => {
+              onSubmit={forgotPasswordOtpForm.handleSubmit(async (values) => {
                 setIsSubmitting(true);
                 const result = await submitForgotPasswordOtp(
                   { ok: false, message: '', step: 'otp' },
@@ -643,10 +708,16 @@ export function MyAccountAuthForm() {
                 control={forgotPasswordOtpForm.control}
                 name="otp"
                 render={({ field }) => (
-                  <OtpInputField label="OTP code" value={field.value} onChange={field.onChange} />
+                  <OtpInputField
+                    label="OTP code"
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
                 )}
               />
-              <ErrorText message={forgotPasswordOtpForm.formState.errors.otp?.message} />
+              <ErrorText
+                message={forgotPasswordOtpForm.formState.errors.otp?.message}
+              />
               <div className="flex flex-wrap gap-3">
                 <Button
                   type="submit"
@@ -668,13 +739,19 @@ export function MyAccountAuthForm() {
                         toast.error(result?.message ?? 'Failed to resend OTP.');
                         return;
                       }
-                      toast.success(result.message ?? 'OTP sent again successfully.');
+                      toast.success(
+                        result.message ?? 'OTP sent again successfully.',
+                      );
                     })();
                   }}
                 >
                   {isResending ? 'Sending...' : 'Resend OTP'}
                 </Button>
-                <Button type="button" variant="ghost" onClick={() => setView('forgot-email')}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setView('forgot-email')}
+                >
                   Back
                 </Button>
               </div>
@@ -683,7 +760,7 @@ export function MyAccountAuthForm() {
             <form
               key="forgot-reset-form"
               className="grid gap-4"
-              onSubmit={forgotPasswordResetForm.handleSubmit(async values => {
+              onSubmit={forgotPasswordResetForm.handleSubmit(async (values) => {
                 setIsSubmitting(true);
                 const result = await submitResetPassword(
                   { ok: false, message: '', step: 'reset' },
@@ -706,28 +783,40 @@ export function MyAccountAuthForm() {
             >
               <div className="rounded-2xl border border-dashed border-border px-4 py-3 text-sm text-foreground/65">
                 Set a new password for{' '}
-                <span className="font-semibold text-secondary">{forgotEmail || 'your account'}</span>.
+                <span className="font-semibold text-secondary">
+                  {forgotEmail || 'your account'}
+                </span>
+                .
               </div>
               <PasswordField
                 id="reset-password"
                 label="New password"
                 placeholder="New password"
                 autoComplete="new-password"
-                onToggle={() => setShowResetPassword(value => !value)}
+                onToggle={() => setShowResetPassword((value) => !value)}
                 visible={showResetPassword}
                 {...forgotPasswordResetForm.register('newPassword')}
               />
-              <ErrorText message={forgotPasswordResetForm.formState.errors.newPassword?.message} />
+              <ErrorText
+                message={
+                  forgotPasswordResetForm.formState.errors.newPassword?.message
+                }
+              />
               <PasswordField
                 id="reset-confirm-password"
                 label="Confirm password"
                 placeholder="Confirm password"
                 autoComplete="new-password"
-                onToggle={() => setShowResetConfirmPassword(value => !value)}
+                onToggle={() => setShowResetConfirmPassword((value) => !value)}
                 visible={showResetConfirmPassword}
                 {...forgotPasswordResetForm.register('confirmPassword')}
               />
-              <ErrorText message={forgotPasswordResetForm.formState.errors.confirmPassword?.message} />
+              <ErrorText
+                message={
+                  forgotPasswordResetForm.formState.errors.confirmPassword
+                    ?.message
+                }
+              />
               <div className="flex flex-wrap gap-3">
                 <Button
                   type="submit"
@@ -736,7 +825,11 @@ export function MyAccountAuthForm() {
                 >
                   {isSubmitting ? 'Saving...' : 'Reset password'}
                 </Button>
-                <Button type="button" variant="ghost" onClick={() => setView('signin')}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setView('signin')}
+                >
                   Back to login
                 </Button>
               </div>
@@ -761,7 +854,7 @@ export function MyAccountAuthForm() {
       <Card className="border-0 bg-secondary p-6 text-secondary-foreground shadow-sm">
         <h2 className="text-2xl font-black">Why create an account</h2>
         <div className="mt-4 space-y-3 text-sm text-secondary-foreground/80">
-          {accountBenefits.map(item => (
+          {accountBenefits.map((item) => (
             <div key={item} className="rounded-2xl bg-white/10 px-4 py-3">
               {item}
             </div>

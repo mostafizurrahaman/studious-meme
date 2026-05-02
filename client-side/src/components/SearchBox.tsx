@@ -17,7 +17,10 @@ export function SearchBox() {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
@@ -55,7 +58,10 @@ export function SearchBox() {
 
   const visibleResults = query.trim().length >= 2 ? results : null;
   const showDropdown =
-    isOpen && visibleResults && (visibleResults.products.length > 0 || visibleResults.suggestions.length > 0);
+    isOpen &&
+    visibleResults &&
+    (visibleResults.products.length > 0 ||
+      visibleResults.suggestions.length > 0);
 
   return (
     <div ref={wrapperRef} className="relative w-full">
@@ -65,17 +71,23 @@ export function SearchBox() {
           <input
             type="text"
             value={query}
-            onChange={e => setQuery(e.target.value)}
+            onChange={(e) => setQuery(e.target.value)}
             onFocus={() => query.trim().length >= 2 && setIsOpen(true)}
             placeholder="Search…"
             className="h-11 w-full bg-transparent px-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
             aria-label="Search"
           />
-          {isLoading && <Loader2 className="mr-4 h-4 w-4 animate-spin text-muted-foreground" />}
+          {isLoading && (
+            <Loader2 className="mr-4 h-4 w-4 animate-spin text-muted-foreground" />
+          )}
         </div>
 
         <Link
-          href={query.trim().length >= 2 ? `/shop?searchTerm=${encodeURIComponent(query)}` : '/shop'}
+          href={
+            query.trim().length >= 2
+              ? `/shop?searchTerm=${encodeURIComponent(query)}`
+              : '/shop'
+          }
           className="flex h-11 shrink-0 items-center bg-secondary px-3 text-sm font-semibold text-secondary-foreground! hover:bg-secondary/80"
         >
           Search

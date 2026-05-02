@@ -29,7 +29,8 @@ export function OrderDetailAdminClient({
     return <div className="p-4 text-muted-foreground">Order not found</div>;
   }
 
-  const activeIndex = order.status === 'DELIVERED' ? 2 : order.status === 'PROCESSING' ? 1 : 0;
+  const activeIndex =
+    order.status === 'DELIVERED' ? 2 : order.status === 'PROCESSING' ? 1 : 0;
 
   return (
     <div className="space-y-6">
@@ -38,10 +39,16 @@ export function OrderDetailAdminClient({
         <div>
           <h2 className="text-2xl font-bold">{order.orderId}</h2>
           <div className="mt-2 flex flex-wrap gap-3 text-sm text-muted-foreground">
-            <span className="cursor-help" title={formatDashboardDate(order.createdAt, { time: true })}>
+            <span
+              className="cursor-help"
+              title={formatDashboardDate(order.createdAt, { time: true })}
+            >
               {formatDashboardDate(order.createdAt)}
             </span>
-            <span className="cursor-help" title={formatDashboardDate(order.updatedAt, { time: true })}>
+            <span
+              className="cursor-help"
+              title={formatDashboardDate(order.updatedAt, { time: true })}
+            >
               {formatDashboardDate(order.updatedAt)}
             </span>
             <span className="font-medium">{order.status}</span>
@@ -65,10 +72,14 @@ export function OrderDetailAdminClient({
               key={step.key}
               className={`rounded-xl border p-4 ${isActive ? 'border-primary/30 bg-background' : 'border-border bg-background/50'}`}
             >
-              <div className={`text-sm font-semibold ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
+              <div
+                className={`text-sm font-semibold ${isActive ? 'text-primary' : 'text-muted-foreground'}`}
+              >
                 {step.label}
               </div>
-              <div className="mt-1 text-xs text-muted-foreground">{isActive ? 'Completed' : 'Pending'}</div>
+              <div className="mt-1 text-xs text-muted-foreground">
+                {isActive ? 'Completed' : 'Pending'}
+              </div>
             </div>
           );
         })}
@@ -81,19 +92,24 @@ export function OrderDetailAdminClient({
         </CardHeader>
         <CardContent className="grid gap-2 text-sm">
           <div>
-            <span className="font-medium">Name:</span> {order.customer.name || '-'}
+            <span className="font-medium">Name:</span>{' '}
+            {order.customer.name || '-'}
           </div>
           <div>
-            <span className="font-medium">Phone:</span> {order.customer.phone || '-'}
+            <span className="font-medium">Phone:</span>{' '}
+            {order.customer.phone || '-'}
           </div>
           <div>
-            <span className="font-medium">Email:</span> {order.customer.email || '-'}
+            <span className="font-medium">Email:</span>{' '}
+            {order.customer.email || '-'}
           </div>
           <div>
-            <span className="font-medium">Address:</span> {order.customer.address || '-'}
+            <span className="font-medium">Address:</span>{' '}
+            {order.customer.address || '-'}
           </div>
           <div>
-            <span className="font-medium">City:</span> {order.customer.city || '-'}
+            <span className="font-medium">City:</span>{' '}
+            {order.customer.city || '-'}
           </div>
         </CardContent>
       </Card>
@@ -101,10 +117,12 @@ export function OrderDetailAdminClient({
       {/* Items */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Items ({order.items.length})</CardTitle>
+          <CardTitle className="text-lg">
+            Items ({order.items.length})
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          {order.items.map(item => (
+          {order.items.map((item) => (
             <div key={item.sku} className="flex gap-4 rounded-lg border p-3">
               <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-muted">
                 <Image
@@ -122,8 +140,12 @@ export function OrderDetailAdminClient({
                 </div>
               </div>
               <div className="text-right">
-                <div className="font-medium">{formatMoney(item.unitPrice * item.quantity)}</div>
-                <div className="text-sm text-muted-foreground">{formatMoney(item.unitPrice)} each</div>
+                <div className="font-medium">
+                  {formatMoney(item.unitPrice * item.quantity)}
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {formatMoney(item.unitPrice)} each
+                </div>
               </div>
             </div>
           ))}
@@ -152,7 +174,11 @@ export function OrderDetailAdminClient({
             <span>Total</span>
             <span>{formatMoney(order.total)}</span>
           </div>
-          {order.couponCode && <div className="text-muted-foreground">Coupon: {order.couponCode}</div>}
+          {order.couponCode && (
+            <div className="text-muted-foreground">
+              Coupon: {order.couponCode}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useCartStore } from "@/lib/cart-store";
+import Link from 'next/link';
+import { useCartStore } from '@/lib/cart-store';
 
 export function CartCountLink() {
   const count = useCartStore((state) =>

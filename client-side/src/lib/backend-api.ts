@@ -1,11 +1,11 @@
-import { CATALOG_REVALIDATE_SECONDS } from "@/lib/isr";
+import { CATALOG_REVALIDATE_SECONDS } from '@/lib/isr';
 
 type JsonRecord = Record<string, unknown>;
 
 function getBackendApiBase(): string {
   return (process.env.NEXT_PUBLIC_BACKEND_FULL_URL as string).replace(
     /\/$/,
-    "",
+    '',
   );
 }
 
@@ -15,7 +15,7 @@ function isJsonSerializableBody(body: unknown): body is JsonRecord {
     !(body instanceof FormData) &&
     !(body instanceof Blob) &&
     !(body instanceof URLSearchParams) &&
-    typeof body !== "string"
+    typeof body !== 'string'
   );
 }
 
@@ -30,9 +30,9 @@ function isJsonSerializableBody(body: unknown): body is JsonRecord {
 // }
 
 async function readJsonSafely(response: Response): Promise<unknown> {
-  const contentType = response.headers.get("content-type") ?? "";
+  const contentType = response.headers.get('content-type') ?? '';
 
-  if (!contentType.includes("application/json")) {
+  if (!contentType.includes('application/json')) {
     return null;
   }
 
@@ -43,8 +43,8 @@ async function readJsonSafely(response: Response): Promise<unknown> {
   }
 }
 
-interface BackendRequestOptions extends Omit<RequestInit, "body" | "headers"> {
-  body?: RequestInit["body"] | JsonRecord | unknown[];
+interface BackendRequestOptions extends Omit<RequestInit, 'body' | 'headers'> {
+  body?: RequestInit['body'] | JsonRecord | unknown[];
   headers?: HeadersInit;
   token?: string | null;
   baseUrl?: string;
@@ -56,26 +56,26 @@ export async function requestBackendJson<T>(
   options: BackendRequestOptions = {},
 ): Promise<T> {
   const { body, headers, token, baseUrl, ...fetchOptions } = options;
-  const method = String(fetchOptions.method ?? "GET").toUpperCase();
+  const method = String(fetchOptions.method ?? 'GET').toUpperCase();
 
   const requestHeaders = new Headers(headers);
 
   if (token) {
-    requestHeaders.set("Authorization", `Bearer ${token}`);
+    requestHeaders.set('Authorization', `Bearer ${token}`);
   }
 
-  if (isJsonSerializableBody(body) && !requestHeaders.has("Content-Type")) {
-    requestHeaders.set("Content-Type", "application/json");
+  if (isJsonSerializableBody(body) && !requestHeaders.has('Content-Type')) {
+    requestHeaders.set('Content-Type', 'application/json');
   }
 
   const requestBody: BodyInit | undefined = isJsonSerializableBody(body)
     ? JSON.stringify(body)
-    : typeof body === "undefined" || body === null
+    : typeof body === 'undefined' || body === null
       ? undefined
       : (body as BodyInit);
 
   const nextOptions =
-    !token && method === "GET" && !fetchOptions.cache
+    !token && method === 'GET' && !fetchOptions.cache
       ? {
           next: {
             revalidate:
@@ -85,10 +85,13 @@ export async function requestBackendJson<T>(
         }
       : {};
 
-  const cacheOptions = token && method === "GET" && !fetchOptions.cache ? { cache: "no-store" as const } : {};
+  const cacheOptions =
+    token && method === 'GET' && !fetchOptions.cache
+      ? { cache: 'no-store' as const }
+      : {};
 
   const response = await fetch(
-    `${(baseUrl ?? getBackendApiBase()).replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`,
+    `${(baseUrl ?? getBackendApiBase()).replace(/\/$/, '')}${path.startsWith('/') ? path : `/${path}`}`,
     {
       ...fetchOptions,
       ...cacheOptions,

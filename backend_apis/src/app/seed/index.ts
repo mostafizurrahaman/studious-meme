@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
-import config from "../config";
-import { ROLE } from "../modules/User/user.constant";
-import UserModel from "../modules/User/user.model";
-import colors from "colors";
+import config from '../config';
+import { ROLE } from '../modules/User/user.constant';
+import UserModel from '../modules/User/user.model';
+import colors from 'colors';
 
 const superAdminData = {
   role: ROLE.SUPER_ADMIN,
@@ -26,12 +26,12 @@ const seedSuperAdmin = async () => {
     if (!isSuperAdminExist) {
       await UserModel.create(superAdminData);
 
-      console.log(colors.green("SUPER_ADMIN created successfully!").bold);
+      console.log(colors.green('SUPER_ADMIN created successfully!').bold);
     } else {
-      console.log(colors.yellow("SUPER_ADMIN already exists!").bold);
+      console.log(colors.yellow('SUPER_ADMIN already exists!').bold);
     }
   } catch (error) {
-    console.error("Error seeding SUPER_ADMIN:", error);
+    console.error('Error seeding SUPER_ADMIN:', error);
   }
 };
 

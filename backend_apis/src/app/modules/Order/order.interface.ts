@@ -4,7 +4,13 @@ import type { TShippingZone } from './order.constants';
 export type TPaymentMethod = 'CASH_ON_DELIVERY' | 'PORTPOS';
 export type TPaymentMethodInput = TPaymentMethod | 'COD';
 export type TPaymentGateway = 'CASH_ON_DELIVERY' | 'PORTPOS';
-export type TPaymentStatus = 'UNPAID' | 'PENDING_PAYMENT' | 'PAID' | 'FAILED' | 'CANCELLED' | 'REFUNDED';
+export type TPaymentStatus =
+  | 'UNPAID'
+  | 'PENDING_PAYMENT'
+  | 'PAID'
+  | 'FAILED'
+  | 'CANCELLED'
+  | 'REFUNDED';
 export type TOrderStatus =
   | 'PLACED'
   | 'PENDING_PAYMENT'

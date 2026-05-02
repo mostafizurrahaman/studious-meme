@@ -1,17 +1,17 @@
-import type { Metadata } from "next";
-import { DashboardBrandsManager } from "@/components/dashboard/DashboardBrandsManager";
-import { requireDashboardRoles } from "@/lib/dashboard-auth";
-import { buildMetadata } from "@/lib/seo";
-import { getAllBrands } from "@/services/Brand";
+import type { Metadata } from 'next';
+import { DashboardBrandsManager } from '@/components/dashboard/DashboardBrandsManager';
+import { requireDashboardRoles } from '@/lib/dashboard-auth';
+import { buildMetadata } from '@/lib/seo';
+import { getAllBrands } from '@/services/Brand';
 
 export const metadata: Metadata = buildMetadata({
-  title: "Brands",
-  description: "Manage brand directory entries and active status.",
-  path: "/dashboard/admin/brands",
+  title: 'Brands',
+  description: 'Manage brand directory entries and active status.',
+  path: '/dashboard/admin/brands',
   noindex: true,
 });
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 type Props = {
   searchParams: Promise<{ page?: string; limit?: string; searchTerm?: string }>;
@@ -24,11 +24,11 @@ const parsePositiveInteger = (value: string | undefined, fallback: number) => {
 };
 
 export default async function AdminBrandsPage({ searchParams }: Props) {
-  await requireDashboardRoles(["ADMIN", "SUPER_ADMIN"]);
+  await requireDashboardRoles(['ADMIN', 'SUPER_ADMIN']);
   const query = await searchParams;
   const page = parsePositiveInteger(query.page, 1);
   const limit = parsePositiveInteger(query.limit, 50);
-  const searchTerm = query.searchTerm?.trim() ?? "";
+  const searchTerm = query.searchTerm?.trim() ?? '';
   const brandsResult = await getAllBrands({ page, limit, searchTerm }).catch(
     () => null,
   );

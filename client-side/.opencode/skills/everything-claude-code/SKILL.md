@@ -140,8 +140,8 @@ _Preferred import style_
 
 ```typescript
 // Use relative imports
-import { Button } from "../components/Button";
-import { useAuth } from "./hooks/useAuth";
+import { Button } from '../components/Button';
+import { useAuth } from './hooks/useAuth';
 ```
 
 ## Testing
@@ -172,8 +172,8 @@ try {
   const result = await riskyOperation();
   return result;
 } catch (error) {
-  console.error("Operation failed:", error);
-  throw new Error("User-friendly message");
+  console.error('Operation failed:', error);
+  throw new Error('User-friendly message');
 }
 ```
 

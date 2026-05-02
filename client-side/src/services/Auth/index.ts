@@ -1,11 +1,11 @@
-"use server";
+'use server';
 
-import { cookies } from "next/headers";
-import type { FieldValues } from "react-hook-form";
-import { requestBackendJson } from "@/lib/backend-api";
-import { getValidAccessTokenForServerActions } from "@/lib/getValidAccessToken";
-import type { AuthUser } from "@/types";
-import { decodeAuthToken } from "@/lib/auth/session";
+import { cookies } from 'next/headers';
+import type { FieldValues } from 'react-hook-form';
+import { requestBackendJson } from '@/lib/backend-api';
+import { getValidAccessTokenForServerActions } from '@/lib/getValidAccessToken';
+import type { AuthUser } from '@/types';
+import { decodeAuthToken } from '@/lib/auth/session';
 
 type BackendEnvelope<T> = {
   success?: boolean;
@@ -38,19 +38,19 @@ async function getCookieStore() {
 async function setAuthCookies(tokens: AuthTokens) {
   const cookieStore = await getCookieStore();
 
-  cookieStore.set("accessToken", tokens.accessToken, {
+  cookieStore.set('accessToken', tokens.accessToken, {
     httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    path: '/',
   });
 
   if (tokens.refreshToken) {
-    cookieStore.set("refreshToken", tokens.refreshToken, {
+    cookieStore.set('refreshToken', tokens.refreshToken, {
       httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
     });
   }
 }
@@ -58,19 +58,19 @@ async function setAuthCookies(tokens: AuthTokens) {
 async function clearAuthCookies() {
   const cookieStore = await getCookieStore();
 
-  cookieStore.set("accessToken", "", {
+  cookieStore.set('accessToken', '', {
     httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    path: '/',
     maxAge: 0,
   });
 
-  cookieStore.set("refreshToken", "", {
+  cookieStore.set('refreshToken', '', {
     httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    path: '/',
     maxAge: 0,
   });
 }
@@ -78,11 +78,11 @@ async function clearAuthCookies() {
 async function setPasswordFlowCookies(token: string) {
   const cookieStore = await getCookieStore();
 
-  cookieStore.set("forgotPassToken", token, {
+  cookieStore.set('forgotPassToken', token, {
     httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    path: '/',
   });
 }
 
@@ -91,9 +91,9 @@ export const signInUser = async (
   userData: FieldValues,
 ): Promise<BackendEnvelope<AuthTokens>> => {
   const result = await requestBackendJson<BackendEnvelope<AuthTokens>>(
-    "/user/signin",
+    '/user/signin',
     {
-      method: "POST",
+      method: 'POST',
       body: userData as Record<string, unknown>,
     },
   );
@@ -111,9 +111,9 @@ export const signUpUser = async (userData: {
   password: string;
 }): Promise<BackendEnvelope<SignupOtpResponse>> => {
   return requestBackendJson<BackendEnvelope<SignupOtpResponse>>(
-    "/user/signup",
+    '/user/signup',
     {
-      method: "POST",
+      method: 'POST',
       body: userData,
     },
   );
@@ -124,9 +124,9 @@ export const verifySignupOtp = async (payload: {
   otp: string;
 }): Promise<BackendEnvelope<AuthTokens>> => {
   const result = await requestBackendJson<BackendEnvelope<AuthTokens>>(
-    "/user/verify-signup-otp",
+    '/user/verify-signup-otp',
     {
-      method: "POST",
+      method: 'POST',
       body: payload,
     },
   );
@@ -142,9 +142,9 @@ export const sendSignupOtpAgain = async (
   userEmail: string,
 ): Promise<BackendEnvelope<SignupOtpResponse>> => {
   return requestBackendJson<BackendEnvelope<SignupOtpResponse>>(
-    "/user/send-signup-otp-again",
+    '/user/send-signup-otp-again',
     {
-      method: "POST",
+      method: 'POST',
       body: { userEmail },
     },
   );
@@ -157,9 +157,9 @@ export const updateProfilePhoto = async (
   const accessToken = await getValidAccessTokenForServerActions();
 
   const result = await requestBackendJson<BackendEnvelope<AuthTokens>>(
-    "/user/update-profile-photo",
+    '/user/update-profile-photo',
     {
-      method: "PUT",
+      method: 'PUT',
       body: data,
       token: accessToken ?? undefined,
     },
@@ -179,9 +179,9 @@ export const updateProfileData = async (
   const accessToken = await getValidAccessTokenForServerActions();
 
   const result = await requestBackendJson<BackendEnvelope<AuthTokens>>(
-    "/user/update-profile-data",
+    '/user/update-profile-data',
     {
-      method: "PATCH",
+      method: 'PATCH',
       body: data as Record<string, unknown>,
       token: accessToken ?? undefined,
     },
@@ -212,9 +212,9 @@ export const changePassword = async (data: {
   const accessToken = await getValidAccessTokenForServerActions();
 
   const result = await requestBackendJson<BackendEnvelope<AuthTokens>>(
-    "/user/change-password",
+    '/user/change-password',
     {
-      method: "PATCH",
+      method: 'PATCH',
       body: data,
       token: accessToken ?? undefined,
     },
@@ -232,9 +232,9 @@ export const forgotPassword = async (
   email: string,
 ): Promise<BackendEnvelope<ForgotPasswordToken>> => {
   const result = await requestBackendJson<BackendEnvelope<ForgotPasswordToken>>(
-    "/user/forgot-password",
+    '/user/forgot-password',
     {
-      method: "POST",
+      method: 'POST',
       body: { email },
     },
   );
@@ -251,12 +251,12 @@ export const sendForgotPasswordOtpAgain = async (): Promise<
   BackendEnvelope<unknown>
 > => {
   const cookieStore = await getCookieStore();
-  const token = cookieStore.get("forgotPassToken")?.value;
+  const token = cookieStore.get('forgotPassToken')?.value;
 
   return requestBackendJson<BackendEnvelope<unknown>>(
-    "/user/send-forgot-password-otp-again",
+    '/user/send-forgot-password-otp-again',
     {
-      method: "POST",
+      method: 'POST',
       body: { token },
     },
   );
@@ -267,22 +267,22 @@ export const verifyOtpForForgotPassword = async (
   otp: string,
 ): Promise<BackendEnvelope<ResetPasswordToken>> => {
   const cookieStore = await getCookieStore();
-  const token = cookieStore.get("forgotPassToken")?.value;
+  const token = cookieStore.get('forgotPassToken')?.value;
 
   const result = await requestBackendJson<BackendEnvelope<ResetPasswordToken>>(
-    "/user/verify-forgot-password-otp",
+    '/user/verify-forgot-password-otp',
     {
-      method: "POST",
+      method: 'POST',
       body: { token, otp },
     },
   );
 
   if (result?.success && result.data?.resetPasswordToken) {
-    cookieStore.set("resetPasswordToken", result.data.resetPasswordToken, {
+    cookieStore.set('resetPasswordToken', result.data.resetPasswordToken, {
       httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
     });
   }
 
@@ -294,19 +294,19 @@ export const setNewPasswordIntoDB = async (
   newPassword: string,
 ): Promise<BackendEnvelope<unknown>> => {
   const cookieStore = await getCookieStore();
-  const resetPasswordToken = cookieStore.get("resetPasswordToken")?.value;
+  const resetPasswordToken = cookieStore.get('resetPasswordToken')?.value;
 
   const result = await requestBackendJson<BackendEnvelope<unknown>>(
-    "/user/reset-password",
+    '/user/reset-password',
     {
-      method: "POST",
+      method: 'POST',
       body: { resetPasswordToken, newPassword },
     },
   );
 
   if (result?.success) {
-    cookieStore.delete("forgotPassToken");
-    cookieStore.delete("resetPasswordToken");
+    cookieStore.delete('forgotPassToken');
+    cookieStore.delete('resetPasswordToken');
   }
 
   return result;
@@ -328,9 +328,9 @@ export const getNewAccessToken = async (
   refreshToken: string,
 ): Promise<BackendEnvelope<AuthTokens>> => {
   const result = await requestBackendJson<BackendEnvelope<AuthTokens>>(
-    "/user/access-token",
+    '/user/access-token',
     {
-      method: "GET",
+      method: 'GET',
       token: refreshToken,
     },
   );

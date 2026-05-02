@@ -1,7 +1,7 @@
-import { jwtDecode } from "jwt-decode";
-import { z } from "zod";
-import type { AuthUser } from "@/types";
-import { normalizeRole } from "./roles";
+import { jwtDecode } from 'jwt-decode';
+import { z } from 'zod';
+import type { AuthUser } from '@/types';
+import { normalizeRole } from './roles';
 
 const authTokenPayloadSchema = z
   .object({
@@ -35,10 +35,10 @@ function toAuthUser(payload: AuthTokenPayload): AuthUser | null {
     _id: id,
     name: payload.name,
     email: payload.email,
-    image: payload.image ?? "",
+    image: payload.image ?? '',
     role,
     phone: payload.phone,
-    dob: typeof payload.dob === "string" ? payload.dob : undefined,
+    dob: typeof payload.dob === 'string' ? payload.dob : undefined,
   };
 }
 
@@ -70,7 +70,7 @@ export function decodeAuthToken(
 export function getAuthTokenFromRequest(request: {
   cookies: CookieStoreLike;
 }): string | null {
-  return request.cookies.get("accessToken")?.value ?? null;
+  return request.cookies.get('accessToken')?.value ?? null;
 }
 
 export function getAuthUserFromRequest(request: {

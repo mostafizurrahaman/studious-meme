@@ -1,25 +1,25 @@
-"use client";
+'use client';
 
-import { useCallback, useMemo } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { useCallback, useMemo } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { TablePagination } from "@/components/ui/table-pagination";
-import { formatDashboardDate } from "@/lib/formatDate";
+} from '@/components/ui/card';
+import { TablePagination } from '@/components/ui/table-pagination';
+import { formatDashboardDate } from '@/lib/formatDate';
 import {
   buildDashboardActivityCards,
   type DashboardActivityCard,
   type DashboardActivityRecord,
-} from "@/lib/dashboard-activity";
+} from '@/lib/dashboard-activity';
 
 export type DashboardWishlistRecord = DashboardActivityRecord;
 export type DashboardComparisonRecord = DashboardActivityRecord;
@@ -85,18 +85,18 @@ function ActivityCardView({
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
-                <Badge variant={card.isActive ? "default" : "secondary"}>
-                  {card.lastAction === "clear"
-                    ? "Cleared"
+                <Badge variant={card.isActive ? 'default' : 'secondary'}>
+                  {card.lastAction === 'clear'
+                    ? 'Cleared'
                     : card.clearedAt
-                      ? "Cleared"
+                      ? 'Cleared'
                       : card.isActive
-                        ? "Active"
-                        : "Removed"}
+                        ? 'Active'
+                        : 'Removed'}
                 </Badge>
                 <Badge variant="outline">{actionLabel}</Badge>
                 <Badge variant="outline">{card.eventCount} events</Badge>
-                {typeof card.quantity === "number" ? (
+                {typeof card.quantity === 'number' ? (
                   <Badge variant="outline">Qty {card.quantity}</Badge>
                 ) : null}
               </div>
@@ -110,19 +110,19 @@ function ActivityCardView({
                 <div className="mt-1 font-semibold text-foreground">
                   {card.addedAt
                     ? formatDashboardDate(card.addedAt, { time: true })
-                    : "—"}
+                    : '—'}
                 </div>
               </div>
               <div>
                 <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
-                  {card.clearedAt ? "Cleared on" : "Removed on"}
+                  {card.clearedAt ? 'Cleared on' : 'Removed on'}
                 </div>
                 <div className="mt-1 font-semibold text-foreground">
                   {card.clearedAt
                     ? formatDashboardDate(card.clearedAt, { time: true })
                     : card.removedAt
                       ? formatDashboardDate(card.removedAt, { time: true })
-                      : "—"}
+                      : '—'}
                 </div>
               </div>
               <div>
@@ -132,7 +132,7 @@ function ActivityCardView({
                 <div className="mt-1 font-semibold text-foreground">
                   {card.updatedAt
                     ? formatDashboardDate(card.updatedAt, { time: true })
-                    : "—"}
+                    : '—'}
                 </div>
               </div>
               <div>
@@ -140,7 +140,7 @@ function ActivityCardView({
                   Category
                 </div>
                 <div className="mt-1 font-semibold text-foreground">
-                  {card.category ?? "—"}
+                  {card.category ?? '—'}
                 </div>
               </div>
             </div>
@@ -157,10 +157,10 @@ function ActivityCardView({
                 </Button>
               ) : null}
               <span className="rounded-full bg-muted px-3 py-1">
-                {card.isActive ? "Still active in list" : "No longer active"}
+                {card.isActive ? 'Still active in list' : 'No longer active'}
               </span>
               <span className="rounded-full bg-muted px-3 py-1">
-                {card.lastAction ?? "add"}
+                {card.lastAction ?? 'add'}
               </span>
             </div>
           </div>
@@ -189,8 +189,8 @@ function ActivityManager({
     (updates: { page?: number; limit?: number }) => {
       const params = new URLSearchParams(searchParams.toString());
 
-      params.set("page", String(updates.page ?? paginationMeta.page));
-      params.set("limit", String(updates.limit ?? paginationMeta.limit));
+      params.set('page', String(updates.page ?? paginationMeta.page));
+      params.set('limit', String(updates.limit ?? paginationMeta.limit));
 
       router.push(`${pathname}?${params.toString()}`);
     },
@@ -206,7 +206,7 @@ function ActivityManager({
       <CardContent className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="text-sm text-muted-foreground">
-            Showing {cards.length} grouped cards from {paginationMeta.total}{" "}
+            Showing {cards.length} grouped cards from {paginationMeta.total}{' '}
             activity records
           </div>
           <div className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">

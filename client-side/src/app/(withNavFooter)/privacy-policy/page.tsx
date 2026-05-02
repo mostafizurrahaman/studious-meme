@@ -1,13 +1,13 @@
-import { ManagedPageContent } from "@/components/ManagedPageContent";
-import { SeoScripts } from "@/components/SeoScripts";
-import { policySections } from "@/lib/static-site-content";
-import { privacyPolicyMetadata, privacyPolicySchemas } from "@/lib/seo";
-import { getPageByType } from "@/services/Page";
+import { ManagedPageContent } from '@/components/ManagedPageContent';
+import { SeoScripts } from '@/components/SeoScripts';
+import { policySections } from '@/lib/static-site-content';
+import { privacyPolicyMetadata, privacyPolicySchemas } from '@/lib/seo';
+import { getPageByType } from '@/services/Page';
 
 export const metadata = privacyPolicyMetadata;
 
 export default async function PrivacyPolicyPage() {
-  const pageResult = await getPageByType("privacy-policy").catch(() => null);
+  const pageResult = await getPageByType('privacy-policy').catch(() => null);
 
   return (
     <>

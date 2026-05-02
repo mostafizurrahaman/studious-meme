@@ -1,13 +1,13 @@
-import { ErrorRequestHandler } from "express";
-import httpStatus from "http-status";
-import { ZodError } from "zod";
-import { TErrorSources } from "../interface/error";
-import config from "../config";
-import handleZodError from "../errors/handleZodError";
-import handleCastError from "../errors/handleCastError";
-import handleDuplicateError from "../errors/handleDuplicateError";
-import AppError from "./AppError";
-import handleValidationError from "../errors/handleValidationError";
+import { ErrorRequestHandler } from 'express';
+import httpStatus from 'http-status';
+import { ZodError } from 'zod';
+import { TErrorSources } from '../interface/error';
+import config from '../config';
+import handleZodError from '../errors/handleZodError';
+import handleCastError from '../errors/handleCastError';
+import handleDuplicateError from '../errors/handleDuplicateError';
+import AppError from './AppError';
+import handleValidationError from '../errors/handleValidationError';
 // import { errorLogger } from '../middlewares/logger';
 
 // global error handling middleware (four parameters error handler)
@@ -15,11 +15,11 @@ import handleValidationError from "../errors/handleValidationError";
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, _next) => {
   // settle default values
   let statusCode: number = httpStatus.INTERNAL_SERVER_ERROR;
-  let message = "Something went wrong!";
+  let message = 'Something went wrong!';
   let errorSources: TErrorSources = [
     {
-      path: "",
-      message: "Something went wrong!",
+      path: '',
+      message: 'Something went wrong!',
     },
   ];
 
@@ -30,12 +30,12 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, _next) => {
     // message = simplifiedError?.message;
     message = simplifiedError?.errorSources[0].message;
     errorSources = simplifiedError?.errorSources;
-  } else if (err?.name === "ValidationError") {
+  } else if (err?.name === 'ValidationError') {
     const simplifiedError = handleValidationError(err);
     statusCode = simplifiedError?.statusCode;
     message = simplifiedError?.message;
     errorSources = simplifiedError?.errorSources;
-  } else if (err?.name === "CastError") {
+  } else if (err?.name === 'CastError') {
     const simplifiedError = handleCastError(err);
     statusCode = simplifiedError?.statusCode;
     message = simplifiedError?.message;
@@ -50,7 +50,7 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, _next) => {
     message = err.message;
     errorSources = [
       {
-        path: "",
+        path: '',
         message: err?.message,
       },
     ];
@@ -58,7 +58,7 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, _next) => {
     message = err.message;
     errorSources = [
       {
-        path: "",
+        path: '',
         message: err?.message,
       },
     ];
@@ -74,7 +74,7 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, _next) => {
     message,
     errorSources,
     // err,
-    stack: config.NODE_ENV === "development" ? err?.stack : null,
+    stack: config.NODE_ENV === 'development' ? err?.stack : null,
   });
 };
 

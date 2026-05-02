@@ -1,18 +1,18 @@
-import Link from "next/link";
-import { UserAvatar } from "@/components/UserAvatar";
-import { ProfileSettingsForm } from "@/components/ProfileSettingsForm";
-import { Button } from "@/components/ui/button";
+import Link from 'next/link';
+import { UserAvatar } from '@/components/UserAvatar';
+import { ProfileSettingsForm } from '@/components/ProfileSettingsForm';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { formatDashboardDate } from "@/lib/formatDate";
-import { getDashboardRoleConfig } from "@/lib/dashboard-navigation";
-import { getDashboardPathByRole } from "@/lib/auth/roles";
-import type { AuthRole } from "@/types";
+} from '@/components/ui/card';
+import { formatDashboardDate } from '@/lib/formatDate';
+import { getDashboardRoleConfig } from '@/lib/dashboard-navigation';
+import { getDashboardPathByRole } from '@/lib/auth/roles';
+import type { AuthRole } from '@/types';
 
 export async function RoleProfilePage({
   role,
@@ -28,7 +28,7 @@ export async function RoleProfilePage({
   };
 }) {
   const config = getDashboardRoleConfig(role);
-  const dashboardPath = getDashboardPathByRole(role) ?? "/dashboard";
+  const dashboardPath = getDashboardPathByRole(role) ?? '/dashboard';
   const profile = user;
 
   return (
@@ -65,7 +65,7 @@ export async function RoleProfilePage({
       </Card>
 
       <ProfileSettingsForm
-        key={`${profile.name}-${profile.email}-${profile.phone ?? ""}-${profile.dob ?? ""}-${profile.image ?? ""}`}
+        key={`${profile.name}-${profile.email}-${profile.phone ?? ''}-${profile.dob ?? ''}-${profile.image ?? ''}`}
         profile={{
           name: profile.name,
           email: profile.email,

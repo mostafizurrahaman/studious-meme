@@ -4,7 +4,16 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
-import { MessageCircle, Minus, PackageCheck, Play, Plus, Send, Share, Truck } from 'lucide-react';
+import {
+  MessageCircle,
+  Minus,
+  PackageCheck,
+  Play,
+  Plus,
+  Send,
+  Share,
+  Truck,
+} from 'lucide-react';
 import PaymentOptionSvg from '@/assets/Payment-Option.svg';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -18,7 +27,12 @@ import { addCartItem } from '@/services/Cart';
 
 function FacebookIcon({ className }: { className?: string }) {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+    >
       <path d="M18.77 7.46H14.5v-1.42c0-.66.1-1 1.15-1h3v-3.97H11.3c-1.45 0-1.77.86-1.77 1.77V8.5H8.15v3.5h3v8.15h3.5v-8.15h2.75l.27-3.54z" />
     </svg>
   );
@@ -26,7 +40,12 @@ function FacebookIcon({ className }: { className?: string }) {
 
 function TwitterIcon({ className }: { className?: string }) {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+    >
       <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
     </svg>
   );
@@ -34,7 +53,12 @@ function TwitterIcon({ className }: { className?: string }) {
 
 function LinkedinIcon({ className }: { className?: string }) {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+    >
       <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.621 4.267 6.03v6.711zM5.337 7.433c-1.144 0-2.064-.926-2.064-2.084 0-1.16.92-2.084 2.064-2.084 1.14 0 2.063.924 2.063 2.084 0 1.158-.922 2.084-2.063 2.084zm1.602 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.752v20.495C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.752C24 .774 23.2 0 22.222 0h.003z" />
     </svg>
   );
@@ -42,8 +66,19 @@ function LinkedinIcon({ className }: { className?: string }) {
 
 function PinterestIcon({ className }: { className?: string }) {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
-      <text x="12" y="19" textAnchor="middle" fontSize="26" fontWeight="bold" fill="#6b7280">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      className={className}
+    >
+      <text
+        x="12"
+        y="19"
+        textAnchor="middle"
+        fontSize="26"
+        fontWeight="bold"
+        fill="#6b7280"
+      >
         P
       </text>
     </svg>
@@ -59,7 +94,8 @@ const sharePlatforms = [
   {
     name: 'Facebook',
     Icon: FacebookIcon,
-    buildHref: (url: string) => `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+    buildHref: (url: string) =>
+      `https://www.facebook.com/sharer/sharer.php?u=${url}`,
   },
   {
     name: 'X',
@@ -75,12 +111,14 @@ const sharePlatforms = [
   {
     name: 'LinkedIn',
     Icon: LinkedinIcon,
-    buildHref: (url: string) => `https://www.linkedin.com/shareArticle?mini=true&url=${url}`,
+    buildHref: (url: string) =>
+      `https://www.linkedin.com/shareArticle?mini=true&url=${url}`,
   },
   {
     name: 'WhatsApp',
     Icon: MessageCircle,
-    buildHref: (url: string) => `https://api.whatsapp.com/send?text=${encodeURIComponent(url)}`,
+    buildHref: (url: string) =>
+      `https://api.whatsapp.com/send?text=${encodeURIComponent(url)}`,
   },
   {
     name: 'Telegram',
@@ -156,10 +194,13 @@ function resolveYouTubeVideoId(product: Product) {
 
 export function ProductDetailClient({ product }: ProductDetailClientProps) {
   const router = useRouter();
-  const addProductQuantity = useCartStore(state => state.addProductQuantity);
-  const markItemAsSynced = useCartStore(state => state.markItemAsSynced);
+  const addProductQuantity = useCartStore((state) => state.addProductQuantity);
+  const markItemAsSynced = useCartStore((state) => state.markItemAsSynced);
   const images = useMemo(
-    () => (product.images.length > 0 ? product.images : [getProductPrimaryImage(product)]),
+    () =>
+      product.images.length > 0
+        ? product.images
+        : [getProductPrimaryImage(product)],
     [product],
   );
   const youtubeVideoId = resolveYouTubeVideoId(product);
@@ -195,22 +236,37 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   const productUrl = `https://malamal.com.bd/product/${product.slug}/`;
   const encodedProductUrl = encodeURIComponent(productUrl);
   const primaryImage = getProductPrimaryImage(product);
-  const shareMedia = primaryImage.startsWith('http') ? primaryImage : `https://malamal.com.bd${primaryImage}`;
+  const shareMedia = primaryImage.startsWith('http')
+    ? primaryImage
+    : `https://malamal.com.bd${primaryImage}`;
 
   const selectedMediaStillExists = selectedMedia
-    ? galleryItems.some(item => item.src === selectedMedia.src && item.type === selectedMedia.type)
+    ? galleryItems.some(
+        (item) =>
+          item.src === selectedMedia.src && item.type === selectedMedia.type,
+      )
     : false;
-  const activeMedia = selectedMediaStillExists ? selectedMedia : (galleryItems[0] ?? null);
-  const activeMediaKey = activeMedia ? `${activeMedia.type}:${activeMedia.src}` : '';
-  const isZooming = zoomState.mediaKey === activeMediaKey ? zoomState.isZooming : false;
-  const zoomPosition = zoomState.mediaKey === activeMediaKey ? zoomState.position : '50% 50%';
+  const activeMedia = selectedMediaStillExists
+    ? selectedMedia
+    : (galleryItems[0] ?? null);
+  const activeMediaKey = activeMedia
+    ? `${activeMedia.type}:${activeMedia.src}`
+    : '';
+  const isZooming =
+    zoomState.mediaKey === activeMediaKey ? zoomState.isZooming : false;
+  const zoomPosition =
+    zoomState.mediaKey === activeMediaKey ? zoomState.position : '50% 50%';
 
   function handleZoomMove(event: React.MouseEvent<HTMLDivElement>) {
     if (activeMedia?.type !== 'image') return;
     const rect = event.currentTarget.getBoundingClientRect();
     const x = ((event.clientX - rect.left) / rect.width) * 100;
     const y = ((event.clientY - rect.top) / rect.height) * 100;
-    setZoomState({ mediaKey: activeMediaKey, position: `${x}% ${y}%`, isZooming: true });
+    setZoomState({
+      mediaKey: activeMediaKey,
+      position: `${x}% ${y}%`,
+      isZooming: true,
+    });
   }
 
   function resetZoom(media: GalleryMedia | null = activeMedia) {
@@ -222,7 +278,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
     addProductQuantity(product, quantity);
     if (product.id) {
       void addCartItem(product.id, quantity)
-        .then(result => {
+        .then((result) => {
           if (result?.success) {
             markItemAsSynced(product.id);
           }
@@ -238,7 +294,12 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
       <section className="grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] xl:grid-cols-[620px_minmax(0,1fr)]">
         <div className="space-y-4">
           <div
-            className={cn('grid gap-3', galleryItems.length > 1 ? 'sm:grid-cols-[86px_minmax(0,1fr)]' : '')}
+            className={cn(
+              'grid gap-3',
+              galleryItems.length > 1
+                ? 'sm:grid-cols-[86px_minmax(0,1fr)]'
+                : '',
+            )}
           >
             {galleryItems.length > 1 ? (
               <div className="order-2 flex gap-2 overflow-x-auto sm:order-1 sm:flex-col sm:overflow-visible">
@@ -281,9 +342,12 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                 className="relative aspect-[4/3] overflow-hidden rounded-lg lg:aspect-[1.05/1]"
                 onMouseMove={handleZoomMove}
                 onMouseEnter={() =>
-                  setZoomState(current => ({
+                  setZoomState((current) => ({
                     mediaKey: activeMediaKey,
-                    position: current.mediaKey === activeMediaKey ? current.position : '50% 50%',
+                    position:
+                      current.mediaKey === activeMediaKey
+                        ? current.position
+                        : '50% 50%',
                     isZooming: true,
                   }))
                 }
@@ -335,9 +399,12 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                 <div className="inline-flex rounded-full bg-white/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-secondary-foreground">
                   Bulk pricing
                 </div>
-                <h2 className="text-lg font-extrabold leading-tight sm:text-xl">Need a quotation?</h2>
+                <h2 className="text-lg font-extrabold leading-tight sm:text-xl">
+                  Need a quotation?
+                </h2>
                 <p className="text-sm leading-6 text-secondary-foreground/78">
-                  Share your quantity and delivery location for project or retail orders.
+                  Share your quantity and delivery location for project or
+                  retail orders.
                 </p>
               </div>
               <Button
@@ -348,9 +415,15 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               </Button>
             </div>
             <div className="flex flex-wrap gap-2 border-t border-white/10 px-3 py-4 text-xs font-medium text-secondary-foreground/90 sm:px-4">
-              <span className="rounded-full bg-white/10 px-3 py-1">Bulk order support</span>
-              <span className="rounded-full bg-white/10 px-3 py-1">Corporate procurement</span>
-              <span className="rounded-full bg-white/10 px-3 py-1">Delivery coordination</span>
+              <span className="rounded-full bg-white/10 px-3 py-1">
+                Bulk order support
+              </span>
+              <span className="rounded-full bg-white/10 px-3 py-1">
+                Corporate procurement
+              </span>
+              <span className="rounded-full bg-white/10 px-3 py-1">
+                Delivery coordination
+              </span>
             </div>
           </Card>
         </div>
@@ -391,7 +464,8 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
             />
           ) : (
             <p className="text-sm leading-6 text-foreground/70">
-              {product.title} is available for direct order with dedicated sales support.
+              {product.title} is available for direct order with dedicated sales
+              support.
             </p>
           )}
           <Button
@@ -410,15 +484,19 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               <button
                 type="button"
                 className="flex w-10 items-center justify-center border-r"
-                onClick={() => setQuantity(current => Math.max(1, current - 1))}
+                onClick={() =>
+                  setQuantity((current) => Math.max(1, current - 1))
+                }
               >
                 <Minus className="size-4" />
               </button>
-              <span className="flex w-10 items-center justify-center text-sm">{quantity}</span>
+              <span className="flex w-10 items-center justify-center text-sm">
+                {quantity}
+              </span>
               <button
                 type="button"
                 className="flex w-10 items-center justify-center border-l"
-                onClick={() => setQuantity(current => current + 1)}
+                onClick={() => setQuantity((current) => current + 1)}
               >
                 <Plus className="size-4" />
               </button>
@@ -429,19 +507,30 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
             >
               Add To Cart
             </Button>
-            <Button className="h-11 rounded-md font-bold" onClick={() => addQuantityToCart(true)}>
+            <Button
+              className="h-11 rounded-md font-bold"
+              onClick={() => addQuantityToCart(true)}
+            >
               Buy Now
             </Button>
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-3 border-y py-3">
             <div className="flex gap-2">
-              <AddToCompareButton product={product} compact className="h-9 w-auto rounded-md px-3 text-xs" />
-              <AddToWishlistButton product={product} compact className="h-9 w-auto rounded-md px-3 text-xs" />
+              <AddToCompareButton
+                product={product}
+                compact
+                className="h-9 w-auto rounded-md px-3 text-xs"
+              />
+              <AddToWishlistButton
+                product={product}
+                compact
+                className="h-9 w-auto rounded-md px-3 text-xs"
+              />
             </div>
             <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
               <Share className="size-4" />
-              {sharePlatforms.map(platform => {
+              {sharePlatforms.map((platform) => {
                 const Icon = platform.Icon;
                 return (
                   <Button
@@ -473,7 +562,9 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               <div className="grid grid-cols-[auto_1fr_auto] gap-3">
                 <PackageCheck className="mt-0.5 size-5 text-primary" />
                 <div>
-                  <div className="font-bold">Pick up from the Malamal Warehouse</div>
+                  <div className="font-bold">
+                    Pick up from the Malamal Warehouse
+                  </div>
                   <div className="text-muted-foreground">To pick up today</div>
                 </div>
                 <div className="font-bold">Free</div>
@@ -515,7 +606,9 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
             </span>
           </div>
           <div className="space-y-1.5">
-            <h2 className="text-base font-extrabold leading-tight sm:text-lg">Need a quote?</h2>
+            <h2 className="text-base font-extrabold leading-tight sm:text-lg">
+              Need a quote?
+            </h2>
             <p className="max-w-[28ch] text-sm leading-5 text-secondary-foreground/78">
               Tell us your quantity and delivery area.
             </p>

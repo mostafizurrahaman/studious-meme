@@ -1,17 +1,17 @@
-import { model, Schema } from "mongoose";
-import { ICategory } from "./category.interface";
+import { model, Schema } from 'mongoose';
+import { ICategory } from './category.interface';
 
 const categorySchema = new Schema<ICategory>(
   {
     name: {
       type: String,
-      required: [true, "Category name is required!"],
-      unique: [true, "Category name must be unique!"],
+      required: [true, 'Category name is required!'],
+      unique: [true, 'Category name must be unique!'],
     },
     slug: {
       type: String,
-      required: [true, "Category slug is required!"],
-      unique: [true, "Category slug must be unique!"],
+      required: [true, 'Category slug is required!'],
+      unique: [true, 'Category slug must be unique!'],
     },
     subCategories: {
       type: [
@@ -19,11 +19,11 @@ const categorySchema = new Schema<ICategory>(
           {
             name: {
               type: String,
-              required: [true, "SubCategory name is required!"],
+              required: [true, 'SubCategory name is required!'],
             },
             slug: {
               type: String,
-              required: [true, "SubCategory slug is required!"],
+              required: [true, 'SubCategory slug is required!'],
             },
             image: { type: String },
             description: { type: String },
@@ -45,7 +45,7 @@ const categorySchema = new Schema<ICategory>(
             new Set(slugs).size === slugs.length
           );
         },
-        message: "SubCategory name and slug must be unique within a category!",
+        message: 'SubCategory name and slug must be unique within a category!',
       },
     },
     image: { type: String },
@@ -58,11 +58,11 @@ const categorySchema = new Schema<ICategory>(
 
 categorySchema.index(
   { isActive: 1, createdAt: -1 },
-  { name: "category_active_createdAt_idx" },
+  { name: 'category_active_createdAt_idx' },
 );
 categorySchema.index(
-  { isActive: 1, "subCategories.slug": 1 },
-  { name: "category_active_subCategorySlug_idx" },
+  { isActive: 1, 'subCategories.slug': 1 },
+  { name: 'category_active_subCategorySlug_idx' },
 );
 
-export const CategoryModel = model<ICategory>("Category", categorySchema);
+export const CategoryModel = model<ICategory>('Category', categorySchema);

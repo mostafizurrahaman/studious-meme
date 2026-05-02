@@ -10,28 +10,41 @@ import { Input } from '@/components/ui/input';
 // import { Textarea } from '@/components/ui/textarea';
 import { formatMoney } from '@/lib/cart';
 import { useCartStore } from '@/lib/cart-store';
-import { mergeBackendCartIntoLocalItems, mapBackendCartItemsToStoreItems } from '@/lib/cart-hydration';
-import { calculateFulfillmentSummary, formatShippingZoneLabel } from '@/lib/fulfillment';
-import { clearCart as clearCartPersisted, getMyCart, removeCartItem, updateCartItem } from '@/services/Cart';
+import {
+  mergeBackendCartIntoLocalItems,
+  mapBackendCartItemsToStoreItems,
+} from '@/lib/cart-hydration';
+import {
+  calculateFulfillmentSummary,
+  formatShippingZoneLabel,
+} from '@/lib/fulfillment';
+import {
+  clearCart as clearCartPersisted,
+  getMyCart,
+  removeCartItem,
+  updateCartItem,
+} from '@/services/Cart';
 
 export function CartPageClient() {
-  const items = useCartStore(state => state.items);
-  const hydrated = useCartStore(state => state.hydrated);
-  const couponCode = useCartStore(state => state.couponCode);
-  const appliedCoupon = useCartStore(state => state.appliedCoupon);
-  const couponVerification = useCartStore(state => state.couponVerification);
-  const isApplyingCoupon = useCartStore(state => state.isApplyingCoupon);
-  const clear = useCartStore(state => state.clear);
-  const checkout = useCartStore(state => state.checkout);
-  const count = useCartStore(state => state.items.reduce((sum, item) => sum + item.quantity, 0));
-  const increase = useCartStore(state => state.increase);
-  const decrease = useCartStore(state => state.decrease);
-  const remove = useCartStore(state => state.remove);
-  const markItemAsSynced = useCartStore(state => state.markItemAsSynced);
-  const setCouponCode = useCartStore(state => state.setCouponCode);
-  const applyCoupon = useCartStore(state => state.applyCoupon);
-  const clearCoupon = useCartStore(state => state.clearCoupon);
-  const replaceItems = useCartStore(state => state.replaceItems);
+  const items = useCartStore((state) => state.items);
+  const hydrated = useCartStore((state) => state.hydrated);
+  const couponCode = useCartStore((state) => state.couponCode);
+  const appliedCoupon = useCartStore((state) => state.appliedCoupon);
+  const couponVerification = useCartStore((state) => state.couponVerification);
+  const isApplyingCoupon = useCartStore((state) => state.isApplyingCoupon);
+  const clear = useCartStore((state) => state.clear);
+  const checkout = useCartStore((state) => state.checkout);
+  const count = useCartStore((state) =>
+    state.items.reduce((sum, item) => sum + item.quantity, 0),
+  );
+  const increase = useCartStore((state) => state.increase);
+  const decrease = useCartStore((state) => state.decrease);
+  const remove = useCartStore((state) => state.remove);
+  const markItemAsSynced = useCartStore((state) => state.markItemAsSynced);
+  const setCouponCode = useCartStore((state) => state.setCouponCode);
+  const applyCoupon = useCartStore((state) => state.applyCoupon);
+  const clearCoupon = useCartStore((state) => state.clearCoupon);
+  const replaceItems = useCartStore((state) => state.replaceItems);
   const [toast, setToast] = useState('');
 
   const fulfillment = calculateFulfillmentSummary({
@@ -48,13 +61,23 @@ export function CartPageClient() {
     let active = true;
 
     getMyCart()
-      .then(result => {
-        if (!active || !result.success || !Array.isArray(result.data?.items) || result.data.items.length === 0) {
+      .then((result) => {
+        if (
+          !active ||
+          !result.success ||
+          !Array.isArray(result.data?.items) ||
+          result.data.items.length === 0
+        ) {
           return;
         }
 
         const backendItems = mapBackendCartItemsToStoreItems(result.data.items);
-        replaceItems(mergeBackendCartIntoLocalItems(useCartStore.getState().items, backendItems));
+        replaceItems(
+          mergeBackendCartIntoLocalItems(
+            useCartStore.getState().items,
+            backendItems,
+          ),
+        );
       })
       .catch(() => null);
 
@@ -77,12 +100,17 @@ export function CartPageClient() {
     <main className="flex-1 overflow-x-hidden bg-background pb-16">
       <div className="mx-auto w-full max-w-310 px-4 py-6 lg:px-0">
         <Card className="p-6 shadow-sm sm:p-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">Checkout</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">
+            Checkout
+          </p>
           <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-black text-secondary sm:text-4xl">Cart</h1>
+              <h1 className="text-3xl font-black text-secondary sm:text-4xl">
+                Cart
+              </h1>
               <p className="mt-3 text-sm leading-7 text-foreground/65 sm:text-base">
-                Your cart is saved in this browser and the navbar count stays in sync.
+                Your cart is saved in this browser and the navbar count stays in
+                sync.
               </p>
               <div className="mt-4 flex flex-wrap gap-2 text-xs font-semibold text-foreground/60">
                 <span className="rounded-full bg-muted px-3 py-1">
@@ -105,8 +133,11 @@ export function CartPageClient() {
         <section className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
           <Card className="space-y-4 overflow-hidden p-6 shadow-sm">
             {items.length > 0 ? (
-              items.map(item => (
-                <div key={item.sku} className="flex flex-col gap-4 rounded-2xl border border-border p-4 sm:flex-row">
+              items.map((item) => (
+                <div
+                  key={item.sku}
+                  className="flex flex-col gap-4 rounded-2xl border border-border p-4 sm:flex-row"
+                >
                   <Link
                     href={item.href}
                     className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl bg-muted"
@@ -129,7 +160,9 @@ export function CartPageClient() {
                     <div className="mt-1 text-sm text-foreground/55">
                       SKU {item.sku} · {item.brand}
                     </div>
-                    <div className="mt-2 text-sm font-bold text-primary">{item.unitPriceLabel}</div>
+                    <div className="mt-2 text-sm font-bold text-primary">
+                      {item.unitPriceLabel}
+                    </div>
                   </div>
                   <div className="flex w-full flex-col items-start gap-2 sm:ml-auto sm:w-auto sm:items-end">
                     <div className="flex items-center gap-2 rounded-full border border-border px-2 py-1">
@@ -146,8 +179,12 @@ export function CartPageClient() {
                                 ? updateCartItem(item.productId, nextQuantity)
                                 : removeCartItem(item.productId)
                             )
-                              .then(result => {
-                                if (result?.success && nextQuantity > 0 && item.productId) {
+                              .then((result) => {
+                                if (
+                                  result?.success &&
+                                  nextQuantity > 0 &&
+                                  item.productId
+                                ) {
                                   markItemAsSynced(item.productId);
                                 }
                               })
@@ -158,7 +195,9 @@ export function CartPageClient() {
                       >
                         −
                       </Button>
-                      <span className="min-w-6 text-center text-sm font-semibold">{item.quantity}</span>
+                      <span className="min-w-6 text-center text-sm font-semibold">
+                        {item.quantity}
+                      </span>
                       <Button
                         type="button"
                         variant="ghost"
@@ -167,7 +206,7 @@ export function CartPageClient() {
                           increase(item.sku);
                           if (item.productId) {
                             void updateCartItem(item.productId, nextQuantity)
-                              .then(result => {
+                              .then((result) => {
                                 if (result?.success) {
                                   markItemAsSynced(item.productId);
                                 }
@@ -201,7 +240,9 @@ export function CartPageClient() {
               ))
             ) : (
               <div className="rounded-3xl border border-dashed border-border p-8 text-center">
-                <div className="text-lg font-black text-primary">Your cart is empty</div>
+                <div className="text-lg font-black text-primary">
+                  Your cart is empty
+                </div>
                 <p className="mt-2 text-sm text-foreground/55">
                   Start browsing the catalog and add products to save them here.
                 </p>
@@ -218,7 +259,7 @@ export function CartPageClient() {
               <div className="flex flex-wrap items-center gap-3">
                 <Input
                   value={couponCode}
-                  onChange={event => setCouponCode(event.target.value)}
+                  onChange={(event) => setCouponCode(event.target.value)}
                   placeholder="Coupon code"
                 />
                 <Button
@@ -252,7 +293,8 @@ export function CartPageClient() {
               <div className="mt-3 text-sm text-foreground/55">
                 {appliedCoupon
                   ? `Applied ${appliedCoupon.code} · ${appliedCoupon.label}`
-                  : couponVerification?.message || 'Enter a coupon code issued by the admin.'}
+                  : couponVerification?.message ||
+                    'Enter a coupon code issued by the admin.'}
               </div>
             </Card>
           </Card>
@@ -295,7 +337,10 @@ export function CartPageClient() {
               >
                 <Link href="/quotation-request">Request quotation</Link>
               </Button> */}
-              <Button asChild className="h-11 rounded-full px-6 text-sm font-bold shadow-sm">
+              <Button
+                asChild
+                className="h-11 rounded-full px-6 text-sm font-bold shadow-sm"
+              >
                 <Link href="/checkout">Proceed to checkout</Link>
               </Button>
               <Button

@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
-import { ManagedPageContent } from "@/components/ManagedPageContent";
-import { aboutUsMetadata } from "@/lib/seo";
-import { getPageByType } from "@/services/Page";
+import type { Metadata } from 'next';
+import { ManagedPageContent } from '@/components/ManagedPageContent';
+import { aboutUsMetadata } from '@/lib/seo';
+import { getPageByType } from '@/services/Page';
 
 export const metadata: Metadata = aboutUsMetadata;
 
 export default async function AboutUsPage() {
-  const pageResult = await getPageByType("about-us").catch(() => null);
+  const pageResult = await getPageByType('about-us').catch(() => null);
 
   return (
     <ManagedPageContent

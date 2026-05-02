@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { ImagePlus, Link2, X } from "lucide-react";
-import Image from "next/image";
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { ImagePlus, Link2, X } from 'lucide-react';
+import Image from 'next/image';
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 type FileUploadProps = {
   value?: string | File | null;
@@ -19,16 +19,16 @@ export function FileUpload({
   value,
   onChange,
   onBlur,
-  placeholder = "Paste image URL",
+  placeholder = 'Paste image URL',
   disabled,
 }: FileUploadProps) {
   const [isEditing, setIsEditing] = useState(!value);
-  const [url, setUrl] = useState(typeof value === "string" ? value : "");
+  const [url, setUrl] = useState(typeof value === 'string' ? value : '');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const previewUrl = useMemo(() => {
-    if (!value) return "";
-    if (typeof value === "string") return value;
+    if (!value) return '';
+    if (typeof value === 'string') return value;
 
     return URL.createObjectURL(value);
   }, [value]);
@@ -58,9 +58,9 @@ export function FileUpload({
   const handleClear = () => {
     onChange(null);
     setIsEditing(true);
-    setUrl("");
+    setUrl('');
     if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+      fileInputRef.current.value = '';
     }
   };
 
@@ -79,9 +79,9 @@ export function FileUpload({
           </div>
           <div className="flex items-center justify-between gap-2 border-t border-border px-3 py-2">
             <span className="truncate text-xs text-muted-foreground">
-              {typeof value === "string"
+              {typeof value === 'string'
                 ? value
-                : (value?.name ?? "Selected file")}
+                : (value?.name ?? 'Selected file')}
             </span>
             <Button
               type="button"

@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import { TErrorSources, TGenericErrorResponse } from "../interface/error";
+import mongoose from 'mongoose';
+import { TErrorSources, TGenericErrorResponse } from '../interface/error';
 
 // mongoose schema validation error handler
 const handleValidationError = (
@@ -18,7 +18,7 @@ const handleValidationError = (
 
   return {
     statusCode,
-    message: errorSources[0]?.message || "Validation Error!",
+    message: errorSources[0]?.message || 'Validation Error!',
     errorSources,
   };
 };

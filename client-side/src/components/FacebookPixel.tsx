@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
-import Script from "next/script";
-import { usePathname } from "next/navigation";
+import { useEffect, useRef } from 'react';
+import Script from 'next/script';
+import { usePathname } from 'next/navigation';
 import {
   buildFacebookPixelInitScript,
   getFacebookPixelId,
   isFacebookPixelEnabled,
   trackFacebookPageView,
-} from "@/lib/facebook-pixel";
+} from '@/lib/facebook-pixel';
 
 export function FacebookPixel() {
   const pixelId = getFacebookPixelId();

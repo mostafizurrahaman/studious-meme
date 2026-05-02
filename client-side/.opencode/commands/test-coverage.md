@@ -56,12 +56,12 @@ For each uncovered area:
 **Suggested Tests**:
 
 ```typescript
-describe("functionName", () => {
-  it("should [expected behavior]", () => {
+describe('functionName', () => {
+  it('should [expected behavior]', () => {
     // Test code
   });
 
-  it("should handle [edge case]", () => {
+  it('should handle [edge case]', () => {
     // Edge case test
   });
 });

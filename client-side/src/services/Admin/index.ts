@@ -34,8 +34,9 @@ const unsupported = <T>(message: string): BackendEnvelope<T> => ({
   message,
 });
 
-export const getDashboardMetaData = async (): Promise<BackendEnvelope<unknown>> =>
-  unsupported('Endpoint not supported by current backend.');
+export const getDashboardMetaData = async (): Promise<
+  BackendEnvelope<unknown>
+> => unsupported('Endpoint not supported by current backend.');
 
 export const updateNewsStatus = async (): Promise<BackendEnvelope<unknown>> =>
   unsupported('Endpoint not supported by current backend.');
@@ -46,20 +47,26 @@ type GetAllUsersParams = {
   searchTerm?: string;
 };
 
-export const getAllUsers = async (params: GetAllUsersParams = {}): Promise<BackendEnvelope<unknown>> => {
+export const getAllUsers = async (
+  params: GetAllUsersParams = {},
+): Promise<BackendEnvelope<unknown>> => {
   const accessToken = await getValidAccessTokenForServerHandlerGet();
   const searchParams = new URLSearchParams();
 
   if (params.page) searchParams.set('page', String(params.page));
   if (params.limit) searchParams.set('limit', String(params.limit));
-  if (params.searchTerm?.trim()) searchParams.set('searchTerm', params.searchTerm.trim());
+  if (params.searchTerm?.trim())
+    searchParams.set('searchTerm', params.searchTerm.trim());
 
   const query = searchParams.toString();
 
-  return requestBackendJson<BackendEnvelope<unknown>>(`/user/admin-get-all${query ? `?${query}` : ''}`, {
-    method: 'GET',
-    token: accessToken ?? undefined,
-  });
+  return requestBackendJson<BackendEnvelope<unknown>>(
+    `/user/admin-get-all${query ? `?${query}` : ''}`,
+    {
+      method: 'GET',
+      token: accessToken ?? undefined,
+    },
+  );
 };
 
 export const getAllAdmins = async (): Promise<BackendEnvelope<unknown>> => {
@@ -70,36 +77,47 @@ export const getAllAdmins = async (): Promise<BackendEnvelope<unknown>> => {
   });
 };
 
-export const blockUnblockSingleUserById = async (): Promise<BackendEnvelope<unknown>> =>
-  unsupported('Endpoint not supported by current backend.');
+export const blockUnblockSingleUserById = async (): Promise<
+  BackendEnvelope<unknown>
+> => unsupported('Endpoint not supported by current backend.');
 
 export const updateUserStatus = async (
   userId: string,
   isActive: boolean,
 ): Promise<BackendEnvelope<unknown>> => {
   const accessToken = await getValidAccessTokenForServerActions();
-  const result = await requestBackendJson<BackendEnvelope<unknown>>(`/user/admin-users/${userId}/status`, {
-    method: 'PATCH',
-    body: { isActive },
-    token: accessToken ?? undefined,
-  });
+  const result = await requestBackendJson<BackendEnvelope<unknown>>(
+    `/user/admin-users/${userId}/status`,
+    {
+      method: 'PATCH',
+      body: { isActive },
+      token: accessToken ?? undefined,
+    },
+  );
 
   revalidateTag(CACHE_TAGS.USERS, 'max');
   return result;
 };
 
-export const deleteUserById = async (userId: string): Promise<BackendEnvelope<unknown>> => {
+export const deleteUserById = async (
+  userId: string,
+): Promise<BackendEnvelope<unknown>> => {
   const accessToken = await getValidAccessTokenForServerActions();
-  const result = await requestBackendJson<BackendEnvelope<unknown>>(`/user/admin-users/${userId}`, {
-    method: 'DELETE',
-    token: accessToken ?? undefined,
-  });
+  const result = await requestBackendJson<BackendEnvelope<unknown>>(
+    `/user/admin-users/${userId}`,
+    {
+      method: 'DELETE',
+      token: accessToken ?? undefined,
+    },
+  );
 
   revalidateTag(CACHE_TAGS.USERS, 'max');
   return result;
 };
 
-export const createUser = async (payload: AdminCreatePayload): Promise<BackendEnvelope<unknown>> => {
+export const createUser = async (
+  payload: AdminCreatePayload,
+): Promise<BackendEnvelope<unknown>> => {
   const accessToken = await getValidAccessTokenForServerActions();
   const formData = new FormData();
 
@@ -119,11 +137,14 @@ export const createUser = async (payload: AdminCreatePayload): Promise<BackendEn
     formData.append('image', image);
   }
 
-  const result = await requestBackendJson<BackendEnvelope<unknown>>('/admin/admins', {
-    method: 'POST',
-    body: formData,
-    token: accessToken ?? undefined,
-  });
+  const result = await requestBackendJson<BackendEnvelope<unknown>>(
+    '/admin/admins',
+    {
+      method: 'POST',
+      body: formData,
+      token: accessToken ?? undefined,
+    },
+  );
 
   revalidateTag(CACHE_TAGS.ADMINS, 'max');
   return result;
@@ -155,22 +176,30 @@ export const updateAdmin = async (
     formData.append('image', image);
   }
 
-  const result = await requestBackendJson<BackendEnvelope<unknown>>(`/admin/admins/${userId}`, {
-    method: 'PATCH',
-    body: formData,
-    token: accessToken ?? undefined,
-  });
+  const result = await requestBackendJson<BackendEnvelope<unknown>>(
+    `/admin/admins/${userId}`,
+    {
+      method: 'PATCH',
+      body: formData,
+      token: accessToken ?? undefined,
+    },
+  );
 
   revalidateTag(CACHE_TAGS.ADMINS, 'max');
   return result;
 };
 
-export const deleteAdmin = async (userId: string): Promise<BackendEnvelope<unknown>> => {
+export const deleteAdmin = async (
+  userId: string,
+): Promise<BackendEnvelope<unknown>> => {
   const accessToken = await getValidAccessTokenForServerActions();
-  const result = await requestBackendJson<BackendEnvelope<unknown>>(`/admin/admins/${userId}`, {
-    method: 'DELETE',
-    token: accessToken ?? undefined,
-  });
+  const result = await requestBackendJson<BackendEnvelope<unknown>>(
+    `/admin/admins/${userId}`,
+    {
+      method: 'DELETE',
+      token: accessToken ?? undefined,
+    },
+  );
 
   revalidateTag(CACHE_TAGS.ADMINS, 'max');
   return result;

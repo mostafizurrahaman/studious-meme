@@ -1,23 +1,23 @@
-"use client";
+'use client';
 
-import { type ReactNode, useEffect, useState, useTransition } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Controller, useForm } from "react-hook-form";
-import type { SubmitHandler, UseFormReturn } from "react-hook-form";
-import { z } from "zod";
-import { Loader2, Pencil, Plus, Sparkles, Trash2 } from "lucide-react";
-import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { type ReactNode, useEffect, useState, useTransition } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { Controller, useForm } from 'react-hook-form';
+import type { SubmitHandler, UseFormReturn } from 'react-hook-form';
+import { z } from 'zod';
+import { Loader2, Pencil, Plus, Sparkles, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { DashboardInput } from "@/components/dashboard/DashboardInput";
-import { DeleteConfirmationDialog } from "@/components/dashboard/DeleteConfirmationDialog";
+} from '@/components/ui/card';
+import { DashboardInput } from '@/components/dashboard/DashboardInput';
+import { DeleteConfirmationDialog } from '@/components/dashboard/DeleteConfirmationDialog';
 import {
   Table,
   TableBody,
@@ -25,26 +25,26 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { TableFilter } from "@/components/ui/table-filter";
-import { TablePagination } from "@/components/ui/table-pagination";
-import { Textarea } from "@/components/ui/textarea";
+} from '@/components/ui/table';
+import { TableFilter } from '@/components/ui/table-filter';
+import { TablePagination } from '@/components/ui/table-pagination';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { formatDashboardDate } from "@/lib/formatDate";
-import { type Coupon, type CouponDiscountType } from "@/lib/coupons";
+} from '@/components/ui/select';
+import { formatDashboardDate } from '@/lib/formatDate';
+import { type Coupon, type CouponDiscountType } from '@/lib/coupons';
 import {
   createCoupon,
   deleteCoupon,
   updateCoupon,
   updateCouponStatus,
-} from "@/services/Coupon/admin";
-import { makeZodResolver } from "@/lib/form-validation";
+} from '@/services/Coupon/admin';
+import { makeZodResolver } from '@/lib/form-validation';
 
 const couponDiscountOptions: Array<{
   value: CouponDiscountType;
@@ -52,63 +52,60 @@ const couponDiscountOptions: Array<{
   description: string;
 }> = [
   {
-    value: "PERCENTAGE",
-    label: "Percentage",
-    description: "Reduce the cart total by a percentage",
+    value: 'PERCENTAGE',
+    label: 'Percentage',
+    description: 'Reduce the cart total by a percentage',
   },
   {
-    value: "DISCOUNT_AMOUNT",
-    label: "Fixed amount",
-    description: "Subtract a fixed ৳ amount",
+    value: 'DISCOUNT_AMOUNT',
+    label: 'Fixed amount',
+    description: 'Subtract a fixed ৳ amount',
   },
   {
-    value: "FREE_SHIPPING",
-    label: "Free shipping",
-    description: "Remove delivery charges for eligible orders",
+    value: 'FREE_SHIPPING',
+    label: 'Free shipping',
+    description: 'Remove delivery charges for eligible orders',
   },
 ];
 
 const couponFormSchema = z
   .object({
     code: z
-      .string({ error: "Coupon code is required!" })
+      .string({ error: 'Coupon code is required!' })
       .trim()
-      .min(2, { message: "Coupon code must be at least 2 characters long!" })
-      .max(50, { message: "Coupon code must be at most 50 characters long!" }),
+      .min(2, { message: 'Coupon code must be at least 2 characters long!' })
+      .max(50, { message: 'Coupon code must be at most 50 characters long!' }),
     label: z
-      .string({ error: "Coupon label is required!" })
+      .string({ error: 'Coupon label is required!' })
       .trim()
-      .min(2, { message: "Coupon label must be at least 2 characters long!" })
+      .min(2, { message: 'Coupon label must be at least 2 characters long!' })
       .max(100, {
-        message: "Coupon label must be at most 100 characters long!",
+        message: 'Coupon label must be at most 100 characters long!',
       }),
-    description: z
-      .string()
-      .trim()
-      .max(500, {
-        message: "Description must be at most 500 characters long!",
-      }),
-    discountType: z.enum(["PERCENTAGE", "DISCOUNT_AMOUNT", "FREE_SHIPPING"], {
-      error: "Discount type is required!",
+    description: z.string().trim().max(500, {
+      message: 'Description must be at most 500 characters long!',
+    }),
+    discountType: z.enum(['PERCENTAGE', 'DISCOUNT_AMOUNT', 'FREE_SHIPPING'], {
+      error: 'Discount type is required!',
     }),
     discountValue: z
-      .number({ error: "Discount value is required!" })
-      .min(0, { message: "Discount value must be at least 0!" }),
+      .number({ error: 'Discount value is required!' })
+      .min(0, { message: 'Discount value must be at least 0!' }),
     minSubtotal: z
-      .number({ error: "Minimum subtotal is required!" })
-      .min(0, { message: "Minimum subtotal must be at least 0!" }),
+      .number({ error: 'Minimum subtotal is required!' })
+      .min(0, { message: 'Minimum subtotal must be at least 0!' }),
     expiresAt: z
-      .string({ error: "Expiry date is required!" })
+      .string({ error: 'Expiry date is required!' })
       .trim()
-      .min(1, { message: "Expiry date is required!" }),
+      .min(1, { message: 'Expiry date is required!' }),
     isActive: z.boolean(),
   })
   .superRefine((value, ctx) => {
-    if (value.discountType === "PERCENTAGE" && value.discountValue > 100) {
+    if (value.discountType === 'PERCENTAGE' && value.discountValue > 100) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Percentage discount cannot be more than 100!",
-        path: ["discountValue"],
+        message: 'Percentage discount cannot be more than 100!',
+        path: ['discountValue'],
       });
     }
   });
@@ -137,15 +134,15 @@ function ErrorText({ message }: { message?: string }) {
 }
 
 function formatCouponValue(coupon: Coupon) {
-  if (coupon.discountType === "FREE_SHIPPING") {
-    return "Free shipping";
+  if (coupon.discountType === 'FREE_SHIPPING') {
+    return 'Free shipping';
   }
 
-  if (coupon.discountType === "PERCENTAGE") {
+  if (coupon.discountType === 'PERCENTAGE') {
     return `${coupon.discountValue}%`;
   }
 
-  return `৳${coupon.discountValue.toLocaleString("en-US")}`;
+  return `৳${coupon.discountValue.toLocaleString('en-US')}`;
 }
 
 function formatDiscountTypeLabel(discountType: CouponDiscountType) {
@@ -163,10 +160,10 @@ function formatDiscountTypeDescription(discountType: CouponDiscountType) {
 }
 
 function toDateTimeLocalValue(value?: string | Date | null) {
-  if (!value) return "";
+  if (!value) return '';
 
   const date = value instanceof Date ? value : new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
+  if (Number.isNaN(date.getTime())) return '';
 
   const offset = date.getTimezoneOffset();
   const local = new Date(date.getTime() - offset * 60_000);
@@ -179,10 +176,10 @@ function getDefaultCouponValues(): CouponFormValues {
   nextYear.setFullYear(nextYear.getFullYear() + 1);
 
   return {
-    code: "",
-    label: "",
-    description: "",
-    discountType: "PERCENTAGE",
+    code: '',
+    label: '',
+    description: '',
+    discountType: 'PERCENTAGE',
     discountValue: 10,
     minSubtotal: 0,
     expiresAt: toDateTimeLocalValue(nextYear),
@@ -197,7 +194,7 @@ function buildCouponPayload(values: CouponFormValues) {
     description: values.description.trim() || undefined,
     discountType: values.discountType,
     discountValue:
-      values.discountType === "FREE_SHIPPING" ? 0 : values.discountValue,
+      values.discountType === 'FREE_SHIPPING' ? 0 : values.discountValue,
     minSubtotal: values.minSubtotal,
     expiresAt: new Date(values.expiresAt).toISOString(),
     isActive: values.isActive,
@@ -225,8 +222,8 @@ function CouponFormCard({
   onSubmit: SubmitHandler<CouponFormValues>;
   onCancel?: () => void;
 }) {
-  const discountType = form.watch("discountType");
-  const isFreeShipping = discountType === "FREE_SHIPPING";
+  const discountType = form.watch('discountType');
+  const isFreeShipping = discountType === 'FREE_SHIPPING';
 
   return (
     <Card className="shadow-sm border-border/60">
@@ -243,7 +240,7 @@ function CouponFormCard({
               </label>
               <DashboardInput
                 placeholder="WELCOME10"
-                {...form.register("code")}
+                {...form.register('code')}
               />
               <ErrorText message={form.formState.errors.code?.message} />
             </div>
@@ -253,7 +250,7 @@ function CouponFormCard({
               </label>
               <DashboardInput
                 placeholder="10% off for new users"
-                {...form.register("label")}
+                {...form.register('label')}
               />
               <ErrorText message={form.formState.errors.label?.message} />
             </div>
@@ -264,7 +261,7 @@ function CouponFormCard({
               <Textarea
                 placeholder="Short note about the offer"
                 className="min-h-24 rounded-xl border-border/70 bg-background/90 px-4 py-3 text-sm shadow-sm focus-visible:border-primary/60 focus-visible:ring-primary/20"
-                {...form.register("description")}
+                {...form.register('description')}
               />
               <ErrorText message={form.formState.errors.description?.message} />
             </div>
@@ -281,8 +278,8 @@ function CouponFormCard({
                     onValueChange={(value) => {
                       field.onChange(value as CouponDiscountType);
 
-                      if (value === "FREE_SHIPPING") {
-                        form.setValue("discountValue", 0, {
+                      if (value === 'FREE_SHIPPING') {
+                        form.setValue('discountValue', 0, {
                           shouldDirty: true,
                           shouldTouch: true,
                           shouldValidate: true,
@@ -314,19 +311,19 @@ function CouponFormCard({
               <DashboardInput
                 type="number"
                 min={0}
-                max={discountType === "PERCENTAGE" ? 100 : undefined}
+                max={discountType === 'PERCENTAGE' ? 100 : undefined}
                 step="1"
                 disabled={isFreeShipping}
                 placeholder={
                   isFreeShipping
-                    ? "0"
-                    : discountType === "PERCENTAGE"
-                      ? "10"
-                      : "500"
+                    ? '0'
+                    : discountType === 'PERCENTAGE'
+                      ? '10'
+                      : '500'
                 }
-                {...form.register("discountValue", {
+                {...form.register('discountValue', {
                   setValueAs: (value) =>
-                    value === "" ? undefined : Number(value),
+                    value === '' ? undefined : Number(value),
                 })}
               />
               <p className="text-xs text-muted-foreground">
@@ -345,9 +342,9 @@ function CouponFormCard({
                 min={0}
                 step="1"
                 placeholder="0"
-                {...form.register("minSubtotal", {
+                {...form.register('minSubtotal', {
                   setValueAs: (value) =>
-                    value === "" ? undefined : Number(value),
+                    value === '' ? undefined : Number(value),
                 })}
               />
               <p className="text-xs text-muted-foreground">
@@ -361,7 +358,7 @@ function CouponFormCard({
               </label>
               <DashboardInput
                 type="datetime-local"
-                {...form.register("expiresAt")}
+                {...form.register('expiresAt')}
               />
               <ErrorText message={form.formState.errors.expiresAt?.message} />
             </div>
@@ -370,7 +367,7 @@ function CouponFormCard({
                 <input
                   type="checkbox"
                   className="size-4 rounded border-border text-primary focus:ring-primary/20"
-                  {...form.register("isActive")}
+                  {...form.register('isActive')}
                 />
                 <span>Active</span>
               </label>
@@ -417,19 +414,19 @@ export function DashboardCouponsManager({
   const [editingCoupon, setEditingCoupon] = useState<Coupon | null>(null);
   const [pendingDeleteCoupon, setPendingDeleteCoupon] = useState<Pick<
     Coupon,
-    "id" | "code" | "label"
+    'id' | 'code' | 'label'
   > | null>(null);
 
   const createForm = useForm<CouponFormValues>({
     resolver: makeZodResolver(couponFormSchema),
     defaultValues: getDefaultCouponValues(),
-    mode: "onTouched",
+    mode: 'onTouched',
   });
 
   const editForm = useForm<CouponFormValues>({
     resolver: makeZodResolver(couponFormSchema),
     defaultValues: getDefaultCouponValues(),
-    mode: "onTouched",
+    mode: 'onTouched',
   });
 
   useEffect(() => {
@@ -441,7 +438,7 @@ export function DashboardCouponsManager({
     editForm.reset({
       code: editingCoupon.code,
       label: editingCoupon.label,
-      description: editingCoupon.description ?? "",
+      description: editingCoupon.description ?? '',
       discountType: editingCoupon.discountType,
       discountValue: editingCoupon.discountValue,
       minSubtotal: editingCoupon.minSubtotal ?? 0,
@@ -450,8 +447,8 @@ export function DashboardCouponsManager({
     });
   }, [editForm, editingCoupon]);
 
-  function refresh(message: string, type: "success" | "error") {
-    if (type === "success") {
+  function refresh(message: string, type: 'success' | 'error') {
+    if (type === 'success') {
       toast.success(message);
     } else {
       toast.error(message);
@@ -468,15 +465,15 @@ export function DashboardCouponsManager({
     const params = new URLSearchParams(searchParams.toString());
     const nextPage = updates.page ?? paginationMeta.page;
     const nextLimit = updates.limit ?? paginationMeta.limit;
-    const nextSearch = updates.searchTerm ?? params.get("searchTerm") ?? "";
+    const nextSearch = updates.searchTerm ?? params.get('searchTerm') ?? '';
 
-    params.set("page", String(nextPage));
-    params.set("limit", String(nextLimit));
+    params.set('page', String(nextPage));
+    params.set('limit', String(nextLimit));
 
     if (nextSearch.trim()) {
-      params.set("searchTerm", nextSearch.trim());
+      params.set('searchTerm', nextSearch.trim());
     } else {
-      params.delete("searchTerm");
+      params.delete('searchTerm');
     }
 
     router.push(`${pathname}?${params.toString()}`);
@@ -507,11 +504,11 @@ export function DashboardCouponsManager({
       const result = await createCoupon(buildCouponPayload(values));
 
       if (!result?.success) {
-        return refresh(result?.message ?? "Failed to create coupon.", "error");
+        return refresh(result?.message ?? 'Failed to create coupon.', 'error');
       }
 
       createForm.reset(getDefaultCouponValues());
-      refresh(result.message ?? "Coupon created successfully.", "success");
+      refresh(result.message ?? 'Coupon created successfully.', 'success');
     });
   }
 
@@ -525,11 +522,11 @@ export function DashboardCouponsManager({
       );
 
       if (!result?.success) {
-        return refresh(result?.message ?? "Failed to update coupon.", "error");
+        return refresh(result?.message ?? 'Failed to update coupon.', 'error');
       }
 
       setEditingCoupon(null);
-      refresh(result.message ?? "Coupon updated successfully.", "success");
+      refresh(result.message ?? 'Coupon updated successfully.', 'success');
     });
   }
 
@@ -539,15 +536,15 @@ export function DashboardCouponsManager({
 
       if (!result?.success) {
         return refresh(
-          result?.message ?? "Failed to update coupon status.",
-          "error",
+          result?.message ?? 'Failed to update coupon status.',
+          'error',
         );
       }
 
       refresh(
         result.message ??
-          `Coupon ${coupon.isActive ? "disabled" : "enabled"} successfully.`,
-        "success",
+          `Coupon ${coupon.isActive ? 'disabled' : 'enabled'} successfully.`,
+        'success',
       );
     });
   }
@@ -561,7 +558,7 @@ export function DashboardCouponsManager({
       const result = await deleteCoupon(couponId);
 
       if (!result?.success) {
-        return refresh(result?.message ?? "Failed to delete coupon.", "error");
+        return refresh(result?.message ?? 'Failed to delete coupon.', 'error');
       }
 
       if (editingCoupon?.id === couponId) {
@@ -569,7 +566,7 @@ export function DashboardCouponsManager({
       }
 
       setPendingDeleteCoupon(null);
-      refresh(result.message ?? "Coupon deleted successfully.", "success");
+      refresh(result.message ?? 'Coupon deleted successfully.', 'success');
     });
   }
 
@@ -673,7 +670,7 @@ export function DashboardCouponsManager({
                         {coupon.label}
                       </div>
                       <p className="max-w-[24rem] text-xs text-muted-foreground">
-                        {coupon.description || "No description provided."}
+                        {coupon.description || 'No description provided.'}
                       </p>
                       <Badge variant="outline" className="w-fit">
                         {formatDiscountTypeLabel(coupon.discountType)}
@@ -685,8 +682,8 @@ export function DashboardCouponsManager({
                   </TableCell>
                   <TableCell className="whitespace-nowrap">
                     {coupon.minSubtotal
-                      ? `৳${coupon.minSubtotal.toLocaleString("en-US")}`
-                      : "No minimum"}
+                      ? `৳${coupon.minSubtotal.toLocaleString('en-US')}`
+                      : 'No minimum'}
                   </TableCell>
                   <TableCell>
                     <span
@@ -698,8 +695,8 @@ export function DashboardCouponsManager({
                     </span>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={coupon.isActive ? "default" : "secondary"}>
-                      {coupon.isActive ? "Active" : "Disabled"}
+                    <Badge variant={coupon.isActive ? 'default' : 'secondary'}>
+                      {coupon.isActive ? 'Active' : 'Disabled'}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
@@ -716,12 +713,12 @@ export function DashboardCouponsManager({
                       </Button>
                       <Button
                         type="button"
-                        variant={coupon.isActive ? "destructive" : "secondary"}
+                        variant={coupon.isActive ? 'destructive' : 'secondary'}
                         size="sm"
                         onClick={() => handleToggleCouponStatus(coupon)}
                         disabled={isPending}
                       >
-                        {coupon.isActive ? "Disable" : "Enable"}
+                        {coupon.isActive ? 'Disable' : 'Enable'}
                       </Button>
                       <Button
                         type="button"
@@ -766,7 +763,7 @@ export function DashboardCouponsManager({
         onConfirm={confirmDeleteCoupon}
         isPending={isPending}
         title="Delete coupon?"
-        description={`This will permanently delete ${pendingDeleteCoupon?.code || pendingDeleteCoupon?.label || "this coupon"} from the system.`}
+        description={`This will permanently delete ${pendingDeleteCoupon?.code || pendingDeleteCoupon?.label || 'this coupon'} from the system.`}
         confirmLabel="Delete coupon"
       />
     </div>

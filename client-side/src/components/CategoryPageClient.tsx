@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { type Route } from "next";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { type Route } from 'next';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
-import { ProductCard } from "@/components/ProductCard";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { ProductCard } from '@/components/ProductCard';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import {
   getCategoryAccentClassName,
   getCategoryAccentStyle,
-} from "@/lib/category-accent";
-import type { CategoryPageEntry, Product } from "@/lib/storefront-types";
+} from '@/lib/category-accent';
+import type { CategoryPageEntry, Product } from '@/lib/storefront-types';
 
 type Props = {
   category: CategoryPageEntry;
@@ -30,8 +30,8 @@ type Props = {
 };
 
 function parseGroupValues(value: string | null) {
-  return (value ?? "")
-    .split(",")
+  return (value ?? '')
+    .split(',')
     .map((item) => item.trim())
     .filter(Boolean);
 }
@@ -46,11 +46,11 @@ export function CategoryPageClient({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const title = "name" in category ? category.name : category.title;
-  const activeBrands = parseGroupValues(searchParams.get("b"));
-  const activeStock = searchParams.get("s") ?? "";
-  const activePrice = searchParams.get("p") ?? "";
-  const activeSubCategory = searchParams.get("subCategorySlug") ?? "";
+  const title = 'name' in category ? category.name : category.title;
+  const activeBrands = parseGroupValues(searchParams.get('b'));
+  const activeStock = searchParams.get('s') ?? '';
+  const activePrice = searchParams.get('p') ?? '';
+  const activeSubCategory = searchParams.get('subCategorySlug') ?? '';
   const totalPages = Math.max(meta.totalPages, 1);
   const page = Math.min(meta.page, totalPages);
   const activeCount =
@@ -63,7 +63,7 @@ export function CategoryPageClient({
     if (value) params.set(key, value);
     else params.delete(key);
 
-    params.delete("page");
+    params.delete('page');
     router.replace(
       (params.toString()
         ? `${pathname}?${params.toString()}`
@@ -76,7 +76,7 @@ export function CategoryPageClient({
 
   function updatePage(nextPage: number) {
     const params = new URLSearchParams(searchParams.toString());
-    params.set("page", String(nextPage));
+    params.set('page', String(nextPage));
     router.replace(`${pathname}?${params.toString()}` as Route, {
       scroll: false,
     });
@@ -121,23 +121,23 @@ export function CategoryPageClient({
           {selectedSubCategory ? (
             <Button
               type="button"
-              onClick={() => updateParam("subCategorySlug", "")}
+              onClick={() => updateParam('subCategorySlug', '')}
               className="h-auto cursor-pointer rounded-full bg-secondary px-3 py-2 text-xs font-semibold text-secondary-foreground transition hover:bg-secondary/90"
             >
               {selectedSubCategory.name} ×
             </Button>
           ) : null}
           {[
-            ["s", "in-stock", "In stock", activeStock],
-            ["p", "under-10000", "Under ৳ 10k", activePrice],
-            ["p", "10000-50000", "৳ 10k-50k", activePrice],
-            ["p", "50000-plus", "৳ 50k+", activePrice],
+            ['s', 'in-stock', 'In stock', activeStock],
+            ['p', 'under-10000', 'Under ৳ 10k', activePrice],
+            ['p', '10000-50000', '৳ 10k-50k', activePrice],
+            ['p', '50000-plus', '৳ 50k+', activePrice],
           ].map(([key, value, label, active]) => (
             <Button
               key={`${key}-${value}`}
               type="button"
-              onClick={() => updateParam(key, active === value ? "" : value)}
-              className={`h-auto cursor-pointer rounded-full px-3 py-2 text-xs font-semibold transition ${active === value ? "bg-secondary text-secondary-foreground hover:bg-secondary/90" : "bg-muted text-foreground/75 hover:bg-muted/70"}`}
+              onClick={() => updateParam(key, active === value ? '' : value)}
+              className={`h-auto cursor-pointer rounded-full px-3 py-2 text-xs font-semibold transition ${active === value ? 'bg-secondary text-secondary-foreground hover:bg-secondary/90' : 'bg-muted text-foreground/75 hover:bg-muted/70'}`}
             >
               {label}
             </Button>
@@ -153,9 +153,9 @@ export function CategoryPageClient({
                   const next = selected
                     ? activeBrands.filter((item) => item !== brand)
                     : [...activeBrands, brand];
-                  updateParam("b", next.join(","));
+                  updateParam('b', next.join(','));
                 }}
-                className={`h-auto cursor-pointer rounded-full px-3 py-2 text-xs font-semibold transition ${selected ? "bg-secondary text-secondary-foreground hover:bg-secondary/90" : "bg-muted text-foreground/75 hover:bg-muted/70"}`}
+                className={`h-auto cursor-pointer rounded-full px-3 py-2 text-xs font-semibold transition ${selected ? 'bg-secondary text-secondary-foreground hover:bg-secondary/90' : 'bg-muted text-foreground/75 hover:bg-muted/70'}`}
               >
                 {brand}
               </Button>

@@ -1,13 +1,13 @@
-import { ManagedPageContent } from "@/components/ManagedPageContent";
-import { SeoScripts } from "@/components/SeoScripts";
-import { policySections } from "@/lib/static-site-content";
-import { termsAndConditionMetadata, termsAndConditionSchemas } from "@/lib/seo";
-import { getPageByType } from "@/services/Page";
+import { ManagedPageContent } from '@/components/ManagedPageContent';
+import { SeoScripts } from '@/components/SeoScripts';
+import { policySections } from '@/lib/static-site-content';
+import { termsAndConditionMetadata, termsAndConditionSchemas } from '@/lib/seo';
+import { getPageByType } from '@/services/Page';
 
 export const metadata = termsAndConditionMetadata;
 
 export default async function TermsAndConditionsPage() {
-  const pageResult = await getPageByType("terms-and-conditions").catch(
+  const pageResult = await getPageByType('terms-and-conditions').catch(
     () => null,
   );
 

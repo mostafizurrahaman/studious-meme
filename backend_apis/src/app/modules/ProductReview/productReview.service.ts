@@ -4,7 +4,11 @@ import { AppError } from '../../utils';
 import { OrderModel } from '../Order/order.model';
 import { ProductModel } from '../Product/product.model';
 import { ProductReviewModel } from './productReview.model';
-import { IProductReview, TReviewSource, TReviewStatus } from './productReview.interface';
+import {
+  IProductReview,
+  TReviewSource,
+  TReviewStatus,
+} from './productReview.interface';
 import { IUser } from '../User/user.interface';
 import UserModel from '../User/user.model';
 
@@ -12,9 +16,11 @@ const DEFAULT_PUBLIC_LIMIT = 5;
 const DEFAULT_ADMIN_LIMIT = 20;
 const MAX_LIMIT = 100;
 
-const getString = (value: unknown) => (typeof value === 'string' ? value.trim() : '');
+const getString = (value: unknown) =>
+  typeof value === 'string' ? value.trim() : '';
 
-const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const escapeRegExp = (value: string) =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 const parsePositiveInteger = (value: unknown, fallback: number) => {
   const parsed = Number(value);
@@ -30,7 +36,10 @@ const ensureObjectId = (value: string, label: string) => {
   return value;
 };
 
-const resolveSort = (value: unknown, fallback: Record<string, 1 | -1>): Record<string, 1 | -1> => {
+const resolveSort = (
+  value: unknown,
+  fallback: Record<string, 1 | -1>,
+): Record<string, 1 | -1> => {
   switch (getString(value)) {
     case 'createdAt-asc':
       return { createdAt: 1, _id: 1 };
@@ -59,7 +68,10 @@ const resolveProductId = async (value: string) => {
   }
 
   const product = await ProductModel.findOne({
-    $or: [{ slug: trimmed }, { title: { $regex: `^${escapeRegExp(trimmed)}$`, $options: 'i' } }],
+    $or: [
+      { slug: trimmed },
+      { title: { $regex: `^${escapeRegExp(trimmed)}$`, $options: 'i' } },
+    ],
   })
     .select('_id')
     .lean();
@@ -79,7 +91,10 @@ const resolveUserId = async (value: string) => {
 
   const lower = trimmed.toLowerCase();
   const user = await UserModel.findOne({
-    $or: [{ email: lower }, { name: { $regex: `^${escapeRegExp(trimmed)}$`, $options: 'i' } }],
+    $or: [
+      { email: lower },
+      { name: { $regex: `^${escapeRegExp(trimmed)}$`, $options: 'i' } },
+    ],
   })
     .select('_id')
     .lean();
@@ -103,10 +118,13 @@ const assertProductExists = async (
   productId: string | Types.ObjectId,
   { activeOnly }: { activeOnly: boolean },
 ) => {
-  const normalizedProductId = typeof productId === 'string' ? productId : productId.toString();
+  const normalizedProductId =
+    typeof productId === 'string' ? productId : productId.toString();
 
   const product = await ProductModel.findOne(
-    activeOnly ? { _id: normalizedProductId, isActive: true } : { _id: normalizedProductId },
+    activeOnly
+      ? { _id: normalizedProductId, isActive: true }
+      : { _id: normalizedProductId },
   )
     .select('_id title slug images rating')
     .lean();
@@ -118,7 +136,10 @@ const assertProductExists = async (
   return product;
 };
 
-const findDeliveredOrderForProduct = async (userId: Types.ObjectId, productId: Types.ObjectId) => {
+const findDeliveredOrderForProduct = async (
+  userId: Types.ObjectId,
+  productId: Types.ObjectId,
+) => {
   return OrderModel.findOne({
     user: userId,
     status: 'DELIVERED',
@@ -128,8 +149,13 @@ const findDeliveredOrderForProduct = async (userId: Types.ObjectId, productId: T
     .lean();
 };
 
-const recalculateProductReviewStats = async (productId: string | Types.ObjectId) => {
-  const productObjectId = typeof productId === 'string' ? ensureObjectId(productId, 'Product ID') : productId;
+const recalculateProductReviewStats = async (
+  productId: string | Types.ObjectId,
+) => {
+  const productObjectId =
+    typeof productId === 'string'
+      ? ensureObjectId(productId, 'Product ID')
+      : productId;
 
   const [stats] = await ProductReviewModel.aggregate<{
     total: number;
@@ -151,9 +177,14 @@ const recalculateProductReviewStats = async (productId: string | Types.ObjectId)
   ]);
 
   const total = stats?.total ?? 0;
-  const averageRating = total > 0 ? Number((stats?.averageRating ?? 0).toFixed(1)) : 0;
+  const averageRating =
+    total > 0 ? Number((stats?.averageRating ?? 0).toFixed(1)) : 0;
 
-  await ProductModel.findByIdAndUpdate(productObjectId, { rating: averageRating }, { runValidators: true });
+  await ProductModel.findByIdAndUpdate(
+    productObjectId,
+    { rating: averageRating },
+    { runValidators: true },
+  );
 
   return { total, averageRating };
 };
@@ -174,7 +205,12 @@ const mapAdminReview = (review: IProductReview) => ({
 
 const createCustomerReviewIntoDB = async (
   user: IUser,
-  payload: { product: string; rating: number; comment: string; images?: string[] },
+  payload: {
+    product: string;
+    rating: number;
+    comment: string;
+    images?: string[];
+  },
 ) => {
   const productId = await resolveProductId(payload.product);
 
@@ -193,13 +229,22 @@ const createCustomerReviewIntoDB = async (
     .lean();
 
   if (duplicateReview) {
-    throw new AppError(httpStatus.CONFLICT, 'You have already reviewed this product!');
+    throw new AppError(
+      httpStatus.CONFLICT,
+      'You have already reviewed this product!',
+    );
   }
 
-  const deliveredOrder = await findDeliveredOrderForProduct(user._id, product._id);
+  const deliveredOrder = await findDeliveredOrderForProduct(
+    user._id,
+    product._id,
+  );
 
   if (!deliveredOrder) {
-    throw new AppError(httpStatus.FORBIDDEN, 'You can review this product after delivery.');
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      'You can review this product after delivery.',
+    );
   }
 
   const review = await ProductReviewModel.create({
@@ -259,12 +304,20 @@ const createManualReviewIntoDB = async (
   return review;
 };
 
-const getApprovedReviewsForProductFromDB = async (productId: string, query: Record<string, unknown> = {}) => {
+const getApprovedReviewsForProductFromDB = async (
+  productId: string,
+  query: Record<string, unknown> = {},
+) => {
   const validProductId = ensureObjectId(productId, 'Product ID');
-  const product = await assertProductExists(validProductId, { activeOnly: true });
+  const product = await assertProductExists(validProductId, {
+    activeOnly: true,
+  });
 
   const page = parsePositiveInteger(query.page, 1);
-  const limit = Math.min(parsePositiveInteger(query.limit, DEFAULT_PUBLIC_LIMIT), MAX_LIMIT);
+  const limit = Math.min(
+    parsePositiveInteger(query.limit, DEFAULT_PUBLIC_LIMIT),
+    MAX_LIMIT,
+  );
   const skip = (page - 1) * limit;
   const sort = resolveSort(query.sort, { createdAt: -1, _id: -1 });
   const filter = { product: product._id, status: 'approved' as TReviewStatus };
@@ -301,7 +354,8 @@ const getApprovedReviewsForProductFromDB = async (productId: string, query: Reco
     },
     summary: {
       total,
-      averageRating: total > 0 ? Number((stats?.averageRating ?? 0).toFixed(1)) : 0,
+      averageRating:
+        total > 0 ? Number((stats?.averageRating ?? 0).toFixed(1)) : 0,
       productRating: product.rating,
     },
   };
@@ -309,7 +363,10 @@ const getApprovedReviewsForProductFromDB = async (productId: string, query: Reco
 
 const getAllReviewsFromDB = async (query: Record<string, unknown> = {}) => {
   const page = parsePositiveInteger(query.page, 1);
-  const limit = Math.min(parsePositiveInteger(query.limit, DEFAULT_ADMIN_LIMIT), MAX_LIMIT);
+  const limit = Math.min(
+    parsePositiveInteger(query.limit, DEFAULT_ADMIN_LIMIT),
+    MAX_LIMIT,
+  );
   const skip = (page - 1) * limit;
   const filter: Record<string, unknown> = {};
   const searchTerm = getString(query.searchTerm);
@@ -317,7 +374,8 @@ const getAllReviewsFromDB = async (query: Record<string, unknown> = {}) => {
   const userFilter = getString(query.user);
   const status = getString(query.status);
   const source = getString(query.source);
-  const rating = typeof query.rating === 'number' ? query.rating : Number(query.rating);
+  const rating =
+    typeof query.rating === 'number' ? query.rating : Number(query.rating);
   const createdFrom = getString(query.createdFrom);
   const createdTo = getString(query.createdTo);
   const sort = resolveSort(query.sort, { createdAt: -1, _id: -1 });
@@ -381,10 +439,16 @@ const getAllReviewsFromDB = async (query: Record<string, unknown> = {}) => {
           _id: null,
           total: { $sum: 1 },
           pending: { $sum: { $cond: [{ $eq: ['$status', 'pending'] }, 1, 0] } },
-          approved: { $sum: { $cond: [{ $eq: ['$status', 'approved'] }, 1, 0] } },
-          rejected: { $sum: { $cond: [{ $eq: ['$status', 'rejected'] }, 1, 0] } },
+          approved: {
+            $sum: { $cond: [{ $eq: ['$status', 'approved'] }, 1, 0] },
+          },
+          rejected: {
+            $sum: { $cond: [{ $eq: ['$status', 'rejected'] }, 1, 0] },
+          },
           hidden: { $sum: { $cond: [{ $eq: ['$status', 'hidden'] }, 1, 0] } },
-          customer: { $sum: { $cond: [{ $eq: ['$source', 'customer'] }, 1, 0] } },
+          customer: {
+            $sum: { $cond: [{ $eq: ['$source', 'customer'] }, 1, 0] },
+          },
           manual: { $sum: { $cond: [{ $eq: ['$source', 'manual'] }, 1, 0] } },
           averageRating: { $avg: '$rating' },
         },
@@ -428,7 +492,9 @@ const updateReviewIntoDB = async (
   adminUser?: IUser,
 ) => {
   const reviewId = ensureObjectId(id, 'Review ID');
-  const existingReview = await ProductReviewModel.findById(reviewId).select('product status source').lean();
+  const existingReview = await ProductReviewModel.findById(reviewId)
+    .select('product status source')
+    .lean();
 
   if (!existingReview) {
     throw new AppError(httpStatus.NOT_FOUND, 'Review not found!');
@@ -436,10 +502,13 @@ const updateReviewIntoDB = async (
 
   const update: Record<string, unknown> = {};
 
-  if (typeof payload.displayName === 'string') update.displayName = payload.displayName.trim();
-  if (typeof payload.displayImage === 'string') update.displayImage = payload.displayImage.trim();
+  if (typeof payload.displayName === 'string')
+    update.displayName = payload.displayName.trim();
+  if (typeof payload.displayImage === 'string')
+    update.displayImage = payload.displayImage.trim();
   if (typeof payload.rating === 'number') update.rating = payload.rating;
-  if (typeof payload.comment === 'string') update.comment = payload.comment.trim();
+  if (typeof payload.comment === 'string')
+    update.comment = payload.comment.trim();
   if (Array.isArray(payload.images)) update.images = payload.images;
 
   if (payload.status) {
@@ -493,7 +562,11 @@ const updateReviewIntoDB = async (
   return updated;
 };
 
-const updateReviewStatusIntoDB = async (id: string, status: TReviewStatus, adminUser: IUser) => {
+const updateReviewStatusIntoDB = async (
+  id: string,
+  status: TReviewStatus,
+  adminUser: IUser,
+) => {
   return updateReviewIntoDB(id, { status }, adminUser);
 };
 
@@ -509,7 +582,9 @@ const deleteReviewFromDB = async (id: string) => {
   }
 
   const deletedProductId =
-    deleted.product && typeof deleted.product === 'object' && '_id' in deleted.product
+    deleted.product &&
+    typeof deleted.product === 'object' &&
+    '_id' in deleted.product
       ? (deleted.product as { _id: Types.ObjectId })._id
       : (deleted.product as Types.ObjectId);
 

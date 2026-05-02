@@ -5,39 +5,39 @@
  * Supports common coverage report formats.
  */
 
-import { tool, type ToolDefinition } from "@opencode-ai/plugin/tool";
-import * as path from "path";
-import * as fs from "fs";
+import { tool, type ToolDefinition } from '@opencode-ai/plugin/tool';
+import * as path from 'path';
+import * as fs from 'fs';
 
 const checkCoverageTool: ToolDefinition = tool({
   description:
-    "Check test coverage against a threshold and identify files with low coverage. Reads coverage reports from common locations.",
+    'Check test coverage against a threshold and identify files with low coverage. Reads coverage reports from common locations.',
   args: {
     threshold: tool.schema
       .number()
       .optional()
-      .describe("Minimum coverage percentage required (default: 80)"),
+      .describe('Minimum coverage percentage required (default: 80)'),
     showUncovered: tool.schema
       .boolean()
       .optional()
-      .describe("Show list of uncovered files (default: true)"),
+      .describe('Show list of uncovered files (default: true)'),
     format: tool.schema
-      .enum(["summary", "detailed", "json"])
+      .enum(['summary', 'detailed', 'json'])
       .optional()
-      .describe("Output format (default: summary)"),
+      .describe('Output format (default: summary)'),
   },
   async execute(args, context) {
     const threshold = args.threshold ?? 80;
     const showUncovered = args.showUncovered ?? true;
-    const format = args.format ?? "summary";
+    const format = args.format ?? 'summary';
     const cwd = context.worktree || context.directory;
 
     // Look for coverage reports
     const coveragePaths = [
-      "coverage/coverage-summary.json",
-      "coverage/lcov-report/index.html",
-      "coverage/coverage-final.json",
-      ".nyc_output/coverage.json",
+      'coverage/coverage-summary.json',
+      'coverage/lcov-report/index.html',
+      'coverage/coverage-final.json',
+      '.nyc_output/coverage.json',
     ];
 
     let coverageData: CoverageSummary | null = null;
@@ -45,9 +45,9 @@ const checkCoverageTool: ToolDefinition = tool({
 
     for (const coveragePath of coveragePaths) {
       const fullPath = path.join(cwd, coveragePath);
-      if (fs.existsSync(fullPath) && coveragePath.endsWith(".json")) {
+      if (fs.existsSync(fullPath) && coveragePath.endsWith('.json')) {
         try {
-          const content = JSON.parse(fs.readFileSync(fullPath, "utf-8"));
+          const content = JSON.parse(fs.readFileSync(fullPath, 'utf-8'));
           coverageData = parseCoverageData(content);
           coverageFile = coveragePath;
           break;
@@ -60,8 +60,8 @@ const checkCoverageTool: ToolDefinition = tool({
     if (!coverageData) {
       return JSON.stringify({
         success: false,
-        error: "No coverage report found",
-        suggestion: "Run tests with coverage first: npm test -- --coverage",
+        error: 'No coverage report found',
+        suggestion: 'Run tests with coverage first: npm test -- --coverage',
         searchedPaths: coveragePaths,
       });
     }
@@ -79,12 +79,12 @@ const checkCoverageTool: ToolDefinition = tool({
       passed,
     };
 
-    if (format === "detailed" || (showUncovered && uncoveredFiles.length > 0)) {
+    if (format === 'detailed' || (showUncovered && uncoveredFiles.length > 0)) {
       result.uncoveredFiles = uncoveredFiles.slice(0, 20); // Limit to 20 files
       result.uncoveredCount = uncoveredFiles.length;
     }
 
-    if (format === "json") {
+    if (format === 'json') {
       result.rawData = coverageData;
     }
 
@@ -92,7 +92,7 @@ const checkCoverageTool: ToolDefinition = tool({
       result.suggestion = `Coverage is ${coverageData.total.percentage.toFixed(1)}% which is below the ${threshold}% threshold. Focus on these files:\n${uncoveredFiles
         .slice(0, 5)
         .map((f) => `- ${f.file}: ${f.percentage.toFixed(1)}%`)
-        .join("\n")}`;
+        .join('\n')}`;
     }
 
     return JSON.stringify(result);
@@ -119,9 +119,9 @@ interface CoverageResult {
   success: boolean;
   threshold: number;
   coverageFile: string | null;
-  total: CoverageSummary["total"];
+  total: CoverageSummary['total'];
   passed: boolean;
-  uncoveredFiles?: CoverageSummary["files"];
+  uncoveredFiles?: CoverageSummary['files'];
   uncoveredCount?: number;
   rawData?: CoverageSummary;
   suggestion?: string;
@@ -129,17 +129,17 @@ interface CoverageResult {
 
 function parseCoverageData(data: unknown): CoverageSummary {
   // Handle istanbul/nyc format
-  if (typeof data === "object" && data !== null && "total" in data) {
+  if (typeof data === 'object' && data !== null && 'total' in data) {
     const istanbulData = data as Record<string, unknown>;
     const total = istanbulData.total as Record<
       string,
       { total: number; covered: number }
     >;
 
-    const files: CoverageSummary["files"] = [];
+    const files: CoverageSummary['files'] = [];
 
     for (const [key, value] of Object.entries(istanbulData)) {
-      if (key !== "total" && typeof value === "object" && value !== null) {
+      if (key !== 'total' && typeof value === 'object' && value !== null) {
         const fileData = value as Record<
           string,
           { total: number; covered: number }

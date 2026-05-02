@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router } from 'express';
 import {
   actionLimiter,
   adminLimiter,
@@ -6,15 +6,15 @@ import {
   burstProtection,
   duplicateSubmissionGuard,
   validateRequest,
-} from "../../middlewares";
-import { ROLE } from "../User/user.constant";
-import { WishlistHistoryController } from "./wishlistHistory.controller";
-import { WishlistHistoryValidation } from "./wishlistHistory.validation";
+} from '../../middlewares';
+import { ROLE } from '../User/user.constant';
+import { WishlistHistoryController } from './wishlistHistory.controller';
+import { WishlistHistoryValidation } from './wishlistHistory.validation';
 
 const router = Router();
 
 router
-  .route("/")
+  .route('/')
   .get(
     auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN),
     actionLimiter,
@@ -23,14 +23,14 @@ router
   .post(
     auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN),
     actionLimiter,
-    burstProtection("action", 10_000, 12),
+    burstProtection('action', 10_000, 12),
     duplicateSubmissionGuard(),
     validateRequest(WishlistHistoryValidation.wishlistProductSchema),
     WishlistHistoryController.addWishlistItem,
   );
 
 router
-  .route("/admin")
+  .route('/admin')
   .get(
     auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
     adminLimiter,
@@ -38,7 +38,7 @@ router
   );
 
 router
-  .route("/admin/summary")
+  .route('/admin/summary')
   .get(
     auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
     adminLimiter,
@@ -46,7 +46,7 @@ router
   );
 
 router
-  .route("/:productId")
+  .route('/:productId')
   .delete(
     auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN),
     actionLimiter,

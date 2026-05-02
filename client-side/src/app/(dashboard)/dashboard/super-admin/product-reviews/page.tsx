@@ -2,7 +2,10 @@ import type { Metadata } from 'next';
 import { DashboardProductReviewsManager } from '@/components/dashboard/DashboardProductReviewsManager';
 import { requireDashboardRoles } from '@/lib/dashboard-auth';
 import { buildMetadata } from '@/lib/seo';
-import { getAdminProductReviews, type ProductReviewListParams } from '@/services/ProductReview';
+import {
+  getAdminProductReviews,
+  type ProductReviewListParams,
+} from '@/services/ProductReview';
 
 type Props = {
   searchParams: Promise<{
@@ -22,7 +25,8 @@ type Props = {
 
 export const metadata: Metadata = buildMetadata({
   title: 'Product Reviews',
-  description: 'Manage product reviews, moderation, and manual review creation.',
+  description:
+    'Manage product reviews, moderation, and manual review creation.',
   path: '/dashboard/super-admin/product-reviews',
   noindex: true,
 });
@@ -35,7 +39,9 @@ const parsePositiveInteger = (value: string | undefined, fallback: number) => {
   return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
 };
 
-export default async function SuperAdminProductReviewsPage({ searchParams }: Props) {
+export default async function SuperAdminProductReviewsPage({
+  searchParams,
+}: Props) {
   await requireDashboardRoles(['SUPER_ADMIN']);
   const query = await searchParams;
   const page = parsePositiveInteger(query.page, 1);
@@ -54,7 +60,9 @@ export default async function SuperAdminProductReviewsPage({ searchParams }: Pro
     page,
     limit,
     searchTerm,
-    status: status ? (status as 'pending' | 'approved' | 'rejected' | 'hidden') : undefined,
+    status: status
+      ? (status as 'pending' | 'approved' | 'rejected' | 'hidden')
+      : undefined,
     source: source ? (source as 'customer' | 'manual') : undefined,
     product,
     user,
@@ -69,7 +77,9 @@ export default async function SuperAdminProductReviewsPage({ searchParams }: Pro
     page: reviewsResult?.meta?.page ?? page,
     limit: reviewsResult?.meta?.limit ?? limit,
     total: reviewsResult?.meta?.total ?? reviews.length,
-    totalPages: reviewsResult?.meta?.totalPages ?? (Math.ceil(reviews.length / limit) || 1),
+    totalPages:
+      reviewsResult?.meta?.totalPages ??
+      (Math.ceil(reviews.length / limit) || 1),
   };
 
   const summary = {

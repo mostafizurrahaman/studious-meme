@@ -1,7 +1,7 @@
-import httpStatus from "http-status";
-import { AppError, asyncHandler, sendResponse } from "../../utils";
-import { CategoryService } from "./category.service";
-import { getParam } from "../../lib/getParam";
+import httpStatus from 'http-status';
+import { AppError, asyncHandler, sendResponse } from '../../utils';
+import { CategoryService } from './category.service';
+import { getParam } from '../../lib/getParam';
 
 // 1. createCategory
 const createCategory = asyncHandler(async (req, res) => {
@@ -9,7 +9,7 @@ const createCategory = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
-    message: "Category created successfully!",
+    message: 'Category created successfully!',
     data: result,
   });
 });
@@ -20,7 +20,7 @@ const getAllCategories = asyncHandler(async (_req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Categories fetched successfully!",
+    message: 'Categories fetched successfully!',
     data: result,
   });
 });
@@ -31,7 +31,7 @@ const getActiveCategories = asyncHandler(async (_req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Active categories fetched successfully!",
+    message: 'Active categories fetched successfully!',
     data: result,
   });
 });
@@ -44,7 +44,7 @@ const getCategory = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Category fetched successfully!",
+    message: 'Category fetched successfully!',
     data: result,
   });
 });
@@ -57,7 +57,7 @@ const getActiveCategory = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Active category fetched successfully!",
+    message: 'Active category fetched successfully!',
     data: result,
   });
 });
@@ -70,11 +70,11 @@ const updateCategory = asyncHandler(async (req, res) => {
     req.file,
   );
 
-  if (!result) throw new AppError(httpStatus.NOT_FOUND, "Category not found!");
+  if (!result) throw new AppError(httpStatus.NOT_FOUND, 'Category not found!');
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Category updated successfully!",
+    message: 'Category updated successfully!',
     data: result,
   });
 });
@@ -85,11 +85,11 @@ const deleteCategory = asyncHandler(async (req, res) => {
     getParam(req.params.slug),
   );
 
-  if (!result) throw new AppError(httpStatus.NOT_FOUND, "Category not found!");
+  if (!result) throw new AppError(httpStatus.NOT_FOUND, 'Category not found!');
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Category deleted successfully!",
+    message: 'Category deleted successfully!',
     data: result,
   });
 });
@@ -104,7 +104,7 @@ const createCategorySubCategory = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
-    message: "Subcategory created successfully!",
+    message: 'Subcategory created successfully!',
     data: result,
   });
 });
@@ -119,11 +119,11 @@ const updateCategorySubCategory = asyncHandler(async (req, res) => {
   );
 
   if (!result)
-    throw new AppError(httpStatus.NOT_FOUND, "Subcategory not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Subcategory not found!');
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Subcategory updated successfully!",
+    message: 'Subcategory updated successfully!',
     data: result,
   });
 });
@@ -136,11 +136,11 @@ const deleteCategorySubCategory = asyncHandler(async (req, res) => {
   );
 
   if (!result)
-    throw new AppError(httpStatus.NOT_FOUND, "Subcategory not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Subcategory not found!');
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Subcategory deleted successfully!",
+    message: 'Subcategory deleted successfully!',
     data: result,
   });
 });

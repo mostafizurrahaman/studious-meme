@@ -1,6 +1,6 @@
-import type { PropsWithChildren } from "react";
-import { Card } from "@/components/ui/card";
-import { Container } from "@/components/Container";
+import type { PropsWithChildren } from 'react';
+import { Card } from '@/components/ui/card';
+import { Container } from '@/components/Container';
 
 type Props = PropsWithChildren<{
   title: string;

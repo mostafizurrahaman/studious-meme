@@ -1,12 +1,12 @@
-import { SeoScripts } from "@/components/SeoScripts";
-import { WishlistPageClient } from "@/components/WishlistPageClient";
-import { wishlistMetadata, wishlistSchemas } from "@/lib/seo";
-import { mapBackendProductToStorefrontProduct } from "@/services/Product";
-import type { BackendProduct } from "@/services/Product";
-import { getMyWishlist } from "@/services/WishlistHistory";
+import { SeoScripts } from '@/components/SeoScripts';
+import { WishlistPageClient } from '@/components/WishlistPageClient';
+import { wishlistMetadata, wishlistSchemas } from '@/lib/seo';
+import { mapBackendProductToStorefrontProduct } from '@/services/Product';
+import type { BackendProduct } from '@/services/Product';
+import { getMyWishlist } from '@/services/WishlistHistory';
 
 export const metadata = wishlistMetadata;
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 export default async function WishlistPage() {
   const wishlistResult = await getMyWishlist().catch(() => null);

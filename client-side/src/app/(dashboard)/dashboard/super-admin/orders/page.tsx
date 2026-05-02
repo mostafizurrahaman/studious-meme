@@ -1,17 +1,17 @@
-import type { Metadata } from "next";
-import { requireDashboardRoles } from "@/lib/dashboard-auth";
-import { buildMetadata } from "@/lib/seo";
-import { getAllOrdersForAdmin, updateOrderStatus } from "@/services/Order";
-import { DashboardOrdersManager } from "@/components/dashboard/DashboardOrdersManager";
+import type { Metadata } from 'next';
+import { requireDashboardRoles } from '@/lib/dashboard-auth';
+import { buildMetadata } from '@/lib/seo';
+import { getAllOrdersForAdmin, updateOrderStatus } from '@/services/Order';
+import { DashboardOrdersManager } from '@/components/dashboard/DashboardOrdersManager';
 
 export const metadata: Metadata = buildMetadata({
-  title: "Orders",
-  description: "Manage customer orders and order status.",
-  path: "/dashboard/super-admin/orders",
+  title: 'Orders',
+  description: 'Manage customer orders and order status.',
+  path: '/dashboard/super-admin/orders',
   noindex: true,
 });
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 type Props = {
   searchParams: Promise<{ page?: string; limit?: string }>;
@@ -24,7 +24,7 @@ const parsePositiveInteger = (value: string | undefined, fallback: number) => {
 };
 
 export default async function SuperAdminOrdersPage({ searchParams }: Props) {
-  await requireDashboardRoles(["SUPER_ADMIN"]);
+  await requireDashboardRoles(['SUPER_ADMIN']);
   const query = await searchParams;
   const page = parsePositiveInteger(query.page, 1);
   const limit = parsePositiveInteger(query.limit, 50);
@@ -39,14 +39,14 @@ export default async function SuperAdminOrdersPage({ searchParams }: Props) {
   };
 
   async function updateStatus(formData: FormData) {
-    "use server";
+    'use server';
 
-    const orderId = String(formData.get("orderId") ?? "");
-    const status = String(formData.get("status") ?? "") as
-      | "PLACED"
-      | "PROCESSING"
-      | "DELIVERED"
-      | "CANCELLED";
+    const orderId = String(formData.get('orderId') ?? '');
+    const status = String(formData.get('status') ?? '') as
+      | 'PLACED'
+      | 'PROCESSING'
+      | 'DELIVERED'
+      | 'CANCELLED';
 
     await updateOrderStatus(orderId, status);
   }

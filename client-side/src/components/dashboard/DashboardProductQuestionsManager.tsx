@@ -4,19 +4,52 @@ import { useCallback, useEffect, useState, useTransition } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { CheckCircle2, Eye, Link2, Loader2, PencilLine, Trash2 } from 'lucide-react';
+import {
+  CheckCircle2,
+  Eye,
+  Link2,
+  Loader2,
+  PencilLine,
+  Trash2,
+} from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { DashboardInput } from '@/components/dashboard/DashboardInput';
 import { DeleteConfirmationDialog } from '@/components/dashboard/DeleteConfirmationDialog';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { TableFilter } from '@/components/ui/table-filter';
 import { TablePagination } from '@/components/ui/table-pagination';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { formatDashboardDate } from '@/lib/formatDate';
 import { makeZodResolver } from '@/lib/form-validation';
 import {
@@ -39,14 +72,22 @@ type AnswerFormValues = z.infer<typeof answerSchema>;
 
 type Props = {
   questions: ProductQuestionRecord[];
-  paginationMeta: { page: number; limit: number; total: number; totalPages: number };
+  paginationMeta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
   searchTerm?: string;
   status?: string;
   product?: string;
   sort?: string;
 };
 
-const statusOptions: Array<{ label: string; value: ProductQuestionStatus | 'all' }> = [
+const statusOptions: Array<{
+  label: string;
+  value: ProductQuestionStatus | 'all';
+}> = [
   { label: 'All statuses', value: 'all' },
   { label: 'Pending', value: 'pending' },
   { label: 'Answered', value: 'answered' },
@@ -81,14 +122,20 @@ function resolveProduct(question: ProductQuestionRecord) {
 function compactText(value?: string, maxLength = 90) {
   if (!value?.trim()) return '-';
   const normalized = value.replace(/\s+/g, ' ').trim();
-  return normalized.length > maxLength ? `${normalized.slice(0, maxLength)}…` : normalized;
+  return normalized.length > maxLength
+    ? `${normalized.slice(0, maxLength)}…`
+    : normalized;
 }
 
 function DetailBlock({ label, value }: { label: string; value?: string }) {
   return (
     <div className="rounded-xl border bg-muted/20 p-3">
-      <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">{label}</div>
-      <div className="mt-2 whitespace-pre-wrap text-sm leading-6 text-foreground">{value?.trim() || '-'}</div>
+      <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+        {label}
+      </div>
+      <div className="mt-2 whitespace-pre-wrap text-sm leading-6 text-foreground">
+        {value?.trim() || '-'}
+      </div>
     </div>
   );
 }
@@ -109,9 +156,11 @@ export function DashboardProductQuestionsManager({
   const [statusFilter, setStatusFilter] = useState(status);
   const [productFilter, setProductFilter] = useState(product);
   const [sortFilter, setSortFilter] = useState(sort);
-  const [selectedQuestion, setSelectedQuestion] = useState<ProductQuestionRecord | null>(null);
+  const [selectedQuestion, setSelectedQuestion] =
+    useState<ProductQuestionRecord | null>(null);
   const [questionMode, setQuestionMode] = useState<'view' | 'answer'>('view');
-  const [pendingDeleteQuestion, setPendingDeleteQuestion] = useState<ProductQuestionRecord | null>(null);
+  const [pendingDeleteQuestion, setPendingDeleteQuestion] =
+    useState<ProductQuestionRecord | null>(null);
 
   const answerForm = useForm<AnswerFormValues>({
     resolver: makeZodResolver(answerSchema),
@@ -157,7 +206,17 @@ export function DashboardProductQuestionsManager({
 
       router.push(`${pathname}?${params.toString()}`);
     },
-    [paginationMeta.limit, paginationMeta.page, pathname, productFilter, router, search, searchParams, sortFilter, statusFilter],
+    [
+      paginationMeta.limit,
+      paginationMeta.page,
+      pathname,
+      productFilter,
+      router,
+      search,
+      searchParams,
+      sortFilter,
+      statusFilter,
+    ],
   );
 
   function refresh(message: string, type: 'success' | 'error') {
@@ -187,7 +246,10 @@ export function DashboardProductQuestionsManager({
     updateQuery({ page: 1, sort: value });
   }
 
-  function openQuestion(question: ProductQuestionRecord, mode: 'view' | 'answer') {
+  function openQuestion(
+    question: ProductQuestionRecord,
+    mode: 'view' | 'answer',
+  ) {
     setSelectedQuestion(question);
     setQuestionMode(mode);
   }
@@ -202,10 +264,15 @@ export function DashboardProductQuestionsManager({
     if (!questionId) return;
 
     startTransition(async () => {
-      const result = await answerProductQuestion(questionId, { answer: values.answer });
+      const result = await answerProductQuestion(questionId, {
+        answer: values.answer,
+      });
 
       if (!result?.success) {
-        return refresh(result?.message ?? 'Failed to answer question.', 'error');
+        return refresh(
+          result?.message ?? 'Failed to answer question.',
+          'error',
+        );
       }
 
       setSelectedQuestion(null);
@@ -213,15 +280,26 @@ export function DashboardProductQuestionsManager({
     });
   }
 
-  function confirmStatusChange(questionId: string, nextStatus: ProductQuestionStatus) {
+  function confirmStatusChange(
+    questionId: string,
+    nextStatus: ProductQuestionStatus,
+  ) {
     startTransition(async () => {
-      const result = await updateProductQuestionStatus(questionId, { status: nextStatus });
+      const result = await updateProductQuestionStatus(questionId, {
+        status: nextStatus,
+      });
 
       if (!result?.success) {
-        return refresh(result?.message ?? 'Failed to update question status.', 'error');
+        return refresh(
+          result?.message ?? 'Failed to update question status.',
+          'error',
+        );
       }
 
-      refresh(result.message ?? 'Question status updated successfully.', 'success');
+      refresh(
+        result.message ?? 'Question status updated successfully.',
+        'success',
+      );
     });
   }
 
@@ -233,7 +311,10 @@ export function DashboardProductQuestionsManager({
       const result = await deleteProductQuestion(questionId);
 
       if (!result?.success) {
-        return refresh(result?.message ?? 'Failed to delete question.', 'error');
+        return refresh(
+          result?.message ?? 'Failed to delete question.',
+          'error',
+        );
       }
 
       setPendingDeleteQuestion(null);
@@ -262,15 +343,18 @@ export function DashboardProductQuestionsManager({
           />
           <DashboardInput
             value={productFilter}
-            onChange={event => handleProductChange(event.target.value)}
+            onChange={(event) => handleProductChange(event.target.value)}
             placeholder="Filter by product slug or ID"
           />
-          <Select value={statusFilter || 'all'} onValueChange={handleStatusChange}>
+          <Select
+            value={statusFilter || 'all'}
+            onValueChange={handleStatusChange}
+          >
             <SelectTrigger className="h-11 w-full rounded-xl border-border/70 bg-background/90 px-4 text-sm shadow-sm">
               <SelectValue placeholder="Filter status" />
             </SelectTrigger>
             <SelectContent>
-              {statusOptions.map(option => (
+              {statusOptions.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
                 </SelectItem>
@@ -282,7 +366,7 @@ export function DashboardProductQuestionsManager({
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>
-              {sortOptions.map(option => (
+              {sortOptions.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
                 </SelectItem>
@@ -315,7 +399,7 @@ export function DashboardProductQuestionsManager({
               </TableRow>
             ) : null}
 
-            {questions.map(question => {
+            {questions.map((question) => {
               const productRef = resolveProduct(question);
               const productSlug = productRef?.slug?.trim();
 
@@ -323,26 +407,43 @@ export function DashboardProductQuestionsManager({
                 <TableRow key={question._id ?? question.question}>
                   <TableCell className="align-top">
                     <div className="space-y-1">
-                      <div className="line-clamp-3 font-medium">{question.question}</div>
-                      <div className="text-xs text-muted-foreground">{resolveLabel(question.user)}</div>
+                      <div className="line-clamp-3 font-medium">
+                        {question.question}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {resolveLabel(question.user)}
+                      </div>
                     </div>
                   </TableCell>
                   <TableCell className="align-top">
                     <div className="space-y-1">
-                      <div className="font-medium">{productRef?.title?.trim() || '-'}</div>
-                      <div className="text-xs text-muted-foreground">{productSlug || '-'}</div>
+                      <div className="font-medium">
+                        {productRef?.title?.trim() || '-'}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {productSlug || '-'}
+                      </div>
                     </div>
                   </TableCell>
                   <TableCell className="align-top">
                     <div className="space-y-1">
-                      <div className="font-medium">{resolveLabel(question.user)}</div>
-                      <div className="text-xs text-muted-foreground">{resolveEmail(question.user)}</div>
+                      <div className="font-medium">
+                        {resolveLabel(question.user)}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {resolveEmail(question.user)}
+                      </div>
                     </div>
                   </TableCell>
                   <TableCell className="align-top">
                     <Select
                       value={question.status}
-                      onValueChange={value => confirmStatusChange(question._id ?? '', value as ProductQuestionStatus)}
+                      onValueChange={(value) =>
+                        confirmStatusChange(
+                          question._id ?? '',
+                          value as ProductQuestionStatus,
+                        )
+                      }
                       disabled={!question._id || isPending}
                     >
                       <SelectTrigger className="h-9 w-full rounded-full border-border/70 bg-background/90 px-3 text-xs shadow-sm">
@@ -363,7 +464,13 @@ export function DashboardProductQuestionsManager({
                   <TableCell className="align-top whitespace-nowrap text-sm">
                     <span
                       className="cursor-help"
-                      title={question.createdAt ? formatDashboardDate(question.createdAt, { time: true }) : undefined}
+                      title={
+                        question.createdAt
+                          ? formatDashboardDate(question.createdAt, {
+                              time: true,
+                            })
+                          : undefined
+                      }
                     >
                       {formatDashboardDate(question.createdAt)}
                     </span>
@@ -371,22 +478,47 @@ export function DashboardProductQuestionsManager({
                   <TableCell className="align-top whitespace-nowrap text-sm">
                     <span
                       className="cursor-help"
-                      title={question.answeredAt ? formatDashboardDate(question.answeredAt, { time: true }) : undefined}
+                      title={
+                        question.answeredAt
+                          ? formatDashboardDate(question.answeredAt, {
+                              time: true,
+                            })
+                          : undefined
+                      }
                     >
                       {formatDashboardDate(question.answeredAt)}
                     </span>
                   </TableCell>
                   <TableCell className="align-top">
                     <div className="flex flex-wrap justify-end gap-2">
-                      <Button type="button" variant="outline" size="icon" onClick={() => openQuestion(question, 'view')}>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => openQuestion(question, 'view')}
+                      >
                         <Eye className="size-4" />
                       </Button>
-                      <Button type="button" variant="outline" size="icon" onClick={() => openQuestion(question, 'answer')}>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => openQuestion(question, 'answer')}
+                      >
                         <PencilLine className="size-4" />
                       </Button>
                       {productSlug ? (
-                        <Button asChild type="button" variant="outline" size="icon" title="Visit product details">
-                          <Link href={`/product/${productSlug}`} target="_blank">
+                        <Button
+                          asChild
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          title="Visit product details"
+                        >
+                          <Link
+                            href={`/product/${productSlug}`}
+                            target="_blank"
+                          >
                             <Link2 className="size-4" />
                           </Link>
                         </Button>
@@ -412,39 +544,72 @@ export function DashboardProductQuestionsManager({
           page={paginationMeta.page}
           limit={paginationMeta.limit}
           total={paginationMeta.total}
-          onPageChange={page => updateQuery({ page })}
-          onLimitChange={limit => updateQuery({ page: 1, limit })}
+          onPageChange={(page) => updateQuery({ page })}
+          onLimitChange={(limit) => updateQuery({ page: 1, limit })}
         />
       </CardContent>
 
-      <Dialog open={Boolean(selectedQuestion)} onOpenChange={open => (!open ? closeQuestionDialog() : undefined)}>
+      <Dialog
+        open={Boolean(selectedQuestion)}
+        onOpenChange={(open) => (!open ? closeQuestionDialog() : undefined)}
+      >
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-4xl">
           <DialogHeader>
-            <DialogTitle>{questionMode === 'answer' ? 'Answer question' : 'Question details'}</DialogTitle>
+            <DialogTitle>
+              {questionMode === 'answer'
+                ? 'Answer question'
+                : 'Question details'}
+            </DialogTitle>
             <DialogDescription>
-              View the question, related product, asker info, and current answer.
+              View the question, related product, asker info, and current
+              answer.
             </DialogDescription>
           </DialogHeader>
 
           {selectedQuestion ? (
             <div className="grid gap-4">
               <div className="grid gap-3 sm:grid-cols-2">
-                <DetailBlock label="Question" value={selectedQuestion.question} />
-                <DetailBlock label="Current answer" value={selectedQuestion.answer} />
+                <DetailBlock
+                  label="Question"
+                  value={selectedQuestion.question}
+                />
+                <DetailBlock
+                  label="Current answer"
+                  value={selectedQuestion.answer}
+                />
               </div>
 
               <div className="grid gap-3 sm:grid-cols-2">
-                <DetailBlock label="Asked by" value={`${resolveLabel(selectedQuestion.user)} • ${resolveEmail(selectedQuestion.user)}`} />
-                <DetailBlock label="Product" value={resolveProduct(selectedQuestion)?.title || '-'} />
+                <DetailBlock
+                  label="Asked by"
+                  value={`${resolveLabel(selectedQuestion.user)} • ${resolveEmail(selectedQuestion.user)}`}
+                />
+                <DetailBlock
+                  label="Product"
+                  value={resolveProduct(selectedQuestion)?.title || '-'}
+                />
               </div>
 
               <div className="grid gap-3 sm:grid-cols-3">
                 <DetailBlock label="Status" value={selectedQuestion.status} />
-                <DetailBlock label="Created at" value={formatDashboardDate(selectedQuestion.createdAt, { time: true })} />
-                <DetailBlock label="Answered at" value={formatDashboardDate(selectedQuestion.answeredAt, { time: true })} />
+                <DetailBlock
+                  label="Created at"
+                  value={formatDashboardDate(selectedQuestion.createdAt, {
+                    time: true,
+                  })}
+                />
+                <DetailBlock
+                  label="Answered at"
+                  value={formatDashboardDate(selectedQuestion.answeredAt, {
+                    time: true,
+                  })}
+                />
               </div>
 
-              <form className="space-y-3" onSubmit={answerForm.handleSubmit(confirmAnswer)}>
+              <form
+                className="space-y-3"
+                onSubmit={answerForm.handleSubmit(confirmAnswer)}
+              >
                 <div className="space-y-1.5">
                   <Textarea
                     className="min-h-36 rounded-2xl"
@@ -452,16 +617,24 @@ export function DashboardProductQuestionsManager({
                     {...answerForm.register('answer')}
                   />
                   {answerForm.formState.errors.answer?.message ? (
-                    <p className="text-xs text-destructive">{answerForm.formState.errors.answer.message}</p>
+                    <p className="text-xs text-destructive">
+                      {answerForm.formState.errors.answer.message}
+                    </p>
                   ) : null}
                 </div>
 
                 <DialogFooter className="gap-2 sm:justify-between">
                   <div className="text-xs text-muted-foreground">
-                    {questionMode === 'answer' ? 'Submitting will mark the question as answered.' : 'You can still edit and save the answer.'}
+                    {questionMode === 'answer'
+                      ? 'Submitting will mark the question as answered.'
+                      : 'You can still edit and save the answer.'}
                   </div>
                   <Button type="submit" disabled={isPending}>
-                    {isPending ? <Loader2 className="size-4 animate-spin" /> : <CheckCircle2 className="size-4" />}
+                    {isPending ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <CheckCircle2 className="size-4" />
+                    )}
                     Save answer
                   </Button>
                 </DialogFooter>
@@ -473,7 +646,9 @@ export function DashboardProductQuestionsManager({
 
       <DeleteConfirmationDialog
         open={Boolean(pendingDeleteQuestion)}
-        onOpenChange={open => (!open && !isPending ? setPendingDeleteQuestion(null) : undefined)}
+        onOpenChange={(open) =>
+          !open && !isPending ? setPendingDeleteQuestion(null) : undefined
+        }
         onConfirm={confirmDeleteQuestion}
         isPending={isPending}
         title="Delete product question"

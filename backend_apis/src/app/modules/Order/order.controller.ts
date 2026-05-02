@@ -1,8 +1,8 @@
-import httpStatus from "http-status";
-import { asyncHandler, sendResponse } from "../../utils";
-import { ROLE } from "../User/user.constant";
-import { PaymentService } from "../Payment/payment.service";
-import { OrderService } from "./order.service";
+import httpStatus from 'http-status';
+import { asyncHandler, sendResponse } from '../../utils';
+import { ROLE } from '../User/user.constant';
+import { PaymentService } from '../Payment/payment.service';
+import { OrderService } from './order.service';
 
 const getSingleParam = (value: string | string[]) =>
   Array.isArray(value) ? value[0] : value;
@@ -13,7 +13,7 @@ const previewCheckout = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Checkout preview generated successfully!",
+    message: 'Checkout preview generated successfully!',
     data: result,
   });
 });
@@ -22,7 +22,7 @@ const previewCheckout = asyncHandler(async (req, res) => {
 const createOrder = asyncHandler(async (req, res) => {
   const order = await OrderService.createOrderIntoDB(req.user, req.body);
 
-  if (req.body.paymentMethod === "PORTPOS") {
+  if (req.body.paymentMethod === 'PORTPOS') {
     const payment = await PaymentService.initiatePortPosPayment(
       req.user,
       order.orderId,
@@ -30,7 +30,7 @@ const createOrder = asyncHandler(async (req, res) => {
 
     sendResponse(res, {
       statusCode: httpStatus.CREATED,
-      message: "Payment initiated successfully!",
+      message: 'Payment initiated successfully!',
       data: {
         orderId: order.orderId,
         invoiceId: payment.invoiceId,
@@ -44,7 +44,7 @@ const createOrder = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
-    message: "Order created successfully!",
+    message: 'Order created successfully!',
     data: order,
   });
 });
@@ -55,7 +55,7 @@ const getMyOrders = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Orders fetched successfully!",
+    message: 'Orders fetched successfully!',
     data: result.data,
     meta: result.meta,
   });
@@ -70,7 +70,7 @@ const getMySingleOrder = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Order fetched successfully!",
+    message: 'Order fetched successfully!',
     data: result,
   });
 });
@@ -86,7 +86,7 @@ const getSingleOrder = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Order fetched successfully!",
+    message: 'Order fetched successfully!',
     data: result,
   });
 });
@@ -97,7 +97,7 @@ const getAllOrdersForAdmin = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Orders fetched successfully!",
+    message: 'Orders fetched successfully!',
     data: result.data,
     meta: result.meta,
   });
@@ -112,7 +112,7 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Order status updated successfully!",
+    message: 'Order status updated successfully!',
     data: result,
   });
 });

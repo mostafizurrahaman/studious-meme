@@ -1,16 +1,16 @@
-import { Card, CardHeader } from "@/components/ui/card";
-import { SeoScripts } from "@/components/SeoScripts";
-import { ShopPageClient } from "@/components/ShopPageClient";
-import { buildShopSchemas, shopMetadata } from "@/lib/seo";
-import { getActiveCategories } from "@/services/Category";
+import { Card, CardHeader } from '@/components/ui/card';
+import { SeoScripts } from '@/components/SeoScripts';
+import { ShopPageClient } from '@/components/ShopPageClient';
+import { buildShopSchemas, shopMetadata } from '@/lib/seo';
+import { getActiveCategories } from '@/services/Category';
 import {
   mapBackendCategoryToStorefrontCategory,
   type BackendCategory,
-} from "@/services/Category/mappers";
+} from '@/services/Category/mappers';
 import {
   getAllActiveProducts,
   mapBackendProductToStorefrontProduct,
-} from "@/services/Product";
+} from '@/services/Product';
 
 export const metadata = shopMetadata;
 
@@ -30,7 +30,7 @@ const DEFAULT_SHOP_LIMIT = 24;
 
 export default async function ShopPage({ searchParams }: Props) {
   const query = await searchParams;
-  const page = Math.max(Number(query.page ?? "1") || 1, 1);
+  const page = Math.max(Number(query.page ?? '1') || 1, 1);
   const limit = Math.max(
     Number(query.limit ?? String(DEFAULT_SHOP_LIMIT)) || DEFAULT_SHOP_LIMIT,
     1,
@@ -65,10 +65,10 @@ export default async function ShopPage({ searchParams }: Props) {
     totalPages: productsResult?.meta?.totalPages ?? 1,
   };
   const stats = [
-    [String(meta.total), "Products"],
-    [String(backendCategories.length), "Categories"],
-    [String(meta.page), "Current page"],
-    [String(meta.totalPages), "Total pages"],
+    [String(meta.total), 'Products'],
+    [String(backendCategories.length), 'Categories'],
+    [String(meta.page), 'Current page'],
+    [String(meta.totalPages), 'Total pages'],
   ];
 
   return (

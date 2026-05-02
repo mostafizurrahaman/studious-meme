@@ -1,15 +1,33 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowUpRight, BadgePercent, GitCompare, Heart, ShoppingCart } from 'lucide-react';
+import {
+  ArrowUpRight,
+  BadgePercent,
+  GitCompare,
+  Heart,
+  ShoppingCart,
+} from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { getCategoryAccentClassName, getCategoryAccentStyle } from '@/lib/category-accent';
+import {
+  getCategoryAccentClassName,
+  getCategoryAccentStyle,
+} from '@/lib/category-accent';
 import { ProductCard } from '@/components/ProductCard';
 import { SectionHeading } from '@/components/SectionHeading';
 import { HomeHeroCarousel } from '@/components/HomeHeroCarousel';
 import { HomeAboutSection } from '@/components/HomeAboutSection';
-import { mapBackendBrandToStorefrontBrand, type BackendBrand } from '@/services/Brand';
-import { mapBackendCategoryToStorefrontCategory, type BackendCategory } from '@/services/Category/mappers';
-import { mapBackendProductToStorefrontProduct, type BackendProduct } from '@/services/Product';
+import {
+  mapBackendBrandToStorefrontBrand,
+  type BackendBrand,
+} from '@/services/Brand';
+import {
+  mapBackendCategoryToStorefrontCategory,
+  type BackendCategory,
+} from '@/services/Category/mappers';
+import {
+  mapBackendProductToStorefrontProduct,
+  type BackendProduct,
+} from '@/services/Product';
 
 const directoryTileLinkClass =
   'group block rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background';
@@ -84,7 +102,7 @@ type HomePageProps = {
 
 export async function HomePage({ heroContent }: HomePageProps) {
   const heroSlides: HeroSlide[] = heroContent?.heroSection?.slides?.length
-    ? heroContent.heroSection.slides.map(slide => ({
+    ? heroContent.heroSection.slides.map((slide) => ({
         title: slide.title,
         description: slide.description,
         image: slide.image,
@@ -93,7 +111,7 @@ export async function HomePage({ heroContent }: HomePageProps) {
     : [];
 
   const heroFeatures: HeroSlide[] = heroContent?.heroSection?.features?.length
-    ? heroContent.heroSection.features.map(card => ({
+    ? heroContent.heroSection.features.map((card) => ({
         title: card.title,
         description: card.description,
         image: card.image,
@@ -102,19 +120,27 @@ export async function HomePage({ heroContent }: HomePageProps) {
     : [];
 
   const featuredCatalog = heroContent?.featuredProducts?.length
-    ? await Promise.all(heroContent.featuredProducts.map(mapBackendProductToStorefrontProduct))
+    ? await Promise.all(
+        heroContent.featuredProducts.map(mapBackendProductToStorefrontProduct),
+      )
     : [];
 
   const latestCatalog = heroContent?.latestProducts?.length
-    ? await Promise.all(heroContent.latestProducts.map(mapBackendProductToStorefrontProduct))
+    ? await Promise.all(
+        heroContent.latestProducts.map(mapBackendProductToStorefrontProduct),
+      )
     : [];
 
   const categoryCards = heroContent?.categories?.length
-    ? heroContent.categories.slice(0, 6).map(mapBackendCategoryToStorefrontCategory)
+    ? heroContent.categories
+        .slice(0, 6)
+        .map(mapBackendCategoryToStorefrontCategory)
     : [];
 
   const brandItems = heroContent?.brands?.length
-    ? await Promise.all(heroContent.brands.map(mapBackendBrandToStorefrontBrand))
+    ? await Promise.all(
+        heroContent.brands.map(mapBackendBrandToStorefrontBrand),
+      )
     : [];
 
   return (
@@ -163,7 +189,9 @@ export async function HomePage({ heroContent }: HomePageProps) {
           <CardContent className="px-5 pb-5 pt-6 sm:px-6">
             <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-5">
               {featuredCatalog.length > 0 ? (
-                featuredCatalog.map(product => <ProductCard key={product.sku} product={product} />)
+                featuredCatalog.map((product) => (
+                  <ProductCard key={product.sku} product={product} />
+                ))
               ) : (
                 <div className="col-span-full text-center text-foreground/60 py-12">
                   No featured products available
@@ -180,7 +208,9 @@ export async function HomePage({ heroContent }: HomePageProps) {
           <CardContent className="px-5 pb-5 pt-6 sm:px-6">
             <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-5">
               {latestCatalog.length > 0 ? (
-                latestCatalog.map(product => <ProductCard key={product.sku} product={product} />)
+                latestCatalog.map((product) => (
+                  <ProductCard key={product.sku} product={product} />
+                ))
               ) : (
                 <div className="col-span-full text-center text-foreground/60 py-12">
                   No latest products available
@@ -193,12 +223,19 @@ export async function HomePage({ heroContent }: HomePageProps) {
         {categoryCards.length > 0 && (
           <Card className="mt-8 shadow-sm">
             <CardHeader className="px-5 pb-0 pt-5 sm:px-6">
-              <SectionHeading title="Shop By Category" actionHref="/main-categories" />
+              <SectionHeading
+                title="Shop By Category"
+                actionHref="/main-categories"
+              />
             </CardHeader>
             <CardContent className="px-5 pb-5 pt-6 sm:px-6">
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {categoryCards.map(card => (
-                  <Link key={card.slug} href={card.href} className={directoryTileLinkClass}>
+                {categoryCards.map((card) => (
+                  <Link
+                    key={card.slug}
+                    href={card.href}
+                    className={directoryTileLinkClass}
+                  >
                     <Card className={`${directoryTileCardClass} p-4`}>
                       <span className={directoryTileSheenClass} />
                       <span
@@ -233,7 +270,9 @@ export async function HomePage({ heroContent }: HomePageProps) {
                           <div className="mt-3 text-lg font-black leading-tight text-secondary transition-colors duration-300 group-hover:text-primary">
                             {card.name}
                           </div>
-                          <p className="mt-2 text-sm leading-6 text-foreground/65">{card.description}</p>
+                          <p className="mt-2 text-sm leading-6 text-foreground/65">
+                            {card.description}
+                          </p>
                         </div>
 
                         <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-border/70 bg-background/90 text-foreground/50 transition-all duration-300 group-hover:border-primary/25 group-hover:bg-primary group-hover:text-white group-hover:shadow-sm">
@@ -261,12 +300,19 @@ export async function HomePage({ heroContent }: HomePageProps) {
         {brandItems.length > 0 && (
           <Card className="mt-8 shadow-sm">
             <CardHeader className="px-5 pb-0 pt-5 sm:px-6">
-              <SectionHeading title="Shop By Brands" actionHref="/shop-by-brands" />
+              <SectionHeading
+                title="Shop By Brands"
+                actionHref="/shop-by-brands"
+              />
             </CardHeader>
             <CardContent className="px-5 pb-5 pt-6 sm:px-6">
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
-                {brandItems.map(brand => (
-                  <Link key={brand.name} href={brand.href} className={directoryTileLinkClass}>
+                {brandItems.map((brand) => (
+                  <Link
+                    key={brand.name}
+                    href={brand.href}
+                    className={directoryTileLinkClass}
+                  >
                     <Card className={`${brandTileCardClass} p-4 text-center`}>
                       <span className={brandTileSheenClass} />
                       <span className={brandTileSweepClass} />
@@ -309,8 +355,8 @@ export async function HomePage({ heroContent }: HomePageProps) {
               Catalog, cart and checkout flows are all covered here.
             </h2>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-secondary-foreground/78 sm:text-base">
-              The structure mirrors the storefront and keeps product, cart and checkout sections aligned for
-              the full shopping experience.
+              The structure mirrors the storefront and keeps product, cart and
+              checkout sections aligned for the full shopping experience.
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -345,7 +391,9 @@ export async function HomePage({ heroContent }: HomePageProps) {
                 </div>
                 <div>
                   <div className="font-bold text-white">{title}</div>
-                  <div className="mt-1 text-sm text-secondary-foreground/70">{text}</div>
+                  <div className="mt-1 text-sm text-secondary-foreground/70">
+                    {text}
+                  </div>
                 </div>
               </div>
             ))}

@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import { useTransition } from "react";
-import { toast } from "sonner";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import type { Product } from "@/lib/storefront-types";
-import { useWishlistStore } from "@/lib/wishlist-store";
+import { useRouter } from 'next/navigation';
+import { useTransition } from 'react';
+import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import type { Product } from '@/lib/storefront-types';
+import { useWishlistStore } from '@/lib/wishlist-store';
 import {
   addWishlistItem,
   removeWishlistItem,
-} from "@/services/WishlistHistory";
+} from '@/services/WishlistHistory';
 
 type Props = {
   product: Product;
@@ -32,7 +32,7 @@ export function AddToWishlistButton({
 
   function handleToggle() {
     if (!product.id) {
-      toast.error("This product cannot be saved right now.");
+      toast.error('This product cannot be saved right now.');
       return;
     }
 
@@ -44,13 +44,13 @@ export function AddToWishlistButton({
         const result = await addWishlistItem(productId);
         if (!result.success) {
           if (
-            result.message === "Sign in to save wishlist items to your account."
+            result.message === 'Sign in to save wishlist items to your account.'
           ) {
-            router.push("/my-account?notice=wishlist");
+            router.push('/my-account?notice=wishlist');
             return;
           }
 
-          toast.error(result.message ?? "Unable to update wishlist.");
+          toast.error(result.message ?? 'Unable to update wishlist.');
           return;
         }
 
@@ -59,7 +59,7 @@ export function AddToWishlistButton({
       } else {
         const result = await removeWishlistItem(productId);
         if (!result.success) {
-          toast.error(result.message ?? "Unable to update wishlist.");
+          toast.error(result.message ?? 'Unable to update wishlist.');
           return;
         }
 
@@ -71,17 +71,17 @@ export function AddToWishlistButton({
   return (
     <Button
       type="button"
-      variant={saved ? "secondary" : "outline"}
+      variant={saved ? 'secondary' : 'outline'}
       disabled={!hydrated || isPending}
       onClick={handleToggle}
       className={cn(
         compact
-          ? "h-9 w-full justify-center rounded-full border-border px-2 py-0.5 text-[10px] font-semibold shadow-sm"
-          : "h-12 rounded-full px-6 text-sm font-bold shadow-sm",
+          ? 'h-9 w-full justify-center rounded-full border-border px-2 py-0.5 text-[10px] font-semibold shadow-sm'
+          : 'h-12 rounded-full px-6 text-sm font-bold shadow-sm',
         className,
       )}
     >
-      {saved ? "In wishlist" : compact ? "Wishlist" : "Add to wishlist"}
+      {saved ? 'In wishlist' : compact ? 'Wishlist' : 'Add to wishlist'}
     </Button>
   );
 }

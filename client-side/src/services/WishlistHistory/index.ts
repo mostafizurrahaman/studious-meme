@@ -1,12 +1,12 @@
-"use server";
+'use server';
 
-import { revalidateTag } from "next/cache";
-import { requestBackendJson } from "@/lib/backend-api";
-import { CACHE_TAGS } from "@/lib/cache-tags";
+import { revalidateTag } from 'next/cache';
+import { requestBackendJson } from '@/lib/backend-api';
+import { CACHE_TAGS } from '@/lib/cache-tags';
 import {
   getValidAccessTokenForServerActions,
   getValidAccessTokenForServerHandlerGet,
-} from "@/lib/getValidAccessToken";
+} from '@/lib/getValidAccessToken';
 
 type BackendEnvelope<T> = {
   success?: boolean;
@@ -20,19 +20,19 @@ export type WishlistHistoryRecord = {
   _id?: string;
   user?: unknown;
   product?: unknown;
-    productSnapshot?: {
-      title: string;
-      brand: string;
-      category: string;
-      categorySlug?: string;
-      images: string[];
-      sku: string;
-      slug: string;
-      price: number;
-      sellingUnit?: string;
-      stock?: number | null;
-      weightKg?: number;
-      isNoCOD?: boolean;
+  productSnapshot?: {
+    title: string;
+    brand: string;
+    category: string;
+    categorySlug?: string;
+    images: string[];
+    sku: string;
+    slug: string;
+    price: number;
+    sellingUnit?: string;
+    stock?: number | null;
+    weightKg?: number;
+    isNoCOD?: boolean;
   };
   createdAt?: string;
   updatedAt?: string;
@@ -46,14 +46,14 @@ export const addWishlistItem = async (
   if (!accessToken) {
     return {
       success: false,
-      message: "Sign in to save wishlist items to your account.",
+      message: 'Sign in to save wishlist items to your account.',
     };
   }
 
   const result = await requestBackendJson<
     BackendEnvelope<WishlistHistoryRecord>
-  >("/wishlist", {
-    method: "POST",
+  >('/wishlist', {
+    method: 'POST',
     body: { productId },
     token: accessToken,
   });
@@ -70,14 +70,14 @@ export const removeWishlistItem = async (
   if (!accessToken) {
     return {
       success: false,
-      message: "Sign in to update wishlist items on your account.",
+      message: 'Sign in to update wishlist items on your account.',
     };
   }
 
   const result = await requestBackendJson<BackendEnvelope<null>>(
     `/wishlist/${productId}`,
     {
-      method: "DELETE",
+      method: 'DELETE',
       token: accessToken,
     },
   );
@@ -96,9 +96,9 @@ export const getMyWishlist = async (): Promise<
   }
 
   return requestBackendJson<BackendEnvelope<WishlistHistoryRecord[]>>(
-    "/wishlist",
+    '/wishlist',
     {
-      method: "GET",
+      method: 'GET',
       token: accessToken,
       next: { tags: [CACHE_TAGS.WISHLIST] },
     },
@@ -113,11 +113,11 @@ type HistoryListParams = {
 const buildHistoryQuery = (params: HistoryListParams = {}) => {
   const searchParams = new URLSearchParams();
 
-  if (params.page) searchParams.set("page", String(params.page));
-  if (params.limit) searchParams.set("limit", String(params.limit));
+  if (params.page) searchParams.set('page', String(params.page));
+  if (params.limit) searchParams.set('limit', String(params.limit));
 
   const query = searchParams.toString();
-  return query ? `?${query}` : "";
+  return query ? `?${query}` : '';
 };
 
 export const getAllWishlist = async (
@@ -128,7 +128,7 @@ export const getAllWishlist = async (
   return requestBackendJson<BackendEnvelope<WishlistHistoryRecord[]>>(
     `/wishlist/admin${buildHistoryQuery(params)}`,
     {
-      method: "GET",
+      method: 'GET',
       token: accessToken ?? undefined,
       next: { tags: [CACHE_TAGS.WISHLIST] },
     },
@@ -152,9 +152,9 @@ export const getWishlistInsights = async (): Promise<
   const accessToken = await getValidAccessTokenForServerHandlerGet();
 
   return requestBackendJson<BackendEnvelope<WishlistInsightSummary>>(
-    "/wishlist/admin/summary",
+    '/wishlist/admin/summary',
     {
-      method: "GET",
+      method: 'GET',
       token: accessToken ?? undefined,
       next: { tags: [CACHE_TAGS.WISHLIST] },
     },

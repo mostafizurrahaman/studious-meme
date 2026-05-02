@@ -1,14 +1,14 @@
 /* eslint-disable no-console */
-import fs from "fs";
-import path from "path";
-import readline from "readline";
+import fs from 'fs';
+import path from 'path';
+import readline from 'readline';
 
 // Function to create a module with dynamic files
 const createModule = (rawModuleName: string): void => {
   const moduleName = rawModuleName.toLowerCase();
   const folderName = capitalize(moduleName);
-  const baseDir = path.join(__dirname, "../", "app", "modules", folderName);
-  console.log(__dirname, " dir name");
+  const baseDir = path.join(__dirname, '../', 'app', 'modules', folderName);
+  console.log(__dirname, ' dir name');
 
   // List of files to be created
   const files = [
@@ -32,22 +32,22 @@ const createModule = (rawModuleName: string): void => {
   files.forEach((file) => {
     const filePath = path.join(baseDir, file);
     if (!fs.existsSync(filePath)) {
-      let content = "";
+      let content = '';
 
       // Basic template for each file
-      if (file.endsWith(".routes.ts")) {
+      if (file.endsWith('.routes.ts')) {
         content = `import { Router } from 'express';\nimport { ${moduleName}Controller } from './${moduleName}.controller';\n\nconst router = Router();\n\n// Define routes\nrouter.get('/', ${moduleName}Controller.getAll);\n\nexport default router;\n`;
-      } else if (file.endsWith(".controller.ts")) {
+      } else if (file.endsWith('.controller.ts')) {
         content = `import { Request, Response } from 'express';\nimport { ${moduleName}Service } from './${moduleName}.service';\n\nexport const ${moduleName}Controller = {\n  async getAll(req: Request, res: Response) {\n    const data = await ${moduleName}Service.getAll();\n    res.json(data);\n  },\n};\n`;
-      } else if (file.endsWith(".service.ts")) {
+      } else if (file.endsWith('.service.ts')) {
         content = `export const ${moduleName}Service = {\n  async getAll() {\n    // Example service logic\n    return [{ message: 'Service logic here' }];\n  },\n};\n`;
-      } else if (file.endsWith(".interface.ts")) {
+      } else if (file.endsWith('.interface.ts')) {
         content = `export interface I${capitalize(
           moduleName,
         )} {\n  id: string;\n  name: string;\n}\n`;
-      } else if (file.endsWith(".validation.ts")) {
+      } else if (file.endsWith('.validation.ts')) {
         content = `import { z } from 'zod';\n\nexport const ${moduleName}Validation = {\n  create: z.object({\n    name: z.string().min(1, 'Name is required'),\n  }),\n  update: z.object({\n    id: z.string().uuid('Invalid ID format'),\n    name: z.string().optional(),\n  }),\n};\n`;
-      } else if (file.endsWith(".model.ts")) {
+      } else if (file.endsWith('.model.ts')) {
         // Template for the model.ts file
         content = `import { Schema, model, Document } from 'mongoose';\n\nexport interface I${capitalize(
           moduleName,
@@ -60,7 +60,7 @@ const createModule = (rawModuleName: string): void => {
         )}', ${moduleName}Schema);\n\nexport default ${moduleName}Model;\n`;
       }
 
-      fs.writeFileSync(filePath, content, "utf-8");
+      fs.writeFileSync(filePath, content, 'utf-8');
       console.log(`File created: ${filePath}`);
     } else {
       console.log(`File already exists: ${filePath}`);
@@ -78,11 +78,11 @@ const rl = readline.createInterface({
   output: process.stdout,
 });
 
-rl.question("Enter module name: ", (answer) => {
+rl.question('Enter module name: ', (answer) => {
   const trimmed = answer.trim();
 
   if (!trimmed) {
-    console.error("Module name is required!");
+    console.error('Module name is required!');
     rl.close();
     process.exit(1);
   }

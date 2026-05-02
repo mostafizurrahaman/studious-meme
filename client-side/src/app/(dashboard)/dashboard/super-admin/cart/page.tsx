@@ -1,21 +1,21 @@
-import type { Metadata } from "next";
-import { DashboardCartManager } from "@/components/dashboard/DashboardEngagementManager";
-import { requireDashboardRoles } from "@/lib/dashboard-auth";
-import { buildMetadata } from "@/lib/seo";
-import { getAllCarts } from "@/services/Cart";
+import type { Metadata } from 'next';
+import { DashboardCartManager } from '@/components/dashboard/DashboardEngagementManager';
+import { requireDashboardRoles } from '@/lib/dashboard-auth';
+import { buildMetadata } from '@/lib/seo';
+import { getAllCarts } from '@/services/Cart';
 
 type Props = {
   searchParams: Promise<{ page?: string; limit?: string }>;
 };
 
 export const metadata: Metadata = buildMetadata({
-  title: "Cart Activity",
-  description: "Review backend-saved cart activity.",
-  path: "/dashboard/super-admin/cart",
+  title: 'Cart Activity',
+  description: 'Review backend-saved cart activity.',
+  path: '/dashboard/super-admin/cart',
   noindex: true,
 });
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 const parsePositiveInteger = (value: string | undefined, fallback: number) => {
   const parsed = Number(value);
@@ -24,7 +24,7 @@ const parsePositiveInteger = (value: string | undefined, fallback: number) => {
 };
 
 export default async function SuperAdminCartPage({ searchParams }: Props) {
-  await requireDashboardRoles(["SUPER_ADMIN"]);
+  await requireDashboardRoles(['SUPER_ADMIN']);
   const query = await searchParams;
   const page = parsePositiveInteger(query.page, 1);
   const limit = parsePositiveInteger(query.limit, 50);

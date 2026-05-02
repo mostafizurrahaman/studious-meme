@@ -1,4 +1,4 @@
-import { model, Schema, Types } from "mongoose";
+import { model, Schema, Types } from 'mongoose';
 
 const HISTORY_TTL_SECONDS = 60 * 60 * 24 * 30;
 
@@ -23,7 +23,7 @@ type ComparisonHistoryEventDoc = {
     weightKg?: number;
     isNoCOD?: boolean;
   };
-  action: "add" | "remove";
+  action: 'add' | 'remove';
   expireAt: Date;
   createdAt?: Date;
   updatedAt?: Date;
@@ -31,8 +31,8 @@ type ComparisonHistoryEventDoc = {
 
 const comparisonHistoryEventSchema = new Schema<ComparisonHistoryEventDoc>(
   {
-    user: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    product: { type: Schema.Types.ObjectId, ref: "Product", required: true },
+    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    product: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
     productSnapshot: {
       title: { type: String, required: true },
       brand: { type: String, required: true },
@@ -51,7 +51,7 @@ const comparisonHistoryEventSchema = new Schema<ComparisonHistoryEventDoc>(
       weightKg: { type: Number },
       isNoCOD: { type: Boolean },
     },
-    action: { type: String, enum: ["add", "remove"], required: true },
+    action: { type: String, enum: ['add', 'remove'], required: true },
     expireAt: {
       type: Date,
       required: true,
@@ -63,18 +63,18 @@ const comparisonHistoryEventSchema = new Schema<ComparisonHistoryEventDoc>(
 
 comparisonHistoryEventSchema.index(
   { expireAt: 1 },
-  { expireAfterSeconds: 0, name: "comparisonHistoryEvent_ttl_idx" },
+  { expireAfterSeconds: 0, name: 'comparisonHistoryEvent_ttl_idx' },
 );
 comparisonHistoryEventSchema.index(
   { user: 1, createdAt: -1 },
-  { name: "comparisonHistoryEvent_user_createdAt_idx" },
+  { name: 'comparisonHistoryEvent_user_createdAt_idx' },
 );
 comparisonHistoryEventSchema.index(
-  { "productSnapshot.category": 1, createdAt: -1 },
-  { name: "comparisonHistoryEvent_category_createdAt_idx" },
+  { 'productSnapshot.category': 1, createdAt: -1 },
+  { name: 'comparisonHistoryEvent_category_createdAt_idx' },
 );
 
 export const ComparisonHistoryEventModel = model<ComparisonHistoryEventDoc>(
-  "ComparisonHistoryEvent",
+  'ComparisonHistoryEvent',
   comparisonHistoryEventSchema,
 );

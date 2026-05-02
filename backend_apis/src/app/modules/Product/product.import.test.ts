@@ -4,7 +4,10 @@ import { ProductValidation } from './product.validation';
 describe('ProductValidation Import Check', () => {
   it('should import ProductValidation', () => {
     console.log('ProductValidation:', typeof ProductValidation);
-    console.log('productCreateSchema:', typeof ProductValidation?.productCreateSchema);
+    console.log(
+      'productCreateSchema:',
+      typeof ProductValidation?.productCreateSchema,
+    );
     expect(ProductValidation).toBeDefined();
     expect(ProductValidation.productCreateSchema).toBeDefined();
   });

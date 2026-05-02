@@ -798,18 +798,18 @@
 // export default serverHomePage;
 
 /* eslint-disable no-console */
-import fs from "fs";
-import path from "path";
-import os from "os";
-import osUtils from "os-utils";
-import dotenv from "dotenv";
-import config from "../config";
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
+import osUtils from 'os-utils';
+import dotenv from 'dotenv';
+import config from '../config';
 dotenv.config();
 
 // (4)
-const logsDir = path.join(process.cwd(), "logs");
-const responseLogFilePath = path.join(logsDir, "ResponseTime.log");
-const errorLogFilePath = path.join(logsDir, "Error.log");
+const logsDir = path.join(process.cwd(), 'logs');
+const responseLogFilePath = path.join(logsDir, 'ResponseTime.log');
+const errorLogFilePath = path.join(logsDir, 'Error.log');
 
 interface ErrorLogEntry {
   timestamp: string;
@@ -825,7 +825,7 @@ interface ResponseLogEntry {
   route: string;
   method: string;
   responseTime: number;
-  label: "Low" | "Medium" | "High";
+  label: 'Low' | 'Medium' | 'High';
 }
 
 function readLogFile(): {
@@ -837,12 +837,12 @@ function readLogFile(): {
 
   try {
     if (fs.existsSync(responseLogFilePath)) {
-      const responseLogData = fs.readFileSync(responseLogFilePath, "utf8");
+      const responseLogData = fs.readFileSync(responseLogFilePath, 'utf8');
 
       // Robustly handle multiple JSON objects on the same line or concatenated
-      const normalizedData = responseLogData.replace(/\}[\s]*\{/g, "}\n{");
+      const normalizedData = responseLogData.replace(/\}[\s]*\{/g, '}\n{');
 
-      normalizedData.split("\n").forEach((entry) => {
+      normalizedData.split('\n').forEach((entry) => {
         if (!entry.trim()) return;
 
         try {
@@ -851,59 +851,59 @@ function readLogFile(): {
             const responseTime = parseFloat(log.responseTime);
             const label =
               responseTime > 2000
-                ? "High"
+                ? 'High'
                 : responseTime > 1000
-                  ? "Medium"
-                  : "Low";
+                  ? 'Medium'
+                  : 'Low';
 
             responseTimeLogs.push({
               timestamp: new Date(log.timestamp).toLocaleString(),
-              route: log.url || "N/A",
-              method: log.method || "N/A",
+              route: log.url || 'N/A',
+              method: log.method || 'N/A',
               responseTime,
               label,
             });
           }
         } catch (err) {
-          console.error("Error parsing response time log entry:", err);
+          console.error('Error parsing response time log entry:', err);
         }
       });
     }
   } catch (err) {
-    console.error("Error reading response time log file:", err);
+    console.error('Error reading response time log file:', err);
   }
 
   try {
     if (fs.existsSync(errorLogFilePath)) {
-      const errorLogData = fs.readFileSync(errorLogFilePath, "utf8");
+      const errorLogData = fs.readFileSync(errorLogFilePath, 'utf8');
 
       // Robustly handle multiple JSON objects on the same line or concatenated
-      const normalizedErrorData = errorLogData.replace(/\}[\s]*\{/g, "}\n{");
+      const normalizedErrorData = errorLogData.replace(/\}[\s]*\{/g, '}\n{');
 
-      normalizedErrorData.split("\n").forEach((entry) => {
+      normalizedErrorData.split('\n').forEach((entry) => {
         if (!entry.trim()) return;
         try {
           const log = JSON.parse(entry);
           if (
-            log.level === "error" &&
-            !(log.url && log.url.includes("/favicon.ico"))
+            log.level === 'error' &&
+            !(log.url && log.url.includes('/favicon.ico'))
           ) {
             errorLogs.push({
               timestamp: new Date(log.timestamp).toLocaleString(),
-              method: log.method || "N/A",
-              statusCode: log.status || "N/A",
+              method: log.method || 'N/A',
+              statusCode: log.status || 'N/A',
               message: log.message,
-              errorPath: log.url || "N/A",
-              stack: log.stack || "No stack trace available",
+              errorPath: log.url || 'N/A',
+              stack: log.stack || 'No stack trace available',
             });
           }
         } catch (err) {
-          console.error("Error parsing error log entry:", err);
+          console.error('Error parsing error log entry:', err);
         }
       });
     }
   } catch (err) {
-    console.error("Error reading error log file:", err);
+    console.error('Error reading error log file:', err);
   }
 
   return {
@@ -968,7 +968,7 @@ function generateErrorLogTable(errorLogs: ErrorLogEntry[]): string {
     `;
   });
 
-  tableHtml += "</tbody></table>";
+  tableHtml += '</tbody></table>';
   return tableHtml;
 }
 
@@ -1006,7 +1006,7 @@ function generateResponseTimeTable(
     `;
   });
 
-  tableHtml += "</tbody></table>";
+  tableHtml += '</tbody></table>';
   return tableHtml;
 }
 
@@ -1029,20 +1029,20 @@ async function serverHomePage(): Promise<string> {
 
   const monitorClientConfig = Buffer.from(
     JSON.stringify({
-      monitorUserName: config.monitor.username || "",
-      monitorPassword: config.monitor.password || "",
-      superUserName: config.superAdmin.email || "",
-      superPassWord: config.superAdmin.password || "",
+      monitorUserName: config.monitor.username || '',
+      monitorPassword: config.monitor.password || '',
+      superUserName: config.superAdmin.email || '',
+      superPassWord: config.superAdmin.password || '',
       chartLabels: responseTimeLogs
         .slice(0, 20)
         .reverse()
-        .map((l) => l.timestamp.split(", ")[1]),
+        .map((l) => l.timestamp.split(', ')[1]),
       chartData: responseTimeLogs
         .slice(0, 20)
         .reverse()
         .map((l) => l.responseTime),
     }),
-  ).toString("base64");
+  ).toString('base64');
 
   return `
   <!DOCTYPE html>
@@ -1050,7 +1050,7 @@ async function serverHomePage(): Promise<string> {
     <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>${config.preffered_website_name || "Server"} Monitor v2.5.2</title>
+      <title>${config.preffered_website_name || 'Server'} Monitor v2.5.2</title>
       <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
       <style>
@@ -1251,7 +1251,7 @@ async function serverHomePage(): Promise<string> {
 
       <div id="main-view" class="container">
         <header>
-          <div class="logo">${(config.preffered_website_name || "BasBanGeet").toUpperCase()}<span> MONITOR</span></div>
+          <div class="logo">${(config.preffered_website_name || 'BasBanGeet').toUpperCase()}<span> MONITOR</span></div>
           <div class="header-actions">
             <div style="display: flex; align-items: center; gap: 0.5rem; background: rgba(0,0,0,0.2); padding: 0.5rem 1rem; border-radius: 2rem;">
               <div class="pulse"></div>
@@ -1503,11 +1503,11 @@ export function getMonitorStats() {
           responseTimeLogs.reduce((acc, log) => acc + log.responseTime, 0) /
           totalRequests
         ).toFixed(2)
-      : "0";
+      : '0';
   const errorRate =
     totalRequests > 0
       ? ((totalErrors / (totalRequests + totalErrors)) * 100).toFixed(2)
-      : "0";
+      : '0';
 
   const memory = {
     total: (os.totalmem() / 1024 / 1024 / 1024).toFixed(2),
@@ -1528,7 +1528,7 @@ export function getMonitorStats() {
     chartLabels: responseTimeLogs
       .slice(0, 20)
       .reverse()
-      .map((l) => l.timestamp.split(", ")[1]),
+      .map((l) => l.timestamp.split(', ')[1]),
     chartData: responseTimeLogs
       .slice(0, 20)
       .reverse()

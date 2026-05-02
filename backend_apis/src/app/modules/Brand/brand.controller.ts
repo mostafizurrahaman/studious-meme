@@ -1,7 +1,7 @@
-import httpStatus from "http-status";
-import { AppError, asyncHandler, sendResponse } from "../../utils";
-import { BrandService } from "./brand.service";
-import { getParam } from "../../lib/getParam";
+import httpStatus from 'http-status';
+import { AppError, asyncHandler, sendResponse } from '../../utils';
+import { BrandService } from './brand.service';
+import { getParam } from '../../lib/getParam';
 
 // 1. createBrand
 const createBrand = asyncHandler(async (req, res) => {
@@ -9,7 +9,7 @@ const createBrand = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
-    message: "Brand created successfully!",
+    message: 'Brand created successfully!',
     data: result,
   });
 });
@@ -20,7 +20,7 @@ const getAllBrands = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Brands fetched successfully!",
+    message: 'Brands fetched successfully!',
     data: result.data,
     meta: result.meta,
   });
@@ -32,7 +32,7 @@ const getActiveBrands = asyncHandler(async (_req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Active brands fetched successfully!",
+    message: 'Active brands fetched successfully!',
     data: result,
   });
 });
@@ -45,7 +45,7 @@ const getBrand = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Brand fetched successfully!",
+    message: 'Brand fetched successfully!',
     data: result,
   });
 });
@@ -58,7 +58,7 @@ const getActiveBrand = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Active brand fetched successfully!",
+    message: 'Active brand fetched successfully!',
     data: result,
   });
 });
@@ -71,11 +71,11 @@ const updateBrand = asyncHandler(async (req, res) => {
     req.file,
   );
 
-  if (!result) throw new AppError(httpStatus.NOT_FOUND, "Brand not found!");
+  if (!result) throw new AppError(httpStatus.NOT_FOUND, 'Brand not found!');
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Brand updated successfully!",
+    message: 'Brand updated successfully!',
     data: result,
   });
 });
@@ -86,11 +86,11 @@ const deleteBrand = asyncHandler(async (req, res) => {
     getParam(req.params.slug),
   );
 
-  if (!result) throw new AppError(httpStatus.NOT_FOUND, "Brand not found!");
+  if (!result) throw new AppError(httpStatus.NOT_FOUND, 'Brand not found!');
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Brand deleted successfully!",
+    message: 'Brand deleted successfully!',
     data: result,
   });
 });

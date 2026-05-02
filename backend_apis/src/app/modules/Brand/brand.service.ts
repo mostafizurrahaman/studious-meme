@@ -1,9 +1,9 @@
-import httpStatus from "http-status";
-import { AppError } from "../../utils";
-import { deleteImageFromCloudinary, sendImageToCloudinary } from "../../lib";
-import { BrandModel } from "./brand.model";
-import { IBrand } from "./brand.interface";
-import { MulterFile } from "../../lib/upload";
+import httpStatus from 'http-status';
+import { AppError } from '../../utils';
+import { deleteImageFromCloudinary, sendImageToCloudinary } from '../../lib';
+import { BrandModel } from './brand.model';
+import { IBrand } from './brand.interface';
+import { MulterFile } from '../../lib/upload';
 
 // 1. createBrandIntoDB
 const createBrandIntoDB = async (
@@ -11,7 +11,7 @@ const createBrandIntoDB = async (
   imageFile?: MulterFile,
 ) => {
   if (!imageFile) {
-    throw new AppError(httpStatus.NOT_FOUND, "Brand image is required!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Brand image is required!');
   }
 
   const { secure_url } = await sendImageToCloudinary(imageFile);
@@ -34,14 +34,14 @@ const getAllBrandsFromDB = async (query: Record<string, unknown>) => {
   const limit = Number(query.limit) || 50;
   const skip = (page - 1) * limit;
   const searchTerm =
-    typeof query.searchTerm === "string" ? query.searchTerm.trim() : "";
+    typeof query.searchTerm === 'string' ? query.searchTerm.trim() : '';
   const filter: Record<string, unknown> = {};
 
   if (searchTerm) {
     filter.$or = [
-      { name: { $regex: searchTerm, $options: "i" } },
-      { slug: { $regex: searchTerm, $options: "i" } },
-      { description: { $regex: searchTerm, $options: "i" } },
+      { name: { $regex: searchTerm, $options: 'i' } },
+      { slug: { $regex: searchTerm, $options: 'i' } },
+      { description: { $regex: searchTerm, $options: 'i' } },
     ];
   }
 
@@ -72,14 +72,14 @@ const getActiveBrandsFromDB = async () =>
 // 3. getBrandBySlugFromDB
 const getBrandBySlugFromDB = async (slug: string) => {
   const doc = await BrandModel.findOne({ slug }).lean();
-  if (!doc) throw new AppError(httpStatus.NOT_FOUND, "Brand not found!");
+  if (!doc) throw new AppError(httpStatus.NOT_FOUND, 'Brand not found!');
   return doc;
 };
 
 // 4. getActiveBrandBySlugFromDB
 const getActiveBrandBySlugFromDB = async (slug: string) => {
   const doc = await BrandModel.findOne({ slug, isActive: true }).lean();
-  if (!doc) throw new AppError(httpStatus.NOT_FOUND, "Brand not found!");
+  if (!doc) throw new AppError(httpStatus.NOT_FOUND, 'Brand not found!');
   return doc;
 };
 
@@ -89,10 +89,10 @@ const updateBrandIntoDB = async (
   payload: Partial<IBrand>,
   imageFile?: MulterFile,
 ) => {
-  const existingBrand = await BrandModel.findOne({ slug }).select("image");
+  const existingBrand = await BrandModel.findOne({ slug }).select('image');
 
   if (!existingBrand) {
-    throw new AppError(httpStatus.NOT_FOUND, "Brand not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Brand not found!');
   }
 
   let uploadedImage: string | undefined;
@@ -106,14 +106,14 @@ const updateBrandIntoDB = async (
     const updated = await BrandModel.findOneAndUpdate(
       { slug },
       { ...payload, ...(uploadedImage ? { image: uploadedImage } : {}) },
-      { returnDocument: "after", runValidators: true },
+      { returnDocument: 'after', runValidators: true },
     );
 
     if (!updated) {
       if (uploadedImage) {
         await deleteImageFromCloudinary(uploadedImage);
       }
-      throw new AppError(httpStatus.NOT_FOUND, "Brand not found!");
+      throw new AppError(httpStatus.NOT_FOUND, 'Brand not found!');
     }
 
     if (

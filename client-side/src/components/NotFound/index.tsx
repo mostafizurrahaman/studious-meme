@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { ArrowLeft, Home, Search, ShoppingBag } from "lucide-react";
-import notFoundImage from "@/assets/404.png";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { ArrowLeft, Home, Search, ShoppingBag } from 'lucide-react';
+import notFoundImage from '@/assets/404.png';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 
 const helpfulLinks = [
-  { label: "Shop", href: "/shop", icon: ShoppingBag },
-  { label: "Return Policy", href: "/return-policy", icon: Search },
-  { label: "Contact", href: "/our-contacts", icon: Search },
+  { label: 'Shop', href: '/shop', icon: ShoppingBag },
+  { label: 'Return Policy', href: '/return-policy', icon: Search },
+  { label: 'Contact', href: '/our-contacts', icon: Search },
 ];
 
 const NotFound = () => {

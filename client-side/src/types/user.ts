@@ -1,11 +1,11 @@
-export const AUTH_ROLES = ["SUPER_ADMIN", "ADMIN", "USER"] as const;
+export const AUTH_ROLES = ['SUPER_ADMIN', 'ADMIN', 'USER'] as const;
 
 export type AuthRole = (typeof AUTH_ROLES)[number];
 
 export const DASHBOARD_ROUTE_SEGMENTS = [
-  "super-admin",
-  "admin",
-  "user",
+  'super-admin',
+  'admin',
+  'user',
 ] as const;
 
 export type DashboardRouteSegment = (typeof DASHBOARD_ROUTE_SEGMENTS)[number];

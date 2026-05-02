@@ -1,17 +1,20 @@
-import httpStatus from "http-status";
-import { Types } from "mongoose";
-import { AppError } from "../../utils";
-import { ProductModel } from "../Product/product.model";
-import { DEFAULT_SELLING_UNIT, normalizeSellingUnit } from "../Product/selling-unit";
-import { IUser } from "../User/user.interface";
-import { ComparisonHistoryModel } from "./comparisonHistory.model";
-import { ComparisonHistoryEventModel } from "./comparisonHistoryEvent.model";
+import httpStatus from 'http-status';
+import { Types } from 'mongoose';
+import { AppError } from '../../utils';
+import { ProductModel } from '../Product/product.model';
+import {
+  DEFAULT_SELLING_UNIT,
+  normalizeSellingUnit,
+} from '../Product/selling-unit';
+import { IUser } from '../User/user.interface';
+import { ComparisonHistoryModel } from './comparisonHistory.model';
+import { ComparisonHistoryEventModel } from './comparisonHistoryEvent.model';
 
 const MAX_COMPARE_ITEMS = 4;
 
 const toObjectId = (value: string) => {
   if (!Types.ObjectId.isValid(value)) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Invalid product ID!");
+    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid product ID!');
   }
 
   return new Types.ObjectId(value);
@@ -22,12 +25,12 @@ const getProductSnapshot = async (productId: string) => {
     _id: toObjectId(productId),
     isActive: true,
   })
-    .populate({ path: "brand", match: { isActive: true } })
-    .populate({ path: "category", match: { isActive: true } })
+    .populate({ path: 'brand', match: { isActive: true } })
+    .populate({ path: 'category', match: { isActive: true } })
     .lean();
 
   if (!product || !product.brand || !product.category) {
-    throw new AppError(httpStatus.NOT_FOUND, "Product not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Product not found!');
   }
 
   return {
@@ -37,12 +40,13 @@ const getProductSnapshot = async (productId: string) => {
       brand: (product.brand as unknown as { name: string }).name,
       category: (product.category as unknown as { name: string }).name,
       categorySlug: (product.category as unknown as { slug?: string }).slug,
-      subCategorySlug: product.subCategorySlug ?? "",
+      subCategorySlug: product.subCategorySlug ?? '',
       images: product.images,
       sku: product.sku,
       slug: product.slug,
       price: product.price,
-       sellingUnit: normalizeSellingUnit(product.sellingUnit) ?? DEFAULT_SELLING_UNIT,
+      sellingUnit:
+        normalizeSellingUnit(product.sellingUnit) ?? DEFAULT_SELLING_UNIT,
       stock: product.stock,
       rating: product.rating,
       oldPrice: product.oldPrice,
@@ -81,7 +85,7 @@ const addComparisonItemIntoDB = async (user: IUser, productId: string) => {
     if (currentCategory && currentCategory !== snapshot.category) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
-        "You can compare only products from the same category.",
+        'You can compare only products from the same category.',
       );
     }
   }
@@ -96,7 +100,7 @@ const addComparisonItemIntoDB = async (user: IUser, productId: string) => {
     user: user._id,
     product: product._id,
     productSnapshot: snapshot,
-    action: "add",
+    action: 'add',
   });
 
   return result;
@@ -118,7 +122,7 @@ const removeComparisonItemFromDB = async (user: IUser, productId: string) => {
       user: user._id,
       product: productObjectId,
       productSnapshot: existing.productSnapshot,
-      action: "remove",
+      action: 'remove',
     });
   }
 
@@ -138,17 +142,17 @@ const getAllComparisonHistoryFromDB = async (
   const limit = Number(query.limit) || 50;
   const skip = (page - 1) * limit;
   const category =
-    typeof query.category === "string" ? query.category.trim() : "";
-  const user = typeof query.user === "string" ? query.user.trim() : "";
+    typeof query.category === 'string' ? query.category.trim() : '';
+  const user = typeof query.user === 'string' ? query.user.trim() : '';
 
   const filter: Record<string, unknown> = {};
-  if (category) filter["productSnapshot.category"] = category;
+  if (category) filter['productSnapshot.category'] = category;
   if (user) filter.user = toObjectId(user);
 
   const [data, total] = await Promise.all([
     ComparisonHistoryEventModel.find(filter)
-      .populate("user", "name email phone image role isActive")
-      .populate("product")
+      .populate('user', 'name email phone image role isActive')
+      .populate('product')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
@@ -173,17 +177,17 @@ const getComparisonInsightsFromDB = async () => {
       ComparisonHistoryEventModel.aggregate([
         {
           $group: {
-            _id: "$productSnapshot.category",
+            _id: '$productSnapshot.category',
             count: { $sum: 1 },
-            users: { $addToSet: "$user" },
+            users: { $addToSet: '$user' },
           },
         },
         {
           $project: {
             _id: 0,
-            category: "$_id",
+            category: '$_id',
             count: 1,
-            userCount: { $size: "$users" },
+            userCount: { $size: '$users' },
           },
         },
         { $sort: { count: -1 } },
@@ -191,18 +195,18 @@ const getComparisonInsightsFromDB = async () => {
       ComparisonHistoryEventModel.aggregate([
         {
           $group: {
-            _id: "$productSnapshot.title",
+            _id: '$productSnapshot.title',
             count: { $sum: 1 },
-            category: { $first: "$productSnapshot.category" },
+            category: { $first: '$productSnapshot.category' },
           },
         },
-        { $project: { _id: 0, product: "$_id", count: 1, category: 1 } },
+        { $project: { _id: 0, product: '$_id', count: 1, category: 1 } },
         { $sort: { count: -1 } },
         { $limit: 10 },
       ]),
       ComparisonHistoryEventModel.aggregate([
-        { $group: { _id: "$user", count: { $sum: 1 } } },
-        { $project: { _id: 0, user: "$_id", count: 1 } },
+        { $group: { _id: '$user', count: { $sum: 1 } } },
+        { $project: { _id: 0, user: '$_id', count: 1 } },
         { $sort: { count: -1 } },
         { $limit: 10 },
       ]),

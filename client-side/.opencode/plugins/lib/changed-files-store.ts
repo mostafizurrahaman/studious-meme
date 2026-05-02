@@ -1,20 +1,20 @@
-import * as path from "path";
+import * as path from 'path';
 
-export type ChangeType = "added" | "modified" | "deleted";
+export type ChangeType = 'added' | 'modified' | 'deleted';
 
 const changes = new Map<string, ChangeType>();
-let worktreeRoot = "";
+let worktreeRoot = '';
 
 export function initStore(worktree: string): void {
   worktreeRoot = worktree || process.cwd();
 }
 
 function toRelative(p: string): string {
-  if (!p) return "";
+  if (!p) return '';
   const normalized = path.normalize(p);
   if (path.isAbsolute(normalized) && worktreeRoot) {
     const rel = path.relative(worktreeRoot, normalized);
-    return rel.startsWith("..") ? normalized : rel;
+    return rel.startsWith('..') ? normalized : rel;
   }
   return normalized;
 }

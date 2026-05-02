@@ -1,10 +1,10 @@
-"use server";
+'use server';
 
-import { requestBackendJson } from "@/lib/backend-api";
+import { requestBackendJson } from '@/lib/backend-api';
 import {
   getValidAccessTokenForServerActions,
   getValidAccessTokenForServerHandlerGet,
-} from "@/lib/getValidAccessToken";
+} from '@/lib/getValidAccessToken';
 
 type BackendEnvelope<T> = {
   success?: boolean;
@@ -44,16 +44,16 @@ export type BackendOrder = {
   subtotal: number;
   discount: number;
   delivery: number;
-  shippingZone?: "inside_dhaka" | "outside_dhaka";
+  shippingZone?: 'inside_dhaka' | 'outside_dhaka';
   shippingCharge?: number;
   totalWeightKg?: number;
   codEligible?: boolean;
   codReasons?: string[];
   total: number;
   couponCode?: string;
-  paymentMethod: "CASH_ON_DELIVERY" | "PORTPOS";
-  paymentStatus: "UNPAID" | "PENDING" | "PAID" | "FAILED" | "CANCELLED";
-  status: "PLACED" | "PROCESSING" | "DELIVERED" | "CANCELLED";
+  paymentMethod: 'CASH_ON_DELIVERY' | 'PORTPOS';
+  paymentStatus: 'UNPAID' | 'PENDING' | 'PAID' | 'FAILED' | 'CANCELLED';
+  status: 'PLACED' | 'PROCESSING' | 'DELIVERED' | 'CANCELLED';
   transactionId?: string;
   gatewayUrl?: string;
   createdAt: string;
@@ -75,7 +75,7 @@ export type CreateOrderPayload = {
     note?: string;
   };
   couponCode?: string;
-  paymentMethod: "CASH_ON_DELIVERY" | "PORTPOS";
+  paymentMethod: 'CASH_ON_DELIVERY' | 'PORTPOS';
 };
 
 export type PreviewCheckoutPayload = CreateOrderPayload;
@@ -84,7 +84,7 @@ export type CheckoutPreview = {
   items: BackendOrderItem[];
   subtotal: number;
   discount: number;
-  shippingZone: "inside_dhaka" | "outside_dhaka";
+  shippingZone: 'inside_dhaka' | 'outside_dhaka';
   shippingCharge: number;
   totalWeightKg: number;
   codEligible: boolean;
@@ -96,8 +96,8 @@ export const createOrder = async (
   payload: CreateOrderPayload,
 ): Promise<BackendEnvelope<BackendOrder>> => {
   const accessToken = await getValidAccessTokenForServerActions();
-  return requestBackendJson<BackendEnvelope<BackendOrder>>("/order/checkout", {
-    method: "POST",
+  return requestBackendJson<BackendEnvelope<BackendOrder>>('/order/checkout', {
+    method: 'POST',
     body: payload,
     token: accessToken ?? undefined,
   });
@@ -108,9 +108,9 @@ export const previewCheckout = async (
 ): Promise<BackendEnvelope<CheckoutPreview>> => {
   const accessToken = await getValidAccessTokenForServerActions();
   return requestBackendJson<BackendEnvelope<CheckoutPreview>>(
-    "/order/checkout-preview",
+    '/order/checkout-preview',
     {
-      method: "POST",
+      method: 'POST',
       body: payload,
       token: accessToken ?? undefined,
     },
@@ -125,11 +125,11 @@ type UserListParams = {
 const buildUserListQuery = (params: UserListParams = {}) => {
   const searchParams = new URLSearchParams();
 
-  if (params.page) searchParams.set("page", String(params.page));
-  if (params.limit) searchParams.set("limit", String(params.limit));
+  if (params.page) searchParams.set('page', String(params.page));
+  if (params.limit) searchParams.set('limit', String(params.limit));
 
   const query = searchParams.toString();
-  return query ? `?${query}` : "";
+  return query ? `?${query}` : '';
 };
 
 export const getMyOrders = async (
@@ -139,7 +139,7 @@ export const getMyOrders = async (
   return requestBackendJson<PaginatedBackendEnvelope<BackendOrder[]>>(
     `/order/my-orders${buildUserListQuery(params)}`,
     {
-      method: "GET",
+      method: 'GET',
       token: accessToken ?? undefined,
     },
   );
@@ -152,7 +152,7 @@ export const getMyOrderById = async (
   return requestBackendJson<BackendEnvelope<BackendOrder>>(
     `/order/my-orders/${orderId}`,
     {
-      method: "GET",
+      method: 'GET',
       token: accessToken ?? undefined,
     },
   );
@@ -167,12 +167,12 @@ type AdminListParams = {
 const buildAdminListQuery = (params: AdminListParams = {}) => {
   const searchParams = new URLSearchParams();
 
-  if (params.page) searchParams.set("page", String(params.page));
-  if (params.limit) searchParams.set("limit", String(params.limit));
-  if (params.status?.trim()) searchParams.set("status", params.status.trim());
+  if (params.page) searchParams.set('page', String(params.page));
+  if (params.limit) searchParams.set('limit', String(params.limit));
+  if (params.status?.trim()) searchParams.set('status', params.status.trim());
 
   const query = searchParams.toString();
-  return query ? `?${query}` : "";
+  return query ? `?${query}` : '';
 };
 
 export const getAllOrdersForAdmin = async (
@@ -182,7 +182,7 @@ export const getAllOrdersForAdmin = async (
   return requestBackendJson<BackendEnvelope<BackendOrder[]>>(
     `/order/admin/orders${buildAdminListQuery(params)}`,
     {
-      method: "GET",
+      method: 'GET',
       token: accessToken ?? undefined,
     },
   );
@@ -195,7 +195,7 @@ export const getOrderById = async (
   return requestBackendJson<BackendEnvelope<BackendOrder>>(
     `/order/orders/${orderId}`,
     {
-      method: "GET",
+      method: 'GET',
       token: accessToken ?? undefined,
     },
   );
@@ -203,13 +203,13 @@ export const getOrderById = async (
 
 export const updateOrderStatus = async (
   orderId: string,
-  status: BackendOrder["status"],
+  status: BackendOrder['status'],
 ): Promise<BackendEnvelope<BackendOrder>> => {
   const accessToken = await getValidAccessTokenForServerActions();
   return requestBackendJson<BackendEnvelope<BackendOrder>>(
     `/order/admin/orders/${orderId}/status`,
     {
-      method: "PATCH",
+      method: 'PATCH',
       body: { status },
       token: accessToken ?? undefined,
     },

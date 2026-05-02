@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { AddToCartButton } from "@/components/cart/AddToCartButton";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { formatMoney, formatPriceLabelWithUnit } from "@/lib/cart";
-import { getProductPrimaryImage, type Product } from "@/lib/storefront-types";
-import { useCompareStore } from "@/lib/compare-store";
+import { useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { AddToCartButton } from '@/components/cart/AddToCartButton';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { formatMoney, formatPriceLabelWithUnit } from '@/lib/cart';
+import { getProductPrimaryImage, type Product } from '@/lib/storefront-types';
+import { useCompareStore } from '@/lib/compare-store';
 import {
   MAX_COMPARE_ITEMS,
   buildCompareSpecRows,
   comparisonHistoryRecordToProduct,
-} from "@/lib/compare";
-import { getMyComparisonHistory } from "@/services/ComparisonHistory";
-import { CompareRemoveButton } from "./CompareRemoveButton";
+} from '@/lib/compare';
+import { getMyComparisonHistory } from '@/services/ComparisonHistory';
+import { CompareRemoveButton } from './CompareRemoveButton';
 
 type Props = {
   authenticated: boolean;
@@ -138,7 +138,10 @@ export function ComparePageClient({ authenticated, initialProducts }: Props) {
                       </div>
                       <div className="flex items-end gap-2">
                         <div className="text-lg font-black text-primary">
-                          {formatPriceLabelWithUnit(product.price, product.sellingUnit)}
+                          {formatPriceLabelWithUnit(
+                            product.price,
+                            product.sellingUnit,
+                          )}
                         </div>
                         {product.oldPrice ? (
                           <div className="pb-0.5 text-sm text-foreground/40 line-through">
@@ -181,7 +184,7 @@ export function ComparePageClient({ authenticated, initialProducts }: Props) {
                           COD
                         </span>
                         <span className="text-right">
-                          {product.isNoCOD ? "Unavailable" : "Available"}
+                          {product.isNoCOD ? 'Unavailable' : 'Available'}
                         </span>
                       </div>
                     </div>

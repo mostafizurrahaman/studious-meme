@@ -1,10 +1,10 @@
-"use server";
+'use server';
 
-import type { FieldValues } from "react-hook-form";
-import { revalidateTag } from "next/cache";
-import { requestBackendJson } from "@/lib/backend-api";
-import { CACHE_TAGS } from "@/lib/cache-tags";
-import { getValidAccessTokenForServerHandlerGet } from "@/lib/getValidAccessToken";
+import type { FieldValues } from 'react-hook-form';
+import { revalidateTag } from 'next/cache';
+import { requestBackendJson } from '@/lib/backend-api';
+import { CACHE_TAGS } from '@/lib/cache-tags';
+import { getValidAccessTokenForServerHandlerGet } from '@/lib/getValidAccessToken';
 
 type BackendEnvelope<T> = {
   success?: boolean;
@@ -33,9 +33,9 @@ export const createContact = async (
   contactData: FieldValues,
 ): Promise<BackendEnvelope<BackendContact>> => {
   const result = await requestBackendJson<BackendEnvelope<BackendContact>>(
-    "/contact",
+    '/contact',
     {
-      method: "POST",
+      method: 'POST',
       body: contactData as Record<string, unknown>,
     },
   );
@@ -45,19 +45,19 @@ export const createContact = async (
 };
 
 export const getAllContacts = async (
-  page: string = "1",
-  limit: string = "50",
-  searchTerm: string = "",
+  page: string = '1',
+  limit: string = '50',
+  searchTerm: string = '',
 ): Promise<BackendEnvelope<BackendContact[]>> => {
   const accessToken = await getValidAccessTokenForServerHandlerGet();
 
   const query = new URLSearchParams({ page, limit });
-  if (searchTerm.trim()) query.set("searchTerm", searchTerm.trim());
+  if (searchTerm.trim()) query.set('searchTerm', searchTerm.trim());
 
   return requestBackendJson<BackendEnvelope<BackendContact[]>>(
     `/contact?${query.toString()}`,
     {
-      method: "GET",
+      method: 'GET',
       token: accessToken ?? undefined,
     },
   );

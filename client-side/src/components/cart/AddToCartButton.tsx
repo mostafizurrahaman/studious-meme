@@ -7,9 +7,15 @@ import { useCartStore } from '@/lib/cart-store';
 import type { Product } from '@/lib/storefront-types';
 import { addCartItem } from '@/services/Cart';
 
-export function AddToCartButton({ product, className }: { product: Product; className?: string }) {
-  const addProduct = useCartStore(state => state.addProduct);
-  const markItemAsSynced = useCartStore(state => state.markItemAsSynced);
+export function AddToCartButton({
+  product,
+  className,
+}: {
+  product: Product;
+  className?: string;
+}) {
+  const addProduct = useCartStore((state) => state.addProduct);
+  const markItemAsSynced = useCartStore((state) => state.markItemAsSynced);
   const [added, setAdded] = useState(false);
 
   return (
@@ -20,7 +26,7 @@ export function AddToCartButton({ product, className }: { product: Product; clas
         setAdded(true);
         if (product.id) {
           void addCartItem(product.id)
-            .then(result => {
+            .then((result) => {
               if (result?.success) {
                 markItemAsSynced(product.id);
               }

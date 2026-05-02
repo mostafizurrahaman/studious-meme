@@ -100,7 +100,9 @@ app.use(
 app.use(
   cors({
     credentials: true,
-    origin: config.allowed_origins.length ? config.allowed_origins : ['http://localhost:3000'],
+    origin: config.allowed_origins.length
+      ? config.allowed_origins
+      : ['http://localhost:3000'],
   }),
 );
 
@@ -128,8 +130,15 @@ app.use('/public', express.static('public'));
 
 // favicon route
 app.get('/favicon.ico', (_req: Request, res: Response) => {
-  const faviconPath = path.join(process.cwd(), 'src', 'app', 'utils', 'assets', 'icon.png');
-  res.sendFile(faviconPath, err => {
+  const faviconPath = path.join(
+    process.cwd(),
+    'src',
+    'app',
+    'utils',
+    'assets',
+    'icon.png',
+  );
+  res.sendFile(faviconPath, (err) => {
     if (err) {
       res.sendStatus(404);
     }

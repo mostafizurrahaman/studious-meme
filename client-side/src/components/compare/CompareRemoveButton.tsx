@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useTransition } from "react";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { useCompareStore } from "@/lib/compare-store";
-import type { Product } from "@/lib/storefront-types";
-import { removeCompareItem } from "@/services/ComparisonHistory";
+import { useTransition } from 'react';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { useCompareStore } from '@/lib/compare-store';
+import type { Product } from '@/lib/storefront-types';
+import { removeCompareItem } from '@/services/ComparisonHistory';
 
 type Props = {
   product: Product;
@@ -32,7 +32,7 @@ export function CompareRemoveButton({ product, productId, onRemoved }: Props) {
           const result = await removeCompareItem(productId);
 
           if (!result.success) {
-            toast.error(result.message ?? "Unable to update compare list.");
+            toast.error(result.message ?? 'Unable to update compare list.');
             replaceItems(snapshot);
             return;
           }
@@ -41,7 +41,7 @@ export function CompareRemoveButton({ product, productId, onRemoved }: Props) {
         });
       }}
     >
-      {isPending ? "Removing..." : "Remove"}
+      {isPending ? 'Removing...' : 'Remove'}
     </Button>
   );
 }

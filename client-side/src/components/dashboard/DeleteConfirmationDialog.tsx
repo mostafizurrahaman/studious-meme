@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { Loader2, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Loader2, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 
 type DeleteConfirmationDialogProps = {
   open: boolean;
@@ -26,9 +26,9 @@ export function DeleteConfirmationDialog({
   onOpenChange,
   onConfirm,
   isPending = false,
-  title = "Confirm deletion",
+  title = 'Confirm deletion',
   description,
-  confirmLabel = "Delete",
+  confirmLabel = 'Delete',
 }: DeleteConfirmationDialogProps) {
   return (
     <Dialog
@@ -62,7 +62,7 @@ export function DeleteConfirmationDialog({
             ) : (
               <Trash2 className="size-4" />
             )}
-            {isPending ? "Deleting..." : confirmLabel}
+            {isPending ? 'Deleting...' : confirmLabel}
           </Button>
         </DialogFooter>
       </DialogContent>

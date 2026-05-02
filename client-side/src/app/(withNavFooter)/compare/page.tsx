@@ -1,12 +1,12 @@
-import { SeoScripts } from "@/components/SeoScripts";
-import { ComparePageClient } from "@/components/compare/ComparePageClient";
-import { compareMetadata, compareSchemas } from "@/lib/seo";
-import { comparisonHistoryRecordToProduct } from "@/lib/compare";
-import type { Product } from "@/lib/storefront-types";
-import { getMyComparisonHistory } from "@/services/ComparisonHistory";
+import { SeoScripts } from '@/components/SeoScripts';
+import { ComparePageClient } from '@/components/compare/ComparePageClient';
+import { compareMetadata, compareSchemas } from '@/lib/seo';
+import { comparisonHistoryRecordToProduct } from '@/lib/compare';
+import type { Product } from '@/lib/storefront-types';
+import { getMyComparisonHistory } from '@/services/ComparisonHistory';
 
 export const metadata = compareMetadata;
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 export default async function ComparePage() {
   const result = await getMyComparisonHistory().catch(() => null);

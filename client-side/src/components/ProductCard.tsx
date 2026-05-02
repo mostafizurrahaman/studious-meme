@@ -15,13 +15,20 @@ type Props = {
   trailingAction?: React.ReactNode;
 };
 
-export function ProductCard({ product, priority = false, trailingAction }: Props) {
+export function ProductCard({
+  product,
+  priority = false,
+  trailingAction,
+}: Props) {
   const primaryImage = getProductPrimaryImage(product);
 
   return (
     <Card className="group overflow-hidden border-border transition hover:-translate-y-0.5 hover:shadow-md">
       <div className="relative aspect-square bg-muted p-2">
-        <Link href={`/product/${product.slug}`} className="absolute inset-0 block">
+        <Link
+          href={`/product/${product.slug}`}
+          className="absolute inset-0 block"
+        >
           <Image
             src={primaryImage}
             alt={product.title}
@@ -74,9 +81,13 @@ export function ProductCard({ product, priority = false, trailingAction }: Props
           <span className="text-foreground/50">({product.rating})</span>
         </div>
         <div className="flex items-center gap-2 text-[11px] sm:text-[13px]">
-          <span className="font-extrabold text-primary">{formatPriceLabelWithUnit(product.price, product.sellingUnit)}</span>
+          <span className="font-extrabold text-primary">
+            {formatPriceLabelWithUnit(product.price, product.sellingUnit)}
+          </span>
           {product.oldPrice ? (
-            <span className="text-foreground/45 line-through">{formatMoney(Number(product.oldPrice))}</span>
+            <span className="text-foreground/45 line-through">
+              {formatMoney(Number(product.oldPrice))}
+            </span>
           ) : null}
         </div>
         <div className="flex items-center justify-between text-[9px] text-foreground/60 sm:text-[11px]">
@@ -93,7 +104,9 @@ export function ProductCard({ product, priority = false, trailingAction }: Props
             >
               <Link href={`/product/${product.slug}`}>View</Link>
             </Button>
-            {trailingAction ? <div className="shrink-0">{trailingAction}</div> : null}
+            {trailingAction ? (
+              <div className="shrink-0">{trailingAction}</div>
+            ) : null}
           </div>
         </div>
       </CardContent>

@@ -29,7 +29,9 @@ router
       { name: 'displayImage', maxCount: 1 },
       { name: 'images', maxCount: 5 },
     ]),
-    validateRequestFromFormData(ProductReviewValidation.manualCreateReviewSchema),
+    validateRequestFromFormData(
+      ProductReviewValidation.manualCreateReviewSchema,
+    ),
     ProductReviewController.createManualReview,
   );
 

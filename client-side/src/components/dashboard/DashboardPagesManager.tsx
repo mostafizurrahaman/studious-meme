@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
-import Link from "next/link";
-import { toast } from "sonner";
+import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
+import Link from 'next/link';
+import { toast } from 'sonner';
 import {
   Bold,
   Eraser,
@@ -29,52 +29,52 @@ import {
   TextAlignStart,
   Underline,
   Undo2,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 import {
   pageLabels,
   publicPagePathBySlug,
   type BackendPage,
   type DashboardPageSlug,
-} from "@/lib/page-content";
-import { createOrUpdatePageByType } from "@/services/Page";
+} from '@/lib/page-content';
+import { createOrUpdatePageByType } from '@/services/Page';
 
 type DashboardPagesManagerProps = {
   page: BackendPage | null;
   slug: DashboardPageSlug;
 };
 
-const emptyContent = "<p>Write page content here.</p>";
+const emptyContent = '<p>Write page content here.</p>';
 const textColors = [
-  "#111827",
-  "#2563eb",
-  "#15803d",
-  "#b91c1c",
-  "#c2410c",
-  "#7c3aed",
+  '#111827',
+  '#2563eb',
+  '#15803d',
+  '#b91c1c',
+  '#c2410c',
+  '#7c3aed',
 ];
 const highlightColors = [
-  "#ffffff",
-  "#fef3c7",
-  "#dcfce7",
-  "#dbeafe",
-  "#fee2e2",
-  "#f3e8ff",
+  '#ffffff',
+  '#fef3c7',
+  '#dcfce7',
+  '#dbeafe',
+  '#fee2e2',
+  '#f3e8ff',
 ];
 
 function runEditorCommand(command: string, value?: string) {
@@ -82,15 +82,15 @@ function runEditorCommand(command: string, value?: string) {
 }
 
 function formatDashboardTimestamp(value?: string) {
-  if (!value) return "Not saved yet";
+  if (!value) return 'Not saved yet';
 
-  return new Intl.DateTimeFormat("en-GB", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-    second: "2-digit",
+  return new Intl.DateTimeFormat('en-GB', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    second: '2-digit',
     hour12: true,
   }).format(new Date(value));
 }
@@ -112,12 +112,12 @@ export function DashboardPagesManager({
   }, [content]);
 
   const plainText = useMemo(
-    () => content.replace(/<[^>]+>/g, "").trim(),
+    () => content.replace(/<[^>]+>/g, '').trim(),
     [content],
   );
 
   function syncEditorContent() {
-    setContent(editorRef.current?.innerHTML ?? "");
+    setContent(editorRef.current?.innerHTML ?? '');
   }
 
   function focusEditor() {
@@ -131,21 +131,21 @@ export function DashboardPagesManager({
   }
 
   function handleLink() {
-    const url = window.prompt("Enter link URL");
+    const url = window.prompt('Enter link URL');
     if (!url) return;
 
-    handleFormat("createLink", url);
+    handleFormat('createLink', url);
   }
 
   function handleSave() {
     startTransition(async () => {
       if (!title.trim()) {
-        toast.error("Title is required.");
+        toast.error('Title is required.');
         return;
       }
 
       if (plainText.length < 10) {
-        toast.error("Content must be at least 10 characters long.");
+        toast.error('Content must be at least 10 characters long.');
         return;
       }
 
@@ -156,11 +156,11 @@ export function DashboardPagesManager({
       });
 
       if (!result?.success) {
-        toast.error(result?.message ?? "Failed to save page.");
+        toast.error(result?.message ?? 'Failed to save page.');
         return;
       }
 
-      toast.success(result.message ?? "Page saved successfully.");
+      toast.success(result.message ?? 'Page saved successfully.');
     });
   }
 
@@ -203,7 +203,7 @@ export function DashboardPagesManager({
           <div className="overflow-hidden rounded-xl border bg-background">
             <div className="flex flex-wrap items-center gap-1 border-b bg-muted/35 p-2">
               <Select
-                onValueChange={(value) => handleFormat("formatBlock", value)}
+                onValueChange={(value) => handleFormat('formatBlock', value)}
               >
                 <SelectTrigger className="h-8 w-34 bg-background">
                   <SelectValue placeholder="Style" />
@@ -220,7 +220,7 @@ export function DashboardPagesManager({
                 type="button"
                 variant="ghost"
                 size="icon"
-                onClick={() => handleFormat("undo")}
+                onClick={() => handleFormat('undo')}
               >
                 <Undo2 className="size-4" />
               </Button>
@@ -228,7 +228,7 @@ export function DashboardPagesManager({
                 type="button"
                 variant="ghost"
                 size="icon"
-                onClick={() => handleFormat("redo")}
+                onClick={() => handleFormat('redo')}
               >
                 <Redo2 className="size-4" />
               </Button>
@@ -236,7 +236,7 @@ export function DashboardPagesManager({
                 type="button"
                 variant="ghost"
                 size="icon"
-                onClick={() => handleFormat("bold")}
+                onClick={() => handleFormat('bold')}
               >
                 <Bold className="size-4" />
               </Button>
@@ -244,7 +244,7 @@ export function DashboardPagesManager({
                 type="button"
                 variant="ghost"
                 size="icon"
-                onClick={() => handleFormat("italic")}
+                onClick={() => handleFormat('italic')}
               >
                 <Italic className="size-4" />
               </Button>
@@ -252,7 +252,7 @@ export function DashboardPagesManager({
                 type="button"
                 variant="ghost"
                 size="icon"
-                onClick={() => handleFormat("underline")}
+                onClick={() => handleFormat('underline')}
               >
                 <Underline className="size-4" />
               </Button>
@@ -260,7 +260,7 @@ export function DashboardPagesManager({
                 type="button"
                 variant="ghost"
                 size="icon"
-                onClick={() => handleFormat("strikeThrough")}
+                onClick={() => handleFormat('strikeThrough')}
               >
                 <Strikethrough className="size-4" />
               </Button>
@@ -268,7 +268,7 @@ export function DashboardPagesManager({
                 type="button"
                 variant="ghost"
                 size="icon"
-                onClick={() => handleFormat("formatBlock", "p")}
+                onClick={() => handleFormat('formatBlock', 'p')}
               >
                 <Pilcrow className="size-4" />
               </Button>
@@ -276,7 +276,7 @@ export function DashboardPagesManager({
                 type="button"
                 variant="ghost"
                 size="icon"
-                onClick={() => handleFormat("formatBlock", "h1")}
+                onClick={() => handleFormat('formatBlock', 'h1')}
               >
                 <Heading1 className="size-4" />
               </Button>
@@ -284,7 +284,7 @@ export function DashboardPagesManager({
                 type="button"
                 variant="ghost"
                 size="icon"
-                onClick={() => handleFormat("formatBlock", "h2")}
+                onClick={() => handleFormat('formatBlock', 'h2')}
               >
                 <Heading2 className="size-4" />
               </Button>
@@ -292,7 +292,7 @@ export function DashboardPagesManager({
                 type="button"
                 variant="ghost"
                 size="icon"
-                onClick={() => handleFormat("formatBlock", "h3")}
+                onClick={() => handleFormat('formatBlock', 'h3')}
               >
                 <Heading3 className="size-4" />
               </Button>
@@ -300,7 +300,7 @@ export function DashboardPagesManager({
                 type="button"
                 variant="ghost"
                 size="icon"
-                onClick={() => handleFormat("formatBlock", "blockquote")}
+                onClick={() => handleFormat('formatBlock', 'blockquote')}
               >
                 <Quote className="size-4" />
               </Button>
@@ -308,7 +308,7 @@ export function DashboardPagesManager({
                 type="button"
                 variant="ghost"
                 size="icon"
-                onClick={() => handleFormat("insertUnorderedList")}
+                onClick={() => handleFormat('insertUnorderedList')}
               >
                 <List className="size-4" />
               </Button>
@@ -316,7 +316,7 @@ export function DashboardPagesManager({
                 type="button"
                 variant="ghost"
                 size="icon"
-                onClick={() => handleFormat("insertOrderedList")}
+                onClick={() => handleFormat('insertOrderedList')}
               >
                 <ListOrdered className="size-4" />
               </Button>
@@ -332,7 +332,7 @@ export function DashboardPagesManager({
                 type="button"
                 variant="ghost"
                 size="icon"
-                onClick={() => handleFormat("unlink")}
+                onClick={() => handleFormat('unlink')}
               >
                 <Link2Off className="size-4" />
               </Button>
@@ -340,7 +340,7 @@ export function DashboardPagesManager({
                 type="button"
                 variant="ghost"
                 size="icon"
-                onClick={() => handleFormat("justifyLeft")}
+                onClick={() => handleFormat('justifyLeft')}
               >
                 <TextAlignStart className="size-4" />
               </Button>
@@ -348,7 +348,7 @@ export function DashboardPagesManager({
                 type="button"
                 variant="ghost"
                 size="icon"
-                onClick={() => handleFormat("justifyCenter")}
+                onClick={() => handleFormat('justifyCenter')}
               >
                 <TextAlignCenter className="size-4" />
               </Button>
@@ -356,7 +356,7 @@ export function DashboardPagesManager({
                 type="button"
                 variant="ghost"
                 size="icon"
-                onClick={() => handleFormat("justifyRight")}
+                onClick={() => handleFormat('justifyRight')}
               >
                 <TextAlignEnd className="size-4" />
               </Button>
@@ -364,7 +364,7 @@ export function DashboardPagesManager({
                 type="button"
                 variant="ghost"
                 size="icon"
-                onClick={() => handleFormat("justifyFull")}
+                onClick={() => handleFormat('justifyFull')}
               >
                 <TextAlignJustify className="size-4" />
               </Button>
@@ -372,7 +372,7 @@ export function DashboardPagesManager({
                 type="button"
                 variant="ghost"
                 size="icon"
-                onClick={() => handleFormat("outdent")}
+                onClick={() => handleFormat('outdent')}
               >
                 <Outdent className="size-4" />
               </Button>
@@ -380,12 +380,12 @@ export function DashboardPagesManager({
                 type="button"
                 variant="ghost"
                 size="icon"
-                onClick={() => handleFormat("indent")}
+                onClick={() => handleFormat('indent')}
               >
                 <Indent className="size-4" />
               </Button>
               <Select
-                onValueChange={(value) => handleFormat("foreColor", value)}
+                onValueChange={(value) => handleFormat('foreColor', value)}
               >
                 <SelectTrigger className="h-8 w-30 bg-background">
                   <SelectValue placeholder="Text" />
@@ -405,7 +405,7 @@ export function DashboardPagesManager({
                 </SelectContent>
               </Select>
               <Select
-                onValueChange={(value) => handleFormat("hiliteColor", value)}
+                onValueChange={(value) => handleFormat('hiliteColor', value)}
               >
                 <SelectTrigger className="h-8 w-34 bg-background">
                   <SelectValue placeholder="Highlight" />
@@ -418,7 +418,7 @@ export function DashboardPagesManager({
                           className="size-3 rounded-full border"
                           style={{ backgroundColor: color }}
                         />
-                        {color === "#ffffff" ? "None" : color}
+                        {color === '#ffffff' ? 'None' : color}
                       </span>
                     </SelectItem>
                   ))}
@@ -428,7 +428,7 @@ export function DashboardPagesManager({
                 type="button"
                 variant="ghost"
                 size="icon"
-                onClick={() => handleFormat("removeFormat")}
+                onClick={() => handleFormat('removeFormat')}
               >
                 <Eraser className="size-4" />
               </Button>
@@ -455,7 +455,7 @@ export function DashboardPagesManager({
               onClick={handleSave}
             >
               <Save className="size-4" />
-              {isPending ? "Saving..." : "Save content"}
+              {isPending ? 'Saving...' : 'Save content'}
             </Button>
           </div>
         </CardContent>

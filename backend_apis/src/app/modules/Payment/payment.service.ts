@@ -69,11 +69,17 @@ type PortPosOrderLean = {
 
 const requirePortPosConfig = () => {
   if (!config.portpos.app_key || !config.portpos.secret_key) {
-    throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, 'PortPOS credentials are not configured.');
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      'PortPOS credentials are not configured.',
+    );
   }
 
   if (!config.urls.backend_public || !config.urls.frontend_app) {
-    throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, 'Public app URLs are not configured.');
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      'Public app URLs are not configured.',
+    );
   }
 };
 
@@ -86,33 +92,50 @@ const isSuccessStatus = (status: string) =>
   ['PAID', 'SUCCESS', 'VALID', 'VALIDATED', 'COMPLETED'].includes(status);
 
 const isFailureStatus = (status: string) =>
-  ['FAILED', 'FAIL', 'CANCELLED', 'CANCELED', 'VOID', 'EXPIRED'].includes(status);
+  ['FAILED', 'FAIL', 'CANCELLED', 'CANCELED', 'VOID', 'EXPIRED'].includes(
+    status,
+  );
 
 const getInvoiceIdFromPayload = (payload: GatewayPayload) => {
-  const candidate = payload.invoice_id ?? payload.invoice ?? payload.invoiceId ?? payload.reference;
+  const candidate =
+    payload.invoice_id ??
+    payload.invoice ??
+    payload.invoiceId ??
+    payload.reference;
   return typeof candidate === 'string' ? candidate : '';
 };
 
 const getAmountFromPayload = (payload: GatewayPayload) => {
-  const candidate = payload.amount ?? (payload.order as { amount?: unknown } | undefined)?.amount;
+  const candidate =
+    payload.amount ??
+    (payload.order as { amount?: unknown } | undefined)?.amount;
   return normalizeAmount(candidate as number | string | undefined);
 };
 
 const getStatusFromPayload = (payload: GatewayPayload) => {
   const candidate =
-    payload.status ?? (payload.billing as { gateway?: { status?: unknown } } | undefined)?.gateway?.status;
+    payload.status ??
+    (payload.billing as { gateway?: { status?: unknown } } | undefined)?.gateway
+      ?.status;
   return typeof candidate === 'string' ? candidate.toUpperCase() : '';
 };
 
 const getReferenceFromPayload = (payload: GatewayPayload) => {
-  const candidate = payload.reference ?? (payload.order as { reference?: unknown } | undefined)?.reference;
+  const candidate =
+    payload.reference ??
+    (payload.order as { reference?: unknown } | undefined)?.reference;
   return typeof candidate === 'string' ? candidate : '';
 };
 
-const buildPaymentRecordPayload = (order: PortPosOrderLean, transactionId: string) => ({
+const buildPaymentRecordPayload = (
+  order: PortPosOrderLean,
+  transactionId: string,
+) => ({
   user: order.user,
   order: order._id,
-  amount: normalizeAmount(order.payableAmount ?? order.totalAmount ?? order.total),
+  amount: normalizeAmount(
+    order.payableAmount ?? order.totalAmount ?? order.total,
+  ),
   currency: order.currency ?? 'BDT',
   status: 'INITIATED' as const,
   gateway: 'PORTPOS' as const,
@@ -122,7 +145,10 @@ const buildPaymentRecordPayload = (order: PortPosOrderLean, transactionId: strin
 });
 
 // 1. initiatePortPosPayment
-const initiatePortPosPayment = async (user: IUser, orderId: string): Promise<PortPosInitiationResult> => {
+const initiatePortPosPayment = async (
+  user: IUser,
+  orderId: string,
+): Promise<PortPosInitiationResult> => {
   requirePortPosConfig();
 
   const order = (await OrderModel.findOne({
@@ -135,7 +161,10 @@ const initiatePortPosPayment = async (user: IUser, orderId: string): Promise<Por
   }
 
   if (order.paymentMethod !== 'PORTPOS') {
-    throw new AppError(httpStatus.BAD_REQUEST, 'This order is not configured for PortPOS payment.');
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'This order is not configured for PortPOS payment.',
+    );
   }
 
   if (order.paymentStatus === 'PAID') {
@@ -153,12 +182,14 @@ const initiatePortPosPayment = async (user: IUser, orderId: string): Promise<Por
     return {
       orderId,
       invoiceId: existingPayment.invoiceId,
-      paymentUrl: existingPayment.paymentUrl || existingPayment.gatewayUrl || '',
+      paymentUrl:
+        existingPayment.paymentUrl || existingPayment.gatewayUrl || '',
       transactionId: existingPayment.transactionId,
     };
   }
 
-  const transactionId = order.transactionId ?? `PORTPOS-${order.orderId}-${Date.now()}`;
+  const transactionId =
+    order.transactionId ?? `PORTPOS-${order.orderId}-${Date.now()}`;
 
   const paymentRecord = await Payment.findOneAndUpdate(
     { transactionId },
@@ -172,7 +203,9 @@ const initiatePortPosPayment = async (user: IUser, orderId: string): Promise<Por
     createdInvoice = await PortPosService.createInvoice(
       {
         ...order,
-        payableAmount: normalizeAmount(order.payableAmount ?? order.totalAmount ?? order.total),
+        payableAmount: normalizeAmount(
+          order.payableAmount ?? order.totalAmount ?? order.total,
+        ),
         currency: order.currency ?? 'BDT',
       },
       user,
@@ -181,7 +214,8 @@ const initiatePortPosPayment = async (user: IUser, orderId: string): Promise<Por
     await Payment.findByIdAndUpdate(paymentRecord?._id, {
       status: 'FAILED',
       failedAt: new Date(),
-      gatewayPayload: error instanceof Error ? { message: error.message } : undefined,
+      gatewayPayload:
+        error instanceof Error ? { message: error.message } : undefined,
     });
 
     throw error;
@@ -209,8 +243,12 @@ const initiatePortPosPayment = async (user: IUser, orderId: string): Promise<Por
     transactionId,
     gatewayUrl: createdInvoice.paymentUrl,
     status: 'PENDING_PAYMENT',
-    payableAmount: normalizeAmount(order.payableAmount ?? order.totalAmount ?? order.total),
-    totalAmount: normalizeAmount(order.payableAmount ?? order.totalAmount ?? order.total),
+    payableAmount: normalizeAmount(
+      order.payableAmount ?? order.totalAmount ?? order.total,
+    ),
+    totalAmount: normalizeAmount(
+      order.payableAmount ?? order.totalAmount ?? order.total,
+    ),
     currency: order.currency ?? 'BDT',
   });
 
@@ -250,14 +288,21 @@ const finalizePaymentFromGateway = async (
     paymentStatus: finalStatus,
     status: orderStatus,
     paymentGateway: 'PORTPOS',
-    invoiceId: getInvoiceIdFromPayload(payload) || payment?.invoiceId || order.invoiceId,
-    ...(payment?._id || order.paymentId ? { paymentId: String(payment?._id ?? order.paymentId) } : {}),
+    invoiceId:
+      getInvoiceIdFromPayload(payload) || payment?.invoiceId || order.invoiceId,
+    ...(payment?._id || order.paymentId
+      ? { paymentId: String(payment?._id ?? order.paymentId) }
+      : {}),
     transactionId: payment?.transactionId || order.transactionId || '',
   });
 
   return {
     orderId: order.orderId,
-    invoiceId: getInvoiceIdFromPayload(payload) || payment?.invoiceId || order.invoiceId || '',
+    invoiceId:
+      getInvoiceIdFromPayload(payload) ||
+      payment?.invoiceId ||
+      order.invoiceId ||
+      '',
     paymentStatus: finalStatus,
     orderStatus,
   };
@@ -278,7 +323,9 @@ const handlePortPosIpn = async (payload: GatewayPayload) => {
   const verifiedResponse = await PortPosService.validateIpn(invoiceId, amount);
   const verifiedData = verifiedResponse.data;
   const verifiedOrderAmount = normalizeAmount(verifiedData?.order?.amount);
-  const verifiedCurrency = String(verifiedData?.order?.currency ?? '').toUpperCase();
+  const verifiedCurrency = String(
+    verifiedData?.order?.currency ?? '',
+  ).toUpperCase();
   const verifiedStatus = getStatusFromPayload({
     ...payload,
     status: verifiedData?.order?.status ?? payload.status,
@@ -286,7 +333,10 @@ const handlePortPosIpn = async (payload: GatewayPayload) => {
   const orderId = reference || String(verifiedData?.reference ?? '');
 
   if (!orderId) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'PortPOS IPN did not include an order reference.');
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'PortPOS IPN did not include an order reference.',
+    );
   }
 
   const order = (await OrderModel.findOne({
@@ -297,7 +347,11 @@ const handlePortPosIpn = async (payload: GatewayPayload) => {
   }
 
   let payment = (await Payment.findOne({
-    $or: [{ invoiceId }, { transactionId: order.transactionId }, { order: String(order._id) }],
+    $or: [
+      { invoiceId },
+      { transactionId: order.transactionId },
+      { order: String(order._id) },
+    ],
   }).sort({ createdAt: -1 })) as PaymentRecordLike | null;
 
   if (!payment) {
@@ -330,15 +384,28 @@ const handlePortPosIpn = async (payload: GatewayPayload) => {
   }
 
   if (verifiedCurrency && verifiedCurrency !== 'BDT') {
-    throw new AppError(httpStatus.BAD_REQUEST, 'PortPOS currency mismatch detected.');
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'PortPOS currency mismatch detected.',
+    );
   }
 
   if (verifiedOrderAmount && verifiedOrderAmount !== amount) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'PortPOS amount mismatch detected.');
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'PortPOS amount mismatch detected.',
+    );
   }
 
-  if (verifiedStatus && !isSuccessStatus(verifiedStatus) && !isFailureStatus(verifiedStatus)) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'PortPOS payment status is not valid.');
+  if (
+    verifiedStatus &&
+    !isSuccessStatus(verifiedStatus) &&
+    !isFailureStatus(verifiedStatus)
+  ) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'PortPOS payment status is not valid.',
+    );
   }
 
   if (isSuccessStatus(verifiedStatus)) {
@@ -378,14 +445,19 @@ const verifyPortPosPayment = async (user: IUser, orderId: string) => {
   }).sort({ createdAt: -1 })) as PaymentRecordLike | null;
 
   if (!payment?.invoiceId && !order.invoiceId) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'PortPOS invoice not found for this order.');
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'PortPOS invoice not found for this order.',
+    );
   }
 
   const invoiceId = payment?.invoiceId || order.invoiceId || '';
   const verifiedResponse = await PortPosService.verifyInvoice(invoiceId);
   const verifiedData = verifiedResponse.data;
   const verifiedAmount = normalizeAmount(verifiedData?.order?.amount);
-  const verifiedCurrency = String(verifiedData?.order?.currency ?? '').toUpperCase();
+  const verifiedCurrency = String(
+    verifiedData?.order?.currency ?? '',
+  ).toUpperCase();
   const verifiedStatus = String(
     verifiedData?.order?.status ?? verifiedData?.billing?.gateway?.status ?? '',
   ).toUpperCase();
@@ -397,7 +469,9 @@ const verifyPortPosPayment = async (user: IUser, orderId: string) => {
       {
         user: order.user,
         order: order._id,
-        amount: normalizeAmount(order.payableAmount ?? order.totalAmount ?? order.total),
+        amount: normalizeAmount(
+          order.payableAmount ?? order.totalAmount ?? order.total,
+        ),
         currency: order.currency ?? 'BDT',
         status: 'INITIATED',
         gateway: 'PORTPOS',
@@ -411,18 +485,28 @@ const verifyPortPosPayment = async (user: IUser, orderId: string) => {
   }
 
   if (verifiedReference && verifiedReference !== order.orderId) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'PortPOS order reference mismatch detected.');
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'PortPOS order reference mismatch detected.',
+    );
   }
 
   if (verifiedCurrency && verifiedCurrency !== 'BDT') {
-    throw new AppError(httpStatus.BAD_REQUEST, 'PortPOS currency mismatch detected.');
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'PortPOS currency mismatch detected.',
+    );
   }
 
   if (
     verifiedAmount &&
-    verifiedAmount !== normalizeAmount(order.payableAmount ?? order.totalAmount ?? order.total)
+    verifiedAmount !==
+      normalizeAmount(order.payableAmount ?? order.totalAmount ?? order.total)
   ) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'PortPOS amount mismatch detected.');
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'PortPOS amount mismatch detected.',
+    );
   }
 
   if (isSuccessStatus(verifiedStatus)) {
@@ -482,12 +566,16 @@ const refundPayment = async (orderId: string, amount?: number) => {
     $or: [{ invoiceId: order.invoiceId }, { order: String(order._id) }],
   }).sort({ createdAt: -1 })) as PaymentRecordLike | null;
   if (!payment?.invoiceId) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'PortPOS invoice not found for this order.');
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'PortPOS invoice not found for this order.',
+    );
   }
 
   const refundResponse = await PortPosService.refundPayment(
     payment.invoiceId,
-    amount || normalizeAmount(order.payableAmount ?? order.totalAmount ?? order.total),
+    amount ||
+      normalizeAmount(order.payableAmount ?? order.totalAmount ?? order.total),
   );
 
   await Payment.findByIdAndUpdate(payment._id, {
@@ -505,7 +593,10 @@ const refundPayment = async (orderId: string, amount?: number) => {
 };
 
 // 6. getMyPaymentsFromDB
-const getMyPaymentsFromDB = async (user: IUser, query: Record<string, unknown> = {}) => {
+const getMyPaymentsFromDB = async (
+  user: IUser,
+  query: Record<string, unknown> = {},
+) => {
   const page = Number(query.page) || 1;
   const limit = Number(query.limit) || 50;
   const skip = (page - 1) * limit;
@@ -552,7 +643,9 @@ const getAllPaymentsForAdminFromDB = async (query: Record<string, unknown>) => {
       .limit(limit)
       .lean(),
     Payment.countDocuments(),
-    Payment.aggregate([{ $group: { _id: null, totalAmount: { $sum: '$amount' } } }]),
+    Payment.aggregate([
+      { $group: { _id: null, totalAmount: { $sum: '$amount' } } },
+    ]),
   ]);
 
   return {

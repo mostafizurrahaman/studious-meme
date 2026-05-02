@@ -1,7 +1,7 @@
-import httpStatus from "http-status";
-import jwt, { Secret, SignOptions } from "jsonwebtoken";
-import config from "../config";
-import { AppError } from "../utils";
+import httpStatus from 'http-status';
+import jwt, { Secret, SignOptions } from 'jsonwebtoken';
+import config from '../config';
+import { AppError } from '../utils';
 
 type TTokenData = {
   _id: string;
@@ -15,7 +15,7 @@ type TTokenData = {
 
 export const createAccessToken = (payload: TTokenData): string => {
   const token = jwt.sign(payload, config.jwt.access_secret!, {
-    algorithm: "HS256",
+    algorithm: 'HS256',
     expiresIn: config.jwt.access_expires_in!,
   } as SignOptions);
 
@@ -42,7 +42,7 @@ export const createAccessToken = (payload: TTokenData): string => {
 
 export const createRefreshToken = (payload: { email: string }): string => {
   const token = jwt.sign(payload, config.jwt.refresh_secret!, {
-    algorithm: "HS256",
+    algorithm: 'HS256',
     expiresIn: config.jwt.refresh_expires_in!,
   } as SignOptions);
 
@@ -63,6 +63,6 @@ export const verifyToken = (token: string, secret: Secret) => {
 
     return decoded;
   } catch {
-    throw new AppError(httpStatus.UNAUTHORIZED, "Unauthorized access!");
+    throw new AppError(httpStatus.UNAUTHORIZED, 'Unauthorized access!');
   }
 };

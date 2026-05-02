@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
+import { useEffect } from 'react';
 
 export function ServiceWorkerRegistration() {
   useEffect(() => {
-    if (!("serviceWorker" in navigator)) {
+    if (!('serviceWorker' in navigator)) {
       return;
     }
 
@@ -12,7 +12,7 @@ export function ServiceWorkerRegistration() {
 
     const register = async () => {
       try {
-        const registration = await navigator.serviceWorker.register("/sw.js");
+        const registration = await navigator.serviceWorker.register('/sw.js');
 
         if (!cancelled) {
           void registration.update().catch(() => null);

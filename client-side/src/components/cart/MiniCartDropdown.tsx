@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import Link from "next/link";
-import * as React from "react";
+import Image from 'next/image';
+import Link from 'next/link';
+import * as React from 'react';
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { formatMoney } from "@/lib/cart";
-import { useCartStore } from "@/lib/cart-store";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { formatMoney } from '@/lib/cart';
+import { useCartStore } from '@/lib/cart-store';
 
 export const MiniCartDropdown = React.forwardRef<
   HTMLDetailsElement,
@@ -31,9 +31,9 @@ export const MiniCartDropdown = React.forwardRef<
           style={
             active
               ? {
-                  backgroundColor: "var(--primary)",
-                  borderColor: "var(--primary)",
-                  color: "#ffffff",
+                  backgroundColor: 'var(--primary)',
+                  borderColor: 'var(--primary)',
+                  color: '#ffffff',
                 }
               : undefined
           }

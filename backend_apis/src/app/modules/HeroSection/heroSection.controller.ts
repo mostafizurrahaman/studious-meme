@@ -1,7 +1,7 @@
-import httpStatus from "http-status";
-import { AppError, asyncHandler, sendResponse } from "../../utils";
-import { HeroSectionService } from "./heroSection.service";
-import { getParam } from "../../lib/getParam";
+import httpStatus from 'http-status';
+import { AppError, asyncHandler, sendResponse } from '../../utils';
+import { HeroSectionService } from './heroSection.service';
+import { getParam } from '../../lib/getParam';
 
 // 1. getHomeContent
 const getHomeContent = asyncHandler(async (_req, res) => {
@@ -9,7 +9,7 @@ const getHomeContent = asyncHandler(async (_req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Home content fetched successfully!",
+    message: 'Home content fetched successfully!',
     data: result,
   });
 });
@@ -23,7 +23,7 @@ const createHeroSection = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
-    message: "Hero section created successfully!",
+    message: 'Hero section created successfully!',
     data: result,
   });
 });
@@ -34,7 +34,7 @@ const getAllHeroSections = asyncHandler(async (_req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Hero sections fetched successfully!",
+    message: 'Hero sections fetched successfully!',
     data: result,
   });
 });
@@ -47,7 +47,7 @@ const getHeroSection = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Hero section fetched successfully!",
+    message: 'Hero section fetched successfully!',
     data: result,
   });
 });
@@ -61,11 +61,11 @@ const updateHeroSection = asyncHandler(async (req, res) => {
   );
 
   if (!result)
-    throw new AppError(httpStatus.NOT_FOUND, "Hero section not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Hero section not found!');
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Hero section updated successfully!",
+    message: 'Hero section updated successfully!',
     data: result,
   });
 });
@@ -77,11 +77,11 @@ const deleteHeroSection = asyncHandler(async (req, res) => {
   );
 
   if (!result)
-    throw new AppError(httpStatus.NOT_FOUND, "Hero section not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Hero section not found!');
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Hero section deleted successfully!",
+    message: 'Hero section deleted successfully!',
     data: result,
   });
 });

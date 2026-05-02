@@ -7,7 +7,9 @@ import { BANGLADESH_DISTRICTS } from '@/lib/bangladesh-districts';
 import { normalizeOrderPaymentMethod } from '@/lib/payment-method';
 import { getValidAccessTokenForServerActions } from '@/lib/getValidAccessToken';
 
-type CheckoutActionErrors = Partial<Record<'name' | 'phone' | 'email' | 'city' | 'address', string>>;
+type CheckoutActionErrors = Partial<
+  Record<'name' | 'phone' | 'email' | 'city' | 'address', string>
+>;
 
 const CHECKOUT_LOGIN_MESSAGE = 'Sign in to place your order.';
 
@@ -50,10 +52,19 @@ const checkoutSchema = z.object({
     .string()
     .trim()
     .min(1, { message: 'Please select a district.' })
-    .refine(value => BANGLADESH_DISTRICTS.includes(value as (typeof BANGLADESH_DISTRICTS)[number]), {
-      message: 'Please select a valid district.',
-    }),
-  address: z.string().trim().min(1, { message: 'Please enter your delivery address.' }),
+    .refine(
+      (value) =>
+        BANGLADESH_DISTRICTS.includes(
+          value as (typeof BANGLADESH_DISTRICTS)[number],
+        ),
+      {
+        message: 'Please select a valid district.',
+      },
+    ),
+  address: z
+    .string()
+    .trim()
+    .min(1, { message: 'Please enter your delivery address.' }),
 });
 
 function isCartItem(value: unknown): value is CartItem {
@@ -86,11 +97,16 @@ function fail(error: string): CheckoutActionState {
   return { ok: false, error };
 }
 
-function failWithErrors(error: string, errors: CheckoutActionErrors): CheckoutActionState {
+function failWithErrors(
+  error: string,
+  errors: CheckoutActionErrors,
+): CheckoutActionState {
   return { ok: false, error, errors };
 }
 
-function flattenErrors(error: z.ZodError<z.infer<typeof checkoutSchema>>): CheckoutActionErrors {
+function flattenErrors(
+  error: z.ZodError<z.infer<typeof checkoutSchema>>,
+): CheckoutActionErrors {
   const fieldErrors = error.flatten().fieldErrors;
 
   return Object.fromEntries(
@@ -114,7 +130,9 @@ export async function submitCheckoutAction(
   let items: CartItem[] = [];
 
   try {
-    const parsed = JSON.parse(String(formData.get('cartItemsJson') ?? '[]')) as unknown[];
+    const parsed = JSON.parse(
+      String(formData.get('cartItemsJson') ?? '[]'),
+    ) as unknown[];
     items = parsed.filter(isCartItem);
   } catch {
     return fail('Cart data is invalid. Please try again.');
@@ -133,7 +151,10 @@ export async function submitCheckoutAction(
   });
 
   if (!parsed.success) {
-    return failWithErrors('Please fix the highlighted checkout fields.', flattenErrors(parsed.error));
+    return failWithErrors(
+      'Please fix the highlighted checkout fields.',
+      flattenErrors(parsed.error),
+    );
   }
 
   const customer = {
@@ -148,7 +169,7 @@ export async function submitCheckoutAction(
   const normalizedPayment = normalizeOrderPaymentMethod(payment);
 
   const previewResult = await previewCheckout({
-    items: items.map(item => ({ sku: item.sku, quantity: item.quantity })),
+    items: items.map((item) => ({ sku: item.sku, quantity: item.quantity })),
     customer,
     couponCode,
     paymentMethod: normalizedPayment,
@@ -159,15 +180,20 @@ export async function submitCheckoutAction(
       return fail(CHECKOUT_LOGIN_MESSAGE);
     }
 
-    return fail(previewResult?.message ?? 'Failed to preview checkout summary.');
+    return fail(
+      previewResult?.message ?? 'Failed to preview checkout summary.',
+    );
   }
 
-  if (normalizedPayment === 'CASH_ON_DELIVERY' && !previewResult.data.codEligible) {
+  if (
+    normalizedPayment === 'CASH_ON_DELIVERY' &&
+    !previewResult.data.codEligible
+  ) {
     return fail(previewResult.data.codReasons.join(' '));
   }
 
   const orderResult = await createOrder({
-    items: items.map(item => ({ sku: item.sku, quantity: item.quantity })),
+    items: items.map((item) => ({ sku: item.sku, quantity: item.quantity })),
     customer,
     couponCode,
     paymentMethod: normalizedPayment,
@@ -182,10 +208,14 @@ export async function submitCheckoutAction(
   }
 
   if (normalizedPayment === 'PORTPOS') {
-    const paymentResult = await initiatePortPosPayment(orderResult.data.orderId);
+    const paymentResult = await initiatePortPosPayment(
+      orderResult.data.orderId,
+    );
 
     if (!paymentResult?.success || !paymentResult.data?.url) {
-      return fail(paymentResult?.message ?? 'Failed to initiate PortPOS payment.');
+      return fail(
+        paymentResult?.message ?? 'Failed to initiate PortPOS payment.',
+      );
     }
 
     return {

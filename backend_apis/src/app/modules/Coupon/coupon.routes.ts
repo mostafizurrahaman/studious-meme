@@ -1,20 +1,20 @@
-import { Router } from "express";
+import { Router } from 'express';
 import {
   adminLimiter,
   auth,
   burstProtection,
   publicLimiter,
   validateRequest,
-} from "../../middlewares";
-import { ROLE } from "../User/user.constant";
-import { CouponController } from "./coupon.controller";
-import { CouponValidation } from "./coupon.validation";
+} from '../../middlewares';
+import { ROLE } from '../User/user.constant';
+import { CouponController } from './coupon.controller';
+import { CouponValidation } from './coupon.validation';
 
 const router = Router();
 
 // 1. verifyCoupon
 router
-  .route("/verify")
+  .route('/verify')
   .post(
     publicLimiter,
     validateRequest(CouponValidation.couponVerifySchema),
@@ -23,11 +23,11 @@ router
 
 // 2. createCoupon
 router
-  .route("/admin")
+  .route('/admin')
   .post(
     auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
     adminLimiter,
-    burstProtection("admin", 10_000, 15),
+    burstProtection('admin', 10_000, 15),
     validateRequest(CouponValidation.couponCreateSchema),
     CouponController.createCoupon,
   )
@@ -39,7 +39,7 @@ router
 
 // 3. getCoupon, updateCoupon
 router
-  .route("/admin/:couponId")
+  .route('/admin/:couponId')
   .get(
     auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
     adminLimiter,
@@ -48,28 +48,28 @@ router
   .patch(
     auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
     adminLimiter,
-    burstProtection("admin", 10_000, 15),
+    burstProtection('admin', 10_000, 15),
     validateRequest(CouponValidation.couponUpdateSchema),
     CouponController.updateCoupon,
   );
 
 // 4. deleteCoupon
 router
-  .route("/admin/:couponId")
+  .route('/admin/:couponId')
   .delete(
     auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
     adminLimiter,
-    burstProtection("admin", 10_000, 15),
+    burstProtection('admin', 10_000, 15),
     CouponController.deleteCoupon,
   );
 
 // 5. updateCouponStatus
 router
-  .route("/admin/:couponId/status")
+  .route('/admin/:couponId/status')
   .patch(
     auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
     adminLimiter,
-    burstProtection("admin", 10_000, 15),
+    burstProtection('admin', 10_000, 15),
     validateRequest(CouponValidation.couponStatusSchema),
     CouponController.updateCouponStatus,
   );

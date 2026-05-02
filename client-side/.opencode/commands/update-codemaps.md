@@ -75,7 +75,7 @@ docs/CODEMAPS/FILES.md
 **Usage Example**:
 
 ```typescript
-import { functionName } from "@/module";
+import { functionName } from '@/module';
 ```
 
 ## Generation Process

@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
-import type { Product } from "@/lib/storefront-types";
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
+import type { Product } from '@/lib/storefront-types';
 
 type WishlistState = {
   items: Product[];
@@ -48,7 +48,7 @@ export const useWishlistStore = create<WishlistState>()(
       setHydrated: (hydrated) => set({ hydrated }),
     }),
     {
-      name: "malamal-wishlist-v1",
+      name: 'malamal-wishlist-v1',
       storage: createJSONStorage(() => localStorage),
       onRehydrateStorage: () => (state) => {
         state?.setHydrated(true);

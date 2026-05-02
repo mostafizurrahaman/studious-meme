@@ -1,5 +1,5 @@
 export function getFacebookPixelId() {
-  return process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID?.trim() ?? "";
+  return process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID?.trim() ?? '';
 }
 
 type FacebookPixelEventParams = Record<
@@ -23,20 +23,20 @@ export function trackFacebookPixelEvent(
   eventName: string,
   params?: FacebookPixelEventParams,
 ) {
-  if (typeof window === "undefined" || typeof window.fbq !== "function") {
+  if (typeof window === 'undefined' || typeof window.fbq !== 'function') {
     return;
   }
 
   if (params && Object.keys(params).length > 0) {
-    window.fbq("track", eventName, params);
+    window.fbq('track', eventName, params);
     return;
   }
 
-  window.fbq("track", eventName);
+  window.fbq('track', eventName);
 }
 
 export function trackFacebookPageView() {
-  trackFacebookPixelEvent("PageView");
+  trackFacebookPixelEvent('PageView');
 }
 
 export function buildFacebookPixelInitScript(pixelId: string) {

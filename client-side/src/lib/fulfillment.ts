@@ -1,10 +1,10 @@
-import type { CouponVerificationSummary } from "@/lib/coupons";
+import type { CouponVerificationSummary } from '@/lib/coupons';
 
 export const COD_MIN_SUBTOTAL_BDT = 1000;
 
 export const SHIPPING_ZONE = {
-  INSIDE_DHAKA: "inside_dhaka",
-  OUTSIDE_DHAKA: "outside_dhaka",
+  INSIDE_DHAKA: 'inside_dhaka',
+  OUTSIDE_DHAKA: 'outside_dhaka',
 } as const;
 
 export type ShippingZone = (typeof SHIPPING_ZONE)[keyof typeof SHIPPING_ZONE];
@@ -23,7 +23,7 @@ export const SHIPPING_RULES = {
 export const COD_REASONS = {
   subtotal: `Cash on Delivery is available only for orders above ৳${COD_MIN_SUBTOTAL_BDT}.`,
   blockedByProduct:
-    "One or more products in your cart are not eligible for Cash on Delivery.",
+    'One or more products in your cart are not eligible for Cash on Delivery.',
 } as const;
 
 export type FulfillmentItem = {
@@ -34,20 +34,18 @@ export type FulfillmentItem = {
 };
 
 export function normalizeText(value?: string) {
-  return (value ?? "").trim().toLowerCase();
+  return (value ?? '').trim().toLowerCase();
 }
 
-export function deriveShippingZone(
-  city?: string,
-): ShippingZone {
+export function deriveShippingZone(city?: string): ShippingZone {
   const selectedDistrict = normalizeText(city);
-  return selectedDistrict === "dhaka"
+  return selectedDistrict === 'dhaka'
     ? SHIPPING_ZONE.INSIDE_DHAKA
     : SHIPPING_ZONE.OUTSIDE_DHAKA;
 }
 
 export function formatShippingZoneLabel(zone: ShippingZone) {
-  return zone === SHIPPING_ZONE.INSIDE_DHAKA ? "Inside Dhaka" : "Outside Dhaka";
+  return zone === SHIPPING_ZONE.INSIDE_DHAKA ? 'Inside Dhaka' : 'Outside Dhaka';
 }
 
 export function calculateShippingCharge({
@@ -72,7 +70,7 @@ export function calculateShippingCharge({
 }
 
 export function calculateCodEligibility(
-  items: Array<Pick<FulfillmentItem, "isNoCOD">>,
+  items: Array<Pick<FulfillmentItem, 'isNoCOD'>>,
   subtotal: number,
 ) {
   const reasons: string[] = [];
@@ -110,17 +108,14 @@ export function calculateFulfillmentSummary({
   );
   const totalWeightKg = Number(
     items
-      .reduce(
-        (sum, item) => {
-          const itemWeightKg =
-            typeof item.weightKg === "number" && Number.isFinite(item.weightKg)
-              ? item.weightKg
-              : 0;
+      .reduce((sum, item) => {
+        const itemWeightKg =
+          typeof item.weightKg === 'number' && Number.isFinite(item.weightKg)
+            ? item.weightKg
+            : 0;
 
-          return sum + itemWeightKg * item.quantity;
-        },
-        0,
-      )
+        return sum + itemWeightKg * item.quantity;
+      }, 0)
       .toFixed(2),
   );
   const zone = deriveShippingZone(city);
@@ -155,7 +150,7 @@ export function calculateFulfillmentSummary({
     codEligible: cod.eligible,
     codReasons: cod.reasons,
     coupon: null,
-    couponMessage: "",
+    couponMessage: '',
     payableAmount: subtotal + shippingCharge,
   };
 }

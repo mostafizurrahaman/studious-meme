@@ -1,8 +1,8 @@
-import dotenv from "dotenv";
-import path from "path";
+import dotenv from 'dotenv';
+import path from 'path';
 
 dotenv.config({
-  path: path.join(process.cwd(), ".env"),
+  path: path.join(process.cwd(), '.env'),
   // override: true,
   // debug: true
 });
@@ -17,8 +17,8 @@ export default {
   NODE_ENV: process.env.NODE_ENV,
   contact_us_email: process.env.CONTACT_US_EMAIL,
   allowed_origins: process.env.ALLOWED_ORIGINS
-    ? process.env.ALLOWED_ORIGINS.split(",").map((origin) =>
-        origin.trim().replace(/^['"]|['"]$/g, ""),
+    ? process.env.ALLOWED_ORIGINS.split(',').map((origin) =>
+        origin.trim().replace(/^['"]|['"]$/g, ''),
       )
     : [],
 
@@ -73,10 +73,10 @@ export default {
     secret_key: process.env.PORTPOS_SECRET_KEY,
     base_url:
       process.env.PORTPOS_BASE_URL ??
-      "https://api-sandbox.portpos.com/payment/v2",
+      'https://api-sandbox.portpos.com/payment/v2',
     payment_url:
       process.env.PORTPOS_PAYMENT_URL ??
-      "https://api-sandbox.portpos.com/payment/v2/invoice",
+      'https://api-sandbox.portpos.com/payment/v2/invoice',
     redirect_success_url: process.env.PORTPOS_REDIRECT_SUCCESS_URL,
     redirect_fail_url: process.env.PORTPOS_REDIRECT_FAIL_URL,
     redirect_cancel_url: process.env.PORTPOS_REDIRECT_CANCEL_URL,
@@ -88,7 +88,7 @@ export default {
   redis: {
     url: process.env.REDIS_URL,
     rateLimitPrefix:
-      process.env.REDIS_RATE_LIMIT_PREFIX ?? "malamal:rate-limit",
+      process.env.REDIS_RATE_LIMIT_PREFIX ?? 'malamal:rate-limit',
   },
 
   rateLimit: {

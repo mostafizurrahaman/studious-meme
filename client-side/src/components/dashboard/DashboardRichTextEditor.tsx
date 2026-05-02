@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from 'react';
 import {
   Bold,
   Eraser,
@@ -25,15 +25,15 @@ import {
   Underline,
   Undo2,
   Highlighter,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 
 type DashboardRichTextEditorProps = {
   label: string;
@@ -47,28 +47,28 @@ function runEditorCommand(command: string, value?: string) {
 }
 
 const textColors = [
-  "#000000",
-  "#e03131",
-  "#2f9e44",
-  "#f08c00",
-  "#1971c2",
-  "#862e9c",
-  "#ffffff",
+  '#000000',
+  '#e03131',
+  '#2f9e44',
+  '#f08c00',
+  '#1971c2',
+  '#862e9c',
+  '#ffffff',
 ];
 
 const highlightColors = [
-  "#ffffff",
-  "#fffb99",
-  "#ffec99",
-  "#a5d8ff",
-  "#b2f2bb",
-  "#ffc9c9",
+  '#ffffff',
+  '#fffb99',
+  '#ffec99',
+  '#a5d8ff',
+  '#b2f2bb',
+  '#ffc9c9',
 ];
 
 export function DashboardRichTextEditor({
   label,
   value,
-  minHeightClassName = "min-h-48",
+  minHeightClassName = 'min-h-48',
   onChange,
 }: DashboardRichTextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
@@ -80,12 +80,12 @@ export function DashboardRichTextEditor({
   }, [value]);
 
   const editorId = useMemo(
-    () => `${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-editor`,
+    () => `${label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-editor`,
     [label],
   );
 
   function syncEditorContent() {
-    onChange(editorRef.current?.innerHTML ?? "");
+    onChange(editorRef.current?.innerHTML ?? '');
   }
 
   function handleFormat(command: string, commandValue?: string) {
@@ -95,19 +95,22 @@ export function DashboardRichTextEditor({
   }
 
   function handleLink() {
-    const url = window.prompt("Enter link URL");
+    const url = window.prompt('Enter link URL');
     if (!url) return;
-    handleFormat("createLink", url);
+    handleFormat('createLink', url);
   }
 
   return (
     <div className="grid gap-2">
-      <label className="text-xs font-medium text-muted-foreground" htmlFor={editorId}>
+      <label
+        className="text-xs font-medium text-muted-foreground"
+        htmlFor={editorId}
+      >
         {label}
       </label>
       <div className="overflow-hidden rounded-xl border bg-background">
         <div className="flex flex-wrap items-center gap-1 border-b bg-muted/35 p-2">
-          <Select onValueChange={(value) => handleFormat("formatBlock", value)}>
+          <Select onValueChange={(value) => handleFormat('formatBlock', value)}>
             <SelectTrigger className="h-8 w-34 bg-background">
               <SelectValue placeholder="Style" />
             </SelectTrigger>
@@ -119,70 +122,175 @@ export function DashboardRichTextEditor({
               <SelectItem value="blockquote">Quote</SelectItem>
             </SelectContent>
           </Select>
-          <Button type="button" variant="ghost" size="icon" onClick={() => handleFormat("undo")}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => handleFormat('undo')}
+          >
             <Undo2 className="size-4" />
           </Button>
-          <Button type="button" variant="ghost" size="icon" onClick={() => handleFormat("redo")}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => handleFormat('redo')}
+          >
             <Redo2 className="size-4" />
           </Button>
-          <Button type="button" variant="ghost" size="icon" onClick={() => handleFormat("bold")}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => handleFormat('bold')}
+          >
             <Bold className="size-4" />
           </Button>
-          <Button type="button" variant="ghost" size="icon" onClick={() => handleFormat("italic")}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => handleFormat('italic')}
+          >
             <Italic className="size-4" />
           </Button>
-          <Button type="button" variant="ghost" size="icon" onClick={() => handleFormat("underline")}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => handleFormat('underline')}
+          >
             <Underline className="size-4" />
           </Button>
-          <Button type="button" variant="ghost" size="icon" onClick={() => handleFormat("strikeThrough")}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => handleFormat('strikeThrough')}
+          >
             <Strikethrough className="size-4" />
           </Button>
-          <Button type="button" variant="ghost" size="icon" onClick={() => handleFormat("formatBlock", "p")}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => handleFormat('formatBlock', 'p')}
+          >
             <Pilcrow className="size-4" />
           </Button>
-          <Button type="button" variant="ghost" size="icon" onClick={() => handleFormat("formatBlock", "h1")}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => handleFormat('formatBlock', 'h1')}
+          >
             <Heading1 className="size-4" />
           </Button>
-          <Button type="button" variant="ghost" size="icon" onClick={() => handleFormat("formatBlock", "h2")}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => handleFormat('formatBlock', 'h2')}
+          >
             <Heading2 className="size-4" />
           </Button>
-          <Button type="button" variant="ghost" size="icon" onClick={() => handleFormat("formatBlock", "h3")}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => handleFormat('formatBlock', 'h3')}
+          >
             <Heading3 className="size-4" />
           </Button>
-          <Button type="button" variant="ghost" size="icon" onClick={() => handleFormat("formatBlock", "blockquote")}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => handleFormat('formatBlock', 'blockquote')}
+          >
             <Quote className="size-4" />
           </Button>
-          <Button type="button" variant="ghost" size="icon" onClick={() => handleFormat("insertUnorderedList")}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => handleFormat('insertUnorderedList')}
+          >
             <List className="size-4" />
           </Button>
-          <Button type="button" variant="ghost" size="icon" onClick={() => handleFormat("insertOrderedList")}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => handleFormat('insertOrderedList')}
+          >
             <ListOrdered className="size-4" />
           </Button>
-          <Button type="button" variant="ghost" size="icon" onClick={handleLink}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={handleLink}
+          >
             <LinkIcon className="size-4" />
           </Button>
-          <Button type="button" variant="ghost" size="icon" onClick={() => handleFormat("unlink")}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => handleFormat('unlink')}
+          >
             <Link2Off className="size-4" />
           </Button>
-          <Button type="button" variant="ghost" size="icon" onClick={() => handleFormat("justifyLeft")}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => handleFormat('justifyLeft')}
+          >
             <TextAlignStart className="size-4" />
           </Button>
-          <Button type="button" variant="ghost" size="icon" onClick={() => handleFormat("justifyCenter")}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => handleFormat('justifyCenter')}
+          >
             <TextAlignCenter className="size-4" />
           </Button>
-          <Button type="button" variant="ghost" size="icon" onClick={() => handleFormat("justifyRight")}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => handleFormat('justifyRight')}
+          >
             <TextAlignEnd className="size-4" />
           </Button>
-          <Button type="button" variant="ghost" size="icon" onClick={() => handleFormat("justifyFull")}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => handleFormat('justifyFull')}
+          >
             <TextAlignJustify className="size-4" />
           </Button>
-          <Button type="button" variant="ghost" size="icon" onClick={() => handleFormat("outdent")}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => handleFormat('outdent')}
+          >
             <Outdent className="size-4" />
           </Button>
-          <Button type="button" variant="ghost" size="icon" onClick={() => handleFormat("indent")}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => handleFormat('indent')}
+          >
             <Indent className="size-4" />
           </Button>
-          <Select onValueChange={(value) => handleFormat("foreColor", value)}>
+          <Select onValueChange={(value) => handleFormat('foreColor', value)}>
             <SelectTrigger className="h-8 w-30 bg-background">
               <SelectValue placeholder="Text" />
             </SelectTrigger>
@@ -190,14 +298,17 @@ export function DashboardRichTextEditor({
               {textColors.map((color) => (
                 <SelectItem key={color} value={color}>
                   <span className="inline-flex items-center gap-2">
-                    <span className="size-3 rounded-full border" style={{ backgroundColor: color }} />
+                    <span
+                      className="size-3 rounded-full border"
+                      style={{ backgroundColor: color }}
+                    />
                     {color}
                   </span>
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-          <Select onValueChange={(value) => handleFormat("hiliteColor", value)}>
+          <Select onValueChange={(value) => handleFormat('hiliteColor', value)}>
             <SelectTrigger className="h-8 w-34 bg-background">
               <SelectValue placeholder="Highlight" />
             </SelectTrigger>
@@ -205,14 +316,22 @@ export function DashboardRichTextEditor({
               {highlightColors.map((color) => (
                 <SelectItem key={color} value={color}>
                   <span className="inline-flex items-center gap-2">
-                    <span className="size-3 rounded-full border" style={{ backgroundColor: color }} />
-                    {color === "#ffffff" ? "None" : color}
+                    <span
+                      className="size-3 rounded-full border"
+                      style={{ backgroundColor: color }}
+                    />
+                    {color === '#ffffff' ? 'None' : color}
                   </span>
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-          <Button type="button" variant="ghost" size="icon" onClick={() => handleFormat("removeFormat")}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => handleFormat('removeFormat')}
+          >
             <Eraser className="size-4" />
           </Button>
           <Highlighter className="size-4 text-muted-foreground" />

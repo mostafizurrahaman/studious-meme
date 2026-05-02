@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router } from 'express';
 import {
   actionLimiter,
   adminLimiter,
@@ -6,15 +6,15 @@ import {
   burstProtection,
   duplicateSubmissionGuard,
   validateRequest,
-} from "../../middlewares";
-import { ComparisonHistoryController } from "./comparisonHistory.controller";
-import { ComparisonHistoryValidation } from "./comparisonHistory.validation";
-import { ROLE } from "../User/user.constant";
+} from '../../middlewares';
+import { ComparisonHistoryController } from './comparisonHistory.controller';
+import { ComparisonHistoryValidation } from './comparisonHistory.validation';
+import { ROLE } from '../User/user.constant';
 
 const router = Router();
 
 router
-  .route("/")
+  .route('/')
   .get(
     auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN),
     actionLimiter,
@@ -23,14 +23,14 @@ router
   .post(
     auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN),
     actionLimiter,
-    burstProtection("action", 10_000, 12),
+    burstProtection('action', 10_000, 12),
     duplicateSubmissionGuard(),
     validateRequest(ComparisonHistoryValidation.compareSchema),
     ComparisonHistoryController.addComparisonItem,
   );
 
 router
-  .route("/my-items")
+  .route('/my-items')
   .get(
     auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN),
     actionLimiter,
@@ -39,7 +39,7 @@ router
 
 // 3. getAllComparisonHistory
 router
-  .route("/admin")
+  .route('/admin')
   .get(
     auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
     adminLimiter,
@@ -47,7 +47,7 @@ router
   );
 
 router
-  .route("/admin/summary")
+  .route('/admin/summary')
   .get(
     auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
     adminLimiter,
@@ -55,7 +55,7 @@ router
   );
 
 router
-  .route("/:productId")
+  .route('/:productId')
   .delete(
     auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN),
     actionLimiter,

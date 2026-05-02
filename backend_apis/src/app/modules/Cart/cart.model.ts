@@ -45,6 +45,9 @@ const cartSchema = new Schema<ICart>(
 );
 
 cartSchema.index({ user: 1 }, { unique: true, name: 'cart_user_unique_idx' });
-cartSchema.index({ user: 1, updatedAt: -1 }, { name: 'cart_user_updatedAt_idx' });
+cartSchema.index(
+  { user: 1, updatedAt: -1 },
+  { name: 'cart_user_updatedAt_idx' },
+);
 
 export const CartModel = model<ICart>('Cart', cartSchema);

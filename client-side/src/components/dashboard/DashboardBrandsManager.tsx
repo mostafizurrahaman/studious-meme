@@ -9,12 +9,30 @@ import { Controller, useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { DashboardInput } from '@/components/dashboard/DashboardInput';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { TableFilter } from '@/components/ui/table-filter';
 import { TablePagination } from '@/components/ui/table-pagination';
-import { createBrand, deleteBrand, type BackendBrand, updateBrand } from '@/services/Brand';
+import {
+  createBrand,
+  deleteBrand,
+  type BackendBrand,
+  updateBrand,
+} from '@/services/Brand';
 import { slugify } from '@/lib/slug';
 import { formatDashboardDate } from '@/lib/formatDate';
 import Image from 'next/image';
@@ -22,8 +40,14 @@ import { dashboardFormSchemas, makeZodResolver } from '@/lib/form-validation';
 import { DeleteConfirmationDialog } from '@/components/dashboard/DeleteConfirmationDialog';
 
 const brandEditSchema = z.object({
-  name: z.string({ error: 'Brand name is required!' }).trim().min(1, { message: 'Brand name is required!' }),
-  slug: z.string({ error: 'Brand slug is required!' }).trim().min(1, { message: 'Brand slug is required!' }),
+  name: z
+    .string({ error: 'Brand name is required!' })
+    .trim()
+    .min(1, { message: 'Brand name is required!' }),
+  slug: z
+    .string({ error: 'Brand slug is required!' })
+    .trim()
+    .min(1, { message: 'Brand slug is required!' }),
   description: z
     .string({ error: 'Brand description is required!' })
     .trim()
@@ -42,7 +66,9 @@ function ErrorText({ message }: { message?: string }) {
 
 function sliceText(value?: string, maxLength = 44) {
   if (!value) return '-';
-  return value.length > maxLength ? `${value.slice(0, maxLength).trim()}…` : value;
+  return value.length > maxLength
+    ? `${value.slice(0, maxLength).trim()}…`
+    : value;
 }
 
 export function DashboardBrandsManager({
@@ -69,13 +95,15 @@ export function DashboardBrandsManager({
   const [isDragging, setIsDragging] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [editingSlug, setEditingSlug] = useState<string | null>(null);
-  const [editingBrandImageFile, setEditingBrandImageFile] = useState<File | null>(null);
+  const [editingBrandImageFile, setEditingBrandImageFile] =
+    useState<File | null>(null);
   const [editingBrandImagePreview, setEditingBrandImagePreview] = useState('');
   const [editingBrandSlugSynced, setEditingBrandSlugSynced] = useState(true);
   const [isEditingDragging, setIsEditingDragging] = useState(false);
-  const [pendingDeleteBrand, setPendingDeleteBrand] = useState<Pick<BackendBrand, 'slug' | 'name'> | null>(
-    null,
-  );
+  const [pendingDeleteBrand, setPendingDeleteBrand] = useState<Pick<
+    BackendBrand,
+    'slug' | 'name'
+  > | null>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const editingImageInputRef = useRef<HTMLInputElement>(null);
 
@@ -141,13 +169,18 @@ export function DashboardBrandsManager({
 
     startTransition(async () => {
       const result = await deleteBrand(slug);
-      if (!result?.success) return refresh(result?.message ?? 'Failed to delete brand.', 'error');
+      if (!result?.success)
+        return refresh(result?.message ?? 'Failed to delete brand.', 'error');
       setPendingDeleteBrand(null);
       refresh(result.message ?? 'Brand deleted successfully.', 'success');
     });
   }
 
-  function updateQuery(updates: { page?: number; limit?: number; searchTerm?: string }) {
+  function updateQuery(updates: {
+    page?: number;
+    limit?: number;
+    searchTerm?: string;
+  }) {
     const params = new URLSearchParams(searchParams.toString());
     const nextPage = updates.page ?? paginationMeta.page;
     const nextLimit = updates.limit ?? paginationMeta.limit;
@@ -227,34 +260,42 @@ export function DashboardBrandsManager({
         </CardHeader>
         <CardContent className="grid items-start gap-3 md:grid-cols-2 xl:grid-cols-5">
           <div className="grid gap-1.5">
-            <DashboardInput placeholder="Name" {...createForm.register('name')} />
+            <DashboardInput
+              placeholder="Name"
+              {...createForm.register('name')}
+            />
             <ErrorText message={createForm.formState.errors.name?.message} />
           </div>
           <div className="grid gap-1.5">
             <DashboardInput
               placeholder="Slug"
               {...createForm.register('slug')}
-              onChange={e => handleBrandSlugChange(e.target.value)}
+              onChange={(e) => handleBrandSlugChange(e.target.value)}
             />
             <ErrorText message={createForm.formState.errors.slug?.message} />
           </div>
           <div className="grid gap-1.5">
-            <DashboardInput placeholder="Description" {...createForm.register('description')} />
-            <ErrorText message={createForm.formState.errors.description?.message} />
+            <DashboardInput
+              placeholder="Description"
+              {...createForm.register('description')}
+            />
+            <ErrorText
+              message={createForm.formState.errors.description?.message}
+            />
           </div>
           <div className="space-y-2 self-start xl:col-span-2">
             <div
               role="button"
               tabIndex={0}
               onClick={() => imageInputRef.current?.click()}
-              onKeyDown={event => {
+              onKeyDown={(event) => {
                 if (event.key === 'Enter' || event.key === ' ') {
                   event.preventDefault();
                   imageInputRef.current?.click();
                 }
               }}
               onDragEnter={() => setIsDragging(true)}
-              onDragOver={event => {
+              onDragOver={(event) => {
                 event.preventDefault();
                 setIsDragging(true);
               }}
@@ -271,7 +312,9 @@ export function DashboardBrandsManager({
                   <UploadCloud className="size-5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="text-sm font-semibold text-foreground">Brand image</div>
+                  <div className="text-sm font-semibold text-foreground">
+                    Brand image
+                  </div>
                   <p className="text-xs text-muted-foreground">
                     Drag and drop an image here or click to upload.
                   </p>
@@ -299,7 +342,7 @@ export function DashboardBrandsManager({
               type="file"
               accept="image/*"
               className="sr-only"
-              onChange={e => {
+              onChange={(e) => {
                 handleBrandImageSelect(e.target.files?.[0]);
                 e.currentTarget.value = '';
               }}
@@ -314,7 +357,7 @@ export function DashboardBrandsManager({
               type="button"
               className="gap-2"
               disabled={isCreating}
-              onClick={createForm.handleSubmit(async values => {
+              onClick={createForm.handleSubmit(async (values) => {
                 if (!brandImageFile) {
                   toast.error('Brand image is required.');
                   return;
@@ -330,7 +373,11 @@ export function DashboardBrandsManager({
                 });
                 setIsCreating(false);
 
-                if (!result?.success) return refresh(result?.message ?? 'Failed to create brand.', 'error');
+                if (!result?.success)
+                  return refresh(
+                    result?.message ?? 'Failed to create brand.',
+                    'error',
+                  );
 
                 createForm.reset({
                   name: '',
@@ -342,7 +389,10 @@ export function DashboardBrandsManager({
                 setBrandImagePreview('');
                 setBrandSlugSynced(true);
 
-                refresh(result.message ?? 'Brand created successfully.', 'success');
+                refresh(
+                  result.message ?? 'Brand created successfully.',
+                  'success',
+                );
               })}
             >
               <Plus className="size-4" />
@@ -362,7 +412,7 @@ export function DashboardBrandsManager({
           <TableFilter
             key={searchTerm}
             value={searchTerm}
-            onChange={value => updateQuery({ page: 1, searchTerm: value })}
+            onChange={(value) => updateQuery({ page: 1, searchTerm: value })}
             placeholder="Search brands..."
           />
         </CardHeader>
@@ -387,7 +437,9 @@ export function DashboardBrandsManager({
                 return (
                   <TableRow key={brand.slug}>
                     <TableCell className="w-14 font-medium text-muted-foreground">
-                      {(paginationMeta.page - 1) * paginationMeta.limit + index + 1}
+                      {(paginationMeta.page - 1) * paginationMeta.limit +
+                        index +
+                        1}
                     </TableCell>
                     <TableCell className="min-w-0">
                       {isEditing ? (
@@ -395,15 +447,17 @@ export function DashboardBrandsManager({
                           <div
                             role="button"
                             tabIndex={0}
-                            onClick={() => editingImageInputRef.current?.click()}
-                            onKeyDown={event => {
+                            onClick={() =>
+                              editingImageInputRef.current?.click()
+                            }
+                            onKeyDown={(event) => {
                               if (event.key === 'Enter' || event.key === ' ') {
                                 event.preventDefault();
                                 editingImageInputRef.current?.click();
                               }
                             }}
                             onDragEnter={() => setIsEditingDragging(true)}
-                            onDragOver={event => {
+                            onDragOver={(event) => {
                               event.preventDefault();
                               setIsEditingDragging(true);
                             }}
@@ -421,7 +475,11 @@ export function DashboardBrandsManager({
                                   <Image
                                     height={500}
                                     width={500}
-                                    src={editingBrandImagePreview || brand.image || ''}
+                                    src={
+                                      editingBrandImagePreview ||
+                                      brand.image ||
+                                      ''
+                                    }
                                     alt={editingBrandName || brand.name}
                                     className="h-full w-full object-cover"
                                   />
@@ -439,8 +497,10 @@ export function DashboardBrandsManager({
                             type="file"
                             accept="image/*"
                             className="sr-only"
-                            onChange={e => {
-                              handleEditingBrandImageSelect(e.target.files?.[0]);
+                            onChange={(e) => {
+                              handleEditingBrandImageSelect(
+                                e.target.files?.[0],
+                              );
                               e.currentTarget.value = '';
                             }}
                           />
@@ -464,7 +524,9 @@ export function DashboardBrandsManager({
                     <TableCell className="min-w-0 whitespace-normal font-medium">
                       {isEditing ? (
                         <div className="grid min-w-0 gap-1.5">
-                          <label className="text-[11px] font-medium text-muted-foreground">Brand name</label>
+                          <label className="text-[11px] font-medium text-muted-foreground">
+                            Brand name
+                          </label>
                           <Controller
                             control={editForm.control}
                             name="name"
@@ -475,11 +537,15 @@ export function DashboardBrandsManager({
                                   value={field.value}
                                   placeholder="Brand name"
                                   className="max-w-full"
-                                  onChange={e => field.onChange(e.target.value)}
+                                  onChange={(e) =>
+                                    field.onChange(e.target.value)
+                                  }
                                   onBlur={field.onBlur}
                                   aria-invalid={fieldState.invalid}
                                 />
-                                <ErrorText message={fieldState.error?.message} />
+                                <ErrorText
+                                  message={fieldState.error?.message}
+                                />
                               </div>
                             )}
                           />
@@ -491,7 +557,9 @@ export function DashboardBrandsManager({
                     <TableCell className="min-w-0 whitespace-normal">
                       {isEditing ? (
                         <div className="grid min-w-0 gap-1.5">
-                          <label className="text-[11px] font-medium text-muted-foreground">Brand slug</label>
+                          <label className="text-[11px] font-medium text-muted-foreground">
+                            Brand slug
+                          </label>
                           <Controller
                             control={editForm.control}
                             name="slug"
@@ -504,12 +572,14 @@ export function DashboardBrandsManager({
                                   className="max-w-full"
                                   onBlur={field.onBlur}
                                   aria-invalid={fieldState.invalid}
-                                  onChange={e => {
+                                  onChange={(e) => {
                                     setEditingBrandSlugSynced(false);
                                     field.onChange(slugify(e.target.value));
                                   }}
                                 />
-                                <ErrorText message={fieldState.error?.message} />
+                                <ErrorText
+                                  message={fieldState.error?.message}
+                                />
                               </div>
                             )}
                           />
@@ -521,7 +591,9 @@ export function DashboardBrandsManager({
                     <TableCell className="min-w-0 max-w-60 whitespace-normal text-sm text-muted-foreground">
                       {isEditing ? (
                         <div className="grid min-w-0 gap-1.5">
-                          <label className="text-[11px] font-medium text-muted-foreground">Description</label>
+                          <label className="text-[11px] font-medium text-muted-foreground">
+                            Description
+                          </label>
                           <Controller
                             control={editForm.control}
                             name="description"
@@ -532,11 +604,15 @@ export function DashboardBrandsManager({
                                   value={field.value ?? ''}
                                   placeholder="Brand description"
                                   className="max-w-full"
-                                  onChange={e => field.onChange(e.target.value)}
+                                  onChange={(e) =>
+                                    field.onChange(e.target.value)
+                                  }
                                   onBlur={field.onBlur}
                                   aria-invalid={fieldState.invalid}
                                 />
-                                <ErrorText message={fieldState.error?.message} />
+                                <ErrorText
+                                  message={fieldState.error?.message}
+                                />
                               </div>
                             )}
                           />
@@ -575,14 +651,18 @@ export function DashboardBrandsManager({
                               <input
                                 type="checkbox"
                                 checked={field.value}
-                                onChange={e => field.onChange(e.target.checked)}
+                                onChange={(e) =>
+                                  field.onChange(e.target.checked)
+                                }
                               />
                             )}
                           />
                           Active
                         </label>
                       ) : (
-                        <Badge variant="secondary">{brand.isActive === false ? 'Inactive' : 'Active'}</Badge>
+                        <Badge variant="secondary">
+                          {brand.isActive === false ? 'Inactive' : 'Active'}
+                        </Badge>
                       )}
                     </TableCell>
                     <TableCell className="text-right">
@@ -592,7 +672,7 @@ export function DashboardBrandsManager({
                             <Button
                               size="sm"
                               disabled={isPending}
-                              onClick={editForm.handleSubmit(values =>
+                              onClick={editForm.handleSubmit((values) =>
                                 startTransition(async () => {
                                   const result = await updateBrand(brand.slug, {
                                     name: values.name.trim(),
@@ -602,7 +682,11 @@ export function DashboardBrandsManager({
                                     isActive: values.isActive,
                                   });
                                   if (!result?.success)
-                                    return refresh(result?.message ?? 'Failed to update brand.', 'error');
+                                    return refresh(
+                                      result?.message ??
+                                        'Failed to update brand.',
+                                      'error',
+                                    );
                                   setEditingSlug(null);
                                   setEditingBrandImageFile(null);
                                   setEditingBrandImagePreview('');
@@ -613,7 +697,11 @@ export function DashboardBrandsManager({
                                     description: '',
                                     isActive: true,
                                   });
-                                  refresh(result.message ?? 'Brand updated successfully.', 'success');
+                                  refresh(
+                                    result.message ??
+                                      'Brand updated successfully.',
+                                    'success',
+                                  );
                                 }),
                               )}
                             >
@@ -644,7 +732,9 @@ export function DashboardBrandsManager({
                               size="sm"
                               variant="outline"
                               onClick={() => {
-                                if (editingBrandImagePreview.startsWith('blob:')) {
+                                if (
+                                  editingBrandImagePreview.startsWith('blob:')
+                                ) {
                                   URL.revokeObjectURL(editingBrandImagePreview);
                                 }
                                 setEditingSlug(brand.slug);
@@ -689,8 +779,8 @@ export function DashboardBrandsManager({
                 page={paginationMeta.page}
                 limit={paginationMeta.limit}
                 total={paginationMeta.total}
-                onPageChange={page => updateQuery({ page })}
-                onLimitChange={limit => updateQuery({ page: 1, limit })}
+                onPageChange={(page) => updateQuery({ page })}
+                onLimitChange={(limit) => updateQuery({ page: 1, limit })}
               />
             </div>
           )}
@@ -698,7 +788,7 @@ export function DashboardBrandsManager({
       </Card>
       <DeleteConfirmationDialog
         open={Boolean(pendingDeleteBrand)}
-        onOpenChange={open => {
+        onOpenChange={(open) => {
           if (!open) closeDeleteDialog();
         }}
         onConfirm={confirmDeleteBrand}

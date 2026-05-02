@@ -1,12 +1,12 @@
-import { redirect } from "next/navigation";
-import { getDashboardPath, isRoleSegmentMatch } from "@/lib/dashboard";
-import { getCurrentUser } from "@/services/Auth";
+import { redirect } from 'next/navigation';
+import { getDashboardPath, isRoleSegmentMatch } from '@/lib/dashboard';
+import { getCurrentUser } from '@/services/Auth';
 
 export async function requireDashboardUser() {
   const user = await getCurrentUser();
 
   if (!user) {
-    redirect("/my-account");
+    redirect('/my-account');
   }
 
   return user;

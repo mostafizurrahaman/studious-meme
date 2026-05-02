@@ -1,6 +1,6 @@
-import { CartPageClient } from "@/components/CartPageClient";
-import { SeoScripts } from "@/components/SeoScripts";
-import { cartMetadata, cartSchemas } from "@/lib/seo";
+import { CartPageClient } from '@/components/CartPageClient';
+import { SeoScripts } from '@/components/SeoScripts';
+import { cartMetadata, cartSchemas } from '@/lib/seo';
 
 export const metadata = cartMetadata;
 

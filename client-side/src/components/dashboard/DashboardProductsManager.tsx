@@ -12,17 +12,43 @@ import {
 } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
-import { Copy, ImagePlus, Pencil, Plus, Trash2, UploadCloud, X } from 'lucide-react';
+import {
+  Copy,
+  ImagePlus,
+  Pencil,
+  Plus,
+  Trash2,
+  UploadCloud,
+  X,
+} from 'lucide-react';
 import { type UseFormReturn, useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { DashboardInput } from '@/components/dashboard/DashboardInput';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { TableFilter } from '@/components/ui/table-filter';
 import { TablePagination } from '@/components/ui/table-pagination';
-import { createProduct, deleteProduct, type BackendProduct, updateProduct } from '@/services/Product';
+import {
+  createProduct,
+  deleteProduct,
+  type BackendProduct,
+  updateProduct,
+} from '@/services/Product';
 import { formatDashboardDate } from '@/lib/formatDate';
 import { slugify } from '@/lib/slug';
 import type { BackendCategory } from '@/services/Category/mappers';
@@ -32,7 +58,11 @@ import { DeleteConfirmationDialog } from '@/components/dashboard/DeleteConfirmat
 import { DashboardRichTextEditor } from '@/components/dashboard/DashboardRichTextEditor';
 import { formatStockLabel } from '@/lib/stock';
 import { formatPriceLabelWithUnit } from '@/lib/cart';
-import { DEFAULT_SELLING_UNIT, SELLING_UNIT_OPTIONS, isSellingUnit } from '@/lib/selling-unit';
+import {
+  DEFAULT_SELLING_UNIT,
+  SELLING_UNIT_OPTIONS,
+  isSellingUnit,
+} from '@/lib/selling-unit';
 
 type Option = { value: string; label: string };
 const MAX_PRODUCT_IMAGES = 5;
@@ -40,7 +70,7 @@ const imagePreviewRotations = ['-18deg', '-8deg', '4deg', '14deg', '24deg'];
 const stockFieldSchema = z
   .string()
   .trim()
-  .refine(value => value === '' || /^\d+$/.test(value), {
+  .refine((value) => value === '' || /^\d+$/.test(value), {
     message: 'Stock must be a valid non-negative whole number!',
   });
 
@@ -62,7 +92,9 @@ function isSupportedYouTubeUrl(value: string) {
     const pathname = url.pathname.replace(/\/+$/, '');
 
     if (hostname === 'youtu.be') {
-      return YOUTUBE_VIDEO_ID_PATTERN.test(pathname.split('/').filter(Boolean)[0] ?? '');
+      return YOUTUBE_VIDEO_ID_PATTERN.test(
+        pathname.split('/').filter(Boolean)[0] ?? '',
+      );
     }
 
     if (hostname === 'youtube.com' || hostname === 'm.youtube.com') {
@@ -71,11 +103,15 @@ function isSupportedYouTubeUrl(value: string) {
       }
 
       if (pathname.startsWith('/embed/')) {
-        return YOUTUBE_VIDEO_ID_PATTERN.test(pathname.split('/').filter(Boolean)[1] ?? '');
+        return YOUTUBE_VIDEO_ID_PATTERN.test(
+          pathname.split('/').filter(Boolean)[1] ?? '',
+        );
       }
 
       if (pathname.startsWith('/shorts/')) {
-        return YOUTUBE_VIDEO_ID_PATTERN.test(pathname.split('/').filter(Boolean)[1] ?? '');
+        return YOUTUBE_VIDEO_ID_PATTERN.test(
+          pathname.split('/').filter(Boolean)[1] ?? '',
+        );
       }
     }
 
@@ -99,11 +135,20 @@ type DashboardProductsManagerProps = {
 };
 
 const productEditSchema = z.object({
-  title: z.string({ error: 'Title is required!' }).trim().min(1, { message: 'Title is required!' }),
+  title: z
+    .string({ error: 'Title is required!' })
+    .trim()
+    .min(1, { message: 'Title is required!' }),
 
-  slug: z.string({ error: 'Slug is required!' }).trim().min(1, { message: 'Slug is required!' }),
+  slug: z
+    .string({ error: 'Slug is required!' })
+    .trim()
+    .min(1, { message: 'Slug is required!' }),
 
-  sku: z.string({ error: 'SKU is required!' }).trim().min(1, { message: 'SKU is required!' }),
+  sku: z
+    .string({ error: 'SKU is required!' })
+    .trim()
+    .min(1, { message: 'SKU is required!' }),
 
   features: z.string().refine(richTextHasContent, {
     message: 'Features are required!',
@@ -112,7 +157,10 @@ const productEditSchema = z.object({
     message: 'Description is required!',
   }),
 
-  price: z.string({ error: 'Price is required!' }).trim().min(1, { message: 'Price is required!' }),
+  price: z
+    .string({ error: 'Price is required!' })
+    .trim()
+    .min(1, { message: 'Price is required!' }),
 
   oldPrice: z.string().trim().optional(),
 
@@ -121,30 +169,41 @@ const productEditSchema = z.object({
   youtubeVideoUrl: z
     .string()
     .trim()
-    .refine(value => value === '' || isSupportedYouTubeUrl(value), {
+    .refine((value) => value === '' || isSupportedYouTubeUrl(value), {
       message: 'Please enter a valid YouTube URL!',
     })
     .optional(),
 
-  brand: z.string({ error: 'Brand is required!' }).trim().min(1, { message: 'Brand is required!' }),
+  brand: z
+    .string({ error: 'Brand is required!' })
+    .trim()
+    .min(1, { message: 'Brand is required!' }),
 
-  category: z.string({ error: 'Category is required!' }).trim().min(1, { message: 'Category is required!' }),
+  category: z
+    .string({ error: 'Category is required!' })
+    .trim()
+    .min(1, { message: 'Category is required!' }),
 
   subCategorySlug: z.string().trim().optional(),
 
   stock: stockFieldSchema,
 
-  rating: z.string({ error: 'Rating is required!' }).trim().min(1, { message: 'Rating is required!' }),
+  rating: z
+    .string({ error: 'Rating is required!' })
+    .trim()
+    .min(1, { message: 'Rating is required!' }),
 
   weightKg: z
     .string({ error: 'Weight is required!' })
     .trim()
     .min(1, { message: 'Weight is required!' })
-    .refine(value => Number(value) > 0, {
+    .refine((value) => Number(value) > 0, {
       message: 'Weight must be greater than 0!',
     }),
 
-  sellingUnit: z.enum(SELLING_UNIT_OPTIONS, { error: 'Selling unit is required!' }),
+  sellingUnit: z.enum(SELLING_UNIT_OPTIONS, {
+    error: 'Selling unit is required!',
+  }),
 
   isFeatured: z.boolean().default(false),
   isNoCOD: z.boolean().default(false),
@@ -152,11 +211,20 @@ const productEditSchema = z.object({
 });
 
 const productCreateSchema = z.object({
-  title: z.string({ error: 'Title is required!' }).trim().min(1, { message: 'Title is required!' }),
+  title: z
+    .string({ error: 'Title is required!' })
+    .trim()
+    .min(1, { message: 'Title is required!' }),
 
-  slug: z.string({ error: 'Slug is required!' }).trim().min(1, { message: 'Slug is required!' }),
+  slug: z
+    .string({ error: 'Slug is required!' })
+    .trim()
+    .min(1, { message: 'Slug is required!' }),
 
-  sku: z.string({ error: 'SKU is required!' }).trim().min(1, { message: 'SKU is required!' }),
+  sku: z
+    .string({ error: 'SKU is required!' })
+    .trim()
+    .min(1, { message: 'SKU is required!' }),
 
   features: z.string().refine(richTextHasContent, {
     message: 'Features are required!',
@@ -165,7 +233,10 @@ const productCreateSchema = z.object({
     message: 'Description is required!',
   }),
 
-  price: z.string({ error: 'Price is required!' }).trim().min(1, { message: 'Price is required!' }),
+  price: z
+    .string({ error: 'Price is required!' })
+    .trim()
+    .min(1, { message: 'Price is required!' }),
 
   oldPrice: z.string().trim().optional(),
 
@@ -174,30 +245,41 @@ const productCreateSchema = z.object({
   youtubeVideoUrl: z
     .string()
     .trim()
-    .refine(value => value === '' || isSupportedYouTubeUrl(value), {
+    .refine((value) => value === '' || isSupportedYouTubeUrl(value), {
       message: 'Please enter a valid YouTube URL!',
     })
     .optional(),
 
-  brand: z.string({ error: 'Brand is required!' }).trim().min(1, { message: 'Brand is required!' }),
+  brand: z
+    .string({ error: 'Brand is required!' })
+    .trim()
+    .min(1, { message: 'Brand is required!' }),
 
-  category: z.string({ error: 'Category is required!' }).trim().min(1, { message: 'Category is required!' }),
+  category: z
+    .string({ error: 'Category is required!' })
+    .trim()
+    .min(1, { message: 'Category is required!' }),
 
   subCategorySlug: z.string().trim().optional(),
 
   stock: stockFieldSchema,
 
-  rating: z.string({ error: 'Rating is required!' }).trim().min(1, { message: 'Rating is required!' }),
+  rating: z
+    .string({ error: 'Rating is required!' })
+    .trim()
+    .min(1, { message: 'Rating is required!' }),
 
   weightKg: z
     .string({ error: 'Weight is required!' })
     .trim()
     .min(1, { message: 'Weight is required!' })
-    .refine(value => Number(value) > 0, {
+    .refine((value) => Number(value) > 0, {
       message: 'Weight must be greater than 0!',
     }),
 
-  sellingUnit: z.enum(SELLING_UNIT_OPTIONS, { error: 'Selling unit is required!' }),
+  sellingUnit: z.enum(SELLING_UNIT_OPTIONS, {
+    error: 'Selling unit is required!',
+  }),
 
   isFeatured: z.boolean().default(false),
   isNoCOD: z.boolean().default(false),
@@ -215,14 +297,26 @@ function ErrorText({ message }: { message?: string }) {
 }
 
 function FieldLabel({ children }: { children: ReactNode }) {
-  return <label className="text-xs font-medium text-muted-foreground">{children}</label>;
+  return (
+    <label className="text-xs font-medium text-muted-foreground">
+      {children}
+    </label>
+  );
 }
 
-function FormSection({ title, children }: { title: string; children: ReactNode }) {
+function FormSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: ReactNode;
+}) {
   return (
     <section className="rounded-2xl border border-border/60 bg-background/80 p-4 shadow-sm">
       <div className="mb-4 border-b border-border/60 pb-3">
-        <h3 className="text-lg font-bold tracking-tight text-foreground">{title}</h3>
+        <h3 className="text-lg font-bold tracking-tight text-foreground">
+          {title}
+        </h3>
       </div>
       {children}
     </section>
@@ -254,7 +348,8 @@ function ProductFormSections({
   descriptionValue: string;
   footerAction?: ReactNode;
 }) {
-  const nativeSelectClassName = 'h-10 rounded-md border border-input bg-background px-3 text-sm';
+  const nativeSelectClassName =
+    'h-10 rounded-md border border-input bg-background px-3 text-sm';
 
   return (
     <div className="space-y-5">
@@ -265,7 +360,7 @@ function ProductFormSections({
             <DashboardInput
               placeholder="Title"
               {...form.register('title', {
-                onChange: e => titleOnChange(e.target.value),
+                onChange: (e) => titleOnChange(e.target.value),
               })}
             />
             <div className="min-h-4" aria-hidden="true" />
@@ -277,7 +372,7 @@ function ProductFormSections({
             <DashboardInput
               placeholder="Slug"
               {...form.register('slug', {
-                onChange: e => slugOnChange(e.target.value),
+                onChange: (e) => slugOnChange(e.target.value),
               })}
             />
             <div className="min-h-4" aria-hidden="true" />
@@ -293,9 +388,12 @@ function ProductFormSections({
 
           <div className="grid gap-1.5">
             <FieldLabel>Brand</FieldLabel>
-            <select className={nativeSelectClassName} {...form.register('brand')}>
+            <select
+              className={nativeSelectClassName}
+              {...form.register('brand')}
+            >
               <option value="">Brand</option>
-              {brandOptions.map(option => (
+              {brandOptions.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
@@ -310,11 +408,11 @@ function ProductFormSections({
             <select
               className={nativeSelectClassName}
               {...form.register('category', {
-                onChange: e => categoryOnChange(e.target.value),
+                onChange: (e) => categoryOnChange(e.target.value),
               })}
             >
               <option value="">Category</option>
-              {categories.flatMap(category =>
+              {categories.flatMap((category) =>
                 category._id
                   ? [
                       <option key={category._id} value={category._id}>
@@ -336,14 +434,16 @@ function ProductFormSections({
               disabled={!categoryValue}
             >
               <option value="">Sub-category</option>
-              {subCategoryOptions.map(subCategory => (
+              {subCategoryOptions.map((subCategory) => (
                 <option key={subCategory.slug} value={subCategory.slug}>
                   {subCategory.name}
                 </option>
               ))}
             </select>
             <div className="min-h-4" aria-hidden="true" />
-            <ErrorText message={form.formState.errors.subCategorySlug?.message} />
+            <ErrorText
+              message={form.formState.errors.subCategorySlug?.message}
+            />
           </div>
         </div>
       </FormSection>
@@ -378,14 +478,19 @@ function ProductFormSections({
 
           <div className="grid gap-1.5">
             <FieldLabel>Selling unit</FieldLabel>
-            <select className={nativeSelectClassName} {...form.register('sellingUnit')}>
-              {SELLING_UNIT_OPTIONS.map(unit => (
+            <select
+              className={nativeSelectClassName}
+              {...form.register('sellingUnit')}
+            >
+              {SELLING_UNIT_OPTIONS.map((unit) => (
                 <option key={unit} value={unit}>
                   {unit}
                 </option>
               ))}
             </select>
-            <p className="text-xs text-muted-foreground">Select how this product is sold.</p>
+            <p className="text-xs text-muted-foreground">
+              Select how this product is sold.
+            </p>
             <ErrorText message={form.formState.errors.sellingUnit?.message} />
           </div>
 
@@ -414,7 +519,9 @@ function ProductFormSections({
               step={1}
               {...form.register('stock')}
             />
-            <p className="text-xs text-muted-foreground">Leave blank to keep it always in stock.</p>
+            <p className="text-xs text-muted-foreground">
+              Leave blank to keep it always in stock.
+            </p>
             <ErrorText message={form.formState.errors.stock?.message} />
           </div>
 
@@ -433,7 +540,10 @@ function ProductFormSections({
 
           <div className="grid gap-1.5">
             <FieldLabel>Badge</FieldLabel>
-            <DashboardInput placeholder="Badge, e.g. Sale, New, Hot, -25%" {...form.register('badge')} />
+            <DashboardInput
+              placeholder="Badge, e.g. Sale, New, Hot, -25%"
+              {...form.register('badge')}
+            />
             <div className="min-h-4" aria-hidden="true" />
             <ErrorText message={form.formState.errors.badge?.message} />
           </div>
@@ -444,9 +554,16 @@ function ProductFormSections({
         <div className="grid gap-2">
           <div className="grid gap-1.5">
             <FieldLabel>YouTube video URL</FieldLabel>
-            <DashboardInput placeholder="YouTube video URL" {...form.register('youtubeVideoUrl')} />
-            <p className="text-xs text-muted-foreground">Paste a YouTube video link</p>
-            <ErrorText message={form.formState.errors.youtubeVideoUrl?.message} />
+            <DashboardInput
+              placeholder="YouTube video URL"
+              {...form.register('youtubeVideoUrl')}
+            />
+            <p className="text-xs text-muted-foreground">
+              Paste a YouTube video link
+            </p>
+            <ErrorText
+              message={form.formState.errors.youtubeVideoUrl?.message}
+            />
           </div>
         </div>
       </FormSection>
@@ -474,7 +591,7 @@ function ProductFormSections({
             label="Features"
             value={featuresValue ?? ''}
             minHeightClassName="min-h-40"
-            onChange={value =>
+            onChange={(value) =>
               form.setValue('features', value, {
                 shouldDirty: true,
                 shouldValidate: true,
@@ -486,7 +603,7 @@ function ProductFormSections({
           <DashboardRichTextEditor
             label="Description"
             value={descriptionValue ?? ''}
-            onChange={value =>
+            onChange={(value) =>
               form.setValue('description', value, {
                 shouldDirty: true,
                 shouldValidate: true,
@@ -522,11 +639,20 @@ export function DashboardProductsManager({
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [productImageFiles, setProductImageFiles] = useState<File[]>([]);
-  const [productImagePreviews, setProductImagePreviews] = useState<string[]>([]);
-  const [editingProductImageFiles, setEditingProductImageFiles] = useState<File[]>([]);
-  const [editingProductImagePreviews, setEditingProductImagePreviews] = useState<string[]>([]);
-  const [hoveredProductImagePreview, setHoveredProductImagePreview] = useState('');
-  const [hoveredEditingProductImagePreview, setHoveredEditingProductImagePreview] = useState('');
+  const [productImagePreviews, setProductImagePreviews] = useState<string[]>(
+    [],
+  );
+  const [editingProductImageFiles, setEditingProductImageFiles] = useState<
+    File[]
+  >([]);
+  const [editingProductImagePreviews, setEditingProductImagePreviews] =
+    useState<string[]>([]);
+  const [hoveredProductImagePreview, setHoveredProductImagePreview] =
+    useState('');
+  const [
+    hoveredEditingProductImagePreview,
+    setHoveredEditingProductImagePreview,
+  ] = useState('');
   const [slugAutoSync, setSlugAutoSync] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
   const [editingSlug, setEditingSlug] = useState<string | null>(null);
@@ -589,7 +715,8 @@ export function DashboardProductsManager({
   });
 
   const selectedCategory = useMemo(
-    () => categories.find(category => category._id === createCategory) ?? null,
+    () =>
+      categories.find((category) => category._id === createCategory) ?? null,
     [categories, createCategory],
   );
 
@@ -638,11 +765,13 @@ export function DashboardProductsManager({
   });
 
   const editingSelectedCategory = useMemo(
-    () => categories.find(category => category._id === editingCategory) ?? null,
+    () =>
+      categories.find((category) => category._id === editingCategory) ?? null,
     [categories, editingCategory],
   );
 
-  const editingSubCategoryOptions = editingSelectedCategory?.subCategories ?? [];
+  const editingSubCategoryOptions =
+    editingSelectedCategory?.subCategories ?? [];
 
   useEffect(() => {
     if (!editingSlug) return;
@@ -665,11 +794,13 @@ export function DashboardProductsManager({
 
   useEffect(() => {
     return () => {
-      [...productImagePreviews, ...editingProductImagePreviews].forEach(preview => {
-        if (preview.startsWith('blob:')) {
-          URL.revokeObjectURL(preview);
-        }
-      });
+      [...productImagePreviews, ...editingProductImagePreviews].forEach(
+        (preview) => {
+          if (preview.startsWith('blob:')) {
+            URL.revokeObjectURL(preview);
+          }
+        },
+      );
     };
   }, [editingProductImagePreviews, productImagePreviews]);
 
@@ -691,7 +822,14 @@ export function DashboardProductsManager({
 
       router.push(`${pathname}?${nextParams.toString()}`);
     },
-    [paginationMeta.limit, paginationMeta.page, pathname, router, search, searchParams],
+    [
+      paginationMeta.limit,
+      paginationMeta.page,
+      pathname,
+      router,
+      search,
+      searchParams,
+    ],
   );
 
   const handleSearchChange = (value: string) => {
@@ -747,7 +885,8 @@ export function DashboardProductsManager({
 
     startTransition(async () => {
       const result = await deleteProduct(slug);
-      if (!result?.success) return refresh(result?.message ?? 'Failed to delete product.', 'error');
+      if (!result?.success)
+        return refresh(result?.message ?? 'Failed to delete product.', 'error');
       setPendingDeleteProduct(null);
       refresh(result.message ?? 'Product deleted successfully.', 'success');
     });
@@ -786,32 +925,42 @@ export function DashboardProductsManager({
       return;
     }
 
-    setProductImageFiles(current => [...current, ...nextFiles]);
-    setProductImagePreviews(current => [...current, ...nextFiles.map(file => URL.createObjectURL(file))]);
+    setProductImageFiles((current) => [...current, ...nextFiles]);
+    setProductImagePreviews((current) => [
+      ...current,
+      ...nextFiles.map((file) => URL.createObjectURL(file)),
+    ]);
   }
 
   function appendEditingProductImages(files?: FileList | File[]) {
     const nextFiles = Array.from(files ?? []);
     if (nextFiles.length === 0) return;
-    if (editingProductImagePreviews.length + nextFiles.length > MAX_PRODUCT_IMAGES) {
+    if (
+      editingProductImagePreviews.length + nextFiles.length >
+      MAX_PRODUCT_IMAGES
+    ) {
       toast.error(`You can upload up to ${MAX_PRODUCT_IMAGES} product images.`);
       return;
     }
 
-    setEditingProductImageFiles(current => [...current, ...nextFiles]);
-    setEditingProductImagePreviews(current => [
+    setEditingProductImageFiles((current) => [...current, ...nextFiles]);
+    setEditingProductImagePreviews((current) => [
       ...current,
-      ...nextFiles.map(file => URL.createObjectURL(file)),
+      ...nextFiles.map((file) => URL.createObjectURL(file)),
     ]);
   }
 
   function removeProductImage(index: number) {
     const preview = productImagePreviews[index];
     if (preview?.startsWith('blob:')) URL.revokeObjectURL(preview);
-    setProductImageFiles(current => current.filter((_, fileIndex) => fileIndex !== index));
-    setProductImagePreviews(current => {
+    setProductImageFiles((current) =>
+      current.filter((_, fileIndex) => fileIndex !== index),
+    );
+    setProductImagePreviews((current) => {
       const next = current.filter((_, previewIndex) => previewIndex !== index);
-      setHoveredProductImagePreview(hovered => (hovered === preview ? (next[0] ?? '') : hovered));
+      setHoveredProductImagePreview((hovered) =>
+        hovered === preview ? (next[0] ?? '') : hovered,
+      );
       return next;
     });
   }
@@ -820,15 +969,21 @@ export function DashboardProductsManager({
     const preview = editingProductImagePreviews[index];
     if (preview?.startsWith('blob:')) URL.revokeObjectURL(preview);
     const blobFileIndex =
-      editingProductImagePreviews.slice(0, index + 1).filter(item => item.startsWith('blob:')).length - 1;
+      editingProductImagePreviews
+        .slice(0, index + 1)
+        .filter((item) => item.startsWith('blob:')).length - 1;
 
     if (preview?.startsWith('blob:')) {
-      setEditingProductImageFiles(current => current.filter((_, fileIndex) => fileIndex !== blobFileIndex));
+      setEditingProductImageFiles((current) =>
+        current.filter((_, fileIndex) => fileIndex !== blobFileIndex),
+      );
     }
 
-    setEditingProductImagePreviews(current => {
+    setEditingProductImagePreviews((current) => {
       const next = current.filter((_, previewIndex) => previewIndex !== index);
-      setHoveredEditingProductImagePreview(hovered => (hovered === preview ? (next[0] ?? '') : hovered));
+      setHoveredEditingProductImagePreview((hovered) =>
+        hovered === preview ? (next[0] ?? '') : hovered,
+      );
       return next;
     });
   }
@@ -836,7 +991,7 @@ export function DashboardProductsManager({
   function getEditingImagePayload() {
     let blobIndex = 0;
 
-    return editingProductImagePreviews.map(preview => {
+    return editingProductImagePreviews.map((preview) => {
       if (!preview.startsWith('blob:')) return preview;
       const file = editingProductImageFiles[blobIndex];
       blobIndex += 1;
@@ -844,15 +999,23 @@ export function DashboardProductsManager({
     });
   }
 
-  function handleEditingProductImageDrop(event: React.DragEvent<HTMLDivElement>) {
+  function handleEditingProductImageDrop(
+    event: React.DragEvent<HTMLDivElement>,
+  ) {
     event.preventDefault();
     appendEditingProductImages(event.dataTransfer.files);
   }
 
   function startEditingProduct(product: BackendProduct) {
     setEditingSlug(product.slug);
-    const brandId = typeof product.brand === 'string' ? product.brand : (product.brand._id ?? '');
-    const categoryId = typeof product.category === 'string' ? product.category : (product.category._id ?? '');
+    const brandId =
+      typeof product.brand === 'string'
+        ? product.brand
+        : (product.brand._id ?? '');
+    const categoryId =
+      typeof product.category === 'string'
+        ? product.category
+        : (product.category._id ?? '');
     productEditForm.reset({
       title: product.title,
       slug: product.slug,
@@ -869,7 +1032,9 @@ export function DashboardProductsManager({
       stock: product.stock == null ? '' : String(product.stock),
       rating: String(product.rating),
       weightKg: product.weightKg == null ? '' : String(product.weightKg),
-      sellingUnit: isSellingUnit(product.sellingUnit) ? product.sellingUnit : DEFAULT_SELLING_UNIT,
+      sellingUnit: isSellingUnit(product.sellingUnit)
+        ? product.sellingUnit
+        : DEFAULT_SELLING_UNIT,
       isFeatured: product.isFeatured,
       isNoCOD: product.isNoCOD,
       isActive: product.isActive,
@@ -915,7 +1080,9 @@ export function DashboardProductsManager({
       <Card className="shadow-sm">
         <CardHeader>
           <CardTitle>Create product</CardTitle>
-          <CardDescription>Add a new catalog item using backend CRUD.</CardDescription>
+          <CardDescription>
+            Add a new catalog item using backend CRUD.
+          </CardDescription>
         </CardHeader>
         <CardContent className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
           <ProductFormSections
@@ -935,7 +1102,7 @@ export function DashboardProductsManager({
                   type="button"
                   disabled={isPending || isCreating}
                   className="gap-2"
-                  onClick={productCreateForm.handleSubmit(async values => {
+                  onClick={productCreateForm.handleSubmit(async (values) => {
                     if (productImageFiles.length === 0) {
                       toast.error('At least one product image is required.');
                       return;
@@ -950,12 +1117,15 @@ export function DashboardProductsManager({
                       features: values.features ?? '',
                       description: values.description ?? '',
                       price: Number(values.price),
-                      oldPrice: values.oldPrice?.trim() ? Number(values.oldPrice) : undefined,
+                      oldPrice: values.oldPrice?.trim()
+                        ? Number(values.oldPrice)
+                        : undefined,
                       badge: values.badge?.trim() || undefined,
                       youtubeVideoUrl: values.youtubeVideoUrl?.trim() ?? '',
                       brand: values.brand.trim(),
                       category: values.category.trim(),
-                      subCategorySlug: values.subCategorySlug?.trim() || undefined,
+                      subCategorySlug:
+                        values.subCategorySlug?.trim() || undefined,
                       stock: values.stock.trim() ? Number(values.stock) : null,
                       rating: Number(values.rating),
                       weightKg: Number(values.weightKg),
@@ -967,7 +1137,10 @@ export function DashboardProductsManager({
                     setIsCreating(false);
 
                     if (!result?.success)
-                      return refresh(result?.message ?? 'Failed to create product.', 'error');
+                      return refresh(
+                        result?.message ?? 'Failed to create product.',
+                        'error',
+                      );
 
                     productCreateForm.reset({
                       title: '',
@@ -989,13 +1162,17 @@ export function DashboardProductsManager({
                       isNoCOD: false,
                       isActive: true,
                     });
-                    productImagePreviews.forEach(preview => {
-                      if (preview.startsWith('blob:')) URL.revokeObjectURL(preview);
+                    productImagePreviews.forEach((preview) => {
+                      if (preview.startsWith('blob:'))
+                        URL.revokeObjectURL(preview);
                     });
                     setProductImageFiles([]);
                     setProductImagePreviews([]);
                     setSlugAutoSync(true);
-                    refresh(result.message ?? 'Product created successfully.', 'success');
+                    refresh(
+                      result.message ?? 'Product created successfully.',
+                      'success',
+                    );
                   })}
                 >
                   <Plus className="size-4" />
@@ -1009,15 +1186,15 @@ export function DashboardProductsManager({
               role="button"
               tabIndex={0}
               onClick={() => productImageInputRef.current?.click()}
-              onKeyDown={event => {
+              onKeyDown={(event) => {
                 if (event.key === 'Enter' || event.key === ' ') {
                   event.preventDefault();
                   productImageInputRef.current?.click();
                 }
               }}
               className="rounded-2xl border-2 border-dashed border-border/70 bg-background/80 p-3 transition hover:border-primary/40"
-              onDragOver={event => event.preventDefault()}
-              onDrop={event => {
+              onDragOver={(event) => event.preventDefault()}
+              onDrop={(event) => {
                 event.preventDefault();
                 appendProductImages(event.dataTransfer.files);
               }}
@@ -1027,8 +1204,12 @@ export function DashboardProductsManager({
                   <UploadCloud className="size-5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="text-xs font-medium text-muted-foreground">Product images</div>
-                  <p className="text-xs text-muted-foreground">Click or drop to upload up to 5 images.</p>
+                  <div className="text-xs font-medium text-muted-foreground">
+                    Product images
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Click or drop to upload up to 5 images.
+                  </p>
                   <div className="mt-2 grid grid-cols-2 gap-2">
                     {productImagePreviews.length > 0 ? (
                       <div className="col-span-2">
@@ -1036,20 +1217,27 @@ export function DashboardProductsManager({
                           {productImagePreviews.map((preview, index) => {
                             const total = productImagePreviews.length;
                             const reversedIndex = total - index - 1;
-                            const isHovered = hoveredProductImagePreview === preview;
+                            const isHovered =
+                              hoveredProductImagePreview === preview;
 
                             return (
                               <button
                                 key={preview}
                                 type="button"
-                                onMouseEnter={() => setHoveredProductImagePreview(preview)}
-                                onFocus={() => setHoveredProductImagePreview(preview)}
+                                onMouseEnter={() =>
+                                  setHoveredProductImagePreview(preview)
+                                }
+                                onFocus={() =>
+                                  setHoveredProductImagePreview(preview)
+                                }
                                 className="absolute left-1/2 top-3 size-24 overflow-hidden rounded-lg border bg-muted shadow-sm transition duration-200 focus:outline-none focus:ring-2 focus:ring-primary"
                                 style={{
                                   transform: `translateX(calc(-50% + ${
                                     (reversedIndex - (total - 1) / 2) * 34
                                   }px)) scale(${isHovered ? 1.15 : 1}) rotate(${
-                                    imagePreviewRotations[index % imagePreviewRotations.length]
+                                    imagePreviewRotations[
+                                      index % imagePreviewRotations.length
+                                    ]
                                   })`,
                                   zIndex: isHovered ? 999 : total - index,
                                 }}
@@ -1065,12 +1253,15 @@ export function DashboardProductsManager({
                                 <span
                                   role="button"
                                   tabIndex={0}
-                                  onClick={event => {
+                                  onClick={(event) => {
                                     event.stopPropagation();
                                     removeProductImage(index);
                                   }}
-                                  onKeyDown={event => {
-                                    if (event.key === 'Enter' || event.key === ' ') {
+                                  onKeyDown={(event) => {
+                                    if (
+                                      event.key === 'Enter' ||
+                                      event.key === ' '
+                                    ) {
                                       event.preventDefault();
                                       event.stopPropagation();
                                       removeProductImage(index);
@@ -1088,7 +1279,10 @@ export function DashboardProductsManager({
                           <Image
                             height={420}
                             width={420}
-                            src={hoveredProductImagePreview || productImagePreviews[0]}
+                            src={
+                              hoveredProductImagePreview ||
+                              productImagePreviews[0]
+                            }
                             alt="Selected product preview"
                             className="h-full w-full object-contain p-2"
                           />
@@ -1110,7 +1304,7 @@ export function DashboardProductsManager({
               accept="image/*"
               multiple
               className="sr-only"
-              onChange={event => {
+              onChange={(event) => {
                 appendProductImages(event.target.files || []);
                 event.currentTarget.value = '';
               }}
@@ -1152,7 +1346,7 @@ export function DashboardProductsManager({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {products.map(product => {
+              {products.map((product) => {
                 const isEditing = editingSlug === product.slug;
                 return (
                   <Fragment key={product.sku}>
@@ -1229,11 +1423,16 @@ export function DashboardProductsManager({
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell className="min-w-0">{resolveProductRefLabel(product.brand)}</TableCell>
+                      <TableCell className="min-w-0">
+                        {resolveProductRefLabel(product.brand)}
+                      </TableCell>
                       <TableCell>{product.sku}</TableCell>
                       <TableCell className="min-w-0">
                         {product.badge ? (
-                          <Badge variant="outline" className="max-w-28 truncate">
+                          <Badge
+                            variant="outline"
+                            className="max-w-28 truncate"
+                          >
                             {product.badge}
                           </Badge>
                         ) : (
@@ -1241,20 +1440,30 @@ export function DashboardProductsManager({
                         )}
                       </TableCell>
                       <TableCell className="min-w-0">
-                        <Badge variant={product.isActive ? 'default' : 'secondary'}>
+                        <Badge
+                          variant={product.isActive ? 'default' : 'secondary'}
+                        >
                           {product.isActive ? 'Active' : 'Inactive'}
                         </Badge>
                       </TableCell>
                       <TableCell className="min-w-0">
-                        <Badge variant="secondary">{formatStockLabel(product.stock)}</Badge>
+                        <Badge variant="secondary">
+                          {formatStockLabel(product.stock)}
+                        </Badge>
                       </TableCell>
                       <TableCell className="min-w-0">
-                        <Badge variant={product.isFeatured ? 'default' : 'secondary'}>
+                        <Badge
+                          variant={product.isFeatured ? 'default' : 'secondary'}
+                        >
                           {product.isFeatured ? 'Featured' : 'No'}
                         </Badge>
                       </TableCell>
                       <TableCell className="min-w-0">
-                        <Badge variant={product.isNoCOD ? 'destructive' : 'secondary'}>
+                        <Badge
+                          variant={
+                            product.isNoCOD ? 'destructive' : 'secondary'
+                          }
+                        >
                           {product.isNoCOD ? 'Blocked' : 'Allowed'}
                         </Badge>
                       </TableCell>
@@ -1264,7 +1473,10 @@ export function DashboardProductsManager({
                           : '-'}
                       </TableCell>
                       <TableCell className="min-w-0">
-                        {formatPriceLabelWithUnit(product.price, product.sellingUnit)}
+                        {formatPriceLabelWithUnit(
+                          product.price,
+                          product.sellingUnit,
+                        )}
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
@@ -1273,43 +1485,67 @@ export function DashboardProductsManager({
                               <Button
                                 size="sm"
                                 disabled={isPending || isEditingSaving}
-                                onClick={productEditForm.handleSubmit(async values => {
-                                  setIsEditingSaving(true);
-                                  const result = await updateProduct(product.slug, {
-                                    title: values.title.trim(),
-                                    slug: values.slug.trim(),
-                                    sku: values.sku.trim(),
-                                    features: values.features ?? '',
-                                    description: values.description ?? '',
-                                    price: Number(values.price),
-                                    oldPrice: values.oldPrice?.trim() ? Number(values.oldPrice) : undefined,
-                                    badge: values.badge?.trim() || undefined,
-                                    youtubeVideoUrl: values.youtubeVideoUrl?.trim() ?? '',
-                                    brand: values.brand.trim(),
-                                    category: values.category.trim(),
-                                    subCategorySlug: values.subCategorySlug?.trim() ?? '',
-                                    stock: values.stock.trim() ? Number(values.stock) : null,
-                                    rating: Number(values.rating),
-                                    weightKg: Number(values.weightKg),
-                                    sellingUnit: values.sellingUnit,
-                                    isFeatured: values.isFeatured,
-                                    isNoCOD: values.isNoCOD,
-                                    isActive: values.isActive,
-                                    images: getEditingImagePayload(),
-                                  });
-                                  setIsEditingSaving(false);
+                                onClick={productEditForm.handleSubmit(
+                                  async (values) => {
+                                    setIsEditingSaving(true);
+                                    const result = await updateProduct(
+                                      product.slug,
+                                      {
+                                        title: values.title.trim(),
+                                        slug: values.slug.trim(),
+                                        sku: values.sku.trim(),
+                                        features: values.features ?? '',
+                                        description: values.description ?? '',
+                                        price: Number(values.price),
+                                        oldPrice: values.oldPrice?.trim()
+                                          ? Number(values.oldPrice)
+                                          : undefined,
+                                        badge:
+                                          values.badge?.trim() || undefined,
+                                        youtubeVideoUrl:
+                                          values.youtubeVideoUrl?.trim() ?? '',
+                                        brand: values.brand.trim(),
+                                        category: values.category.trim(),
+                                        subCategorySlug:
+                                          values.subCategorySlug?.trim() ?? '',
+                                        stock: values.stock.trim()
+                                          ? Number(values.stock)
+                                          : null,
+                                        rating: Number(values.rating),
+                                        weightKg: Number(values.weightKg),
+                                        sellingUnit: values.sellingUnit,
+                                        isFeatured: values.isFeatured,
+                                        isNoCOD: values.isNoCOD,
+                                        isActive: values.isActive,
+                                        images: getEditingImagePayload(),
+                                      },
+                                    );
+                                    setIsEditingSaving(false);
 
-                                  if (!result?.success) {
-                                    return refresh(result?.message ?? 'Failed to update product.', 'error');
-                                  }
+                                    if (!result?.success) {
+                                      return refresh(
+                                        result?.message ??
+                                          'Failed to update product.',
+                                        'error',
+                                      );
+                                    }
 
-                                  stopEditingProduct();
-                                  refresh(result.message ?? 'Product updated successfully.', 'success');
-                                })}
+                                    stopEditingProduct();
+                                    refresh(
+                                      result.message ??
+                                        'Product updated successfully.',
+                                      'success',
+                                    );
+                                  },
+                                )}
                               >
                                 {isEditingSaving ? 'Saving...' : 'Save'}
                               </Button>
-                              <Button size="sm" variant="outline" onClick={stopEditingProduct}>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={stopEditingProduct}
+                              >
                                 Cancel
                               </Button>
                             </>
@@ -1349,10 +1585,14 @@ export function DashboardProductsManager({
                             <ProductFormSections
                               form={productEditForm}
                               titleOnChange={handleEditingTitleChange}
-                              slugOnChange={value => {
-                                productEditForm.setValue('slug', slugify(value), {
-                                  shouldValidate: true,
-                                });
+                              slugOnChange={(value) => {
+                                productEditForm.setValue(
+                                  'slug',
+                                  slugify(value),
+                                  {
+                                    shouldValidate: true,
+                                  },
+                                );
                               }}
                               categoryOnChange={handleEditingCategoryChange}
                               categoryValue={editingCategory}
@@ -1369,13 +1609,16 @@ export function DashboardProductsManager({
                                 onClick={() => {
                                   editingProductImageInputRef.current?.click();
                                 }}
-                                onKeyDown={event => {
-                                  if (event.key === 'Enter' || event.key === ' ') {
+                                onKeyDown={(event) => {
+                                  if (
+                                    event.key === 'Enter' ||
+                                    event.key === ' '
+                                  ) {
                                     event.preventDefault();
                                     editingProductImageInputRef.current?.click();
                                   }
                                 }}
-                                onDragOver={event => event.preventDefault()}
+                                onDragOver={(event) => event.preventDefault()}
                                 onDrop={handleEditingProductImageDrop}
                                 className="rounded-2xl border-2 border-dashed border-border/70 bg-background/80 p-3 transition hover:border-primary/40"
                               >
@@ -1391,65 +1634,89 @@ export function DashboardProductsManager({
                                       Click or drop to add more images.
                                     </p>
                                     <div className="mt-2 grid grid-cols-2 gap-2">
-                                      {editingProductImagePreviews.length > 0 ? (
+                                      {editingProductImagePreviews.length >
+                                      0 ? (
                                         <div className="col-span-2">
                                           <div className="relative h-34">
-                                            {editingProductImagePreviews.map((preview, index) => {
-                                              const total = editingProductImagePreviews.length;
-                                              const reversedIndex = total - index - 1;
-                                              const isHovered = hoveredEditingProductImagePreview === preview;
+                                            {editingProductImagePreviews.map(
+                                              (preview, index) => {
+                                                const total =
+                                                  editingProductImagePreviews.length;
+                                                const reversedIndex =
+                                                  total - index - 1;
+                                                const isHovered =
+                                                  hoveredEditingProductImagePreview ===
+                                                  preview;
 
-                                              return (
-                                                <button
-                                                  key={preview}
-                                                  type="button"
-                                                  onMouseEnter={() =>
-                                                    setHoveredEditingProductImagePreview(preview)
-                                                  }
-                                                  onFocus={() =>
-                                                    setHoveredEditingProductImagePreview(preview)
-                                                  }
-                                                  className="absolute left-1/2 top-3 size-24 overflow-hidden rounded-lg border bg-muted shadow-sm transition duration-200 focus:outline-none focus:ring-2 focus:ring-primary"
-                                                  style={{
-                                                    transform: `translateX(calc(-50% + ${
-                                                      (reversedIndex - (total - 1) / 2) * 34
-                                                    }px)) scale(${isHovered ? 1.15 : 1}) rotate(${
-                                                      imagePreviewRotations[
-                                                        index % imagePreviewRotations.length
-                                                      ]
-                                                    })`,
-                                                    zIndex: isHovered ? 999 : total - index,
-                                                  }}
-                                                >
-                                                  <Image
-                                                    height={240}
-                                                    width={240}
-                                                    src={preview}
-                                                    alt={`Editing product preview ${index + 1}`}
-                                                    className="h-full w-full object-cover"
-                                                  />
-
-                                                  <span
-                                                    role="button"
-                                                    tabIndex={0}
-                                                    onClick={event => {
-                                                      event.stopPropagation();
-                                                      removeEditingProductImage(index);
+                                                return (
+                                                  <button
+                                                    key={preview}
+                                                    type="button"
+                                                    onMouseEnter={() =>
+                                                      setHoveredEditingProductImagePreview(
+                                                        preview,
+                                                      )
+                                                    }
+                                                    onFocus={() =>
+                                                      setHoveredEditingProductImagePreview(
+                                                        preview,
+                                                      )
+                                                    }
+                                                    className="absolute left-1/2 top-3 size-24 overflow-hidden rounded-lg border bg-muted shadow-sm transition duration-200 focus:outline-none focus:ring-2 focus:ring-primary"
+                                                    style={{
+                                                      transform: `translateX(calc(-50% + ${
+                                                        (reversedIndex -
+                                                          (total - 1) / 2) *
+                                                        34
+                                                      }px)) scale(${isHovered ? 1.15 : 1}) rotate(${
+                                                        imagePreviewRotations[
+                                                          index %
+                                                            imagePreviewRotations.length
+                                                        ]
+                                                      })`,
+                                                      zIndex: isHovered
+                                                        ? 999
+                                                        : total - index,
                                                     }}
-                                                    onKeyDown={event => {
-                                                      if (event.key === 'Enter' || event.key === ' ') {
-                                                        event.preventDefault();
-                                                        event.stopPropagation();
-                                                        removeEditingProductImage(index);
-                                                      }
-                                                    }}
-                                                    className="absolute right-1 top-1 z-1000 flex size-6 items-center justify-center rounded-full bg-background/95 text-destructive shadow"
                                                   >
-                                                    <X className="size-3.5" />
-                                                  </span>
-                                                </button>
-                                              );
-                                            })}
+                                                    <Image
+                                                      height={240}
+                                                      width={240}
+                                                      src={preview}
+                                                      alt={`Editing product preview ${index + 1}`}
+                                                      className="h-full w-full object-cover"
+                                                    />
+
+                                                    <span
+                                                      role="button"
+                                                      tabIndex={0}
+                                                      onClick={(event) => {
+                                                        event.stopPropagation();
+                                                        removeEditingProductImage(
+                                                          index,
+                                                        );
+                                                      }}
+                                                      onKeyDown={(event) => {
+                                                        if (
+                                                          event.key ===
+                                                            'Enter' ||
+                                                          event.key === ' '
+                                                        ) {
+                                                          event.preventDefault();
+                                                          event.stopPropagation();
+                                                          removeEditingProductImage(
+                                                            index,
+                                                          );
+                                                        }
+                                                      }}
+                                                      className="absolute right-1 top-1 z-1000 flex size-6 items-center justify-center rounded-full bg-background/95 text-destructive shadow"
+                                                    >
+                                                      <X className="size-3.5" />
+                                                    </span>
+                                                  </button>
+                                                );
+                                              },
+                                            )}
                                           </div>
                                           <div className="relative mt-2 aspect-square overflow-hidden rounded-xl border bg-muted z-10">
                                             <Image
@@ -1480,8 +1747,10 @@ export function DashboardProductsManager({
                                 accept="image/*"
                                 multiple
                                 className="sr-only"
-                                onChange={event => {
-                                  appendEditingProductImages(event.target.files || []);
+                                onChange={(event) => {
+                                  appendEditingProductImages(
+                                    event.target.files || [],
+                                  );
                                   event.currentTarget.value = '';
                                 }}
                               />
@@ -1501,8 +1770,10 @@ export function DashboardProductsManager({
                 page={paginationMeta.page}
                 limit={paginationMeta.limit}
                 total={paginationMeta.total}
-                onPageChange={nextPage => updateProductQuery({ page: nextPage })}
-                onLimitChange={l => {
+                onPageChange={(nextPage) =>
+                  updateProductQuery({ page: nextPage })
+                }
+                onLimitChange={(l) => {
                   updateProductQuery({ page: 1, limit: l });
                 }}
               />
@@ -1517,7 +1788,7 @@ export function DashboardProductsManager({
         description={`This will permanently delete ${pendingDeleteProduct?.title || 'this product'} from the catalog.`}
         confirmLabel="Delete product"
         isPending={isPending}
-        onOpenChange={open => {
+        onOpenChange={(open) => {
           if (!open) closeDeleteDialog();
         }}
         onConfirm={confirmDeleteProduct}

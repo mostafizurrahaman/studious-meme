@@ -1,13 +1,13 @@
-"use server";
+'use server';
 
-import { revalidateTag } from "next/cache";
-import { requestBackendJson } from "@/lib/backend-api";
-import { CACHE_REVALIDATE } from "@/lib/cache-revalidate";
-import { CACHE_TAGS } from "@/lib/cache-tags";
-import { getValidAccessTokenForServerActions } from "@/lib/getValidAccessToken";
-import type { BackendBrand } from "@/services/Brand";
-import type { BackendCategory } from "@/services/Category/mappers";
-import type { BackendProduct } from "@/services/Product";
+import { revalidateTag } from 'next/cache';
+import { requestBackendJson } from '@/lib/backend-api';
+import { CACHE_REVALIDATE } from '@/lib/cache-revalidate';
+import { CACHE_TAGS } from '@/lib/cache-tags';
+import { getValidAccessTokenForServerActions } from '@/lib/getValidAccessToken';
+import type { BackendBrand } from '@/services/Brand';
+import type { BackendCategory } from '@/services/Category/mappers';
+import type { BackendProduct } from '@/services/Product';
 
 type BackendEnvelope<T> = {
   success?: boolean;
@@ -56,8 +56,8 @@ export const getHomeContent = async (): Promise<
       featuredProducts: BackendProduct[];
       latestProducts: BackendProduct[];
     }>
-  >("/hero/home", {
-    method: "GET",
+  >('/hero/home', {
+    method: 'GET',
     next: {
       revalidate: CACHE_REVALIDATE.LONG,
       tags: [
@@ -77,10 +77,13 @@ export const getAllHeroSections = async (): Promise<
   BackendEnvelope<BackendHeroSection[]>
 > => {
   return requestBackendJson<BackendEnvelope<BackendHeroSection[]>>(
-    "/hero/heroes",
+    '/hero/heroes',
     {
-      method: "GET",
-      next: { revalidate: CACHE_REVALIDATE.LONG, tags: [CACHE_TAGS.HERO, CACHE_TAGS.MARKETING_CONTENT] },
+      method: 'GET',
+      next: {
+        revalidate: CACHE_REVALIDATE.LONG,
+        tags: [CACHE_TAGS.HERO, CACHE_TAGS.MARKETING_CONTENT],
+      },
     },
   );
 };
@@ -91,8 +94,11 @@ export const getHeroSectionById = async (
   return requestBackendJson<BackendEnvelope<BackendHeroSection>>(
     `/hero/heroes/${id}`,
     {
-      method: "GET",
-      next: { revalidate: CACHE_REVALIDATE.LONG, tags: [CACHE_TAGS.HERO, CACHE_TAGS.MARKETING_CONTENT] },
+      method: 'GET',
+      next: {
+        revalidate: CACHE_REVALIDATE.LONG,
+        tags: [CACHE_TAGS.HERO, CACHE_TAGS.MARKETING_CONTENT],
+      },
     },
   );
 };
@@ -112,15 +118,15 @@ function toFormData(payload: Partial<HeroMutationPayload>) {
     ...payload,
     slides: slides.map(({ image, ...slide }) => ({
       ...slide,
-      ...(typeof image === "string" && image ? { image } : {}),
+      ...(typeof image === 'string' && image ? { image } : {}),
     })),
     features: features.map(({ image, ...feature }) => ({
       ...feature,
-      ...(typeof image === "string" && image ? { image } : {}),
+      ...(typeof image === 'string' && image ? { image } : {}),
     })),
   };
 
-  formData.set("data", JSON.stringify(normalizedPayload));
+  formData.set('data', JSON.stringify(normalizedPayload));
 
   slides.forEach((card, index) => {
     if (card.image instanceof File) {
@@ -142,9 +148,9 @@ export const createHeroSection = async (
 ): Promise<BackendEnvelope<BackendHeroSection>> => {
   const accessToken = await getValidAccessTokenForServerActions();
   const result = await requestBackendJson<BackendEnvelope<BackendHeroSection>>(
-    "/hero/heroes",
+    '/hero/heroes',
     {
-      method: "POST",
+      method: 'POST',
       body: toFormData(payload),
       token: accessToken ?? undefined,
     },
@@ -164,7 +170,7 @@ export const updateHeroSection = async (
   const result = await requestBackendJson<BackendEnvelope<BackendHeroSection>>(
     `/hero/heroes/${id}`,
     {
-      method: "PATCH",
+      method: 'PATCH',
       body: toFormData(payload),
       token: accessToken ?? undefined,
     },
@@ -183,7 +189,7 @@ export const deleteHeroSection = async (
   const result = await requestBackendJson<BackendEnvelope<BackendHeroSection>>(
     `/hero/heroes/${id}`,
     {
-      method: "DELETE",
+      method: 'DELETE',
       token: accessToken ?? undefined,
     },
   );

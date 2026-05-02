@@ -1,10 +1,10 @@
-"use server";
+'use server';
 
-import { z } from "zod";
-import { createContact } from "@/services/Contact";
+import { z } from 'zod';
+import { createContact } from '@/services/Contact';
 
 type QuotationRequestErrors = Partial<
-  Record<"name" | "email" | "phone" | "products" | "message", string>
+  Record<'name' | 'email' | 'phone' | 'products' | 'message', string>
 >;
 
 export type QuotationRequestState =
@@ -12,35 +12,29 @@ export type QuotationRequestState =
   | { ok: true; message: string; errors?: undefined };
 
 const quotationRequestSchema = z.object({
-  name: z.string().trim().min(1, { message: "Please enter your full name." }),
+  name: z.string().trim().min(1, { message: 'Please enter your full name.' }),
   company: z.string().trim().optional(),
   email: z
     .string()
     .trim()
-    .min(1, { message: "Please enter your email address." })
-    .email({ message: "Please enter a valid email address." }),
+    .min(1, { message: 'Please enter your email address.' })
+    .email({ message: 'Please enter a valid email address.' }),
   phone: z
     .string()
     .trim()
-    .min(1, { message: "Please enter your phone number." }),
-  products: z
-    .string()
-    .trim()
-    .min(1, {
-      message: "Please list the products or specifications you need.",
-    }),
+    .min(1, { message: 'Please enter your phone number.' }),
+  products: z.string().trim().min(1, {
+    message: 'Please list the products or specifications you need.',
+  }),
   brand: z.string().trim().optional(),
-  message: z
-    .string()
-    .trim()
-    .min(20, {
-      message:
-        "Please add project details or delivery requirements (minimum 20 characters).",
-    }),
+  message: z.string().trim().min(20, {
+    message:
+      'Please add project details or delivery requirements (minimum 20 characters).',
+  }),
 });
 
 function readValue(formData: FormData, key: string) {
-  return String(formData.get(key) ?? "").trim();
+  return String(formData.get(key) ?? '').trim();
 }
 
 function flattenErrors(
@@ -61,31 +55,31 @@ export async function submitQuotationRequest(
   formData: FormData,
 ): Promise<QuotationRequestState> {
   const parsed = quotationRequestSchema.safeParse({
-    name: readValue(formData, "name"),
-    company: readValue(formData, "company"),
-    email: readValue(formData, "email").toLowerCase(),
-    phone: readValue(formData, "phone"),
-    products: readValue(formData, "products"),
-    brand: readValue(formData, "brand"),
-    message: readValue(formData, "message"),
+    name: readValue(formData, 'name'),
+    company: readValue(formData, 'company'),
+    email: readValue(formData, 'email').toLowerCase(),
+    phone: readValue(formData, 'phone'),
+    products: readValue(formData, 'products'),
+    brand: readValue(formData, 'brand'),
+    message: readValue(formData, 'message'),
   });
 
   if (!parsed.success) {
     return {
       ok: false,
-      message: "Please fix the highlighted quotation fields.",
+      message: 'Please fix the highlighted quotation fields.',
       errors: flattenErrors(parsed.error),
     };
   }
 
   const { name, company, email, phone, products, brand, message } = parsed.data;
-  const subjectParts = ["Quotation Request", company, brand].filter(Boolean);
+  const subjectParts = ['Quotation Request', company, brand].filter(Boolean);
   const payload = {
     name,
     company: company || undefined,
     email,
     phone,
-    subject: subjectParts.join(" - ").slice(0, 120),
+    subject: subjectParts.join(' - ').slice(0, 120),
     products,
     brand: brand || undefined,
     message,
@@ -96,12 +90,12 @@ export async function submitQuotationRequest(
   if (!result?.success) {
     return {
       ok: false,
-      message: result?.message ?? "Failed to submit quotation request.",
+      message: result?.message ?? 'Failed to submit quotation request.',
     };
   }
 
   return {
     ok: true,
-    message: result.message ?? "Quotation request submitted successfully.",
+    message: result.message ?? 'Quotation request submitted successfully.',
   };
 }

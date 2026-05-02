@@ -1,7 +1,7 @@
 export type CouponDiscountType =
-  | "PERCENTAGE"
-  | "DISCOUNT_AMOUNT"
-  | "FREE_SHIPPING";
+  | 'PERCENTAGE'
+  | 'DISCOUNT_AMOUNT'
+  | 'FREE_SHIPPING';
 
 export type Coupon = {
   id: string;
@@ -40,7 +40,7 @@ export type CouponVerificationSummary = {
   shippingCharge: number;
   baseShippingCharge: number;
   totalWeightKg: number;
-  shippingZone: "inside_dhaka" | "outside_dhaka";
+  shippingZone: 'inside_dhaka' | 'outside_dhaka';
   codEligible: boolean;
   codAvailable: boolean;
   codReasons: string[];

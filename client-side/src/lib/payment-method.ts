@@ -1,5 +1,5 @@
-export const CASH_ON_DELIVERY_LABEL = "Cash on delivery" as const;
-export const PORTPOS_LABEL = "PortPOS" as const;
+export const CASH_ON_DELIVERY_LABEL = 'Cash on delivery' as const;
+export const PORTPOS_LABEL = 'PortPOS' as const;
 
 export const CHECKOUT_PAYMENT_OPTIONS = [
   CASH_ON_DELIVERY_LABEL,
@@ -11,5 +11,5 @@ export function getCheckoutPaymentLabel(payment: string) {
 }
 
 export function normalizeOrderPaymentMethod(payment: string) {
-  return payment === PORTPOS_LABEL ? "PORTPOS" : "CASH_ON_DELIVERY";
+  return payment === PORTPOS_LABEL ? 'PORTPOS' : 'CASH_ON_DELIVERY';
 }

@@ -1,28 +1,33 @@
-import httpStatus from "http-status";
-import { asyncHandler, sendResponse } from "../../utils";
-import { ProductQuestionService } from "./productQuestion.service";
+import httpStatus from 'http-status';
+import { asyncHandler, sendResponse } from '../../utils';
+import { ProductQuestionService } from './productQuestion.service';
 
-const getParam = (value: string | string[]) => (Array.isArray(value) ? value[0] : value);
+const getParam = (value: string | string[]) =>
+  Array.isArray(value) ? value[0] : value;
 
 const createQuestion = asyncHandler(async (req, res) => {
-  const result = await ProductQuestionService.createQuestionIntoDB(req.user, req.body);
+  const result = await ProductQuestionService.createQuestionIntoDB(
+    req.user,
+    req.body,
+  );
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
-    message: "Question submitted successfully!",
+    message: 'Question submitted successfully!',
     data: result,
   });
 });
 
 const getAnsweredQuestionsForProduct = asyncHandler(async (req, res) => {
-  const result = await ProductQuestionService.getAnsweredQuestionsForProductFromDB(
-    getParam(req.params.productId),
-    req.query,
-  );
+  const result =
+    await ProductQuestionService.getAnsweredQuestionsForProductFromDB(
+      getParam(req.params.productId),
+      req.query,
+    );
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Answered questions fetched successfully!",
+    message: 'Answered questions fetched successfully!',
     data: result.data,
     meta: result.meta,
   });
@@ -33,7 +38,7 @@ const getAllQuestions = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Product questions fetched successfully!",
+    message: 'Product questions fetched successfully!',
     data: result.data,
     meta: result.meta,
   });
@@ -48,7 +53,7 @@ const answerQuestion = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Question answered successfully!",
+    message: 'Question answered successfully!',
     data: result,
   });
 });
@@ -61,17 +66,19 @@ const updateQuestionStatus = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Question status updated successfully!",
+    message: 'Question status updated successfully!',
     data: result,
   });
 });
 
 const deleteQuestion = asyncHandler(async (req, res) => {
-  const result = await ProductQuestionService.deleteQuestionFromDB(getParam(req.params.id));
+  const result = await ProductQuestionService.deleteQuestionFromDB(
+    getParam(req.params.id),
+  );
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Question deleted successfully!",
+    message: 'Question deleted successfully!',
     data: result,
   });
 });

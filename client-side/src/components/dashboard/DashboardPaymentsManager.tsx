@@ -1,9 +1,22 @@
-"use client";
+'use client';
 
 import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { TablePagination } from '@/components/ui/table-pagination';
 import { formatDashboardDate } from '@/lib/formatDate';
 import type { BackendPayment } from '@/services/Payment';
@@ -73,15 +86,22 @@ export function DashboardPaymentsManager({
                 </TableCell>
               </TableRow>
             ) : null}
-            {payments.map(item => {
-              const orderId = typeof item.order === 'object' ? item.order.orderId : item.order;
+            {payments.map((item) => {
+              const orderId =
+                typeof item.order === 'object'
+                  ? item.order.orderId
+                  : item.order;
               return (
                 <TableRow key={item._id}>
-                  <TableCell className="font-medium">{item.transactionId}</TableCell>
+                  <TableCell className="font-medium">
+                    {item.transactionId}
+                  </TableCell>
                   <TableCell>{orderId}</TableCell>
                   <TableCell>৳ {item.amount}</TableCell>
                   <TableCell>
-                    <Badge variant={getStatusVariant(item.status)}>{item.status}</Badge>
+                    <Badge variant={getStatusVariant(item.status)}>
+                      {item.status}
+                    </Badge>
                   </TableCell>
                   <TableCell>
                     <span

@@ -1,7 +1,7 @@
-import { type NextFunction, type Request, type Response } from "express";
-import httpStatus from "http-status";
-import config from "../config";
-import { AppError } from "../utils";
+import { type NextFunction, type Request, type Response } from 'express';
+import httpStatus from 'http-status';
+import config from '../config';
+import { AppError } from '../utils';
 
 /*
 Temporary disable note:
@@ -43,16 +43,16 @@ export const burstProtection =
     return args[2]();
   };
 
-const normalizeIp = (value: string) => value.replace(/^::ffff:/, "").trim();
+const normalizeIp = (value: string) => value.replace(/^::ffff:/, '').trim();
 
 const getClientIp = (req: Request) => {
-  const forwarded = req.headers["x-forwarded-for"];
+  const forwarded = req.headers['x-forwarded-for'];
   const headerIp = Array.isArray(forwarded) ? forwarded[0] : forwarded;
 
   return normalizeIp(
     headerIp
-      ? String(headerIp).split(",")[0]
-      : req.ip || req.socket.remoteAddress || "unknown",
+      ? String(headerIp).split(',')[0]
+      : req.ip || req.socket.remoteAddress || 'unknown',
   );
 };
 
@@ -61,11 +61,11 @@ export const paymentWebhookGuard = (
   _res: Response,
   next: NextFunction,
 ) => {
-  if (req.method !== "POST") {
+  if (req.method !== 'POST') {
     next(
       new AppError(
         httpStatus.METHOD_NOT_ALLOWED,
-        "Webhook method not allowed.",
+        'Webhook method not allowed.',
       ),
     );
     return;
@@ -73,7 +73,7 @@ export const paymentWebhookGuard = (
 
   const allowlist = config.portpos.webhook_ip_allowlist
     ? config.portpos.webhook_ip_allowlist
-        .split(",")
+        .split(',')
         .map((ip) => normalizeIp(ip))
     : [];
 
@@ -82,7 +82,7 @@ export const paymentWebhookGuard = (
 
     if (!allowlist.includes(clientIp)) {
       next(
-        new AppError(httpStatus.FORBIDDEN, "Webhook source is not allowed."),
+        new AppError(httpStatus.FORBIDDEN, 'Webhook source is not allowed.'),
       );
       return;
     }

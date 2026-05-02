@@ -1,18 +1,18 @@
-import { FloatingCategoryRail } from "@/components/FloatingCategoryRail";
-import { Footer } from "@/components/Footer";
-import { MobileToolbar } from "@/components/MobileToolbar";
-import { Container } from "@/components/Container";
-import { StorefrontHeader } from "@/components/StorefrontHeader";
-import { StorefrontFloatingContact } from "@/components/StorefrontFloatingContact";
+import { FloatingCategoryRail } from '@/components/FloatingCategoryRail';
+import { Footer } from '@/components/Footer';
+import { MobileToolbar } from '@/components/MobileToolbar';
+import { Container } from '@/components/Container';
+import { StorefrontHeader } from '@/components/StorefrontHeader';
+import { StorefrontFloatingContact } from '@/components/StorefrontFloatingContact';
 import {
   getActiveBrands,
   mapBackendBrandToStorefrontBrand,
-} from "@/services/Brand";
-import { getActiveCategories } from "@/services/Category";
+} from '@/services/Brand';
+import { getActiveCategories } from '@/services/Category';
 import {
   mapBackendCategoryToStorefrontCategory,
   type BackendCategory,
-} from "@/services/Category/mappers";
+} from '@/services/Category/mappers';
 
 const MainLayout = async ({ children }: { children: React.ReactNode }) => {
   const [categoriesResult, brandsResult] = await Promise.all([
@@ -40,7 +40,7 @@ const MainLayout = async ({ children }: { children: React.ReactNode }) => {
       <main
         style={{
           paddingTop:
-            "var(--storefront-header-height, clamp(120px, 12vw, 160px))",
+            'var(--storefront-header-height, clamp(120px, 12vw, 160px))',
         }}
       >
         <FloatingCategoryRail categories={categories} />

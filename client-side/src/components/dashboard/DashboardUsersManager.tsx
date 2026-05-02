@@ -5,8 +5,21 @@ import { useCallback, useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import Image from 'next/image';
 import { formatDashboardDate } from '@/lib/formatDate';
 import { deleteUserById, updateUserStatus } from '@/services/Admin';
@@ -120,10 +133,16 @@ export function DashboardUsersManager({
     if (!userId) return;
 
     startTransition(async () => {
-      const result = await updateUserStatus(userId, pendingStatusUser.nextIsActive);
+      const result = await updateUserStatus(
+        userId,
+        pendingStatusUser.nextIsActive,
+      );
 
       if (!result?.success) {
-        return refresh(result?.message ?? 'Failed to update user status.', 'error');
+        return refresh(
+          result?.message ?? 'Failed to update user status.',
+          'error',
+        );
       }
 
       setPendingStatusUser(null);
@@ -142,7 +161,7 @@ export function DashboardUsersManager({
           <TableFilter
             key={searchTerm}
             value={searchTerm}
-            onChange={value => updateQuery({ page: 1, searchTerm: value })}
+            onChange={(value) => updateQuery({ page: 1, searchTerm: value })}
             placeholder="Search users..."
           />
           <div className="text-sm text-muted-foreground">
@@ -171,7 +190,7 @@ export function DashboardUsersManager({
                 </TableCell>
               </TableRow>
             ) : null}
-            {users.map(user => (
+            {users.map((user) => (
               <TableRow key={user._id ?? `${user.email}-${user.name}`}>
                 <TableCell>
                   <div className="flex size-12 items-center justify-center overflow-hidden rounded-xl border bg-muted">
@@ -188,22 +207,34 @@ export function DashboardUsersManager({
                     )}
                   </div>
                 </TableCell>
-                <TableCell className="font-medium">{user.name ?? '-'}</TableCell>
+                <TableCell className="font-medium">
+                  {user.name ?? '-'}
+                </TableCell>
                 <TableCell>{user.email ?? '-'}</TableCell>
                 <TableCell>{user.phone ?? '-'}</TableCell>
-                <TableCell>{formatDashboardDate(user.dob, { time: false })}</TableCell>
                 <TableCell>
-                  <Badge variant={user.isActive === false ? 'secondary' : 'default'}>
+                  {formatDashboardDate(user.dob, { time: false })}
+                </TableCell>
+                <TableCell>
+                  <Badge
+                    variant={user.isActive === false ? 'secondary' : 'default'}
+                  >
                     {user.isActive === false ? 'Inactive' : 'Active'}
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <span className="cursor-help" title={formatDashboardDate(user.createdAt, { time: true })}>
+                  <span
+                    className="cursor-help"
+                    title={formatDashboardDate(user.createdAt, { time: true })}
+                  >
                     {formatDashboardDate(user.createdAt)}
                   </span>
                 </TableCell>
                 <TableCell>
-                  <span className="cursor-help" title={formatDashboardDate(user.updatedAt, { time: true })}>
+                  <span
+                    className="cursor-help"
+                    title={formatDashboardDate(user.updatedAt, { time: true })}
+                  >
                     {formatDashboardDate(user.updatedAt)}
                   </span>
                 </TableCell>
@@ -249,13 +280,13 @@ export function DashboardUsersManager({
             page={paginationMeta.page}
             limit={paginationMeta.limit}
             total={paginationMeta.total}
-            onPageChange={page => updateQuery({ page })}
-            onLimitChange={limit => updateQuery({ page: 1, limit })}
+            onPageChange={(page) => updateQuery({ page })}
+            onLimitChange={(limit) => updateQuery({ page: 1, limit })}
           />
         ) : null}
         <DeleteConfirmationDialog
           open={Boolean(pendingDeleteUser)}
-          onOpenChange={open => {
+          onOpenChange={(open) => {
             if (!open) closeDeleteDialog();
           }}
           onConfirm={confirmDeleteUser}
@@ -268,18 +299,24 @@ export function DashboardUsersManager({
         />
         <DeleteConfirmationDialog
           open={Boolean(pendingStatusUser)}
-          onOpenChange={open => {
+          onOpenChange={(open) => {
             if (!open) closeStatusDialog();
           }}
           onConfirm={confirmStatusChange}
           isPending={isPending}
-          title={pendingStatusUser?.nextIsActive ? 'Unblock user account?' : 'Block user account?'}
+          title={
+            pendingStatusUser?.nextIsActive
+              ? 'Unblock user account?'
+              : 'Block user account?'
+          }
           description={
             pendingStatusUser?.nextIsActive
               ? `This will restore dashboard access for ${pendingStatusUser?.name || pendingStatusUser?.email || 'this user'}.`
               : `This will block ${pendingStatusUser?.name || pendingStatusUser?.email || 'this user'} from accessing their account.`
           }
-          confirmLabel={pendingStatusUser?.nextIsActive ? 'Unblock user' : 'Block user'}
+          confirmLabel={
+            pendingStatusUser?.nextIsActive ? 'Unblock user' : 'Block user'
+          }
         />
       </CardContent>
     </Card>

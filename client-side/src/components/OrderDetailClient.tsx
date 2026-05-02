@@ -1,19 +1,23 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import Link from "next/link";
-import { useMemo } from "react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { formatMoney, formatPriceLabelWithUnit, type CartItem } from "@/lib/cart";
-import { formatDashboardDate } from "@/lib/formatDate";
-import { useCartStore } from "@/lib/cart-store";
-import { siteConfig } from "@/lib/seo";
-import type { BackendOrder } from "@/services/Order";
+import Image from 'next/image';
+import Link from 'next/link';
+import { useMemo } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import {
+  formatMoney,
+  formatPriceLabelWithUnit,
+  type CartItem,
+} from '@/lib/cart';
+import { formatDashboardDate } from '@/lib/formatDate';
+import { useCartStore } from '@/lib/cart-store';
+import { siteConfig } from '@/lib/seo';
+import type { BackendOrder } from '@/services/Order';
 
 export function OrderDetailClient({
   order,
-  backHref = "/dashboard/user/orders",
+  backHref = '/dashboard/user/orders',
 }: {
   order: BackendOrder | null;
   backHref?: string;
@@ -22,9 +26,9 @@ export function OrderDetailClient({
 
   const timeline = useMemo(
     () => [
-      { key: "Placed", label: "Placed" },
-      { key: "Processing", label: "Processing" },
-      { key: "Delivered", label: "Delivered" },
+      { key: 'Placed', label: 'Placed' },
+      { key: 'Processing', label: 'Processing' },
+      { key: 'Delivered', label: 'Delivered' },
     ],
     [],
   );
@@ -34,7 +38,7 @@ export function OrderDetailClient({
       <main className="flex-1 bg-background pb-16">
         <div className="mx-auto w-full max-w-310 px-4 py-6 lg:px-0">
           <Card className="p-6 shadow-sm">
-            Order not found.{" "}
+            Order not found.{' '}
             <Link className="font-semibold text-primary" href={backHref}>
               Back to orders
             </Link>
@@ -45,11 +49,11 @@ export function OrderDetailClient({
   }
 
   const activeIndex =
-    order.status === "DELIVERED" ? 2 : order.status === "PROCESSING" ? 1 : 0;
+    order.status === 'DELIVERED' ? 2 : order.status === 'PROCESSING' ? 1 : 0;
   const cartItems: CartItem[] = order.items.map((item) => ({
     sku: item.sku,
     title: item.title,
-    href: "/shop",
+    href: '/shop',
     image: item.image,
     brand: item.brand,
     unitPrice: item.unitPrice,
@@ -63,7 +67,7 @@ export function OrderDetailClient({
   const download = (filename: string, content: string, type: string) => {
     const blob = new Blob([content], { type });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = url;
     a.download = filename;
     a.click();
@@ -74,11 +78,11 @@ export function OrderDetailClient({
     download(
       `${order.orderId}.json`,
       JSON.stringify(order, null, 2),
-      "application/json",
+      'application/json',
     );
   const exportCsv = () => {
     const rows = [
-      ["Order ID", "Item", "SKU", "Qty", "Unit Price", "Line Total"],
+      ['Order ID', 'Item', 'SKU', 'Qty', 'Unit Price', 'Line Total'],
       ...order.items.map((item) => [
         order.orderId,
         item.title,
@@ -93,10 +97,10 @@ export function OrderDetailClient({
       .map((row) =>
         row
           .map((value) => `"${String(value).replaceAll('"', '""')}"`)
-          .join(","),
+          .join(','),
       )
-      .join("\n");
-    download(`${order.orderId}.csv`, csv, "text/csv");
+      .join('\n');
+    download(`${order.orderId}.csv`, csv, 'text/csv');
   };
 
   return (
@@ -163,37 +167,37 @@ export function OrderDetailClient({
                   </div>
                 </div>
                 <div className="text-right text-sm text-foreground/65">
-                  <div>Customer: {order.customer.name || "Guest"}</div>
-                  <div>Phone: {order.customer.phone || "-"}</div>
-                  <div>Email: {order.customer.email || "-"}</div>
+                  <div>Customer: {order.customer.name || 'Guest'}</div>
+                  <div>Phone: {order.customer.phone || '-'}</div>
+                  <div>Email: {order.customer.email || '-'}</div>
                 </div>
               </div>
               <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4 print:hidden">
                 {timeline.map((step, index) => {
                   const isActive = index <= activeIndex;
-                  const isCancelled = order.status === "CANCELLED";
+                  const isCancelled = order.status === 'CANCELLED';
 
                   return (
                     <div
                       key={step.key}
-                      className={`rounded-2xl border px-4 py-3 text-sm ${isActive ? "border-primary/30 bg-background" : "border-border bg-background/70"}`}
+                      className={`rounded-2xl border px-4 py-3 text-sm ${isActive ? 'border-primary/30 bg-background' : 'border-border bg-background/70'}`}
                     >
                       <div
-                        className={`text-xs uppercase tracking-[0.22em] ${isActive ? "text-primary" : "text-foreground/40"}`}
+                        className={`text-xs uppercase tracking-[0.22em] ${isActive ? 'text-primary' : 'text-foreground/40'}`}
                       >
                         {step.label}
                       </div>
                       <div className="mt-2 font-semibold text-foreground/75">
-                        {isCancelled && step.key !== "Placed"
-                          ? "Skipped"
+                        {isCancelled && step.key !== 'Placed'
+                          ? 'Skipped'
                           : isActive
-                            ? "Completed"
-                            : "Pending"}
+                            ? 'Completed'
+                            : 'Pending'}
                       </div>
                     </div>
                   );
                 })}
-                {order.status === "CANCELLED" ? (
+                {order.status === 'CANCELLED' ? (
                   <div className="rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3 text-sm text-primary sm:col-span-2 xl:col-span-4">
                     This order was cancelled.
                   </div>
@@ -218,7 +222,7 @@ export function OrderDetailClient({
                   <div className="font-semibold text-foreground">
                     {item.title}
                   </div>
-                    <div className="mt-1 text-sm text-foreground/55">
+                  <div className="mt-1 text-sm text-foreground/55">
                     SKU {item.sku} · Qty {item.quantity}
                   </div>
                   <div className="mt-2 text-sm font-bold text-primary">
@@ -253,7 +257,7 @@ export function OrderDetailClient({
               </div>
             </div>
             <div className="mt-6 rounded-2xl bg-white/10 p-4 text-sm text-secondary-foreground/80">
-              {order.customer.address || "No address saved."}
+              {order.customer.address || 'No address saved.'}
             </div>
             <div className="mt-6 grid gap-3">
               <Button

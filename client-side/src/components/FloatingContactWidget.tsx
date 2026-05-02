@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   MessageCircleMore,
@@ -6,7 +6,7 @@ import {
   PhoneCall,
   X,
   type LucideIcon,
-} from "lucide-react";
+} from 'lucide-react';
 import {
   useEffect,
   useRef,
@@ -14,7 +14,7 @@ import {
   useSyncExternalStore,
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
-} from "react";
+} from 'react';
 
 type ContactAction = {
   label: string;
@@ -23,16 +23,16 @@ type ContactAction = {
   className: string;
 };
 
-const messengerHref = "https://m.me/malamalxyz";
-const whatsappHref = "https://wa.me/+8801972525821";
-const hotlineHref = "tel:+8801972525821";
+const messengerHref = 'https://m.me/malamalxyz';
+const whatsappHref = 'https://wa.me/+8801972525821';
+const hotlineHref = 'tel:+8801972525821';
 
 const BUTTON_SIZE = 56;
 const EDGE_MARGIN = 12;
 const RIGHT_GAP = 12;
 const BOTTOM_GAP = 112;
 const DRAG_THRESHOLD = 6;
-const WINDOW_SIZE_FALLBACK = "0x0";
+const WINDOW_SIZE_FALLBACK = '0x0';
 
 function clamp(value: number, min: number, max: number) {
   if (max < min) return value;
@@ -40,8 +40,8 @@ function clamp(value: number, min: number, max: number) {
 }
 
 function subscribeWindowSize(callback: () => void) {
-  window.addEventListener("resize", callback);
-  return () => window.removeEventListener("resize", callback);
+  window.addEventListener('resize', callback);
+  return () => window.removeEventListener('resize', callback);
 }
 
 function getWindowSizeSnapshot(): string {
@@ -58,7 +58,7 @@ function useWindowSize() {
     getWindowSizeSnapshot,
     getServerWindowSizeSnapshot,
   );
-  const [width, height] = snapshot.split("x").map(Number);
+  const [width, height] = snapshot.split('x').map(Number);
 
   return {
     width: Number.isFinite(width) ? width : 0,
@@ -71,12 +71,12 @@ function FloatingLabel({
   side,
 }: {
   children: ReactNode;
-  side: "left" | "right";
+  side: 'left' | 'right';
 }) {
   return (
     <span
       className={`pointer-events-none absolute ${
-        side === "left" ? "right-full mr-3" : "left-full ml-3"
+        side === 'left' ? 'right-full mr-3' : 'left-full ml-3'
       } inline-flex translate-x-2 items-center rounded-full border border-border/70 bg-background px-4 py-2 text-sm font-semibold text-foreground opacity-0 shadow-[0_10px_25px_rgba(15,23,42,0.12)] transition-all duration-200 ease-out group-hover:translate-x-0 group-hover:opacity-100 group-focus-within:translate-x-0 group-focus-within:opacity-100`}
     >
       {children}
@@ -100,25 +100,25 @@ export function FloatingContactWidget() {
 
   const actions: ContactAction[] = [
     {
-      label: "WhatsApp",
+      label: 'WhatsApp',
       href: whatsappHref,
       icon: MessageCircleMore,
       className:
-        "bg-[#25D366] text-white shadow-[0_10px_20px_rgba(37,211,102,0.28)]",
+        'bg-[#25D366] text-white shadow-[0_10px_20px_rgba(37,211,102,0.28)]',
     },
     {
-      label: "Messenger",
+      label: 'Messenger',
       href: messengerHref,
       icon: MessageSquare,
       className:
-        "bg-[#0084FF] text-white shadow-[0_10px_20px_rgba(0,132,255,0.22)]",
+        'bg-[#0084FF] text-white shadow-[0_10px_20px_rgba(0,132,255,0.22)]',
     },
     {
-      label: "Call",
+      label: 'Call',
       href: hotlineHref,
       icon: PhoneCall,
       className:
-        "bg-sky-500 text-white shadow-[0_10px_20px_rgba(14,165,233,0.22)]",
+        'bg-sky-500 text-white shadow-[0_10px_20px_rgba(14,165,233,0.22)]',
     },
   ];
 
@@ -135,17 +135,17 @@ export function FloatingContactWidget() {
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
+      if (event.key === 'Escape') {
         setOpen(false);
       }
     };
 
-    document.addEventListener("pointerdown", handlePointerDown);
-    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener('pointerdown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      document.removeEventListener("pointerdown", handlePointerDown);
-      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener('pointerdown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
 
@@ -177,17 +177,17 @@ export function FloatingContactWidget() {
   const actualTop = viewport.height
     ? viewport.height - BOTTOM_GAP - BUTTON_SIZE + clampedOffset.y
     : 0;
-  const labelSide: "left" | "right" =
+  const labelSide: 'left' | 'right' =
     viewport.width && actualLeft + BUTTON_SIZE / 2 < viewport.width / 2
-      ? "right"
-      : "left";
-  const stackDirection: "up" | "down" =
+      ? 'right'
+      : 'left';
+  const stackDirection: 'up' | 'down' =
     viewport.height && actualTop + BUTTON_SIZE / 2 < viewport.height / 2
-      ? "down"
-      : "up";
+      ? 'down'
+      : 'up';
 
   const handlePointerDown = (event: ReactPointerEvent<HTMLButtonElement>) => {
-    if (event.pointerType === "mouse" && event.button !== 0) return;
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
 
     event.currentTarget.setPointerCapture(event.pointerId);
     dragRef.current = {
@@ -260,17 +260,17 @@ export function FloatingContactWidget() {
         className="relative h-14 w-14"
         style={{
           transform: `translate3d(${clampedOffset.x}px, ${clampedOffset.y}px, 0)`,
-          touchAction: "none",
-          willChange: "transform",
+          touchAction: 'none',
+          willChange: 'transform',
         }}
       >
         <div
           className={`absolute flex flex-col gap-3 transition-all duration-300 ease-out motion-reduce:transition-none ${
             open
-              ? "pointer-events-auto scale-100 translate-y-0 opacity-100"
-              : "pointer-events-none scale-95 translate-y-2 opacity-0"
-          } ${stackDirection === "up" ? "bottom-full mb-3" : "top-full mt-3"} ${
-            labelSide === "left" ? "items-end right-0" : "items-start left-0"
+              ? 'pointer-events-auto scale-100 translate-y-0 opacity-100'
+              : 'pointer-events-none scale-95 translate-y-2 opacity-0'
+          } ${stackDirection === 'up' ? 'bottom-full mb-3' : 'top-full mt-3'} ${
+            labelSide === 'left' ? 'items-end right-0' : 'items-start left-0'
           }`}
         >
           {actions.map((action) => {
@@ -284,9 +284,9 @@ export function FloatingContactWidget() {
                 <FloatingLabel side={labelSide}>{action.label}</FloatingLabel>
                 <a
                   href={action.href}
-                  target={action.href.startsWith("http") ? "_blank" : undefined}
+                  target={action.href.startsWith('http') ? '_blank' : undefined}
                   rel={
-                    action.href.startsWith("http") ? "noreferrer" : undefined
+                    action.href.startsWith('http') ? 'noreferrer' : undefined
                   }
                   aria-label={action.label}
                   onClick={() => setOpen(false)}
@@ -306,13 +306,13 @@ export function FloatingContactWidget() {
           onPointerUp={resetDragState}
           onPointerCancel={resetDragState}
           aria-expanded={open}
-          aria-label={open ? "Hide contact actions" : "Open contact actions"}
+          aria-label={open ? 'Hide contact actions' : 'Open contact actions'}
           className={`inline-flex h-14 w-14 items-center justify-center rounded-full border border-white/80 text-white shadow-[0_14px_28px_rgba(15,23,42,0.18)] transition-all duration-300 ease-out hover:scale-105 motion-reduce:transition-none ${
-            open ? "bg-[#8dcf8f]" : "bg-[#6fd58b]"
+            open ? 'bg-[#8dcf8f]' : 'bg-[#6fd58b]'
           }`}
         >
           <span
-            className={`transition-transform duration-300 ${open ? "rotate-90" : "rotate-0"}`}
+            className={`transition-transform duration-300 ${open ? 'rotate-90' : 'rotate-0'}`}
           >
             {open ? (
               <X className="h-7 w-7 text-white" />

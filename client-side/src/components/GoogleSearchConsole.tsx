@@ -1,4 +1,4 @@
-import { siteConfig } from "@/lib/seo";
+import { siteConfig } from '@/lib/seo';
 
 export function GoogleSearchConsole() {
   const verification = siteConfig.googleVerification;

@@ -1,23 +1,23 @@
-import { model, Schema } from "mongoose";
-import { IProductQuestion } from "./productQuestion.interface";
+import { model, Schema } from 'mongoose';
+import { IProductQuestion } from './productQuestion.interface';
 
 const productQuestionSchema = new Schema<IProductQuestion>(
   {
     product: {
       type: Schema.Types.ObjectId,
-      ref: "Product",
-      required: [true, "Product is required!"],
+      ref: 'Product',
+      required: [true, 'Product is required!'],
       index: true,
     },
     user: {
       type: Schema.Types.ObjectId,
-      ref: "User",
-      required: [true, "User is required!"],
+      ref: 'User',
+      required: [true, 'User is required!'],
       index: true,
     },
     question: {
       type: String,
-      required: [true, "Question is required!"],
+      required: [true, 'Question is required!'],
       trim: true,
       maxlength: 1000,
     },
@@ -28,13 +28,13 @@ const productQuestionSchema = new Schema<IProductQuestion>(
     },
     answeredBy: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       index: true,
     },
     status: {
       type: String,
-      enum: ["pending", "answered", "hidden"],
-      default: "pending",
+      enum: ['pending', 'answered', 'hidden'],
+      default: 'pending',
       index: true,
     },
     answeredAt: {
@@ -46,18 +46,18 @@ const productQuestionSchema = new Schema<IProductQuestion>(
 
 productQuestionSchema.index(
   { product: 1, createdAt: -1 },
-  { name: "product_question_product_createdAt_idx" },
+  { name: 'product_question_product_createdAt_idx' },
 );
 productQuestionSchema.index(
   { status: 1, createdAt: -1 },
-  { name: "product_question_status_createdAt_idx" },
+  { name: 'product_question_status_createdAt_idx' },
 );
 productQuestionSchema.index(
   { user: 1, createdAt: -1 },
-  { name: "product_question_user_createdAt_idx" },
+  { name: 'product_question_user_createdAt_idx' },
 );
 
 export const ProductQuestionModel = model<IProductQuestion>(
-  "ProductQuestion",
+  'ProductQuestion',
   productQuestionSchema,
 );

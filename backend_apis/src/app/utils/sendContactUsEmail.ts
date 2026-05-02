@@ -1,7 +1,7 @@
-import httpStatus from "http-status";
-import nodemailer from "nodemailer";
-import config from "../config";
-import AppError from "./AppError";
+import httpStatus from 'http-status';
+import nodemailer from 'nodemailer';
+import config from '../config';
+import AppError from './AppError';
 
 export interface IContactMessage {
   email: string;
@@ -14,7 +14,7 @@ const sendContactUsEmail = async (payload: IContactMessage) => {
   try {
     // Create a transporter for sending emails
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      service: 'gmail',
       auth: {
         user: config.nodemailer.email,
         pass: config.nodemailer.password,
@@ -111,7 +111,7 @@ const sendContactUsEmail = async (payload: IContactMessage) => {
   } catch {
     throw new AppError(
       httpStatus.INTERNAL_SERVER_ERROR,
-      "Failed to send contact us message",
+      'Failed to send contact us message',
     );
   }
 };

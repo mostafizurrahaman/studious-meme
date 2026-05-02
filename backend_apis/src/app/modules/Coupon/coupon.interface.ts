@@ -1,10 +1,10 @@
-import { Document } from "mongoose";
-import type { TShippingZone } from "../Order/order.constants";
+import { Document } from 'mongoose';
+import type { TShippingZone } from '../Order/order.constants';
 
 export type TCouponDiscountType =
-  | "PERCENTAGE"
-  | "DISCOUNT_AMOUNT"
-  | "FREE_SHIPPING";
+  | 'PERCENTAGE'
+  | 'DISCOUNT_AMOUNT'
+  | 'FREE_SHIPPING';
 
 export interface ICoupon extends Document {
   code: string;

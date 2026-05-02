@@ -62,7 +62,7 @@ OpenCode is an alternative CLI for AI-assisted development that supports **all**
 ```typescript
 export const PrettierPlugin = async ({ $ }) => {
   return {
-    "file.edited": async (event) => {
+    'file.edited': async (event) => {
       if (event.path.match(/\.(ts|tsx|js|jsx)$/)) {
         await $`prettier --write ${event.path}`;
       }
@@ -140,7 +140,7 @@ opencode
 ---
 name: planner
 description: Expert planning specialist...
-tools: ["Read", "Grep", "Glob"]
+tools: ['Read', 'Grep', 'Glob']
 model: opus
 ---
 

@@ -1,17 +1,20 @@
-import httpStatus from "http-status";
-import { Types } from "mongoose";
-import { AppError } from "../../utils";
-import { IUser } from "../User/user.interface";
-import { ProductModel } from "../Product/product.model";
-import { DEFAULT_SELLING_UNIT, normalizeSellingUnit } from "../Product/selling-unit";
-import { CartModel } from "./cart.model";
-import { CartHistoryModel } from "./cartHistory.model";
+import httpStatus from 'http-status';
+import { Types } from 'mongoose';
+import { AppError } from '../../utils';
+import { IUser } from '../User/user.interface';
+import { ProductModel } from '../Product/product.model';
+import {
+  DEFAULT_SELLING_UNIT,
+  normalizeSellingUnit,
+} from '../Product/selling-unit';
+import { CartModel } from './cart.model';
+import { CartHistoryModel } from './cartHistory.model';
 
 const MAX_CART_ITEMS = 50;
 
 const toObjectId = (value: string) => {
   if (!Types.ObjectId.isValid(value)) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Invalid product ID!");
+    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid product ID!');
   }
 
   return new Types.ObjectId(value);
@@ -22,12 +25,12 @@ const getActiveProductSnapshot = async (productId: string) => {
     _id: toObjectId(productId),
     isActive: true,
   })
-    .populate({ path: "brand", match: { isActive: true } })
-    .populate({ path: "category", match: { isActive: true } })
+    .populate({ path: 'brand', match: { isActive: true } })
+    .populate({ path: 'category', match: { isActive: true } })
     .lean();
 
   if (!product || !product.brand || !product.category) {
-    throw new AppError(httpStatus.NOT_FOUND, "Product not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Product not found!');
   }
 
   return {
@@ -41,7 +44,8 @@ const getActiveProductSnapshot = async (productId: string) => {
       sku: product.sku,
       slug: product.slug,
       price: product.price,
-       sellingUnit: normalizeSellingUnit(product.sellingUnit) ?? DEFAULT_SELLING_UNIT,
+      sellingUnit:
+        normalizeSellingUnit(product.sellingUnit) ?? DEFAULT_SELLING_UNIT,
       stock: product.stock,
       weightKg: product.weightKg,
       isNoCOD: product.isNoCOD,
@@ -110,7 +114,7 @@ const addCartItemIntoDB = async (
   await CartHistoryModel.create({
     user: user._id,
     product: product._id,
-    action: "add",
+    action: 'add',
     quantity,
     productSnapshot: snapshot,
   });
@@ -128,7 +132,7 @@ const updateCartItemIntoDB = async (
   );
 
   if (!item) {
-    throw new AppError(httpStatus.NOT_FOUND, "Cart item not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Cart item not found!');
   }
 
   item.quantity = quantity;
@@ -146,7 +150,7 @@ const updateCartItemIntoDB = async (
   await CartHistoryModel.create({
     user: user._id,
     product: item.product,
-    action: "update",
+    action: 'update',
     quantity,
     productSnapshot: item.productSnapshot,
   });
@@ -172,7 +176,7 @@ const removeCartItemFromDB = async (user: IUser, productId: string) => {
     await CartHistoryModel.create({
       user: user._id,
       product: removed.product,
-      action: "remove",
+      action: 'remove',
       quantity: removed.quantity,
       productSnapshot: removed.productSnapshot,
     });
@@ -188,14 +192,14 @@ const clearCartFromDB = async (user: IUser) => {
   cart.totalItems = 0;
   await cart.save();
 
-  await CartHistoryModel.create({ user: user._id, action: "clear" });
+  await CartHistoryModel.create({ user: user._id, action: 'clear' });
 
   return cart.toObject();
 };
 
 const getMyCartFromDB = async (user: IUser) => {
   const cart = await CartModel.findOne({ user: user._id })
-    .populate("items.product")
+    .populate('items.product')
     .lean();
   return cart ?? { user: user._id, items: [], subtotal: 0, totalItems: 0 };
 };
@@ -205,17 +209,17 @@ const getAllCartsFromDB = async (query: Record<string, unknown>) => {
   const limit = Number(query.limit) || 50;
   const skip = (page - 1) * limit;
   const category =
-    typeof query.category === "string" ? query.category.trim() : "";
-  const user = typeof query.user === "string" ? query.user.trim() : "";
+    typeof query.category === 'string' ? query.category.trim() : '';
+  const user = typeof query.user === 'string' ? query.user.trim() : '';
 
   const filter: Record<string, unknown> = {};
   if (user) filter.user = toObjectId(user);
-  if (category) filter["items.productSnapshot.category"] = category;
+  if (category) filter['items.productSnapshot.category'] = category;
 
   const [data, total] = await Promise.all([
     CartHistoryModel.find(filter)
-      .populate("user", "name email phone image role isActive")
-      .populate("product")
+      .populate('user', 'name email phone image role isActive')
+      .populate('product')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
@@ -238,52 +242,52 @@ const getCartInsightsFromDB = async () => {
   const [categorySummary, productSummary, userSummary, total] =
     await Promise.all([
       CartHistoryModel.aggregate([
-        { $match: { action: { $in: ["add", "update", "remove"] } } },
+        { $match: { action: { $in: ['add', 'update', 'remove'] } } },
         {
           $group: {
-            _id: "$productSnapshot.category",
-            count: { $sum: { $ifNull: ["$quantity", 1] } },
-            users: { $addToSet: "$user" },
+            _id: '$productSnapshot.category',
+            count: { $sum: { $ifNull: ['$quantity', 1] } },
+            users: { $addToSet: '$user' },
           },
         },
         {
           $project: {
             _id: 0,
-            category: "$_id",
+            category: '$_id',
             count: 1,
-            userCount: { $size: "$users" },
+            userCount: { $size: '$users' },
           },
         },
         { $sort: { count: -1 } },
       ]),
       CartHistoryModel.aggregate([
-        { $match: { action: { $in: ["add", "update", "remove"] } } },
+        { $match: { action: { $in: ['add', 'update', 'remove'] } } },
         {
           $group: {
-            _id: "$productSnapshot.title",
-            count: { $sum: { $ifNull: ["$quantity", 1] } },
-            category: { $first: "$productSnapshot.category" },
+            _id: '$productSnapshot.title',
+            count: { $sum: { $ifNull: ['$quantity', 1] } },
+            category: { $first: '$productSnapshot.category' },
           },
         },
-        { $project: { _id: 0, product: "$_id", count: 1, category: 1 } },
+        { $project: { _id: 0, product: '$_id', count: 1, category: 1 } },
         { $sort: { count: -1 } },
         { $limit: 10 },
       ]),
       CartHistoryModel.aggregate([
-        { $match: { action: { $in: ["add", "update", "remove", "clear"] } } },
+        { $match: { action: { $in: ['add', 'update', 'remove', 'clear'] } } },
         {
           $group: {
-            _id: "$user",
-            count: { $sum: { $ifNull: ["$quantity", 1] } },
+            _id: '$user',
+            count: { $sum: { $ifNull: ['$quantity', 1] } },
           },
         },
-        { $project: { _id: 0, user: "$_id", count: 1 } },
+        { $project: { _id: 0, user: '$_id', count: 1 } },
         { $sort: { count: -1 } },
         { $limit: 10 },
       ]),
       CartHistoryModel.aggregate([
         {
-          $group: { _id: null, total: { $sum: { $ifNull: ["$quantity", 1] } } },
+          $group: { _id: null, total: { $sum: { $ifNull: ['$quantity', 1] } } },
         },
       ]),
     ]);

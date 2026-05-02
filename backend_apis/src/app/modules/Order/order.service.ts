@@ -12,7 +12,10 @@ import {
 } from './order.interface';
 import { normalizePaymentMethod } from './order.utils';
 import { CouponService } from '../Coupon/coupon.service';
-import { DEFAULT_SELLING_UNIT, normalizeSellingUnit } from '../Product/selling-unit';
+import {
+  DEFAULT_SELLING_UNIT,
+  normalizeSellingUnit,
+} from '../Product/selling-unit';
 
 type CreateOrderPayload = {
   items: Array<{ sku: string; quantity: number }>;
@@ -45,7 +48,10 @@ type ProductForCheckout = {
 
 const parsePrice = (value: number) => {
   if (!Number.isFinite(value)) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid product price found in catalog.');
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Invalid product price found in catalog.',
+    );
   }
 
   return value;
@@ -55,7 +61,10 @@ const parseWeight = (value: number | undefined) => {
   const weight = Number(value ?? 1);
 
   if (!Number.isFinite(weight) || weight < 0.01) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid product weight found in catalog.');
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Invalid product weight found in catalog.',
+    );
   }
 
   return weight;
@@ -68,13 +77,19 @@ const resolveSellingUnit = (value: unknown) => {
   return normalizeSellingUnit(value) ?? DEFAULT_SELLING_UNIT;
 };
 
-const createOrderId = () => `ORD-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
+const createOrderId = () =>
+  `ORD-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
 
 const decrementProductStock = async (sku: string, quantity: number) => {
-  const currentProduct = await ProductModel.findOne({ sku, isActive: true }).select('stock').lean();
+  const currentProduct = await ProductModel.findOne({ sku, isActive: true })
+    .select('stock')
+    .lean();
 
   if (!currentProduct) {
-    throw new AppError(httpStatus.BAD_REQUEST, `Not enough stock available for SKU ${sku}.`);
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `Not enough stock available for SKU ${sku}.`,
+    );
   }
 
   const availableStock = getAvailableStock(currentProduct.stock);
@@ -90,7 +105,10 @@ const decrementProductStock = async (sku: string, quantity: number) => {
   ).lean();
 
   if (!updated) {
-    throw new AppError(httpStatus.BAD_REQUEST, `Not enough stock available for SKU ${sku}.`);
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `Not enough stock available for SKU ${sku}.`,
+    );
   }
 
   return updated;
@@ -113,7 +131,10 @@ const resolveName = (value: unknown) => {
   return 'Unknown';
 };
 
-const buildOrderSnapshot = (product: ProductForCheckout, quantity: number): IOrderItemSnapshot => {
+const buildOrderSnapshot = (
+  product: ProductForCheckout,
+  quantity: number,
+): IOrderItemSnapshot => {
   const unitPrice = parsePrice(product.price);
   const weightKg = parseWeight(product.weightKg);
 
@@ -134,10 +155,13 @@ const buildOrderSnapshot = (product: ProductForCheckout, quantity: number): IOrd
   };
 };
 
-const calculateOrderTotals = (payload: CreateOrderPayload, items: IOrderItemSnapshot[]) =>
+const calculateOrderTotals = (
+  payload: CreateOrderPayload,
+  items: IOrderItemSnapshot[],
+) =>
   CouponService.calculateCouponCheckoutSummary({
     couponCode: payload.couponCode,
-    items: items.map(item => ({
+    items: items.map((item) => ({
       unitPrice: item.unitPrice,
       quantity: item.quantity,
       weightKg: item.weightKg,
@@ -149,7 +173,7 @@ const calculateOrderTotals = (payload: CreateOrderPayload, items: IOrderItemSnap
 
 // 1. previewCheckoutFromDB
 const previewCheckoutFromDB = async (payload: CreateOrderPayload) => {
-  const skuList = payload.items.map(item => item.sku);
+  const skuList = payload.items.map((item) => item.sku);
   const products = (await ProductModel.find({
     sku: { $in: skuList },
     isActive: true,
@@ -159,26 +183,38 @@ const previewCheckoutFromDB = async (payload: CreateOrderPayload) => {
     .lean()) as ProductForCheckout[];
 
   if (products.length !== skuList.length) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'One or more products are unavailable for ordering.');
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'One or more products are unavailable for ordering.',
+    );
   }
 
-  const productMap = new Map(products.map(product => [product.sku, product]));
+  const productMap = new Map(products.map((product) => [product.sku, product]));
 
-  const items: IOrderItemSnapshot[] = payload.items.map(item => {
+  const items: IOrderItemSnapshot[] = payload.items.map((item) => {
     const product = productMap.get(item.sku);
 
     if (!product) {
-      throw new AppError(httpStatus.BAD_REQUEST, `Product with SKU ${item.sku} is unavailable.`);
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        `Product with SKU ${item.sku} is unavailable.`,
+      );
     }
 
     if (!Number.isInteger(item.quantity) || item.quantity <= 0) {
-      throw new AppError(httpStatus.BAD_REQUEST, `Invalid quantity for SKU ${item.sku}.`);
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        `Invalid quantity for SKU ${item.sku}.`,
+      );
     }
 
     const unitStock = getAvailableStock(product.stock);
 
     if (unitStock !== null && unitStock < item.quantity) {
-      throw new AppError(httpStatus.BAD_REQUEST, `Not enough stock available for SKU ${item.sku}.`);
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        `Not enough stock available for SKU ${item.sku}.`,
+      );
     }
 
     return buildOrderSnapshot(product, item.quantity);
@@ -214,7 +250,7 @@ const previewCheckoutFromDB = async (payload: CreateOrderPayload) => {
 
 // 2. createOrderIntoDB
 const createOrderIntoDB = async (user: IUser, payload: CreateOrderPayload) => {
-  const skuList = payload.items.map(item => item.sku);
+  const skuList = payload.items.map((item) => item.sku);
   const products = (await ProductModel.find({
     sku: { $in: skuList },
     isActive: true,
@@ -224,29 +260,41 @@ const createOrderIntoDB = async (user: IUser, payload: CreateOrderPayload) => {
     .lean()) as ProductForCheckout[];
 
   if (products.length !== skuList.length) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'One or more products are unavailable for ordering.');
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'One or more products are unavailable for ordering.',
+    );
   }
 
-  const productMap = new Map(products.map(product => [product.sku, product]));
+  const productMap = new Map(products.map((product) => [product.sku, product]));
 
   const updatedStocks: Array<{ sku: string; quantity: number }> = [];
 
   try {
-    const items: IOrderItemSnapshot[] = payload.items.map(item => {
+    const items: IOrderItemSnapshot[] = payload.items.map((item) => {
       const product = productMap.get(item.sku);
 
       if (!product) {
-        throw new AppError(httpStatus.BAD_REQUEST, `Product with SKU ${item.sku} is unavailable.`);
+        throw new AppError(
+          httpStatus.BAD_REQUEST,
+          `Product with SKU ${item.sku} is unavailable.`,
+        );
       }
 
       if (!Number.isInteger(item.quantity) || item.quantity <= 0) {
-        throw new AppError(httpStatus.BAD_REQUEST, `Invalid quantity for SKU ${item.sku}.`);
+        throw new AppError(
+          httpStatus.BAD_REQUEST,
+          `Invalid quantity for SKU ${item.sku}.`,
+        );
       }
 
       const unitStock = getAvailableStock(product.stock);
 
       if (unitStock !== null && unitStock < item.quantity) {
-        throw new AppError(httpStatus.BAD_REQUEST, `Not enough stock available for SKU ${item.sku}.`);
+        throw new AppError(
+          httpStatus.BAD_REQUEST,
+          `Not enough stock available for SKU ${item.sku}.`,
+        );
       }
 
       return buildOrderSnapshot(product, item.quantity);
@@ -270,19 +318,24 @@ const createOrderIntoDB = async (user: IUser, payload: CreateOrderPayload) => {
     } = await calculateOrderTotals(payload, items);
     const delivery = shippingCharge;
     const total = payableAmount;
-    const normalizedPaymentMethod = normalizePaymentMethod(payload.paymentMethod);
+    const normalizedPaymentMethod = normalizePaymentMethod(
+      payload.paymentMethod,
+    );
 
     if (normalizedPaymentMethod === 'CASH_ON_DELIVERY' && !codEligible) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
-        codReasons.includes('COD is not available for one or more products in your cart.')
+        codReasons.includes(
+          'COD is not available for one or more products in your cart.',
+        )
           ? 'COD is not available for one or more products in your cart.'
           : 'COD is not available for orders of 1000 BDT or below.',
       );
     }
 
     const paymentStatus: TPaymentStatus = 'UNPAID';
-    const orderStatus: TOrderStatus = normalizedPaymentMethod === 'PORTPOS' ? 'PENDING_PAYMENT' : 'PLACED';
+    const orderStatus: TOrderStatus =
+      normalizedPaymentMethod === 'PORTPOS' ? 'PENDING_PAYMENT' : 'PLACED';
     const paymentGateway: TPaymentGateway =
       normalizedPaymentMethod === 'PORTPOS' ? 'PORTPOS' : 'CASH_ON_DELIVERY';
 
@@ -317,8 +370,11 @@ const createOrderIntoDB = async (user: IUser, payload: CreateOrderPayload) => {
     return order;
   } catch (error) {
     await Promise.all(
-      updatedStocks.map(item =>
-        ProductModel.updateOne({ sku: item.sku }, { $inc: { stock: item.quantity } }),
+      updatedStocks.map((item) =>
+        ProductModel.updateOne(
+          { sku: item.sku },
+          { $inc: { stock: item.quantity } },
+        ),
       ),
     );
 
@@ -327,13 +383,20 @@ const createOrderIntoDB = async (user: IUser, payload: CreateOrderPayload) => {
 };
 
 // 3. getMyOrdersFromDB
-const getMyOrdersFromDB = async (user: IUser, query: Record<string, unknown> = {}) => {
+const getMyOrdersFromDB = async (
+  user: IUser,
+  query: Record<string, unknown> = {},
+) => {
   const page = Number(query.page) || 1;
   const limit = Number(query.limit) || 50;
   const skip = (page - 1) * limit;
 
   const [data, total] = await Promise.all([
-    OrderModel.find({ user: user._id }).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+    OrderModel.find({ user: user._id })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
     OrderModel.countDocuments({ user: user._id }),
   ]);
 
@@ -393,7 +456,10 @@ const getAllOrdersForAdminFromDB = async (query: Record<string, unknown>) => {
 };
 
 // 6. updateOrderStatusIntoDB
-const updateOrderStatusIntoDB = async (orderId: string, status: TOrderStatus) => {
+const updateOrderStatusIntoDB = async (
+  orderId: string,
+  status: TOrderStatus,
+) => {
   const order = await OrderModel.findOneAndUpdate(
     { orderId },
     { status },

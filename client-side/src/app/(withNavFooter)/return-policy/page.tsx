@@ -1,12 +1,12 @@
-import { ManagedPageContent } from "@/components/ManagedPageContent";
-import { SeoScripts } from "@/components/SeoScripts";
-import { deliveryReturnMetadata, deliveryReturnSchemas } from "@/lib/seo";
-import { getPageByType } from "@/services/Page";
+import { ManagedPageContent } from '@/components/ManagedPageContent';
+import { SeoScripts } from '@/components/SeoScripts';
+import { deliveryReturnMetadata, deliveryReturnSchemas } from '@/lib/seo';
+import { getPageByType } from '@/services/Page';
 
 export const metadata = deliveryReturnMetadata;
 
 export default async function ReturnPolicyPage() {
-  const pageResult = await getPageByType("return-policy").catch(() => null);
+  const pageResult = await getPageByType('return-policy').catch(() => null);
 
   return (
     <>

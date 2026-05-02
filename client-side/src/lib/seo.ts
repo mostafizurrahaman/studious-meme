@@ -1,11 +1,18 @@
 import type { Metadata } from 'next';
 import { parseMoney } from '@/lib/cart';
-import { getProductPrimaryImage, type Brand, type Category, type Product } from '@/lib/storefront-types';
+import {
+  getProductPrimaryImage,
+  type Brand,
+  type Category,
+  type Product,
+} from '@/lib/storefront-types';
 import { isInStockLabel } from '@/lib/stock';
 
 export const siteConfig = {
   name: 'Malamal.com.bd',
-  url: process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ?? 'https://malamal.com.bd',
+  url:
+    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ??
+    'https://malamal.com.bd',
   description:
     'Best Online Hardware Store in Bangladesh - Buy tools & hardware for sale online near Dhaka at low prices.',
   phone: '+880 9638212121',
@@ -13,7 +20,8 @@ export const siteConfig = {
   supportEmail: 'info@malamal.com.bd',
   address: 'Level 11 & 12, Medona Tower, 28, Mohakhali C/A, Dhaka-1212.',
   ogImage: process.env.NEXT_PUBLIC_SITE_OG_IMAGE?.trim() || '/logo.png',
-  googleVerification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim() || '',
+  googleVerification:
+    process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim() || '',
 };
 
 type AboutSection = {
@@ -69,7 +77,9 @@ export const siteAboutSections: AboutSection[] = [
   },
 ];
 
-export const siteFullDescription = siteAboutSections.map(s => `${s.heading}\n${s.content}`).join('\n\n');
+export const siteFullDescription = siteAboutSections
+  .map((s) => `${s.heading}\n${s.content}`)
+  .join('\n\n');
 
 export function absoluteUrl(path: string) {
   return new URL(path, siteConfig.url).toString();
@@ -87,9 +97,17 @@ type MetadataInput = {
   noindex?: boolean;
 };
 
-export function buildMetadata({ title, description, path, image, noindex = false }: MetadataInput): Metadata {
+export function buildMetadata({
+  title,
+  description,
+  path,
+  image,
+  noindex = false,
+}: MetadataInput): Metadata {
   const resolvedImage = image ?? siteConfig.ogImage;
-  const images = resolvedImage ? [{ url: absoluteUrl(resolvedImage) }] : undefined;
+  const images = resolvedImage
+    ? [{ url: absoluteUrl(resolvedImage) }]
+    : undefined;
 
   return {
     title,
@@ -97,7 +115,9 @@ export function buildMetadata({ title, description, path, image, noindex = false
     alternates: {
       canonical: absoluteUrl(path),
     },
-    robots: noindex ? { index: false, follow: false } : { index: true, follow: true },
+    robots: noindex
+      ? { index: false, follow: false }
+      : { index: true, follow: true },
     icons: {
       icon: '/icon.png',
       shortcut: '/icon.png',
@@ -115,7 +135,7 @@ export function buildMetadata({ title, description, path, image, noindex = false
       card: 'summary_large_image',
       title,
       description,
-      images: images?.map(item => item.url),
+      images: images?.map((item) => item.url),
     },
   };
 }
@@ -180,13 +200,15 @@ export const shopByBrandsMetadata = buildMetadata({
 
 export const promotionsMetadata = buildMetadata({
   title: 'Promotions & Offers - Hardware Deals',
-  description: 'View current promotional offers and campaign products on sale at Malamal.',
+  description:
+    'View current promotional offers and campaign products on sale at Malamal.',
   path: '/promotions',
 });
 
 export const cartMetadata = buildMetadata({
   title: 'Shopping Cart - Review Your Order',
-  description: 'Review selected products in your shopping cart before checkout.',
+  description:
+    'Review selected products in your shopping cart before checkout.',
   path: '/cart',
   noindex: true,
 });
@@ -214,7 +236,8 @@ export const compareMetadata = buildMetadata({
 
 export const quotationRequestMetadata = buildMetadata({
   title: 'Request a Quotation - Bulk Orders',
-  description: 'Request bulk pricing and wholesale quotations for project and procurement needs.',
+  description:
+    'Request bulk pricing and wholesale quotations for project and procurement needs.',
   path: '/quotation-request',
 });
 
@@ -227,28 +250,32 @@ export const ourContactsMetadata = buildMetadata({
 
 export const privacyPolicyMetadata = buildMetadata({
   title: 'Privacy Policy - Data Protection',
-  description: 'Learn how Malamal collects, uses and protects your personal information.',
+  description:
+    'Learn how Malamal collects, uses and protects your personal information.',
   path: '/privacy-policy',
   noindex: false,
 });
 
 export const termsAndConditionMetadata = buildMetadata({
   title: 'Terms and Conditions - Legal',
-  description: 'Read the terms and conditions for using Malamal storefront and services.',
+  description:
+    'Read the terms and conditions for using Malamal storefront and services.',
   path: '/terms-and-conditions',
   noindex: false,
 });
 
 export const deliveryReturnMetadata = buildMetadata({
   title: 'Delivery & Return Policy',
-  description: 'Learn about our delivery coverage, return procedures and policies.',
+  description:
+    'Learn about our delivery coverage, return procedures and policies.',
   path: '/return-policy',
   noindex: false,
 });
 
 export const aboutUsMetadata = buildMetadata({
   title: 'About Us',
-  description: 'Learn about Malamal, your trusted online hardware store in Bangladesh.',
+  description:
+    'Learn about Malamal, your trusted online hardware store in Bangladesh.',
   path: '/about-us',
 });
 
@@ -288,7 +315,9 @@ export function buildProductMetadata(product: {
 }) {
   const image = getProductPrimaryImage(product);
 
-  const descriptionParts = [product.description, product.features].filter(Boolean);
+  const descriptionParts = [product.description, product.features].filter(
+    Boolean,
+  );
 
   const fullDescription = descriptionParts.join(' ').slice(0, 160); // SEO friendly
 
@@ -302,7 +331,7 @@ export function buildProductMetadata(product: {
       description: fullDescription,
       url: `${siteConfig.url}/product/${product.slug}`,
       images: product.images?.length
-        ? product.images.map(img => ({ url: img }))
+        ? product.images.map((img) => ({ url: img }))
         : image
           ? [{ url: image }]
           : [],
@@ -357,7 +386,9 @@ function buildCollectionSchema(
   };
 }
 
-export function buildBreadcrumbSchema(items: Array<{ name: string; url: string }>) {
+export function buildBreadcrumbSchema(
+  items: Array<{ name: string; url: string }>,
+) {
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -382,7 +413,7 @@ export function buildFaqSchema(
     name,
     description,
     url: absoluteUrl(path),
-    mainEntity: questions.map(item => ({
+    mainEntity: questions.map((item) => ({
       '@type': 'Question',
       name: item.question,
       acceptedAnswer: {
@@ -393,7 +424,11 @@ export function buildFaqSchema(
   };
 }
 
-export function buildArticleSchema(title: string, description: string, path: string) {
+export function buildArticleSchema(
+  title: string,
+  description: string,
+  path: string,
+) {
   return {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -460,7 +495,7 @@ const organizationSchema = {
 const aboutPageSchema = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
-  mainEntity: siteAboutSections.map(section => ({
+  mainEntity: siteAboutSections.map((section) => ({
     '@type': 'Question',
     name: section.heading,
     acceptedAnswer: {
@@ -489,17 +524,17 @@ export function buildHomeSchemas(input?: {
   const brandItems = input?.brands ?? [];
 
   const items = [
-    ...categories.slice(0, 8).map(category => ({
+    ...categories.slice(0, 8).map((category) => ({
       name: category.name,
       url: category.href,
       image: category.image ? absoluteUrl(category.image) : undefined,
     })),
-    ...products.slice(0, 10).map(product => ({
+    ...products.slice(0, 10).map((product) => ({
       name: product.title,
       url: `/product/${product.slug}`,
       image: getProductPrimaryImage(product),
     })),
-    ...brandItems.slice(0, 8).map(brand => ({
+    ...brandItems.slice(0, 8).map((brand) => ({
       name: brand.name,
       url: brand.href,
       image: brand.image,
@@ -544,11 +579,13 @@ export function buildShopSchemas(products: Product[], categories: Category[]) {
         },
         {
           question: 'Do products show stock and pricing?',
-          answer: 'Yes. Product cards show the current catalog price, stock status and brand information.',
+          answer:
+            'Yes. Product cards show the current catalog price, stock status and brand information.',
         },
         {
           question: 'Can I check out from the shop page?',
-          answer: 'Yes. Add products to cart, review the summary and proceed to checkout when ready.',
+          answer:
+            'Yes. Add products to cart, review the summary and proceed to checkout when ready.',
         },
       ],
     ),
@@ -556,7 +593,7 @@ export function buildShopSchemas(products: Product[], categories: Category[]) {
       'Shop Catalog',
       'Browse products from the hardware catalog.',
       '/shop',
-      products.slice(0, 50).map(product => ({
+      products.slice(0, 50).map((product) => ({
         name: product.title,
         url: `/product/${product.slug}`,
         image: getProductPrimaryImage(product),
@@ -566,7 +603,7 @@ export function buildShopSchemas(products: Product[], categories: Category[]) {
       'Shop Categories',
       'Browse the storefront category structure.',
       '/main-categories',
-      categories.slice(0, 20).map(category => ({
+      categories.slice(0, 20).map((category) => ({
         name: category.name,
         url: category.href,
         image: category.image ? absoluteUrl(category.image) : undefined,
@@ -609,11 +646,13 @@ export function buildCategorySchemas(
         },
         {
           question: 'Are product prices and stock shown here?',
-          answer: 'Yes. Product cards show the current catalog price, stock status and brand information.',
+          answer:
+            'Yes. Product cards show the current catalog price, stock status and brand information.',
         },
         {
           question: 'Can I open a product from this category page?',
-          answer: 'Yes. Select any product card to view details, add it to cart or place an order.',
+          answer:
+            'Yes. Select any product card to view details, add it to cart or place an order.',
         },
       ],
     ),
@@ -621,7 +660,7 @@ export function buildCategorySchemas(
       title,
       category.description,
       `/category/${category.slug}`,
-      products.map(product => ({
+      products.map((product) => ({
         name: product.title,
         url: `/product/${product.slug}`,
         image: getProductPrimaryImage(product),
@@ -642,7 +681,7 @@ export function buildMainCategoriesSchemas(categories: Category[]) {
       'All Categories',
       'Explore the storefront category structure.',
       '/main-categories',
-      items.map(category => ({
+      items.map((category) => ({
         name: category.name,
         url: category.href,
         image: category.image ? absoluteUrl(category.image) : undefined,
@@ -663,7 +702,7 @@ export function buildShopByBrandsSchemas(brandItems: Brand[]) {
       'Shop By Brands',
       'Browse the trusted brands used across the storefront.',
       '/shop-by-brands',
-      items.map(brand => ({
+      items.map((brand) => ({
         name: brand.name,
         url: brand.href,
         image: brand.image,
@@ -684,7 +723,7 @@ export function buildPromotionsSchemas(products: Product[]) {
       'Promotions',
       'View the current promotional offers and campaign products.',
       '/promotions',
-      items.slice(0, 50).map(product => ({
+      items.slice(0, 50).map((product) => ({
         name: product.title,
         url: `/product/${product.slug}`,
         image: getProductPrimaryImage(product),
@@ -698,7 +737,11 @@ export const cartSchemas = [
     { name: 'Home', url: '/' },
     { name: 'Cart', url: '/cart' },
   ]),
-  buildWebPageSchema('Shopping Cart', 'Review selected products before checkout.', '/cart'),
+  buildWebPageSchema(
+    'Shopping Cart',
+    'Review selected products before checkout.',
+    '/cart',
+  ),
 ];
 
 export const checkoutSchemas = [
@@ -707,7 +750,11 @@ export const checkoutSchemas = [
     { name: 'Cart', url: '/cart' },
     { name: 'Checkout', url: '/checkout' },
   ]),
-  buildWebPageSchema('Checkout', 'Complete your order and submit delivery details.', '/checkout'),
+  buildWebPageSchema(
+    'Checkout',
+    'Complete your order and submit delivery details.',
+    '/checkout',
+  ),
 ];
 
 export const wishlistSchemas = [
@@ -715,7 +762,11 @@ export const wishlistSchemas = [
     { name: 'Home', url: '/' },
     { name: 'Wishlist', url: '/wishlist' },
   ]),
-  buildWebPageSchema('Wishlist', 'Review saved products and shortlist items for later.', '/wishlist'),
+  buildWebPageSchema(
+    'Wishlist',
+    'Review saved products and shortlist items for later.',
+    '/wishlist',
+  ),
 ];
 
 export const compareSchemas = [
@@ -723,7 +774,11 @@ export const compareSchemas = [
     { name: 'Home', url: '/' },
     { name: 'Compare', url: '/compare' },
   ]),
-  buildWebPageSchema('Compare Products', 'Compare product details side by side.', '/compare'),
+  buildWebPageSchema(
+    'Compare Products',
+    'Compare product details side by side.',
+    '/compare',
+  ),
 ];
 
 export const ourContactsSchemas = [
@@ -735,7 +790,8 @@ export const ourContactsSchemas = [
     '@context': 'https://schema.org',
     '@type': 'ContactPage',
     name: 'Contact Malamal.com.bd',
-    description: 'Hotline, email, WhatsApp and office details for sales and support.',
+    description:
+      'Hotline, email, WhatsApp and office details for sales and support.',
     url: absoluteUrl('/our-contacts'),
     mainEntity: organizationSchema,
   },
@@ -768,7 +824,8 @@ export const quotationRequestSchemas = [
       },
       {
         question: 'Is quotation support available for bulk orders?',
-        answer: 'Yes. The request form is designed for wholesale, procurement and project buying workflows.',
+        answer:
+          'Yes. The request form is designed for wholesale, procurement and project buying workflows.',
       },
     ],
   ),
@@ -776,7 +833,8 @@ export const quotationRequestSchemas = [
     '@context': 'https://schema.org',
     '@type': 'Service',
     name: 'Bulk Quotation Request',
-    description: 'Request project and wholesale pricing for hardware and industrial products.',
+    description:
+      'Request project and wholesale pricing for hardware and industrial products.',
     serviceType: 'Wholesale and bulk quotation',
     provider: organizationSchema,
     areaServed: 'BD',
@@ -939,7 +997,11 @@ export const myAccountSchemas = [
     { name: 'Home', url: '/' },
     { name: 'My Account', url: '/my-account' },
   ]),
-  buildWebPageSchema('My Account', 'Manage your account, orders, addresses and preferences.', '/my-account'),
+  buildWebPageSchema(
+    'My Account',
+    'Manage your account, orders, addresses and preferences.',
+    '/my-account',
+  ),
 ];
 
 export const ordersSchemas = [

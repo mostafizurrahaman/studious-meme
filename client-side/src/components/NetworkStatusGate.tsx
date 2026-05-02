@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useSyncExternalStore } from "react";
-import { RefreshCcw, WifiOff } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import Link from 'next/link';
+import { useSyncExternalStore } from 'react';
+import { RefreshCcw, WifiOff } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 function subscribe(callback: () => void) {
-  window.addEventListener("online", callback);
-  window.addEventListener("offline", callback);
+  window.addEventListener('online', callback);
+  window.addEventListener('offline', callback);
 
   return () => {
-    window.removeEventListener("online", callback);
-    window.removeEventListener("offline", callback);
+    window.removeEventListener('online', callback);
+    window.removeEventListener('offline', callback);
   };
 }
 
@@ -38,7 +38,7 @@ export function NetworkStatusGate() {
   return (
     <div
       className={cn(
-        "fixed inset-0 z-[200] flex items-start justify-center overflow-y-auto overflow-x-hidden bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.15),transparent_28%),radial-gradient(circle_at_20%_80%,rgba(249,115,22,0.12),transparent_26%),linear-gradient(180deg,#07111f_0%,#020617_100%)] px-4 py-5 sm:items-center sm:px-6",
+        'fixed inset-0 z-[200] flex items-start justify-center overflow-y-auto overflow-x-hidden bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.15),transparent_28%),radial-gradient(circle_at_20%_80%,rgba(249,115,22,0.12),transparent_26%),linear-gradient(180deg,#07111f_0%,#020617_100%)] px-4 py-5 sm:items-center sm:px-6',
       )}
       role="alert"
       aria-live="assertive"
@@ -76,9 +76,9 @@ export function NetworkStatusGate() {
 
               <div className="grid gap-3 text-sm text-white/82 sm:grid-cols-3">
                 {[
-                  "Check Wi-Fi or mobile data",
-                  "Turn off airplane mode",
-                  "Tap reload when connected",
+                  'Check Wi-Fi or mobile data',
+                  'Turn off airplane mode',
+                  'Tap reload when connected',
                 ].map((item) => (
                   <div
                     key={item}

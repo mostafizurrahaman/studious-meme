@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router } from 'express';
 import {
   adminLimiter,
   auth,
@@ -6,16 +6,16 @@ import {
   burstProtection,
   duplicateSubmissionGuard,
   validateRequest,
-} from "../../middlewares";
-import { ROLE } from "../User/user.constant";
-import { ContactValidation } from "./contact.validation";
-import { ContactController } from "./contact.controller";
+} from '../../middlewares';
+import { ROLE } from '../User/user.constant';
+import { ContactValidation } from './contact.validation';
+import { ContactController } from './contact.controller';
 
 const router = Router();
 
 // 1. adminGetAllContacts
 router
-  .route("/")
+  .route('/')
   .get(
     auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
     adminLimiter,
@@ -23,10 +23,10 @@ router
   );
 
 // 2. createContact
-router.route("/").post(
+router.route('/').post(
   // auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN),
   authLimiter,
-  burstProtection("auth", 10_000, 6),
+  burstProtection('auth', 10_000, 6),
   duplicateSubmissionGuard(),
   validateRequest(ContactValidation.createContactValidation),
   ContactController.createContact,

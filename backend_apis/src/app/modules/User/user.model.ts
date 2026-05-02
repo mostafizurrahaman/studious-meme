@@ -1,21 +1,21 @@
-import bcrypt from "bcryptjs";
-import { Aggregate, model, Query, Schema } from "mongoose";
-import config from "../../config";
-import { defaultUserImage, ROLE } from "./user.constant";
-import { IUser, IUserModel } from "./user.interface";
-import { AppError } from "../../utils";
-import httpStatus from "http-status";
+import bcrypt from 'bcryptjs';
+import { Aggregate, model, Query, Schema } from 'mongoose';
+import config from '../../config';
+import { defaultUserImage, ROLE } from './user.constant';
+import { IUser, IUserModel } from './user.interface';
+import { AppError } from '../../utils';
+import httpStatus from 'http-status';
 
 const userSchema = new Schema<IUser, IUserModel>(
   {
     name: {
       type: String,
-      required: [true, "Name is required!"],
+      required: [true, 'Name is required!'],
     },
 
     phone: {
       type: String,
-      default: "N/A",
+      default: 'N/A',
     },
 
     dob: {
@@ -30,8 +30,8 @@ const userSchema = new Schema<IUser, IUserModel>(
 
     email: {
       type: String,
-      required: [true, "Email is required!"],
-      unique: [true, "This email is already used!"],
+      required: [true, 'Email is required!'],
+      unique: [true, 'This email is already used!'],
     },
 
     password: {
@@ -84,17 +84,17 @@ const userSchema = new Schema<IUser, IUserModel>(
 
 userSchema.index(
   { role: 1, createdAt: -1 },
-  { name: "user_role_createdAt_idx" },
+  { name: 'user_role_createdAt_idx' },
 );
 
 // Custom hooks/methods
 
 // Hash password before saving
-userSchema.pre("save", async function (this: IUser) {
+userSchema.pre('save', async function (this: IUser) {
   // only hash if new user OR password modified
-  if (this.isNew || this.isModified("password")) {
+  if (this.isNew || this.isModified('password')) {
     if (!this.password) {
-      throw new AppError(httpStatus.BAD_REQUEST, "Password is required!");
+      throw new AppError(httpStatus.BAD_REQUEST, 'Password is required!');
     }
 
     // 🔑 hash password
@@ -104,16 +104,16 @@ userSchema.pre("save", async function (this: IUser) {
     );
 
     // ⏱️ set password changed time
-    if (!this.isModified("passwordChangedAt")) {
+    if (!this.isModified('passwordChangedAt')) {
       this.passwordChangedAt = new Date();
     }
   }
 });
 
 // Clear password after saving
-userSchema.post("save", function (doc: IUser, next) {
+userSchema.post('save', function (doc: IUser, next) {
   if (doc) {
-    doc.password = "";
+    doc.password = '';
   }
   next();
 });
@@ -154,7 +154,7 @@ userSchema.pre(/^find/, function (this: Query<IUser, IUser>) {
 // });
 
 // aggregation query
-userSchema.pre("aggregate", function (this: Aggregate<IUser>) {
+userSchema.pre('aggregate', function (this: Aggregate<IUser>) {
   this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
 });
 
@@ -162,7 +162,7 @@ userSchema.pre("aggregate", function (this: Aggregate<IUser>) {
 userSchema.statics.isUserExistsByEmailWithPassword = async function (
   email: string,
 ): Promise<IUser | null> {
-  return await UserModel.findOne({ email }).select("+password");
+  return await UserModel.findOne({ email }).select('+password');
 };
 
 // isPasswordMatched
@@ -184,6 +184,6 @@ userSchema.methods.isJWTIssuedBeforePasswordChanged = function (
   return passwordChangedTime > jwtIssuedTimestamp;
 };
 
-const UserModel = model<IUser, IUserModel>("User", userSchema);
+const UserModel = model<IUser, IUserModel>('User', userSchema);
 
 export default UserModel;

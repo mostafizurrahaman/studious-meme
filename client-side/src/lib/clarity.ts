@@ -1,5 +1,5 @@
 export function getClarityId(): string {
-  return process.env.NEXT_PUBLIC_CLARITY_ID?.trim() ?? "";
+  return process.env.NEXT_PUBLIC_CLARITY_ID?.trim() ?? '';
 }
 
 export function isClarityEnabled(): boolean {

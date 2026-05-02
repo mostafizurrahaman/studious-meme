@@ -1,5 +1,5 @@
-import { TPageSlugs } from "./page.constant";
-import { Document } from "mongoose";
+import { TPageSlugs } from './page.constant';
+import { Document } from 'mongoose';
 
 export interface IPage extends Document {
   slug: TPageSlugs;

@@ -201,9 +201,9 @@ const {
   loading,
   error,
   refetch,
-} = useQuery("markets", () => fetch("/api/markets").then((r) => r.json()), {
-  onSuccess: (data) => console.log("Fetched", data.length, "markets"),
-  onError: (err) => console.error("Failed:", err),
+} = useQuery('markets', () => fetch('/api/markets').then((r) => r.json()), {
+  onSuccess: (data) => console.log('Fetched', data.length, 'markets'),
+  onError: (err) => console.error('Failed:', err),
 });
 ```
 
@@ -225,7 +225,7 @@ export function useDebounce<T>(value: T, delay: number): T {
 }
 
 // Usage
-const [searchQuery, setSearchQuery] = useState("");
+const [searchQuery, setSearchQuery] = useState('');
 const debouncedQuery = useDebounce(searchQuery, 500);
 
 useEffect(() => {

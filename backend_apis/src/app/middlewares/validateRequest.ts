@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { NextFunction, Request, Response } from "express";
-import { AppError, asyncHandler } from "../utils";
-import { ZodObject } from "zod";
-import httpStatus from "http-status";
+import { NextFunction, Request, Response } from 'express';
+import { AppError, asyncHandler } from '../utils';
+import { ZodObject } from 'zod';
+import httpStatus from 'http-status';
 
 // validateRequest
 export const validateRequest = (schema: ZodObject<any, any>) => {

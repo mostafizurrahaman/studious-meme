@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router } from 'express';
 import {
   actionLimiter,
   adminLimiter,
@@ -6,15 +6,15 @@ import {
   burstProtection,
   duplicateSubmissionGuard,
   validateRequest,
-} from "../../middlewares";
-import { ROLE } from "../User/user.constant";
-import { CartController } from "./cart.controller";
-import { CartValidation } from "./cart.validation";
+} from '../../middlewares';
+import { ROLE } from '../User/user.constant';
+import { CartController } from './cart.controller';
+import { CartValidation } from './cart.validation';
 
 const router = Router();
 
 router
-  .route("/")
+  .route('/')
   .get(
     auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN),
     actionLimiter,
@@ -22,11 +22,11 @@ router
   );
 
 router
-  .route("/items")
+  .route('/items')
   .post(
     auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN),
     actionLimiter,
-    burstProtection("action", 10_000, 12),
+    burstProtection('action', 10_000, 12),
     duplicateSubmissionGuard(),
     validateRequest(CartValidation.cartAddSchema),
     CartController.addCartItem,
@@ -39,7 +39,7 @@ router
   );
 
 router
-  .route("/items/:productId")
+  .route('/items/:productId')
   .delete(
     auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN),
     actionLimiter,
@@ -47,7 +47,7 @@ router
   );
 
 router
-  .route("/clear")
+  .route('/clear')
   .delete(
     auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN),
     actionLimiter,
@@ -55,7 +55,7 @@ router
   );
 
 router
-  .route("/admin")
+  .route('/admin')
   .get(
     auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
     adminLimiter,
@@ -63,7 +63,7 @@ router
   );
 
 router
-  .route("/admin/summary")
+  .route('/admin/summary')
   .get(
     auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
     adminLimiter,

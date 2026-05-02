@@ -1,6 +1,6 @@
-import httpStatus from "http-status";
-import { asyncHandler, sendResponse } from "../../utils";
-import { ComparisonHistoryService } from "./comparisonHistory.service";
+import httpStatus from 'http-status';
+import { asyncHandler, sendResponse } from '../../utils';
+import { ComparisonHistoryService } from './comparisonHistory.service';
 
 // 1. addComparisonItem
 const addComparisonItem = asyncHandler(async (req, res) => {
@@ -12,7 +12,7 @@ const addComparisonItem = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Added to compare successfully!",
+    message: 'Added to compare successfully!',
     data: result,
   });
 });
@@ -25,7 +25,7 @@ const getMyComparisonHistory = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Compare list fetched successfully!",
+    message: 'Compare list fetched successfully!',
     data: result,
   });
 });
@@ -42,7 +42,7 @@ const removeComparisonItem = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Removed from compare successfully!",
+    message: 'Removed from compare successfully!',
     data: result,
   });
 });
@@ -55,7 +55,7 @@ const getAllComparisonHistory = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Comparison activity fetched successfully!",
+    message: 'Comparison activity fetched successfully!',
     data: result.data,
     meta: result.meta,
   });
@@ -67,7 +67,7 @@ const getComparisonInsights = asyncHandler(async (_req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Comparison insights fetched successfully!",
+    message: 'Comparison insights fetched successfully!',
     data: result,
   });
 });

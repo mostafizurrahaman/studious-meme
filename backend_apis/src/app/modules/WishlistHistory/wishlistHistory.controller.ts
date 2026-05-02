@@ -1,6 +1,6 @@
-import httpStatus from "http-status";
-import { asyncHandler, sendResponse } from "../../utils";
-import { WishlistHistoryService } from "./wishlistHistory.service";
+import httpStatus from 'http-status';
+import { asyncHandler, sendResponse } from '../../utils';
+import { WishlistHistoryService } from './wishlistHistory.service';
 
 const getSingleParam = (value: string | string[]) =>
   Array.isArray(value) ? value[0] : value;
@@ -13,7 +13,7 @@ const addWishlistItem = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Product saved to wishlist successfully!",
+    message: 'Product saved to wishlist successfully!',
     data: result,
   });
 });
@@ -26,7 +26,7 @@ const removeWishlistItem = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Product removed from wishlist successfully!",
+    message: 'Product removed from wishlist successfully!',
     data: result,
   });
 });
@@ -36,7 +36,7 @@ const getMyWishlist = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Wishlist list fetched successfully!",
+    message: 'Wishlist list fetched successfully!',
     data: result,
   });
 });
@@ -46,7 +46,7 @@ const getAllWishlist = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Wishlist records fetched successfully!",
+    message: 'Wishlist records fetched successfully!',
     data: result.data,
     meta: result.meta,
   });
@@ -57,7 +57,7 @@ const getWishlistInsights = asyncHandler(async (_req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Wishlist insights fetched successfully!",
+    message: 'Wishlist insights fetched successfully!',
     data: result,
   });
 });

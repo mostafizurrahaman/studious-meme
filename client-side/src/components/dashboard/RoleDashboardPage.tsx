@@ -1,14 +1,14 @@
-import Link from "next/link";
+import Link from 'next/link';
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from '@/components/ui/card';
 import {
   Table,
   TableBody,
@@ -16,18 +16,18 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import type { AuthRole } from "@/types";
-import { getAllAdmins, getAllUsers } from "@/services/Admin";
-import { getAllBrands } from "@/services/Brand";
-import { getAllCategories } from "@/services/Category";
-import { getAllOrdersForAdmin, getMyOrders } from "@/services/Order";
-import { getAllPaymentsForAdmin, getMyPayments } from "@/services/Payment";
-import { getAllProducts } from "@/services/Product";
+} from '@/components/ui/table';
+import type { AuthRole } from '@/types';
+import { getAllAdmins, getAllUsers } from '@/services/Admin';
+import { getAllBrands } from '@/services/Brand';
+import { getAllCategories } from '@/services/Category';
+import { getAllOrdersForAdmin, getMyOrders } from '@/services/Order';
+import { getAllPaymentsForAdmin, getMyPayments } from '@/services/Payment';
+import { getAllProducts } from '@/services/Product';
 // import { getAllCoupons } from '@/services/Coupon/admin';
 
-import { getDashboardPathByRole } from "@/lib/auth/roles";
-import { getDashboardRoleConfig } from "@/lib/dashboard-navigation";
+import { getDashboardPathByRole } from '@/lib/auth/roles';
+import { getDashboardRoleConfig } from '@/lib/dashboard-navigation';
 
 type Metric = {
   label: string;
@@ -47,28 +47,28 @@ function countItems(
 ): number {
   if (!result) return 0;
 
-  if (typeof result.meta?.total === "number") return result.meta.total;
-  if (typeof result.summary?.total === "number") return result.summary.total;
+  if (typeof result.meta?.total === 'number') return result.meta.total;
+  if (typeof result.summary?.total === 'number') return result.summary.total;
 
   const payload = result.data;
 
   if (Array.isArray(payload)) return payload.length;
 
-  if (payload && typeof payload === "object") {
+  if (payload && typeof payload === 'object') {
     const nested = payload as { data?: unknown; meta?: { total?: unknown } };
 
-    if (typeof nested.meta?.total === "number") return nested.meta.total;
+    if (typeof nested.meta?.total === 'number') return nested.meta.total;
     if (Array.isArray(nested.data)) return nested.data.length;
   }
   return 0;
 }
 
 function safeNumber(value: unknown): number {
-  return typeof value === "number" && Number.isFinite(value) ? value : 0;
+  return typeof value === 'number' && Number.isFinite(value) ? value : 0;
 }
 
 function formatMoney(value: number): string {
-  return `৳ ${value.toLocaleString("en-BD")}`;
+  return `৳ ${value.toLocaleString('en-BD')}`;
 }
 
 function renderFeatureList(items: string[]) {
@@ -106,9 +106,9 @@ function MetricCards({ metrics }: { metrics: Metric[] }) {
 
 export async function RoleDashboardPage({ role }: { role: AuthRole }) {
   const config = getDashboardRoleConfig(role);
-  const dashboardPath = getDashboardPathByRole(role) ?? "/dashboard";
+  const dashboardPath = getDashboardPathByRole(role) ?? '/dashboard';
 
-  if (role === "USER") {
+  if (role === 'USER') {
     const [ordersResult, paymentsResult] = await Promise.all([
       getMyOrders().catch(() => null),
       getMyPayments().catch(() => null),
@@ -120,28 +120,28 @@ export async function RoleDashboardPage({ role }: { role: AuthRole }) {
 
     const metrics: Metric[] = [
       {
-        label: "Orders",
+        label: 'Orders',
         value: String(orders.length),
-        description: "Your backend order history",
+        description: 'Your backend order history',
       },
       {
-        label: "Pending payments",
+        label: 'Pending payments',
         value: String(
-          orders.filter((order) => order.paymentStatus !== "PAID").length,
+          orders.filter((order) => order.paymentStatus !== 'PAID').length,
         ),
-        description: "Orders awaiting payment completion",
+        description: 'Orders awaiting payment completion',
       },
       {
-        label: "Delivered",
+        label: 'Delivered',
         value: String(
-          orders.filter((order) => order.status === "DELIVERED").length,
+          orders.filter((order) => order.status === 'DELIVERED').length,
         ),
-        description: "Completed deliveries",
+        description: 'Completed deliveries',
       },
       {
-        label: "Payment records",
+        label: 'Payment records',
         value: String(payments.length),
-        description: "Your payment history",
+        description: 'Your payment history',
       },
     ];
 
@@ -179,7 +179,7 @@ export async function RoleDashboardPage({ role }: { role: AuthRole }) {
             {config.navigationItems
               .filter(
                 (item) =>
-                  item.label !== "Dashboard" && item.label !== "Profile",
+                  item.label !== 'Dashboard' && item.label !== 'Profile',
               )
               .map((item) => (
                 <Button
@@ -275,41 +275,41 @@ export async function RoleDashboardPage({ role }: { role: AuthRole }) {
     getAllOrdersForAdmin().catch(() => null),
     getAllPaymentsForAdmin().catch(() => null),
     // getAllCoupons({ limit: 1 }).catch(() => null),
-    role === "SUPER_ADMIN"
+    role === 'SUPER_ADMIN'
       ? getAllAdmins().catch(() => null)
       : Promise.resolve(null),
   ]);
 
   const metrics: Metric[] = [
     {
-      label: "Categories",
+      label: 'Categories',
       value: String(countItems(categoriesResult)),
-      description: "Catalog taxonomy pulled from the backend",
+      description: 'Catalog taxonomy pulled from the backend',
     },
     {
-      label: "Brands",
+      label: 'Brands',
       value: String(countItems(brandsResult)),
-      description: "Brand records managed in backend",
+      description: 'Brand records managed in backend',
     },
     {
-      label: "Products",
+      label: 'Products',
       value: String(countItems(productsResult)),
-      description: "Live product catalogue",
+      description: 'Live product catalogue',
     },
     {
-      label: "Users",
+      label: 'Users',
       value: String(countItems(usersResult)),
-      description: "Registered customer accounts",
+      description: 'Registered customer accounts',
     },
     {
-      label: "Orders",
+      label: 'Orders',
       value: String(countItems(ordersResult)),
-      description: "Operational order pipeline",
+      description: 'Operational order pipeline',
     },
     {
-      label: "Payments",
+      label: 'Payments',
       value: String(countItems(paymentsResult)),
-      description: "Payment records and statuses",
+      description: 'Payment records and statuses',
     },
     // TODO: add coupons back
     // {
@@ -317,12 +317,12 @@ export async function RoleDashboardPage({ role }: { role: AuthRole }) {
     //   value: String(countItems(couponsResult)),
     //   description: 'Discount codes configured in backend',
     // },
-    ...(role === "SUPER_ADMIN"
+    ...(role === 'SUPER_ADMIN'
       ? [
           {
-            label: "Admins",
+            label: 'Admins',
             value: String(countItems(adminsResult)),
-            description: "Privileged admin accounts",
+            description: 'Privileged admin accounts',
           },
         ]
       : []),
@@ -342,7 +342,7 @@ export async function RoleDashboardPage({ role }: { role: AuthRole }) {
           <Button asChild className="justify-start text-white!">
             <Link href={`${dashboardPath}/profile`}>Update profile</Link>
           </Button>
-          {role === "SUPER_ADMIN" ? (
+          {role === 'SUPER_ADMIN' ? (
             <Button asChild variant="outline" className="justify-start">
               <Link href="/dashboard/super-admin/admins">Manage admins</Link>
             </Button>

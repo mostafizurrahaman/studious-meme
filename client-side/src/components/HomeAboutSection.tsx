@@ -10,7 +10,9 @@ const VISIBLE_COUNT = 3;
 
 export function HomeAboutSection() {
   const [isExpanded, setIsExpanded] = useState(false);
-  const visibleSections = isExpanded ? siteAboutSections : siteAboutSections.slice(0, VISIBLE_COUNT);
+  const visibleSections = isExpanded
+    ? siteAboutSections
+    : siteAboutSections.slice(0, VISIBLE_COUNT);
 
   return (
     <Card className="mt-8 shadow-sm">

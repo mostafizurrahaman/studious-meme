@@ -1,5 +1,9 @@
 import { Schema, model } from 'mongoose';
-import { IOrder, IOrderCustomerInfo, IOrderItemSnapshot } from './order.interface';
+import {
+  IOrder,
+  IOrderCustomerInfo,
+  IOrderItemSnapshot,
+} from './order.interface';
 import { SHIPPING_ZONE } from './order.constants';
 
 const orderItemSnapshotSchema = new Schema<IOrderItemSnapshot>(
@@ -67,13 +71,28 @@ const orderSchema = new Schema<IOrder>(
     },
     paymentStatus: {
       type: String,
-      enum: ['UNPAID', 'PENDING_PAYMENT', 'PAID', 'FAILED', 'CANCELLED', 'REFUNDED'],
+      enum: [
+        'UNPAID',
+        'PENDING_PAYMENT',
+        'PAID',
+        'FAILED',
+        'CANCELLED',
+        'REFUNDED',
+      ],
       required: true,
       default: 'UNPAID',
     },
     status: {
       type: String,
-      enum: ['PLACED', 'PENDING_PAYMENT', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'],
+      enum: [
+        'PLACED',
+        'PENDING_PAYMENT',
+        'CONFIRMED',
+        'PROCESSING',
+        'SHIPPED',
+        'DELIVERED',
+        'CANCELLED',
+      ],
       required: true,
       default: 'PLACED',
     },
@@ -85,8 +104,17 @@ const orderSchema = new Schema<IOrder>(
   { timestamps: true, versionKey: false },
 );
 
-orderSchema.index({ user: 1, createdAt: -1 }, { name: 'order_user_createdAt_idx' });
-orderSchema.index({ status: 1, createdAt: -1 }, { name: 'order_status_createdAt_idx' });
-orderSchema.index({ invoiceId: 1 }, { unique: true, sparse: true, name: 'order_invoiceId_idx' });
+orderSchema.index(
+  { user: 1, createdAt: -1 },
+  { name: 'order_user_createdAt_idx' },
+);
+orderSchema.index(
+  { status: 1, createdAt: -1 },
+  { name: 'order_status_createdAt_idx' },
+);
+orderSchema.index(
+  { invoiceId: 1 },
+  { unique: true, sparse: true, name: 'order_invoiceId_idx' },
+);
 
 export const OrderModel = model<IOrder>('Order', orderSchema);

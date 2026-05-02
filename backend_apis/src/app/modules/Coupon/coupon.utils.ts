@@ -32,7 +32,8 @@ export const serializeCoupon = (coupon: {
   description: coupon.description,
   discountType: coupon.discountType,
   discountValue: coupon.discountValue,
-  minSubtotal: typeof coupon.minSubtotal === 'number' ? coupon.minSubtotal : undefined,
+  minSubtotal:
+    typeof coupon.minSubtotal === 'number' ? coupon.minSubtotal : undefined,
   expiresAt: new Date(coupon.expiresAt).toISOString(),
   isActive: coupon.isActive,
   createdAt: new Date(coupon.createdAt).toISOString(),
@@ -42,14 +43,20 @@ export const serializeCoupon = (coupon: {
 export const buildCouponCheckoutBase = (
   payload: Pick<TCouponCheckoutInput, 'items' | 'city' | 'address'>,
 ) => {
-  const subtotal = payload.items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
+  const subtotal = payload.items.reduce(
+    (sum, item) => sum + item.unitPrice * item.quantity,
+    0,
+  );
   const totalWeightKg = getTotalWeightKg(
     payload.items.reduce(
-      (sum, item) => sum + (Number.isFinite(item.weightKg ?? 1) ? (item.weightKg ?? 1) : 1) * item.quantity,
+      (sum, item) =>
+        sum +
+        (Number.isFinite(item.weightKg ?? 1) ? (item.weightKg ?? 1) : 1) *
+          item.quantity,
       0,
     ),
   );
-  
+
   const shippingZone = deriveShippingZone(payload.city);
   const baseShippingCharge = calculateShippingCharge({
     totalWeightKg,
@@ -57,7 +64,7 @@ export const buildCouponCheckoutBase = (
   });
   const codEligibility = calculateCodEligibility({
     subtotal,
-    itemBlocksCod: payload.items.some(item => item.isNoCOD),
+    itemBlocksCod: payload.items.some((item) => item.isNoCOD),
   });
 
   return {
@@ -78,7 +85,10 @@ export const resolveCouponSummary = (
     discountValue: number;
   } | null,
   base: ReturnType<typeof buildCouponCheckoutBase>,
-): Pick<TCouponCheckoutSummary, 'discount' | 'shippingCharge' | 'total' | 'payableAmount'> => {
+): Pick<
+  TCouponCheckoutSummary,
+  'discount' | 'shippingCharge' | 'total' | 'payableAmount'
+> => {
   const discount =
     coupon?.discountType === 'PERCENTAGE'
       ? Math.min((base.subtotal * coupon.discountValue) / 100, base.subtotal)
@@ -86,7 +96,8 @@ export const resolveCouponSummary = (
         ? Math.min(coupon.discountValue, base.subtotal)
         : 0;
 
-  const shippingCharge = coupon?.discountType === 'FREE_SHIPPING' ? 0 : base.baseShippingCharge;
+  const shippingCharge =
+    coupon?.discountType === 'FREE_SHIPPING' ? 0 : base.baseShippingCharge;
   const total = Math.max(base.subtotal - discount + shippingCharge, 0);
 
   return {
@@ -101,7 +112,8 @@ export const buildCouponInvalidSummary = (
   base: ReturnType<typeof buildCouponCheckoutBase>,
   message: string,
 ): TCouponCheckoutSummary => {
-  const { discount, shippingCharge, total, payableAmount } = resolveCouponSummary(null, base);
+  const { discount, shippingCharge, total, payableAmount } =
+    resolveCouponSummary(null, base);
 
   return {
     coupon: null,

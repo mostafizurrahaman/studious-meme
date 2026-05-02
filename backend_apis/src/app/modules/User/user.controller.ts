@@ -1,9 +1,9 @@
-import httpStatus from "http-status";
-import { AppError, asyncHandler } from "../../utils";
-import { UserService } from "./user.service";
+import httpStatus from 'http-status';
+import { AppError, asyncHandler } from '../../utils';
+import { UserService } from './user.service';
 // import { TProfileFileFields } from '../../types';
-import { sendResponse } from "../../utils";
-import { OTP_EXPIRY_MINUTES } from "./user.constant";
+import { sendResponse } from '../../utils';
+import { OTP_EXPIRY_MINUTES } from './user.constant';
 
 const getSingleParam = (value: string | string[]) =>
   Array.isArray(value) ? value[0] : value;
@@ -14,7 +14,7 @@ const createUser = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "OTP sent successfully, verify your account in 5 minutes!",
+    message: 'OTP sent successfully, verify your account in 5 minutes!',
     data: result,
   });
 });
@@ -39,7 +39,7 @@ const verifySignupOtp = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
-    message: "OTP verified successfully!",
+    message: 'OTP verified successfully!',
     data: result,
   });
 });
@@ -50,7 +50,7 @@ const signin = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Signin successful!",
+    message: 'Signin successful!',
     data: result,
   });
 });
@@ -61,7 +61,7 @@ const updateProfilePhoto = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Photo updated successfully!",
+    message: 'Photo updated successfully!',
     data: result,
   });
 });
@@ -72,7 +72,7 @@ const updateProfileData = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Data updated successfully!",
+    message: 'Data updated successfully!',
     data: result,
   });
 });
@@ -83,7 +83,7 @@ const changePassword = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Password changed successfully!",
+    message: 'Password changed successfully!',
     data: result,
   });
 });
@@ -96,7 +96,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     message:
-      "OTP sent to your email. Please check your spam or junk folder too!",
+      'OTP sent to your email. Please check your spam or junk folder too!',
     data: result,
   });
 });
@@ -108,7 +108,7 @@ const sendForgotPasswordOtpAgain = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "OTP sent again. Please check your spam or junk folder too!",
+    message: 'OTP sent again. Please check your spam or junk folder too!',
     data: result,
   });
 });
@@ -119,7 +119,7 @@ const verifyOtpForForgotPassword = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "OTP verified successfully!",
+    message: 'OTP verified successfully!',
     data: result,
   });
 });
@@ -130,7 +130,7 @@ const resetPassword = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Password has been reset successfully!",
+    message: 'Password has been reset successfully!',
     data: result,
   });
 });
@@ -141,24 +141,24 @@ const fetchProfile = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Profile data retrieved successfully!",
+    message: 'Profile data retrieved successfully!',
     data: result,
   });
 });
 
 // 13. getNewAccessToken
 const getNewAccessToken = asyncHandler(async (req, res) => {
-  const refreshToken = req.headers.authorization?.replace("Bearer ", "");
+  const refreshToken = req.headers.authorization?.replace('Bearer ', '');
 
   if (!refreshToken) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Refresh token is required!");
+    throw new AppError(httpStatus.BAD_REQUEST, 'Refresh token is required!');
   }
 
   const result = await UserService.getNewAccessTokenFromServer(refreshToken);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Access token given successfully!",
+    message: 'Access token given successfully!',
     data: result,
   });
 });
@@ -169,7 +169,7 @@ const deactivateUserAccount = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Account deactivated successfully!",
+    message: 'Account deactivated successfully!',
     data: result,
   });
 });
@@ -180,7 +180,7 @@ const deleteSpecificUserAccount = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Account deleted successfully!",
+    message: 'Account deleted successfully!',
     data: result,
   });
 });
@@ -191,7 +191,7 @@ const adminGetAllUsers = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Users fetched successfully!",
+    message: 'Users fetched successfully!',
     data: result.data,
     meta: result.meta,
   });
@@ -206,7 +206,7 @@ const adminUpdateUserStatus = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: `User ${req.body.isActive ? "unblocked" : "blocked"} successfully!`,
+    message: `User ${req.body.isActive ? 'unblocked' : 'blocked'} successfully!`,
     data: result,
   });
 });
@@ -219,7 +219,7 @@ const adminDeleteUser = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "User deleted successfully!",
+    message: 'User deleted successfully!',
     data: result,
   });
 });

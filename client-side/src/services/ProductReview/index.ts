@@ -71,11 +71,19 @@ export type ProductReviewRecord = {
 
 export type PublicProductReviewRecord = Pick<
   ProductReviewRecord,
-  '_id' | 'displayName' | 'displayImage' | 'rating' | 'comment' | 'images' | 'createdAt'
+  | '_id'
+  | 'displayName'
+  | 'displayImage'
+  | 'rating'
+  | 'comment'
+  | 'images'
+  | 'createdAt'
 >;
 
 export type ProductReviewListResponse = BackendEnvelope<ProductReviewRecord[]>;
-export type PublicProductReviewListResponse = BackendEnvelope<PublicProductReviewRecord[]>;
+export type PublicProductReviewListResponse = BackendEnvelope<
+  PublicProductReviewRecord[]
+>;
 
 export type CreateCustomerReviewPayload = {
   product: string;
@@ -130,7 +138,7 @@ function toFormData(payload: Record<string, unknown>) {
     formData.append('displayImage', displayImage);
   }
 
-  (images ?? []).forEach(item => {
+  (images ?? []).forEach((item) => {
     if (item instanceof File) {
       formData.append('images', item);
     }
@@ -150,7 +158,13 @@ export type ProductReviewListParams = {
   searchTerm?: string;
   createdFrom?: string;
   createdTo?: string;
-  sort?: 'createdAt-desc' | 'createdAt-asc' | 'rating-desc' | 'rating-asc' | 'status-desc' | 'status-asc';
+  sort?:
+    | 'createdAt-desc'
+    | 'createdAt-asc'
+    | 'rating-desc'
+    | 'rating-asc'
+    | 'status-desc'
+    | 'status-asc';
 };
 
 const buildReviewQuery = (params: ProductReviewListParams = {}) => {
@@ -160,12 +174,17 @@ const buildReviewQuery = (params: ProductReviewListParams = {}) => {
   if (params.limit) searchParams.set('limit', String(params.limit));
   if (params.status) searchParams.set('status', params.status);
   if (params.source) searchParams.set('source', params.source);
-  if (params.product?.trim()) searchParams.set('product', params.product.trim());
+  if (params.product?.trim())
+    searchParams.set('product', params.product.trim());
   if (params.user?.trim()) searchParams.set('user', params.user.trim());
-  if (typeof params.rating === 'number') searchParams.set('rating', String(params.rating));
-  if (params.searchTerm?.trim()) searchParams.set('searchTerm', params.searchTerm.trim());
-  if (params.createdFrom?.trim()) searchParams.set('createdFrom', params.createdFrom.trim());
-  if (params.createdTo?.trim()) searchParams.set('createdTo', params.createdTo.trim());
+  if (typeof params.rating === 'number')
+    searchParams.set('rating', String(params.rating));
+  if (params.searchTerm?.trim())
+    searchParams.set('searchTerm', params.searchTerm.trim());
+  if (params.createdFrom?.trim())
+    searchParams.set('createdFrom', params.createdFrom.trim());
+  if (params.createdTo?.trim())
+    searchParams.set('createdTo', params.createdTo.trim());
   if (params.sort) searchParams.set('sort', params.sort);
 
   const query = searchParams.toString();
@@ -181,11 +200,14 @@ export const createProductReview = async (
     return { success: false, message: 'Sign in to write a review.' };
   }
 
-  const result = await requestBackendJson<BackendEnvelope<ProductReviewRecord>>('/product-reviews', {
-    method: 'POST',
-    body: payload instanceof FormData ? payload : toFormData(payload),
-    token: accessToken,
-  });
+  const result = await requestBackendJson<BackendEnvelope<ProductReviewRecord>>(
+    '/product-reviews',
+    {
+      method: 'POST',
+      body: payload instanceof FormData ? payload : toFormData(payload),
+      token: accessToken,
+    },
+  );
 
   revalidateTag(CACHE_TAGS.PRODUCT_REVIEWS, 'max');
   return result;
@@ -193,7 +215,10 @@ export const createProductReview = async (
 
 export const getProductReviewsByProduct = async (
   productId: string,
-  params: Omit<ProductReviewListParams, 'product' | 'status' | 'source' | 'user'> = {},
+  params: Omit<
+    ProductReviewListParams,
+    'product' | 'status' | 'source' | 'user'
+  > = {},
 ): Promise<BackendEnvelope<PublicProductReviewRecord[]>> => {
   return requestBackendJson<BackendEnvelope<PublicProductReviewRecord[]>>(
     `/product-reviews/product/${productId}${buildReviewQuery(params)}`,
@@ -212,11 +237,17 @@ export const getAdminProductReviews = async (
 ): Promise<ProductReviewListResponse> => {
   const accessToken = await getValidAccessTokenForServerHandlerGet();
 
-  return requestBackendJson<ProductReviewListResponse>(`/admin/product-reviews${buildReviewQuery(params)}`, {
-    method: 'GET',
-    token: accessToken ?? undefined,
-    next: { revalidate: CACHE_REVALIDATE.DEFAULT, tags: [CACHE_TAGS.PRODUCT_REVIEWS] },
-  });
+  return requestBackendJson<ProductReviewListResponse>(
+    `/admin/product-reviews${buildReviewQuery(params)}`,
+    {
+      method: 'GET',
+      token: accessToken ?? undefined,
+      next: {
+        revalidate: CACHE_REVALIDATE.DEFAULT,
+        tags: [CACHE_TAGS.PRODUCT_REVIEWS],
+      },
+    },
+  );
 };
 
 export const createManualProductReview = async (
@@ -228,11 +259,14 @@ export const createManualProductReview = async (
     return { success: false, message: 'Sign in to create a review.' };
   }
 
-  const result = await requestBackendJson<BackendEnvelope<ProductReviewRecord>>('/admin/product-reviews', {
-    method: 'POST',
-    body: toFormData(payload),
-    token: accessToken,
-  });
+  const result = await requestBackendJson<BackendEnvelope<ProductReviewRecord>>(
+    '/admin/product-reviews',
+    {
+      method: 'POST',
+      body: toFormData(payload),
+      token: accessToken,
+    },
+  );
 
   revalidateTag(CACHE_TAGS.PRODUCT_REVIEWS, 'max');
   return result;

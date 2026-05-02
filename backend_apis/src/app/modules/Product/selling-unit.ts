@@ -22,7 +22,8 @@ export const DEFAULT_SELLING_UNIT: SellingUnit = 'pcs';
 
 const SELLING_UNIT_SET = new Set<string>(SELLING_UNIT_OPTIONS);
 
-const isSellingUnit = (value: string): value is SellingUnit => SELLING_UNIT_SET.has(value);
+const isSellingUnit = (value: string): value is SellingUnit =>
+  SELLING_UNIT_SET.has(value);
 
 export const normalizeSellingUnitInput = (value: unknown) => {
   if (typeof value !== 'string') return value;
@@ -31,7 +32,9 @@ export const normalizeSellingUnitInput = (value: unknown) => {
   return trimmed === '' ? undefined : trimmed;
 };
 
-export const normalizeSellingUnit = (value: unknown): SellingUnit | undefined => {
+export const normalizeSellingUnit = (
+  value: unknown,
+): SellingUnit | undefined => {
   const normalized = normalizeSellingUnitInput(value);
 
   return typeof normalized === 'string' && isSellingUnit(normalized)

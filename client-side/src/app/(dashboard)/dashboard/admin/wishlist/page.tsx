@@ -1,20 +1,20 @@
-import type { Metadata } from "next";
+import type { Metadata } from 'next';
 import {
   DashboardWishlistManager,
   type DashboardWishlistRecord,
-} from "@/components/dashboard/DashboardEngagementManager";
-import { requireDashboardRoles } from "@/lib/dashboard-auth";
-import { buildMetadata } from "@/lib/seo";
-import { getAllWishlist } from "@/services/WishlistHistory";
+} from '@/components/dashboard/DashboardEngagementManager';
+import { requireDashboardRoles } from '@/lib/dashboard-auth';
+import { buildMetadata } from '@/lib/seo';
+import { getAllWishlist } from '@/services/WishlistHistory';
 
 export const metadata: Metadata = buildMetadata({
-  title: "Wishlist Activity",
-  description: "Review backend-saved wishlist activity.",
-  path: "/dashboard/admin/wishlist",
+  title: 'Wishlist Activity',
+  description: 'Review backend-saved wishlist activity.',
+  path: '/dashboard/admin/wishlist',
   noindex: true,
 });
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 type Props = {
   searchParams: Promise<{ page?: string; limit?: string }>;
@@ -27,7 +27,7 @@ const parsePositiveInteger = (value: string | undefined, fallback: number) => {
 };
 
 export default async function AdminWishlistPage({ searchParams }: Props) {
-  await requireDashboardRoles(["ADMIN", "SUPER_ADMIN"]);
+  await requireDashboardRoles(['ADMIN', 'SUPER_ADMIN']);
   const query = await searchParams;
   const page = parsePositiveInteger(query.page, 1);
   const limit = parsePositiveInteger(query.limit, 50);

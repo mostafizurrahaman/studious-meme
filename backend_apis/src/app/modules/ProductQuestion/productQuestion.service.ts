@@ -1,19 +1,21 @@
-import httpStatus from "http-status";
-import { Types } from "mongoose";
-import { AppError } from "../../utils";
-import { ProductModel } from "../Product/product.model";
-import UserModel from "../User/user.model";
-import { IUser } from "../User/user.interface";
-import { ProductQuestionModel } from "./productQuestion.model";
-import { ProductQuestionStatus } from "./productQuestion.interface";
+import httpStatus from 'http-status';
+import { Types } from 'mongoose';
+import { AppError } from '../../utils';
+import { ProductModel } from '../Product/product.model';
+import UserModel from '../User/user.model';
+import { IUser } from '../User/user.interface';
+import { ProductQuestionModel } from './productQuestion.model';
+import { ProductQuestionStatus } from './productQuestion.interface';
 
 const DEFAULT_PUBLIC_LIMIT = 5;
 const DEFAULT_ADMIN_LIMIT = 20;
 const MAX_LIMIT = 100;
 
-const getString = (value: unknown) => (typeof value === "string" ? value.trim() : "");
+const getString = (value: unknown) =>
+  typeof value === 'string' ? value.trim() : '';
 
-const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const escapeRegExp = (value: string) =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 const parsePositiveInteger = (value: unknown, fallback: number) => {
   const parsed = Number(value);
@@ -29,19 +31,22 @@ const ensureObjectId = (value: string, label: string) => {
   return value;
 };
 
-const resolveSort = (value: unknown, fallback: Record<string, 1 | -1>): Record<string, 1 | -1> => {
+const resolveSort = (
+  value: unknown,
+  fallback: Record<string, 1 | -1>,
+): Record<string, 1 | -1> => {
   switch (getString(value)) {
-    case "createdAt-asc":
+    case 'createdAt-asc':
       return { createdAt: 1, _id: 1 } as Record<string, 1 | -1>;
-    case "answeredAt-desc":
+    case 'answeredAt-desc':
       return { answeredAt: -1, createdAt: -1 } as Record<string, 1 | -1>;
-    case "answeredAt-asc":
+    case 'answeredAt-asc':
       return { answeredAt: 1, createdAt: 1 } as Record<string, 1 | -1>;
-    case "status-desc":
+    case 'status-desc':
       return { status: -1, createdAt: -1 } as Record<string, 1 | -1>;
-    case "status-asc":
+    case 'status-asc':
       return { status: 1, createdAt: -1 } as Record<string, 1 | -1>;
-    case "createdAt-desc":
+    case 'createdAt-desc':
     default:
       return fallback;
   }
@@ -53,17 +58,17 @@ const resolveProductId = async (value: string) => {
   if (!trimmed) return null;
 
   if (Types.ObjectId.isValid(trimmed)) {
-    const direct = await ProductModel.findById(trimmed).select("_id").lean();
+    const direct = await ProductModel.findById(trimmed).select('_id').lean();
     if (direct) return direct._id;
   }
 
   const product = await ProductModel.findOne({
     $or: [
       { slug: trimmed },
-      { title: { $regex: `^${escapeRegExp(trimmed)}$`, $options: "i" } },
+      { title: { $regex: `^${escapeRegExp(trimmed)}$`, $options: 'i' } },
     ],
   })
-    .select("_id")
+    .select('_id')
     .lean();
 
   return product?._id ?? null;
@@ -75,7 +80,7 @@ const resolveUserId = async (value: string) => {
   if (!trimmed) return null;
 
   if (Types.ObjectId.isValid(trimmed)) {
-    const direct = await UserModel.findById(trimmed).select("_id").lean();
+    const direct = await UserModel.findById(trimmed).select('_id').lean();
     if (direct) return direct._id;
   }
 
@@ -83,30 +88,33 @@ const resolveUserId = async (value: string) => {
   const user = await UserModel.findOne({
     $or: [
       { email: lower },
-      { name: { $regex: `^${escapeRegExp(trimmed)}$`, $options: "i" } },
+      { name: { $regex: `^${escapeRegExp(trimmed)}$`, $options: 'i' } },
     ],
   })
-    .select("_id")
+    .select('_id')
     .lean();
 
   return user?._id ?? null;
 };
 
-const createQuestionIntoDB = async (user: IUser, payload: { product: string; question: string }) => {
-  const productId = ensureObjectId(payload.product, "Product ID");
+const createQuestionIntoDB = async (
+  user: IUser,
+  payload: { product: string; question: string },
+) => {
+  const productId = ensureObjectId(payload.product, 'Product ID');
   const product = await ProductModel.findOne({ _id: productId, isActive: true })
-    .select("_id")
+    .select('_id')
     .lean();
 
   if (!product) {
-    throw new AppError(httpStatus.NOT_FOUND, "Product not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Product not found!');
   }
 
   return ProductQuestionModel.create({
     product: product._id,
     user: user._id,
     question: payload.question.trim(),
-    status: "pending",
+    status: 'pending',
   });
 };
 
@@ -114,24 +122,33 @@ const getAnsweredQuestionsForProductFromDB = async (
   productId: string,
   query: Record<string, unknown> = {},
 ) => {
-  const validProductId = ensureObjectId(productId, "Product ID");
-  const product = await ProductModel.findOne({ _id: validProductId, isActive: true })
-    .select("_id title slug")
+  const validProductId = ensureObjectId(productId, 'Product ID');
+  const product = await ProductModel.findOne({
+    _id: validProductId,
+    isActive: true,
+  })
+    .select('_id title slug')
     .lean();
 
   if (!product) {
-    throw new AppError(httpStatus.NOT_FOUND, "Product not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Product not found!');
   }
 
   const page = parsePositiveInteger(query.page, 1);
-  const limit = Math.min(parsePositiveInteger(query.limit, DEFAULT_PUBLIC_LIMIT), MAX_LIMIT);
+  const limit = Math.min(
+    parsePositiveInteger(query.limit, DEFAULT_PUBLIC_LIMIT),
+    MAX_LIMIT,
+  );
   const skip = (page - 1) * limit;
-  const filter = { product: product._id, status: "answered" as ProductQuestionStatus };
+  const filter = {
+    product: product._id,
+    status: 'answered' as ProductQuestionStatus,
+  };
   const sort = resolveSort(query.sort, { answeredAt: -1, createdAt: -1 });
 
   const [data, total] = await Promise.all([
     ProductQuestionModel.find(filter)
-      .populate({ path: "user", select: "name" })
+      .populate({ path: 'user', select: 'name' })
       .sort(sort)
       .skip(skip)
       .limit(limit)
@@ -152,7 +169,10 @@ const getAnsweredQuestionsForProductFromDB = async (
 
 const getAllQuestionsFromDB = async (query: Record<string, unknown> = {}) => {
   const page = parsePositiveInteger(query.page, 1);
-  const limit = Math.min(parsePositiveInteger(query.limit, DEFAULT_ADMIN_LIMIT), MAX_LIMIT);
+  const limit = Math.min(
+    parsePositiveInteger(query.limit, DEFAULT_ADMIN_LIMIT),
+    MAX_LIMIT,
+  );
   const skip = (page - 1) * limit;
   const filter: Record<string, unknown> = {};
   const searchTerm = getString(query.searchTerm);
@@ -166,7 +186,7 @@ const getAllQuestionsFromDB = async (query: Record<string, unknown> = {}) => {
   }
 
   if (searchTerm) {
-    filter.question = { $regex: escapeRegExp(searchTerm), $options: "i" };
+    filter.question = { $regex: escapeRegExp(searchTerm), $options: 'i' };
   }
 
   if (productFilter) {
@@ -181,9 +201,9 @@ const getAllQuestionsFromDB = async (query: Record<string, unknown> = {}) => {
 
   const [data, total] = await Promise.all([
     ProductQuestionModel.find(filter)
-      .populate({ path: "product", select: "title slug images" })
-      .populate({ path: "user", select: "name email" })
-      .populate({ path: "answeredBy", select: "name email" })
+      .populate({ path: 'product', select: 'title slug images' })
+      .populate({ path: 'user', select: 'name email' })
+      .populate({ path: 'answeredBy', select: 'name email' })
       .sort(sort)
       .skip(skip)
       .limit(limit)
@@ -207,74 +227,79 @@ const answerQuestionIntoDB = async (
   adminUser: IUser,
   answer: string,
 ) => {
-  const questionId = ensureObjectId(id, "Question ID");
-  const existingQuestion = await ProductQuestionModel.findById(questionId).select("_id").lean();
+  const questionId = ensureObjectId(id, 'Question ID');
+  const existingQuestion = await ProductQuestionModel.findById(questionId)
+    .select('_id')
+    .lean();
 
   if (!existingQuestion) {
-    throw new AppError(httpStatus.NOT_FOUND, "Question not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Question not found!');
   }
 
   const updated = await ProductQuestionModel.findByIdAndUpdate(
     questionId,
     {
       answer: answer.trim(),
-      status: "answered",
+      status: 'answered',
       answeredBy: adminUser._id,
       answeredAt: new Date(),
     },
-    { returnDocument: "after", runValidators: true },
+    { returnDocument: 'after', runValidators: true },
   )
-    .populate({ path: "product", select: "title slug images" })
-    .populate({ path: "user", select: "name email" })
-    .populate({ path: "answeredBy", select: "name email" });
+    .populate({ path: 'product', select: 'title slug images' })
+    .populate({ path: 'user', select: 'name email' })
+    .populate({ path: 'answeredBy', select: 'name email' });
 
   if (!updated) {
-    throw new AppError(httpStatus.NOT_FOUND, "Question not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Question not found!');
   }
 
   return updated;
 };
 
-const updateQuestionStatusIntoDB = async (id: string, status: ProductQuestionStatus) => {
-  const questionId = ensureObjectId(id, "Question ID");
+const updateQuestionStatusIntoDB = async (
+  id: string,
+  status: ProductQuestionStatus,
+) => {
+  const questionId = ensureObjectId(id, 'Question ID');
   const existingQuestion = await ProductQuestionModel.findById(questionId)
-    .select("answeredAt answer")
+    .select('answeredAt answer')
     .lean();
 
   if (!existingQuestion) {
-    throw new AppError(httpStatus.NOT_FOUND, "Question not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Question not found!');
   }
 
   const updated = await ProductQuestionModel.findByIdAndUpdate(
     questionId,
     {
       status,
-      ...(status === "answered" && !existingQuestion.answeredAt
+      ...(status === 'answered' && !existingQuestion.answeredAt
         ? { answeredAt: new Date() }
         : {}),
     },
-    { returnDocument: "after", runValidators: true },
+    { returnDocument: 'after', runValidators: true },
   )
-    .populate({ path: "product", select: "title slug images" })
-    .populate({ path: "user", select: "name email" })
-    .populate({ path: "answeredBy", select: "name email" });
+    .populate({ path: 'product', select: 'title slug images' })
+    .populate({ path: 'user', select: 'name email' })
+    .populate({ path: 'answeredBy', select: 'name email' });
 
   if (!updated) {
-    throw new AppError(httpStatus.NOT_FOUND, "Question not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Question not found!');
   }
 
   return updated;
 };
 
 const deleteQuestionFromDB = async (id: string) => {
-  const questionId = ensureObjectId(id, "Question ID");
+  const questionId = ensureObjectId(id, 'Question ID');
   const deleted = await ProductQuestionModel.findByIdAndDelete(questionId)
-    .populate({ path: "product", select: "title slug images" })
-    .populate({ path: "user", select: "name email" })
-    .populate({ path: "answeredBy", select: "name email" });
+    .populate({ path: 'product', select: 'title slug images' })
+    .populate({ path: 'user', select: 'name email' })
+    .populate({ path: 'answeredBy', select: 'name email' });
 
   if (!deleted) {
-    throw new AppError(httpStatus.NOT_FOUND, "Question not found!");
+    throw new AppError(httpStatus.NOT_FOUND, 'Question not found!');
   }
 
   return deleted;

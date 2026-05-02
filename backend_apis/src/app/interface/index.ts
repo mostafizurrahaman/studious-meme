@@ -1,4 +1,4 @@
-import { MulterFile } from "../lib/upload";
+import { MulterFile } from '../lib/upload';
 
 export type TServiceImages = {
   images: MulterFile[];

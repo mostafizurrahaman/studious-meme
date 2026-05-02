@@ -1,8 +1,8 @@
-"use server";
+'use server';
 
-import { jwtDecode } from "jwt-decode";
-import { cookies } from "next/headers";
-import { requestBackendJson } from "@/lib/backend-api";
+import { jwtDecode } from 'jwt-decode';
+import { cookies } from 'next/headers';
+import { requestBackendJson } from '@/lib/backend-api';
 
 type TokenPayload = {
   exp?: number;
@@ -35,18 +35,18 @@ const getTokenExpiryMs = (token: string): number | null => {
 
 const clearAuthCookies = async () => {
   const cookieStore = await cookies();
-  cookieStore.set("accessToken", "", {
+  cookieStore.set('accessToken', '', {
     httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    path: '/',
     maxAge: 0,
   });
-  cookieStore.set("refreshToken", "", {
+  cookieStore.set('refreshToken', '', {
     httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    path: '/',
     maxAge: 0,
   });
 };
@@ -69,9 +69,9 @@ async function refreshAccessToken(
   const promise = (async () => {
     try {
       const result = await requestBackendJson<RefreshResponse>(
-        "/user/access-token",
+        '/user/access-token',
         {
-          method: "GET",
+          method: 'GET',
           token: refreshToken,
         },
       );
@@ -87,7 +87,7 @@ async function refreshAccessToken(
 
       if (writeCookie) {
         const cookieStore = await cookies();
-        cookieStore.set("accessToken", accessToken, { path: "/" });
+        cookieStore.set('accessToken', accessToken, { path: '/' });
       }
 
       return accessToken;
@@ -112,8 +112,8 @@ async function resolveAccessToken(
   writeCookie: boolean,
 ): Promise<string | null> {
   const cookieStore = await cookies();
-  const accessToken = cookieStore.get("accessToken")?.value ?? null;
-  const refreshToken = cookieStore.get("refreshToken")?.value ?? null;
+  const accessToken = cookieStore.get('accessToken')?.value ?? null;
+  const refreshToken = cookieStore.get('refreshToken')?.value ?? null;
 
   if (!accessToken) {
     if (!refreshToken) {

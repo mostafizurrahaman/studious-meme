@@ -1,4 +1,4 @@
-import { MulterFile } from "../lib/upload";
+import { MulterFile } from '../lib/upload';
 
 // Type definition for multiple image files mapped by fieldname
 export type IImageFiles = Record<string, MulterFile[]>;

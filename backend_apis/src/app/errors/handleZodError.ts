@@ -1,5 +1,5 @@
-import { ZodError, ZodIssue } from "zod";
-import { TErrorSources, TGenericErrorResponse } from "../interface/error";
+import { ZodError, ZodIssue } from 'zod';
+import { TErrorSources, TGenericErrorResponse } from '../interface/error';
 
 // zod-validation error handler
 const handleZodError = (err: ZodError): TGenericErrorResponse => {
@@ -8,7 +8,7 @@ const handleZodError = (err: ZodError): TGenericErrorResponse => {
   const errorSources: TErrorSources = err.issues.map((issue: ZodIssue) => {
     const last = issue?.path[issue.path.length - 1];
     const normalizedPath =
-      typeof last === "string" || typeof last === "number"
+      typeof last === 'string' || typeof last === 'number'
         ? last
         : String(last);
     return {
@@ -19,7 +19,7 @@ const handleZodError = (err: ZodError): TGenericErrorResponse => {
 
   return {
     statusCode,
-    message: "Validation Error!",
+    message: 'Validation Error!',
     errorSources,
   };
 };

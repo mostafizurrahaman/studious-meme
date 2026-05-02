@@ -1,6 +1,6 @@
-import httpStatus from "http-status";
-import { asyncHandler, sendResponse } from "../../utils";
-import { PaymentService } from "./payment.service";
+import httpStatus from 'http-status';
+import { asyncHandler, sendResponse } from '../../utils';
+import { PaymentService } from './payment.service';
 
 const getSingleParam = (value: string | string[]) =>
   Array.isArray(value) ? value[0] : value;
@@ -14,7 +14,7 @@ const initiatePortPosPayment = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Payment initiated successfully!",
+    message: 'Payment initiated successfully!',
     data: result,
   });
 });
@@ -28,7 +28,7 @@ const portPosIpn = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "IPN processed successfully!",
+    message: 'IPN processed successfully!',
     data: result,
   });
 });
@@ -42,7 +42,7 @@ const verifyPortPosPayment = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Payment status verified successfully!",
+    message: 'Payment status verified successfully!',
     data: result,
   });
 });
@@ -56,7 +56,7 @@ const refundPortPosPayment = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Payment refunded successfully!",
+    message: 'Payment refunded successfully!',
     data: result,
   });
 });
@@ -67,7 +67,7 @@ const getMyPayments = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Payments retrieved successfully!",
+    message: 'Payments retrieved successfully!',
     data: result.data,
     meta: result.meta,
   });
@@ -79,7 +79,7 @@ const getAllPaymentsForAdmin = asyncHandler(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Payments retrieved successfully!",
+    message: 'Payments retrieved successfully!',
     data: result.data,
     meta: result.meta,
     summary: result.summary,

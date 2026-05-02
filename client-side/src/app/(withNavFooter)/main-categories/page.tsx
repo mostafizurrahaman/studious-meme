@@ -1,17 +1,17 @@
-import { ArrowUpRight } from "lucide-react";
-import Link from "next/link";
-import { SeoScripts } from "@/components/SeoScripts";
-import { Card } from "@/components/ui/card";
+import { ArrowUpRight } from 'lucide-react';
+import Link from 'next/link';
+import { SeoScripts } from '@/components/SeoScripts';
+import { Card } from '@/components/ui/card';
 import {
   getCategoryAccentClassName,
   getCategoryAccentStyle,
-} from "@/lib/category-accent";
-import { buildMainCategoriesSchemas, mainCategoriesMetadata } from "@/lib/seo";
-import { getActiveCategories } from "@/services/Category";
+} from '@/lib/category-accent';
+import { buildMainCategoriesSchemas, mainCategoriesMetadata } from '@/lib/seo';
+import { getActiveCategories } from '@/services/Category';
 import {
   mapBackendCategoryToStorefrontCategory,
   type BackendCategory,
-} from "@/services/Category/mappers";
+} from '@/services/Category/mappers';
 
 export const metadata = mainCategoriesMetadata;
 export default async function MainCategoriesPage() {
@@ -30,15 +30,15 @@ export default async function MainCategoriesPage() {
   // }));
 
   const categoryStats = [
-    { label: "Active categories", value: backendCategories.length },
+    { label: 'Active categories', value: backendCategories.length },
     {
-      label: "Sub categories",
+      label: 'Sub categories',
       value: backendCategories.reduce(
         (total, category) => total + (category.subCategories?.length ?? 0),
         0,
       ),
     },
-    { label: "Browse focus", value: "Curated" },
+    { label: 'Browse focus', value: 'Curated' },
   ];
 
   return (
@@ -112,7 +112,7 @@ export default async function MainCategoriesPage() {
                     </span>
                   </div>
                   <p className="relative mt-3 text-sm leading-7 text-foreground/65">
-                    {category.description || "Browse category products"}
+                    {category.description || 'Browse category products'}
                   </p>
                   <div className="relative mt-5 flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2 text-xs font-semibold text-foreground/55 transition-colors duration-300 group-hover:text-primary">
