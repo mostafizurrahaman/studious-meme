@@ -72,7 +72,8 @@ export function HomeHeroCarousel({ slides, features }: HomeHeroCarouselProps) {
               src={heroSlide.image}
               alt={heroSlide.title}
               fill
-              loading="eager"
+              priority
+              fetchPriority="high"
               // quality={100}
               // unoptimized
               sizes="(max-width: 1024px) 100vw, 50vw"
@@ -139,7 +140,7 @@ export function HomeHeroCarousel({ slides, features }: HomeHeroCarouselProps) {
                   src={slide.image}
                   alt={slide.title}
                   fill
-                  loading={index === 0 ? 'eager' : 'lazy'}
+                  loading="lazy"
                   sizes="(max-width: 1024px) 50vw, 25vw"
                   className="object-cover object-center transition duration-300"
                 />
@@ -157,10 +158,7 @@ export function HomeHeroCarousel({ slides, features }: HomeHeroCarouselProps) {
               src={topFeature.image}
               alt={topFeature.title}
               fill
-              loading="eager"
-              fetchPriority="high"
-              quality={100}
-              unoptimized
+              loading="lazy"
               sizes="(max-width: 1024px) 50vw, 25vw"
               className="object-cover object-center transition duration-300 group-hover:scale-105"
             />
@@ -181,7 +179,7 @@ export function HomeHeroCarousel({ slides, features }: HomeHeroCarouselProps) {
                   src={slide.image}
                   alt={slide.title}
                   fill
-                  loading="eager"
+                  loading="lazy"
                   // quality={100}
                   // unoptimized
                   sizes="(max-width: 1024px) 50vw, 12.5vw"

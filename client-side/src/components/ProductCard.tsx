@@ -66,7 +66,7 @@ export function ProductCard({
       <CardContent className="flex flex-1 flex-col p-2.5 pt-2.5 sm:p-4 sm:pt-4">
         <Link href={`/product/${product.slug}`} className="block">
           <h3
-            className="line-clamp-3 min-h-[3.75rem] wrap-break-word text-[11px] font-semibold leading-5 text-foreground transition hover:text-primary sm:text-[13px]"
+            className="line-clamp-3 min-h-15 wrap-break-word text-[11px] font-semibold leading-5 text-foreground transition hover:text-primary sm:text-[13px]"
             title={product.title}
           >
             {product.title}

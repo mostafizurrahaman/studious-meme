@@ -81,12 +81,8 @@ export default async function PromotionsPage({ searchParams }: Props) {
                 The Best Offers
               </h2>
               <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-                {products.map((product, index) => (
-                  <ProductCard
-                    key={product.sku}
-                    product={product}
-                    priority={index < 5}
-                  />
+                {products.map((product) => (
+                  <ProductCard key={product.sku} product={product} />
                 ))}
               </div>
               {products.length === 0 ? (

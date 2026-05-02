@@ -52,6 +52,8 @@ export default async function ShopByBrandsPage() {
                         alt={brand.name}
                         width={96}
                         height={96}
+                        loading="lazy"
+                        sizes="96px"
                         className="h-full w-full rounded-2xl bg-transparent object-contain p-2 mix-blend-multiply transition duration-300 group-hover:scale-110"
                       />
                     ) : (

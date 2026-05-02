@@ -111,9 +111,13 @@ export default async function MainCategoriesPage() {
                       <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                     </span>
                   </div>
-                  <p className="relative mt-3 text-sm leading-7 text-foreground/65">
+                  {/* <p className="relative mt-3 text-sm leading-7 text-foreground/65">
                     {category.description || 'Browse category products'}
-                  </p>
+                  </p> */}
+                  {/* <p className="mt-2 text-sm leading-6 text-foreground/65">
+                    {category.description.slice(0, 40) +
+                      (category.description.length > 40 ? '...' : '')}
+                  </p> */}
                   <div className="relative mt-5 flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2 text-xs font-semibold text-foreground/55 transition-colors duration-300 group-hover:text-primary">
                       <span className="h-1.5 w-1.5 rounded-full bg-primary/60 transition-transform duration-300 group-hover:scale-125" />

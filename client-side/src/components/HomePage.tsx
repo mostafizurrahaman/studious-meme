@@ -254,6 +254,8 @@ export async function HomePage({ heroContent }: HomePageProps) {
                               alt={card.name}
                               width={80}
                               height={80}
+                              loading="lazy"
+                              sizes="80px"
                               className="h-full w-full rounded-2xl bg-transparent object-contain p-2 mix-blend-multiply transition duration-300 group-hover:scale-110"
                             />
                           ) : (
@@ -325,6 +327,8 @@ export async function HomePage({ heroContent }: HomePageProps) {
                             alt={brand.name}
                             width={64}
                             height={64}
+                            loading="lazy"
+                            sizes="64px"
                             className="h-full w-full rounded-2xl bg-transparent object-contain p-2 mix-blend-multiply transition duration-300 group-hover:scale-[1.14]"
                           />
                         ) : (
