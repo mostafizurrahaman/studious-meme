@@ -620,6 +620,10 @@ function ProductFormSections({
 }
 
 function resolveProductRefLabel(value: BackendProduct['brand']) {
+  if (!value) {
+    return 'Unknown';
+  }
+
   if (typeof value === 'string') {
     return value;
   }
