@@ -15,12 +15,17 @@ type Props = {
   trailingAction?: React.ReactNode;
 };
 
+function shouldBypassImageOptimization(src: string) {
+  return src.startsWith('https://malamal.com.bd/wp-content/uploads/');
+}
+
 export function ProductCard({
   product,
   priority = false,
   trailingAction,
 }: Props) {
   const primaryImage = getProductPrimaryImage(product);
+  const unoptimized = shouldBypassImageOptimization(primaryImage);
 
   return (
     <Card className="group flex h-full flex-col overflow-hidden border-border transition hover:-translate-y-0.5 hover:shadow-md">
@@ -35,6 +40,7 @@ export function ProductCard({
             fill
             priority={priority}
             loading={priority ? 'eager' : 'lazy'}
+            unoptimized={unoptimized}
             sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
             className="ui-image-card object-contain p-2 transition duration-300 group-hover:scale-105"
           />
