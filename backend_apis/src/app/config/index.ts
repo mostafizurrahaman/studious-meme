@@ -81,7 +81,7 @@ export default {
     redirect_fail_url: process.env.PORTPOS_REDIRECT_FAIL_URL,
     redirect_cancel_url: process.env.PORTPOS_REDIRECT_CANCEL_URL,
     ipn_url: process.env.PORTPOS_IPN_URL,
-    mode: process.env.PORTPOS_MODE ?? "sandbox",
+    // mode: process.env.PORTPOS_MODE ?? "sandbox",
     webhook_ip_allowlist: process.env.PAYMENT_WEBHOOK_IP_ALLOWLIST,
   },
 

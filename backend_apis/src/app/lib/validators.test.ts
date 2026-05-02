@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { validateRequest } from './validators';
+import { validateRequest } from '../middlewares/validateRequest';
 import { z } from 'zod';
 
 describe('Validators', () => {

@@ -54,7 +54,7 @@ const productBaseSchema = z.object({
   images: z
     .array(z.string().trim().min(1))
     .max(5, { message: 'You can upload up to 5 product images!' })
-    ),
+    .optional(),
   features: z
     .string({ error: 'Features are required!' })
     .trim()
@@ -64,29 +64,29 @@ const productBaseSchema = z.object({
     .trim()
     .min(1, { message: 'Description is required!' }),
   price: z.coerce.number({ error: 'Price is required!' }).min(0, { message: 'Price is required!' }),
-  oldPrice: z.coerce.number().min(0, { message: 'Old price must be at least 0!' })),
-  badge: z.string()),
+  oldPrice: z.coerce.number().min(0, { message: 'Old price must be at least 0!' }).optional(),
+  badge: z.string().optional(),
   youtubeVideoUrl: z.preprocess(
     normalizeYouTubeUrl,
     z
       .string({ error: 'YouTube video URL must be valid!' })
       .refine(isSupportedYouTubeUrl, { message: 'Please enter a valid YouTube URL!' })
-      ),
+      .optional(),
   ),
   brand: z.string({ error: 'Brand is required!' }).trim().min(1, { message: 'Brand is required!' }),
   category: z.string({ error: 'Category is required!' }).trim().min(1, { message: 'Category is required!' }),
-  subCategorySlug: z.string()),
+  subCategorySlug: z.string().optional(),
   weightKg: z.coerce
     .number({ error: 'Weight is required!' })
     .min(0.01, { message: 'Weight must be greater than 0!' }),
   stock: z.preprocess(
     value => (value === '' ? null : value),
-    z.union([z.coerce.number().int().min(0, { message: 'Stock must be at least 0!' }), z.null()])),
+    z.union([z.coerce.number().int().min(0, { message: 'Stock must be at least 0!' }), z.null()]).optional(),
   ),
   rating: z.coerce.number({ error: 'Rating is required!' }).min(0, { message: 'Rating is required!' }),
-  isFeatured: z.boolean()),
-  isNoCOD: z.boolean()),
-  isActive: z.boolean()),
+  isFeatured: z.boolean().optional(),
+  isNoCOD: z.boolean().optional(),
+  isActive: z.boolean().optional(),
 });
 
 export const ProductValidation = {
@@ -101,7 +101,7 @@ export const ProductValidation = {
     }),
     body: productBaseSchema
       .extend({
-        sellingUnit: sellingUnitSchema),
+        sellingUnit: sellingUnitSchema,
       })
       .partial(),
   }),
