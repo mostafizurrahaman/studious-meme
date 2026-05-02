@@ -23,8 +23,8 @@ export function ProductCard({
   const primaryImage = getProductPrimaryImage(product);
 
   return (
-    <Card className="group overflow-hidden border-border transition hover:-translate-y-0.5 hover:shadow-md">
-      <div className="relative aspect-square bg-muted p-2">
+    <Card className="group flex h-full flex-col overflow-hidden border-border transition hover:-translate-y-0.5 hover:shadow-md">
+      <div className="relative aspect-square shrink-0 bg-muted p-2">
         <Link
           href={`/product/${product.slug}`}
           className="absolute inset-0 block"
@@ -63,24 +63,24 @@ export function ProductCard({
           />
         </div>
       </div>
-      <CardContent className="space-y-1.5 p-2.5 pt-2.5 sm:space-y-2 sm:p-4 sm:pt-4">
+      <CardContent className="flex flex-1 flex-col p-2.5 pt-2.5 sm:p-4 sm:pt-4">
         <Link href={`/product/${product.slug}`} className="block">
           <h3
-            className="wrap-break-word text-[11px] font-semibold leading-5 text-foreground transition hover:text-primary sm:text-[13px]"
+            className="line-clamp-3 min-h-[3.75rem] wrap-break-word text-[11px] font-semibold leading-5 text-foreground transition hover:text-primary sm:text-[13px]"
             title={product.title}
           >
             {product.title}
           </h3>
         </Link>
-        <div className="flex items-center gap-1 text-[9px] text-foreground/55 sm:text-[11px]">
+        <div className="mt-1.5 flex items-center gap-1 text-[9px] text-foreground/55 sm:mt-2 sm:text-[11px]">
           <span>Brand: {product.brand}</span>
           <span>SKU {product.sku}</span>
         </div>
-        <div className="flex items-center gap-1 text-[9px] text-primary sm:text-[11px]">
+        <div className="mt-1.5 flex items-center gap-1 text-[9px] text-primary sm:mt-2 sm:text-[11px]">
           <span>★★★★★</span>
           <span className="text-foreground/50">({product.rating})</span>
         </div>
-        <div className="flex items-center gap-2 text-[11px] sm:text-[13px]">
+        <div className="mt-1.5 flex items-center gap-2 text-[11px] sm:mt-2 sm:text-[13px]">
           <span className="font-extrabold text-primary">
             {formatPriceLabelWithUnit(product.price, product.sellingUnit)}
           </span>
@@ -90,12 +90,12 @@ export function ProductCard({
             </span>
           ) : null}
         </div>
-        <div className="flex items-center justify-between text-[9px] text-foreground/60 sm:text-[11px]">
+        <div className="mt-1.5 flex items-center justify-between text-[9px] text-foreground/60 sm:mt-2 sm:text-[11px]">
           <span>{product.stock}</span>
           <span>In catalog</span>
         </div>
-        <div className="grid gap-1.5 pt-1 sm:grid-cols-1 sm:gap-2">
-          <AddToCartButton product={product} />
+        <div className="mt-auto grid gap-1.5 pt-4 sm:grid-cols-1 sm:gap-2">
+          <AddToCartButton product={product} className="sm:w-full" />
           <div className="flex items-center gap-2">
             <Button
               asChild
