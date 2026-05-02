@@ -36,12 +36,13 @@ const accentPalette = [
   'from-[#3d5a48] to-[#80a27c]',
 ] as const;
 
-function getAccent(slug: string, accent?: string): string {
+function getAccent(slug?: string, accent?: string): string {
   if (accent?.trim()) {
     return accent;
   }
 
-  const sum = Array.from(slug).reduce(
+  const safeSlug = slug?.trim() || 'category';
+  const sum = Array.from(safeSlug).reduce(
     (total, char) => total + char.charCodeAt(0),
     0,
   );
@@ -51,15 +52,18 @@ function getAccent(slug: string, accent?: string): string {
 export function mapBackendCategoryToStorefrontCategory(
   category: BackendCategory,
 ): StorefrontCategory {
+  const name = category.name?.trim() || 'Category';
+  const slug = category.slug?.trim() || 'category';
+
   return {
-    name: category.name,
-    slug: category.slug,
-    href: `/category/${category.slug}`,
+    name,
+    slug,
+    href: `/category/${slug}`,
     image: category.image,
     description:
       category.description ??
-      `${category.name} catalog and related hardware listings.`,
-    accent: getAccent(category.slug, category.accent),
+      `${name} catalog and related hardware listings.`,
+    accent: getAccent(slug, category.accent),
     subCategories: category.subCategories
       ?.filter((subCategory) => subCategory.isActive !== false)
       .map((subCategory) => ({

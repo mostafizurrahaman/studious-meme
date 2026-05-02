@@ -24,7 +24,9 @@ type BackendEnvelope<T> = {
 
 type BackendProductRef =
   | { _id?: string; name?: string; slug?: string }
-  | string;
+  | string
+  | null
+  | undefined;
 
 export type BackendProduct = {
   _id?: string;
@@ -54,6 +56,10 @@ export type BackendProduct = {
 };
 
 function resolveName(value: BackendProductRef): string {
+  if (!value) {
+    return 'Unknown';
+  }
+
   if (typeof value === 'string') {
     return value;
   }
@@ -62,7 +68,7 @@ function resolveName(value: BackendProductRef): string {
 }
 
 function resolveSlug(value: BackendProductRef): string | undefined {
-  if (typeof value === 'string') {
+  if (!value || typeof value === 'string') {
     return undefined;
   }
 
