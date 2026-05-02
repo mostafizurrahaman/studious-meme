@@ -1015,11 +1015,11 @@ export function DashboardProductsManager({
     const brandId =
       typeof product.brand === 'string'
         ? product.brand
-        : (product.brand._id ?? '');
+        : (product.brand?._id ?? '');
     const categoryId =
       typeof product.category === 'string'
         ? product.category
-        : (product.category._id ?? '');
+        : (product.category?._id ?? '');
     productEditForm.reset({
       title: product.title,
       slug: product.slug,
