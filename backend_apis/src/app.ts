@@ -10,6 +10,7 @@ import path from 'path';
 import config from './app/config';
 import serverHomePage, { getMonitorStats } from './app/helpers/serverHomePage';
 import { globalLimiter } from './app/middlewares';
+import { migrateOldImagesToCloudinary } from './app/scripts/migrateOldImagesToCloudinary';
 // import { responseTimeLogger } from './app/middlewares/logger';
 
 const app: Application = express();
@@ -193,6 +194,11 @@ app.get('/monitor/data', (req: Request, res: Response) => {
   const data = getMonitorStats();
   res.json(data);
 });
+
+// Temporary migration hook. Remove after WordPress image URLs are migrated.
+// if (process.env.NODE_ENV !== 'test') {
+//   void migrateOldImagesToCloudinary();
+// }
 
 // global error handler
 app.use(globalErrorHandler);
