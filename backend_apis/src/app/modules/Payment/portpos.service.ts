@@ -164,6 +164,21 @@ const buildRequestUrl = (pathOrUrl: string) => {
 const buildFrontendUrl = (path: string) =>
   `${String(config.urls.frontend_app).replace(/\/$/, '')}${path}`;
 
+const appendOrderQuery = (inputUrl: string, orderId: string, kind: string) => {
+  try {
+    const url = /^https?:\/\//i.test(inputUrl)
+      ? new URL(inputUrl)
+      : new URL(inputUrl, buildFrontendUrl('/'));
+
+    url.searchParams.set('orderId', orderId);
+    url.searchParams.set('payment', kind);
+    return url.toString();
+  } catch {
+    const separator = inputUrl.includes('?') ? '&' : '?';
+    return `${inputUrl}${separator}orderId=${encodeURIComponent(orderId)}&payment=${encodeURIComponent(kind)}`;
+  }
+};
+
 const buildBackendUrl = (path: string) =>
   `${String(config.urls.backend_public).replace(/\/$/, '')}${path}`;
 
@@ -247,18 +262,18 @@ const getRedirectUrl = (
   kind: 'success' | 'fail' | 'cancel',
 ) => {
   if (kind === 'success' && config.portpos.redirect_success_url) {
-    return config.portpos.redirect_success_url;
+    return appendOrderQuery(config.portpos.redirect_success_url, orderId, kind);
   }
 
   if (kind === 'fail' && config.portpos.redirect_fail_url) {
-    return config.portpos.redirect_fail_url;
+    return appendOrderQuery(config.portpos.redirect_fail_url, orderId, kind);
   }
 
   if (kind === 'cancel' && config.portpos.redirect_cancel_url) {
-    return config.portpos.redirect_cancel_url;
+    return appendOrderQuery(config.portpos.redirect_cancel_url, orderId, kind);
   }
 
-  return buildFrontendUrl(`/my-account/orders/${orderId}?payment=${kind}`);
+  return buildFrontendUrl(`/payment/${kind}?orderId=${encodeURIComponent(orderId)}&payment=${kind}`);
 };
 
 const buildCustomerAddress = (order: PortPosOrder) => ({

@@ -42,6 +42,27 @@ export const initiatePortPosPayment = async (
   });
 };
 
+export type PortPosVerificationResult = {
+  orderId: string;
+  invoiceId: string;
+  paymentStatus: string;
+  orderStatus: string;
+  verifiedStatus?: string;
+};
+
+export const verifyPortPosPayment = async (
+  orderId: string,
+): Promise<BackendEnvelope<PortPosVerificationResult>> => {
+  const accessToken = await getValidAccessTokenForServerHandlerGet();
+  return requestBackendJson<BackendEnvelope<PortPosVerificationResult>>(
+    `/payment/portpos/verify/${orderId}`,
+    {
+      method: 'GET',
+      token: accessToken ?? undefined,
+    },
+  );
+};
+
 type UserListParams = {
   page?: number;
   limit?: number;
