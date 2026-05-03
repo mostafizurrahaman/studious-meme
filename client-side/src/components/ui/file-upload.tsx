@@ -74,6 +74,7 @@ export function FileUpload({
               alt="Selected image preview"
               fill
               unoptimized
+              sizes="(max-width: 768px) 100vw, 400px"
               className="object-cover"
             />
           </div>

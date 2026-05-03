@@ -64,6 +64,7 @@ export const MiniCartDropdown = React.forwardRef<
                     src={item.image}
                     alt={item.title}
                     fill
+                    sizes="56px"
                     className="object-contain p-1.5"
                   />
                 </div>

@@ -151,9 +151,11 @@ const buildProductFilters = async (query: Record<string, unknown>) => {
 
   if (searchTerm) {
     and.push({
-      $or: ['title', 'sku', 'slug', 'badge'].map((field) => ({
-        [field]: { $regex: escapeRegExp(searchTerm), $options: 'i' },
-      })),
+      $or: ['title', 'sku', 'slug', 'badge', 'features', 'description'].map(
+        (field) => ({
+          [field]: { $regex: escapeRegExp(searchTerm), $options: 'i' },
+        }),
+      ),
     });
   }
 

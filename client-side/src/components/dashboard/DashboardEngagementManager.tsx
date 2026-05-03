@@ -61,6 +61,7 @@ function ActivityCardView({
                 src={card.image}
                 alt={card.title}
                 fill
+                sizes="(max-width: 1024px) 100vw, 144px"
                 className="object-cover"
               />
             ) : (

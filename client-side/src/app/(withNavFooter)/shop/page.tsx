@@ -23,6 +23,7 @@ type Props = {
     page?: string;
     limit?: string;
     sort?: string;
+    searchTerm?: string;
   }>;
 };
 
@@ -35,6 +36,7 @@ export default async function ShopPage({ searchParams }: Props) {
     Number(query.limit ?? String(DEFAULT_SHOP_LIMIT)) || DEFAULT_SHOP_LIMIT,
     1,
   );
+  const searchTerm = query.searchTerm?.trim() ?? '';
   const [productsResult, categoriesResult] = await Promise.all([
     getAllActiveProducts({
       page,
@@ -44,6 +46,7 @@ export default async function ShopPage({ searchParams }: Props) {
       tag: query.tag,
       price: query.price,
       sort: query.sort,
+      searchTerm,
     }).catch(() => null),
     getActiveCategories().catch(() => null),
   ]);
