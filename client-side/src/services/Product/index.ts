@@ -455,6 +455,7 @@ export type SearchResult = {
     title: string;
     slug: string;
     price: number;
+    oldPrice?: number;
     sellingUnit?: string;
     images: string[];
     badge?: string;

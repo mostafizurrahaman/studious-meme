@@ -181,6 +181,11 @@ export function SearchBox() {
                         {product.sellingUnit ? product.sellingUnit : 'Product'}
                       </div>
                       <div className="mt-2 flex items-center gap-2">
+                        {product.oldPrice ? (
+                          <span className="text-[10px] text-foreground/35 line-through sm:text-xs">
+                            Tk. {product.oldPrice.toLocaleString('en-BD')}
+                          </span>
+                        ) : null}
                         <span className="text-[12px] font-black text-primary sm:text-sm">
                           Tk. {product.price.toLocaleString('en-BD')}
                         </span>

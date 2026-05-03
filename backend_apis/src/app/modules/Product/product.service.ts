@@ -620,6 +620,7 @@ const searchProducts = async (searchTerm: string, limit = 10) => {
         title: 1,
         slug: 1,
         price: 1,
+        oldPrice: 1,
         images: 1,
         badge: 1,
         sellingUnit: 1,
