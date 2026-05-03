@@ -90,6 +90,7 @@ type ProductDetailClientProps = {
 };
 
 const WHATSAPP_URL = 'https://wa.me/8801972525821';
+const HERO_IMAGE_QUALITY = 90;
 const sharePlatforms = [
   {
     name: 'Facebook',
@@ -370,6 +371,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                       alt={product.title}
                       fill
                       priority
+                      quality={HERO_IMAGE_QUALITY}
                       sizes="(max-width: 1024px) 100vw, 620px"
                       className={cn(
                         'object-contain transition-opacity rounded-lg',
