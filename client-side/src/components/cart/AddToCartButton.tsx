@@ -10,9 +10,13 @@ import { addCartItem } from '@/services/Cart';
 export function AddToCartButton({
   product,
   className,
+  disabled = false,
+  disabledLabel = 'Out of stock',
 }: {
   product: Product;
   className?: string;
+  disabled?: boolean;
+  disabledLabel?: string;
 }) {
   const addProduct = useCartStore((state) => state.addProduct);
   const markItemAsSynced = useCartStore((state) => state.markItemAsSynced);
@@ -21,7 +25,12 @@ export function AddToCartButton({
   return (
     <Button
       type="button"
+      disabled={disabled}
       onClick={() => {
+        if (disabled) {
+          return;
+        }
+
         addProduct(product);
         setAdded(true);
         if (product.id) {
@@ -40,7 +49,7 @@ export function AddToCartButton({
         className,
       )}
     >
-      {added ? 'Added' : 'Add to cart'}
+      {disabled ? disabledLabel : added ? 'Added' : 'Add to cart'}
     </Button>
   );
 }

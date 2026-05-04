@@ -34,6 +34,10 @@ function mapBackendCartItem(item: BackendCartItemLike): CartItem | null {
     return null;
   }
 
+  if (typeof item.productSnapshot.stock === 'number' && item.productSnapshot.stock <= 0) {
+    return null;
+  }
+
   const productId = getProductId(item.product);
 
   return {

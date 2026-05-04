@@ -8,6 +8,7 @@ import { AddToCompareButton } from '@/components/compare/AddToCompareButton';
 import { AddToWishlistButton } from '@/components/wishlist/AddToWishlistButton';
 import { formatMoney, formatPriceLabelWithUnit } from '@/lib/cart';
 import { getProductPrimaryImage, type Product } from '@/lib/storefront-types';
+import { isOutOfStockLabel } from '@/lib/stock';
 
 type Props = {
   product: Product;
@@ -25,6 +26,7 @@ export function ProductCard({
   trailingAction,
 }: Props) {
   const primaryImage = getProductPrimaryImage(product);
+  const outOfStock = isOutOfStockLabel(product.stock);
   // const unoptimized = shouldBypassImageOptimization(primaryImage);
 
   return (
@@ -100,9 +102,13 @@ export function ProductCard({
           <span>{product.stock}</span>
           <span>In catalog</span>
         </div>
-        <div className="mt-auto grid gap-1.5 pt-4 sm:grid-cols-1 sm:gap-2">
-          <AddToCartButton product={product} className="sm:w-full" />
-          <div className="flex items-center gap-2">
+          <div className="mt-auto grid gap-1.5 pt-4 sm:grid-cols-1 sm:gap-2">
+            <AddToCartButton
+              product={product}
+              disabled={outOfStock}
+              className="sm:w-full"
+            />
+            <div className="flex items-center gap-2">
             <Button
               asChild
               variant="outline"

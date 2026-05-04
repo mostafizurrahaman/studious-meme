@@ -13,3 +13,7 @@ export function isInStockLabel(stock: string) {
 
   return normalized === 'in stock' || normalized.endsWith(' in stock');
 }
+
+export function isOutOfStockLabel(stock: string) {
+  return stock.trim().toLowerCase() === 'out of stock';
+}

@@ -210,6 +210,13 @@ const previewCheckoutFromDB = async (payload: CreateOrderPayload) => {
 
     const unitStock = getAvailableStock(product.stock);
 
+    if (unitStock !== null && unitStock <= 0) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        `Product with SKU ${item.sku} is out of stock.`,
+      );
+    }
+
     if (unitStock !== null && unitStock < item.quantity) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
@@ -289,6 +296,13 @@ const createOrderIntoDB = async (user: IUser, payload: CreateOrderPayload) => {
       }
 
       const unitStock = getAvailableStock(product.stock);
+
+      if (unitStock !== null && unitStock <= 0) {
+        throw new AppError(
+          httpStatus.BAD_REQUEST,
+          `Product with SKU ${item.sku} is out of stock.`,
+        );
+      }
 
       if (unitStock !== null && unitStock < item.quantity) {
         throw new AppError(

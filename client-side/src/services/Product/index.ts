@@ -168,7 +168,7 @@ export const getAllProducts = async (
     {
       method: 'GET',
       next: {
-        revalidate: CACHE_REVALIDATE.DEFAULT,
+        revalidate: CACHE_REVALIDATE.LONG,
         tags: [CACHE_TAGS.PRODUCTS],
       },
     },
@@ -186,7 +186,7 @@ const fetchActiveProductsPage = async (
     {
       method: 'GET',
       next: {
-        revalidate: CACHE_REVALIDATE.DEFAULT,
+        revalidate: CACHE_REVALIDATE.LONG,
         tags: [CACHE_TAGS.PRODUCTS],
       },
     },
@@ -250,7 +250,7 @@ export const getProductBySlug = async (
     {
       method: 'GET',
       next: {
-        revalidate: CACHE_REVALIDATE.DEFAULT,
+        revalidate: CACHE_REVALIDATE.LONG,
         tags: [CACHE_TAGS.PRODUCTS, CACHE_TAGS.PRODUCT(slug)],
       },
     },
@@ -265,7 +265,7 @@ export const getActiveProductBySlug = async (
     {
       method: 'GET',
       next: {
-        revalidate: CACHE_REVALIDATE.DEFAULT,
+        revalidate: CACHE_REVALIDATE.LONG,
         tags: [CACHE_TAGS.PRODUCTS, CACHE_TAGS.PRODUCT(slug)],
       },
     },
@@ -291,7 +291,7 @@ export const getProductsByCategorySlug = async (
     {
       method: 'GET',
       next: {
-        revalidate: CACHE_REVALIDATE.DEFAULT,
+        revalidate: CACHE_REVALIDATE.LONG,
         tags: [
           CACHE_TAGS.PRODUCTS,
           CACHE_TAGS.CATEGORIES,
@@ -321,7 +321,7 @@ export const getProductsBySubCategorySlug = async (
     {
       method: 'GET',
       next: {
-        revalidate: CACHE_REVALIDATE.DEFAULT,
+        revalidate: CACHE_REVALIDATE.LONG,
         tags: [
           CACHE_TAGS.PRODUCTS,
           CACHE_TAGS.CATEGORIES,

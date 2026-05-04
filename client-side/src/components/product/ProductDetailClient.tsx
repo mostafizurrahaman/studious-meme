@@ -23,6 +23,7 @@ import { useCartStore } from '@/lib/cart-store';
 import { formatMoney, formatPriceLabelWithUnit } from '@/lib/cart';
 import { cn } from '@/lib/utils';
 import { getProductPrimaryImage, type Product } from '@/lib/storefront-types';
+import { isOutOfStockLabel } from '@/lib/stock';
 import { addCartItem } from '@/services/Cart';
 
 function FacebookIcon({ className }: { className?: string }) {
@@ -237,6 +238,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   const productUrl = `https://malamal.com.bd/product/${product.slug}/`;
   const encodedProductUrl = encodeURIComponent(productUrl);
   const primaryImage = getProductPrimaryImage(product);
+  const outOfStock = isOutOfStockLabel(product.stock);
   const shareMedia = primaryImage.startsWith('http')
     ? primaryImage
     : `https://malamal.com.bd${primaryImage}`;
@@ -276,6 +278,10 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   }
 
   function addQuantityToCart(redirect = false) {
+    if (outOfStock) {
+      return;
+    }
+
     addProductQuantity(product, quantity);
     if (product.id) {
       void addCartItem(product.id, quantity)
@@ -470,6 +476,13 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               support.
             </p>
           )}
+
+          {outOfStock ? (
+            <div className="inline-flex rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">
+              Out of stock
+            </div>
+          ) : null}
+
           <Button
             asChild
             variant="link"
@@ -505,15 +518,17 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
             </div>
             <Button
               className="h-11 rounded-md bg-secondary font-bold"
+              disabled={outOfStock}
               onClick={() => addQuantityToCart(false)}
             >
-              Add To Cart
+              {outOfStock ? 'Out of stock' : 'Add To Cart'}
             </Button>
             <Button
               className="h-11 rounded-md font-bold"
+              disabled={outOfStock}
               onClick={() => addQuantityToCart(true)}
             >
-              Buy Now
+              {outOfStock ? 'Out of stock' : 'Buy Now'}
             </Button>
           </div>
 

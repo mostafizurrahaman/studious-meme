@@ -7,6 +7,7 @@ import { toCartItem } from '@/lib/cart';
 import type { Coupon, CouponVerificationSummary } from '@/lib/coupons';
 import { verifyCoupon } from '@/services/Coupon';
 import type { Product } from '@/lib/storefront-types';
+import { isOutOfStockLabel } from '@/lib/stock';
 
 type CheckoutForm = {
   name: string;
@@ -101,6 +102,10 @@ export const useCartStore = create<CartState>()(
       checkout: defaultCheckout,
       orders: [],
       addProduct: (product) => {
+        if (isOutOfStockLabel(product.stock)) {
+          return;
+        }
+
         const nextItem = toCartItem(product);
 
         set((state) => {
@@ -122,6 +127,10 @@ export const useCartStore = create<CartState>()(
         });
       },
       addProductQuantity: (product, quantity) => {
+        if (isOutOfStockLabel(product.stock)) {
+          return;
+        }
+
         const safeQuantity =
           Number.isInteger(quantity) && quantity > 0 ? quantity : 1;
         const nextItem = { ...toCartItem(product), quantity: safeQuantity };

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { formatMoney, formatPriceLabelWithUnit } from '@/lib/cart';
 import { getProductPrimaryImage, type Product } from '@/lib/storefront-types';
+import { isOutOfStockLabel } from '@/lib/stock';
 import { useCompareStore } from '@/lib/compare-store';
 import {
   MAX_COMPARE_ITEMS,
@@ -192,6 +193,7 @@ export function ComparePageClient({ authenticated, initialProducts }: Props) {
                     <div className="mt-4 grid gap-1.5 pt-1 sm:grid-cols-1 sm:gap-2">
                       <AddToCartButton
                         product={product}
+                        disabled={isOutOfStockLabel(product.stock)}
                         className="h-8 rounded-full px-3 text-[8px] font-semibold sm:h-12 sm:text-[11px]"
                       />
                       <div className="flex items-center gap-2">
