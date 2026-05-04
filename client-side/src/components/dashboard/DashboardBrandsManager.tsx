@@ -71,6 +71,12 @@ function sliceText(value?: string, maxLength = 44) {
     : value;
 }
 
+function getBrandDisplayName(
+  brand: Pick<BackendBrand, 'name' | 'slug' | '_id'>,
+) {
+  return brand.name?.trim() || brand.slug || brand._id || 'Unnamed brand';
+}
+
 export function DashboardBrandsManager({
   brands,
   paginationMeta,
@@ -480,7 +486,10 @@ export function DashboardBrandsManager({
                                       brand.image ||
                                       ''
                                     }
-                                    alt={editingBrandName || brand.name}
+                                    alt={
+                                      editingBrandName ||
+                                      getBrandDisplayName(brand)
+                                    }
                                     className="h-full w-full object-cover"
                                   />
                                 ) : (
@@ -512,7 +521,7 @@ export function DashboardBrandsManager({
                               height={500}
                               width={500}
                               src={brand.image}
-                              alt={brand.name}
+                              alt={getBrandDisplayName(brand)}
                               className="h-full w-full object-cover"
                             />
                           ) : (
@@ -551,7 +560,7 @@ export function DashboardBrandsManager({
                           />
                         </div>
                       ) : (
-                        brand.name
+                        getBrandDisplayName(brand)
                       )}
                     </TableCell>
                     <TableCell className="min-w-0 whitespace-normal">
@@ -739,7 +748,7 @@ export function DashboardBrandsManager({
                                 }
                                 setEditingSlug(brand.slug);
                                 editForm.reset({
-                                  name: brand.name,
+                                  name: getBrandDisplayName(brand),
                                   slug: brand.slug,
                                   description: brand.description ?? '',
                                   isActive: brand.isActive,
@@ -758,7 +767,7 @@ export function DashboardBrandsManager({
                               onClick={() =>
                                 setPendingDeleteBrand({
                                   slug: brand.slug,
-                                  name: brand.name,
+                                  name: getBrandDisplayName(brand),
                                 })
                               }
                             >

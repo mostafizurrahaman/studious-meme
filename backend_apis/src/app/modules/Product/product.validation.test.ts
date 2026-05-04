@@ -32,6 +32,18 @@ describe('Product Validation - Critical Paths', () => {
       expect(result.success).toBe(true);
     });
 
+    it('should convert blank stock to null', () => {
+      const result = ProductValidation.productCreateSchema.safeParse({
+        body: { ...validProductBase, stock: '' },
+      });
+
+      expect(result.success).toBe(true);
+
+      if (result.success) {
+        expect(result.data.body.stock).toBeNull();
+      }
+    });
+
     it('should reject product without title', () => {
       const { title, ...dataWithoutTitle } = validProductBase;
       const result = ProductValidation.productCreateSchema.safeParse({
@@ -109,6 +121,19 @@ describe('Product Validation - Critical Paths', () => {
       });
 
       expect(result.success).toBe(true);
+    });
+
+    it('should convert blank stock to null on update', () => {
+      const result = ProductValidation.productUpdateSchema.safeParse({
+        params: { slug: 'test-product' },
+        body: { stock: '' },
+      });
+
+      expect(result.success).toBe(true);
+
+      if (result.success) {
+        expect(result.data.body.stock).toBeNull();
+      }
     });
   });
 });

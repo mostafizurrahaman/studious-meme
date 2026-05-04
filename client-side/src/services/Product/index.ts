@@ -424,6 +424,8 @@ export const updateProduct = async (
 
   revalidateTag(CACHE_TAGS.PRODUCTS, 'max');
   revalidateTag(CACHE_TAGS.SEARCH, 'max');
+  revalidatePath('/dashboard/admin/products');
+  revalidatePath('/dashboard/super-admin/products');
 
   if (nextSlug !== slug) {
     revalidatePath(`/product/${slug}`);

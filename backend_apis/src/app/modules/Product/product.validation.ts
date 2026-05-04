@@ -110,13 +110,15 @@ const productBaseSchema = z.object({
     .number({ error: 'Weight is required!' })
     .min(0.01, { message: 'Weight must be greater than 0!' }),
   stock: z.preprocess(
-    (value) => (value === '' ? null : value),
+    (value) => {
+      if (value === '' || value === null) return null;
+      if (typeof value === 'string' && value.trim() !== '') return Number(value);
+
+      return value;
+    },
     z
       .union([
-        z.coerce
-          .number()
-          .int()
-          .min(0, { message: 'Stock must be at least 0!' }),
+        z.number().int().min(0, { message: 'Stock must be at least 0!' }),
         z.null(),
       ])
       .optional(),

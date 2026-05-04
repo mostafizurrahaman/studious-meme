@@ -46,11 +46,7 @@ const getAllBrandsFromDB = async (query: Record<string, unknown>) => {
   }
 
   const [data, total] = await Promise.all([
-    BrandModel.find(filter)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .lean(),
+    BrandModel.find(filter).sort({ name: 1 }).skip(skip).limit(limit).lean(),
     BrandModel.countDocuments(filter),
   ]);
 
@@ -67,7 +63,7 @@ const getAllBrandsFromDB = async (query: Record<string, unknown>) => {
 
 // 3. getActiveBrandsFromDB
 const getActiveBrandsFromDB = async () =>
-  BrandModel.find({ isActive: true }).sort({ createdAt: -1 }).lean();
+  BrandModel.find({ isActive: true }).sort({ name: 1 }).lean();
 
 // 3. getBrandBySlugFromDB
 const getBrandBySlugFromDB = async (slug: string) => {

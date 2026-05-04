@@ -69,12 +69,23 @@ export const getAllBrandsAcrossPages = async (
   params: Omit<GetAllBrandsParams, 'page'> = {},
 ): Promise<BackendEnvelope<BackendBrand[]>> => {
   const firstPage = await getAllBrands({ ...params, page: 1 });
-  const brands = [...(firstPage.data ?? [])];
+  const brandMap = new Map<string, BackendBrand>();
+
+  for (const brand of firstPage.data ?? []) {
+    const key = brand._id ?? brand.slug;
+    if (key) {
+      brandMap.set(key, brand);
+    }
+  }
+
   const totalPages = firstPage.meta?.totalPages ?? 1;
-  const limit = firstPage.meta?.limit ?? params.limit ?? brands.length;
+  const limit = firstPage.meta?.limit ?? params.limit ?? brandMap.size;
 
   if (totalPages <= 1) {
-    return firstPage;
+    return {
+      ...firstPage,
+      data: Array.from(brandMap.values()),
+    };
   }
 
   const remainingResults = await Promise.all(
@@ -85,18 +96,23 @@ export const getAllBrandsAcrossPages = async (
 
   remainingResults.forEach((result) => {
     if (Array.isArray(result.data)) {
-      brands.push(...result.data);
+      for (const brand of result.data) {
+        const key = brand._id ?? brand.slug;
+        if (key) {
+          brandMap.set(key, brand);
+        }
+      }
     }
   });
 
   return {
     ...firstPage,
-    data: brands,
+    data: Array.from(brandMap.values()),
     meta: {
       ...firstPage.meta,
       page: 1,
       limit,
-      total: firstPage.meta?.total ?? brands.length,
+      total: firstPage.meta?.total ?? brandMap.size,
       totalPages,
     },
   };
@@ -194,6 +210,8 @@ export const createBrand = async (
   revalidateTag(CACHE_TAGS.BRANDS, 'max');
 
   revalidatePath('/shop-by-brands');
+  revalidatePath('/dashboard/admin/brands');
+  revalidatePath('/dashboard/super-admin/brands');
   return result;
 };
 
@@ -215,6 +233,8 @@ export const updateBrand = async (
   );
 
   revalidateTag(CACHE_TAGS.BRANDS, 'max');
+  revalidatePath('/dashboard/admin/brands');
+  revalidatePath('/dashboard/super-admin/brands');
   return result;
 };
 
@@ -231,5 +251,7 @@ export const deleteBrand = async (
   );
 
   revalidateTag(CACHE_TAGS.BRANDS, 'max');
+  revalidatePath('/dashboard/admin/brands');
+  revalidatePath('/dashboard/super-admin/brands');
   return result;
 };

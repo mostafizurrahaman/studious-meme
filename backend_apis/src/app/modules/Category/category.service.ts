@@ -30,12 +30,12 @@ const createCategoryIntoDB = async (
 
 // 2. getAllCategoriesFromDB
 const getAllCategoriesFromDB = async () =>
-  CategoryModel.find({}).sort({ createdAt: -1 }).lean();
+  CategoryModel.find({}).sort({ name: 1 }).lean();
 
 // 3. getActiveCategoriesFromDB
 const getActiveCategoriesFromDB = async () =>
   CategoryModel.find({ isActive: true })
-    .sort({ createdAt: -1 })
+    .sort({ name: 1 })
     .lean()
     .then((categories) =>
       categories.map((category) => ({

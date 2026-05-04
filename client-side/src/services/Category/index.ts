@@ -140,6 +140,8 @@ export const createCategory = async (
   revalidateTag(CACHE_TAGS.CATEGORIES, 'max');
 
   revalidatePath(`/category/${slugify(payload.slug ?? payload.name)}`);
+  revalidatePath('/dashboard/admin/categories');
+  revalidatePath('/dashboard/super-admin/categories');
   return result;
 };
 
@@ -165,6 +167,8 @@ export const updateCategory = async (
   );
 
   revalidateTag(CACHE_TAGS.CATEGORIES, 'max');
+  revalidatePath('/dashboard/admin/categories');
+  revalidatePath('/dashboard/super-admin/categories');
   return result;
 };
 
@@ -181,6 +185,8 @@ export const deleteCategory = async (
   );
 
   revalidateTag(CACHE_TAGS.CATEGORIES, 'max');
+  revalidatePath('/dashboard/admin/categories');
+  revalidatePath('/dashboard/super-admin/categories');
   return result;
 };
 
@@ -202,6 +208,8 @@ export const createCategorySubCategory = async (
   );
 
   revalidateTag(CACHE_TAGS.CATEGORIES, 'max');
+  revalidatePath('/dashboard/admin/categories');
+  revalidatePath('/dashboard/super-admin/categories');
   return result;
 };
 
@@ -224,6 +232,8 @@ export const updateCategorySubCategory = async (
   );
 
   revalidateTag(CACHE_TAGS.CATEGORIES, 'max');
+  revalidatePath('/dashboard/admin/categories');
+  revalidatePath('/dashboard/super-admin/categories');
   return result;
 };
 

@@ -52,7 +52,9 @@ export default async function SuperAdminProductsPage({ searchParams }: Props) {
   };
   const brandOptions = Array.isArray(brandsResult?.data)
     ? brandsResult.data.flatMap((brand) =>
-        brand._id ? [{ value: brand._id, label: brand.name }] : [],
+        brand._id
+          ? [{ value: brand._id, label: brand.name?.trim() || brand.slug || 'Unnamed brand' }]
+          : [],
       )
     : [];
   const categories = Array.isArray(categoriesResult?.data)

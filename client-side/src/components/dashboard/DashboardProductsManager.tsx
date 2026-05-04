@@ -416,7 +416,7 @@ function ProductFormSections({
                 category._id
                   ? [
                       <option key={category._id} value={category._id}>
-                        {category.name}
+                        {category.name?.trim() || category.slug || 'Unnamed category'}
                       </option>,
                     ]
                   : [],
@@ -741,7 +741,7 @@ export function DashboardProductsManager({
       brand: '',
       category: '',
       subCategorySlug: '',
-      stock: '0',
+      stock: '',
       rating: '5',
       weightKg: '',
       sellingUnit: DEFAULT_SELLING_UNIT,

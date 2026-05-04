@@ -88,14 +88,14 @@ const csv = (value: unknown) =>
 const pickSort = (value: unknown): ProductSort => {
   switch (getString(value)) {
     case 'price-asc':
-      return { price: 1, createdAt: -1 };
+      return { price: 1, createdAt: -1, _id: -1 };
     case 'price-desc':
-      return { price: -1, createdAt: -1 };
+      return { price: -1, createdAt: -1, _id: -1 };
     case 'oldest':
-      return { createdAt: 1 };
+      return { createdAt: 1, _id: 1 };
     case 'latest':
     default:
-      return { createdAt: -1 };
+      return { createdAt: -1, _id: -1 };
   }
 };
 

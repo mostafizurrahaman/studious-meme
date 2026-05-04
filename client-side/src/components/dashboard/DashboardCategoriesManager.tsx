@@ -85,6 +85,10 @@ function sliceText(value?: string, maxLength = 44) {
     : value;
 }
 
+function getCategoryDisplayName(category: CategoryRow) {
+  return category.name?.trim() || category.slug || 'Unnamed category';
+}
+
 function AccentColorField({
   value,
   onChange,
@@ -593,14 +597,14 @@ export function DashboardCategoriesManager({
     setPendingDelete({
       type: 'category',
       categorySlug: category.slug,
-      label: category.name,
+      label: getCategoryDisplayName(category),
     });
   }
 
   function startEditingCategory(category: CategoryRow) {
     setEditingSlug(category.slug ?? null);
     categoryEditForm.reset({
-      name: category.name,
+      name: getCategoryDisplayName(category),
       slug: category.slug ?? '',
       description: category.description ?? '',
       accent: category.accent ?? '',
@@ -1026,7 +1030,7 @@ export function DashboardCategoriesManager({
                 const isEditing = editingSlug === category.slug;
 
                 return (
-                  <Fragment key={category.slug ?? category.name}>
+                  <Fragment key={category.slug ?? getCategoryDisplayName(category)}>
                     <TableRow>
                       <TableCell className="w-14 font-medium text-muted-foreground">
                         {categoryIndex + 1}
@@ -1080,7 +1084,7 @@ export function DashboardCategoriesManager({
                                       category.image ||
                                       ''
                                     }
-                                    alt={category.name}
+                                    alt={getCategoryDisplayName(category)}
                                     className="h-full w-full object-cover"
                                   />
                                 ) : (
@@ -1108,7 +1112,7 @@ export function DashboardCategoriesManager({
                                 height={500}
                                 width={500}
                                 src={category.image}
-                                alt={category.name}
+                                alt={getCategoryDisplayName(category)}
                                 className="h-full w-full object-cover"
                               />
                             ) : (
@@ -1159,7 +1163,7 @@ export function DashboardCategoriesManager({
                               />
                             </div>
                           ) : (
-                            category.name
+                          getCategoryDisplayName(category)
                           )}
                         </div>
                       </TableCell>
