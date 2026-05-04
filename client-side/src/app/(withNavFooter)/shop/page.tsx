@@ -81,18 +81,18 @@ export default async function ShopPage({ searchParams }: Props) {
         <div className="px-4 py-6 lg:px-6">
           <Card className="border-0 bg-secondary text-secondary-foreground shadow-sm">
             <CardHeader className="p-6 sm:p-8">
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-secondary-foreground/65">
+              <p className="hidden sm:block mb-4 text-xs font-semibold uppercase tracking-[0.3em] text-secondary-foreground/65">
                 Product catalog
               </p>
-              <div className="mt-4 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                 <div>
                   <h1 className="text-3xl font-black sm:text-4xl">Shop</h1>
-                  <p className="mt-3 max-w-2xl text-sm leading-7 text-white/78 sm:text-base">
+                  <p className="mt-3 hidden sm:block max-w-2xl text-sm leading-7 text-white/78 sm:text-base">
                     Browse the storefront catalog with filters, categories and
                     product cards across the full hardware range.
                   </p>
                 </div>
-                <div className="grid grid-cols-2 gap-3 text-center sm:grid-cols-4">
+                <div className="hidden grid-cols-2 gap-3 text-center sm:grid sm:grid-cols-4">
                   {stats.map(([value, label]) => (
                     <div
                       key={label}

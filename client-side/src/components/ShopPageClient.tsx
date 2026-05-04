@@ -2,11 +2,20 @@
 
 import { type Route } from 'next';
 import Link from 'next/link';
+import { SlidersHorizontal } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { ProductCard } from '@/components/ProductCard';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 import type { Category, Product } from '@/lib/storefront-types';
 
 type Props = {
@@ -209,9 +218,9 @@ export function ShopPageClient({ products, categories, meta }: Props) {
     filters.tag !== 'all' ? filters.tag : '',
   ].filter(Boolean).length;
 
-  return (
-    <section className="mt-6 grid gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
-      <Card className="p-5 shadow-sm">
+  function renderFiltersContent() {
+    return (
+      <>
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-sm font-extrabold text-secondary">Filters</h2>
           {activeCount > 0 ? (
@@ -297,83 +306,121 @@ export function ShopPageClient({ products, categories, meta }: Props) {
             </div>
           </div>
         </div>
-      </Card>
+      </>
+    );
+  }
 
-      <div className="space-y-4">
-        <Card className="p-4 shadow-sm">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div className="text-sm text-foreground/65">
-              Showing {products.length} of {meta.total} products across{' '}
-              {categories.length} categories
-            </div>
-            <div className="flex flex-wrap gap-2 text-xs font-semibold">
-              {[
-                ['all', 'All'],
-                ['sale', 'Sale'],
-                ['featured', 'Featured'],
-                ['latest', 'Latest'],
-                ['industrial', 'Industrial'],
-                ['home', 'Home'],
-              ].map(([value, label]) => (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() =>
-                    updateFilter('tag', value === 'all' ? '' : value)
-                  }
-                  className={`cursor-pointer rounded-full px-3 py-2 transition ${filters.tag === value || (value === 'all' && filters.tag === 'all') ? 'bg-secondary text-secondary-foreground' : 'bg-muted text-foreground/75 hover:bg-muted/70'}`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </Card>
-
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-          {products.map((product) => (
-            <ProductCard key={product.sku} product={product} />
-          ))}
-        </div>
-
-        {products.length === 0 ? (
-          <Card className="p-6 text-center text-sm text-foreground/60 shadow-sm">
-            No products match the selected filters.
-          </Card>
-        ) : null}
-
-        <Card className="flex flex-wrap items-center justify-between gap-3 p-4 text-sm shadow-sm">
-          <span className="text-foreground/60">
-            Page {page} of {totalPages}
-          </span>
-          <div className="flex items-center gap-2">
+  return (
+    <>
+      <div className="mt-4 lg:hidden">
+        <Sheet>
+          <SheetTrigger asChild>
             <Button
               type="button"
               variant="outline"
-              disabled={page <= 1}
-              onClick={() => updatePage(page - 1)}
-              className="h-9 rounded-full border-border px-4 text-xs font-semibold"
+              className="h-11 w-full rounded-full border-border px-4 text-sm font-semibold shadow-sm"
             >
-              Prev
+              <SlidersHorizontal className="size-4" />
+              Filter
+              {activeCount > 0 ? ` (${activeCount})` : ''}
             </Button>
-            <Link
-              href="/quotation-request"
-              className="rounded-full bg-muted px-4 py-2 text-xs font-semibold text-foreground/70 hover:text-primary"
-            >
-              Bulk quote
-            </Link>
-            <Button
-              type="button"
-              variant="outline"
-              disabled={page >= totalPages}
-              onClick={() => updatePage(page + 1)}
-              className="h-9 rounded-full border-border px-4 text-xs font-semibold"
-            >
-              Next
-            </Button>
-          </div>
-        </Card>
+          </SheetTrigger>
+          <SheetContent
+            side="right"
+            className="w-[88vw] max-w-sm overflow-y-auto"
+          >
+            <SheetHeader className="border-b border-border px-5 py-4">
+              <SheetTitle>Filters</SheetTitle>
+              <SheetDescription>
+                Show or hide categories, stock and price filters.
+              </SheetDescription>
+            </SheetHeader>
+            <div className="px-5 py-5">{renderFiltersContent()}</div>
+          </SheetContent>
+        </Sheet>
       </div>
-    </section>
+
+      <section className="mt-6 grid gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
+        <Card className="hidden p-5 shadow-sm lg:block">
+          {renderFiltersContent()}
+        </Card>
+
+        <div className="space-y-4">
+          <Card className="p-4 shadow-sm">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+              <div className="text-sm text-foreground/65">
+                Showing {products.length} of {meta.total} products across{' '}
+                {categories.length} categories
+              </div>
+              <div className="flex flex-wrap gap-2 text-xs font-semibold">
+                {[
+                  ['all', 'All'],
+                  ['sale', 'Sale'],
+                  ['featured', 'Featured'],
+                  ['latest', 'Latest'],
+                  ['industrial', 'Industrial'],
+                  ['home', 'Home'],
+                ].map(([value, label]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() =>
+                      updateFilter('tag', value === 'all' ? '' : value)
+                    }
+                    className={`cursor-pointer rounded-full px-3 py-2 transition ${filters.tag === value || (value === 'all' && filters.tag === 'all') ? 'bg-secondary text-secondary-foreground' : 'bg-muted text-foreground/75 hover:bg-muted/70'}`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </Card>
+
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+            {products.map((product) => (
+              <ProductCard key={product.sku} product={product} />
+            ))}
+          </div>
+
+          {products.length === 0 ? (
+            <Card className="p-6 text-center text-sm text-foreground/60 shadow-sm">
+              No products match the selected filters.
+            </Card>
+          ) : null}
+
+          <Card className="flex flex-wrap items-center justify-between gap-3 p-4 text-sm shadow-sm">
+            <span className="text-foreground/60">
+              Page {page} of {totalPages}
+            </span>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                disabled={page <= 1}
+                onClick={() => updatePage(page - 1)}
+                className="h-9 rounded-full border-border px-4 text-xs font-semibold"
+              >
+                Prev
+              </Button>
+              <Link
+                href="/quotation-request"
+                className="rounded-full bg-muted px-4 py-2 text-xs font-semibold text-foreground/70 hover:text-primary"
+              >
+                Bulk quote
+              </Link>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={page >= totalPages}
+                onClick={() => updatePage(page + 1)}
+                className="h-9 rounded-full border-border px-4 text-xs font-semibold"
+              >
+                Next
+              </Button>
+            </div>
+          </Card>
+        </div>
+      </section>
+    </>
   );
 }
