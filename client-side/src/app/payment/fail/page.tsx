@@ -5,8 +5,8 @@ import { Card } from '@/components/ui/card';
 
 export default function PaymentFailPage() {
   return (
-    <main className="flex-1 bg-muted/20 px-4 py-10">
-      <div className="mx-auto w-full max-w-2xl">
+    <main className="flex flex-1 items-center justify-center bg-muted/20 px-4 py-10">
+      <div className="w-full max-w-2xl">
         <Card className="space-y-5 border-0 p-6 shadow-sm sm:p-8">
           <div className="flex items-center gap-3">
             <AlertCircle className="size-10 text-red-600" />
@@ -26,7 +26,7 @@ export default function PaymentFailPage() {
           </p>
 
           <div className="flex flex-wrap gap-3">
-            <Button asChild>
+            <Button asChild className="text-white! hover:text-black!">
               <Link href="/checkout">
                 <ArrowLeft className="size-4" />
                 Back to checkout

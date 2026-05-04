@@ -1,5 +1,11 @@
 import Link from 'next/link';
-import { AlertCircle, CheckCircle2, Loader2, Package, RefreshCcw } from 'lucide-react';
+import {
+  AlertCircle,
+  CheckCircle2,
+  Loader2,
+  Package,
+  RefreshCcw,
+} from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { verifyPortPosPayment } from '@/services/Payment';
@@ -20,8 +26,8 @@ export default async function PaymentSuccessPage({ searchParams }: Props) {
   const isVerifying = Boolean(orderId) && verification === null;
 
   return (
-    <main className="flex-1 bg-muted/20 px-4 py-10">
-      <div className="mx-auto w-full max-w-2xl">
+    <main className="flex flex-1 items-center justify-center bg-muted/20 px-4 py-10">
+      <div className="w-full max-w-2xl">
         <Card className="overflow-hidden border-0 shadow-sm">
           <div className="border-b bg-background px-6 py-5 sm:px-8">
             <div className="flex items-center gap-3">
@@ -109,7 +115,7 @@ export default async function PaymentSuccessPage({ searchParams }: Props) {
                   </Link>
                 </Button>
               ) : null}
-              <Button asChild variant="outline">
+              <Button asChild variant="outline" className="hover:text-primary!">
                 <Link href="/shop">
                   <RefreshCcw className="size-4" />
                   Continue shopping
