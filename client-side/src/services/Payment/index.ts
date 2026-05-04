@@ -32,10 +32,10 @@ export type PaginatedBackendEnvelope<T> = BackendEnvelope<T> & {
 
 export const initiatePortPosPayment = async (
   orderId: string,
-): Promise<BackendEnvelope<{ url?: string; transactionId?: string }>> => {
+): Promise<BackendEnvelope<{ url?: string; paymentUrl?: string; transactionId?: string }>> => {
   const accessToken = await getValidAccessTokenForServerActions();
   return requestBackendJson<
-    BackendEnvelope<{ url?: string; transactionId?: string }>
+    BackendEnvelope<{ url?: string; paymentUrl?: string; transactionId?: string }>
   >(`/payment/portpos/init/${orderId}`, {
     method: 'POST',
     token: accessToken ?? undefined,

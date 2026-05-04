@@ -55,6 +55,7 @@ export type BackendOrder = {
   paymentStatus: 'UNPAID' | 'PENDING' | 'PAID' | 'FAILED' | 'CANCELLED';
   status: 'PLACED' | 'PROCESSING' | 'DELIVERED' | 'CANCELLED';
   transactionId?: string;
+  paymentUrl?: string;
   gatewayUrl?: string;
   createdAt: string;
   updatedAt: string;

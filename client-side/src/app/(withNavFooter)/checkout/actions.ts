@@ -2,7 +2,6 @@
 
 import { z } from 'zod';
 import { createOrder, previewCheckout } from '@/services/Order';
-import { initiatePortPosPayment } from '@/services/Payment';
 import { BANGLADESH_DISTRICTS } from '@/lib/bangladesh-districts';
 import { normalizeOrderPaymentMethod } from '@/lib/payment-method';
 import { getValidAccessTokenForServerActions } from '@/lib/getValidAccessToken';
@@ -208,20 +207,17 @@ export async function submitCheckoutAction(
   }
 
   if (normalizedPayment === 'PORTPOS') {
-    const paymentResult = await initiatePortPosPayment(
-      orderResult.data.orderId,
-    );
+    const gatewayUrl =
+      orderResult.data.paymentUrl ?? orderResult.data.gatewayUrl;
 
-    if (!paymentResult?.success || !paymentResult.data?.url) {
-      return fail(
-        paymentResult?.message ?? 'Failed to initiate PortPOS payment.',
-      );
+    if (!gatewayUrl) {
+      return fail('Failed to initiate PortPOS payment.');
     }
 
     return {
       ok: true,
       orderId: orderResult.data.orderId,
-      gatewayUrl: paymentResult.data.url,
+      gatewayUrl,
     };
   }
 

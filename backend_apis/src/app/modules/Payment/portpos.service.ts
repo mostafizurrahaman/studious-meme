@@ -228,12 +228,24 @@ const requestPortPos = async <T>(
     headers,
   });
 
-  const payload = (await response.json().catch(() => ({}))) as T & {
-    message?: string;
-    error?: string;
-    errors?: string[];
-    result?: boolean | string;
-  };
+  const rawBody = await response.text().catch(() => '');
+  const payload = (() => {
+    try {
+      return (rawBody ? JSON.parse(rawBody) : {}) as T & {
+        message?: string;
+        error?: string;
+        errors?: string[];
+        result?: boolean | string;
+      };
+    } catch {
+      return {} as T & {
+        message?: string;
+        error?: string;
+        errors?: string[];
+        result?: boolean | string;
+      };
+    }
+  })();
 
   const requestFailed =
     !response.ok ||
@@ -243,14 +255,16 @@ const requestPortPos = async <T>(
       payload.result === false);
 
   if (requestFailed) {
+    const gatewayMessage = extractGatewayMessage(
+      payload as
+        | PortPosInvoiceResponse
+        | PortPosInvoiceDetailsResponse
+        | PortPosRefundResponse,
+    );
+
     throw new AppError(
       httpStatus.BAD_GATEWAY,
-      extractGatewayMessage(
-        payload as
-          | PortPosInvoiceResponse
-          | PortPosInvoiceDetailsResponse
-          | PortPosRefundResponse,
-      ),
+      `PortPOS ${response.status} ${response.statusText || 'request failed'}: ${gatewayMessage}${rawBody ? ` | ${rawBody}` : ''}`,
     );
   }
 
@@ -281,7 +295,7 @@ const buildCustomerAddress = (order: PortPosOrder) => ({
   city: order.customer.city,
   state: order.customer.city,
   zipcode: order.customer.phone.replace(/\D/g, '').slice(-4) || '0000',
-  country: 'Bangladesh',
+  country: 'BD',
 });
 
 const createInvoice = async (order: PortPosOrder, user: IUser) => {
@@ -290,16 +304,14 @@ const createInvoice = async (order: PortPosOrder, user: IUser) => {
   const redirectUrl = getRedirectUrl(order.orderId, 'success');
   const payload = {
     order: {
-      amount: Number(
-        order.payableAmount ?? order.totalAmount ?? order.total ?? 0,
-      ),
+      amount: Number(order.payableAmount ?? order.totalAmount ?? order.total ?? 0),
       currency: order.currency ?? 'BDT',
       redirect_url: redirectUrl,
       ipn_url:
         config.portpos.ipn_url ??
         buildBackendUrl('/api/v1/payment/portpos/ipn'),
       reference: order.orderId,
-      validity: 30,
+      validity: 60,
     },
     product: {
       name: order.items[0]?.title ?? `Order ${order.orderId}`,
@@ -315,20 +327,12 @@ const createInvoice = async (order: PortPosOrder, user: IUser) => {
         address: buildCustomerAddress(order),
       },
     },
-    shipping: {
-      customer: {
-        name: order.customer.name,
-        email: order.customer.email || user.email,
-        phone: order.customer.phone,
-        address: buildCustomerAddress(order),
-      },
-    },
     customs: [
-      { name: 'orderId', value: order.orderId },
-      { name: 'userId', value: String(user._id) },
-      { name: 'successUrl', value: getRedirectUrl(order.orderId, 'success') },
-      { name: 'failUrl', value: getRedirectUrl(order.orderId, 'fail') },
-      { name: 'cancelUrl', value: getRedirectUrl(order.orderId, 'cancel') },
+      { orderId: order.orderId },
+      { userId: String(user._id) },
+      { successUrl: getRedirectUrl(order.orderId, 'success') },
+      { failUrl: getRedirectUrl(order.orderId, 'fail') },
+      { cancelUrl: getRedirectUrl(order.orderId, 'cancel') },
     ],
   };
 
