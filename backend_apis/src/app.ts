@@ -10,7 +10,7 @@ import path from 'path';
 import config from './app/config';
 import serverHomePage, { getMonitorStats } from './app/helpers/serverHomePage';
 import { globalLimiter } from './app/middlewares';
-import { migrateOldImagesToCloudinary } from './app/scripts/migrateOldImagesToCloudinary';
+// import { migrateOldImagesToCloudinary } from './app/scripts/migrateOldImagesToCloudinary';
 // import { responseTimeLogger } from './app/middlewares/logger';
 
 const app: Application = express();
