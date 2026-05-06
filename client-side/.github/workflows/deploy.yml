@@ -22,72 +22,61 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT }}
-          timeout: 60s
-          command_timeout: 30m
-          script_stop: true
           script: |
-            export DEBIAN_FRONTEND=noninteractive
-
-            REPO_URL="${{ secrets.FRONTEND_REPO_URL }}"
-            ENV_DATA='${{ secrets.FRONTEND_ENV_FILE }}'
-
+            # ভ্যারিয়েবল ডিক্লেয়ারেশন
             APP_DIR="/var/www/MalaMal_Frontend"
             APP_NAME="malamal-frontend"
 
-            echo "==> Installing required packages"
+            echo "==> Updating packages"
             sudo apt update -y
             sudo apt install -y git curl
 
-            echo "==> Installing pnpm and pm2 if missing"
-
+            echo "==> Checking/Installing pnpm and pm2"
             if ! command -v pnpm >/dev/null 2>&1; then
               sudo npm install -g pnpm
             fi
-
             if ! command -v pm2 >/dev/null 2>&1; then
               sudo npm install -g pm2
             fi
 
             echo "==> Preparing app directory"
-
             sudo mkdir -p "$APP_DIR"
-            sudo chown -R "$USER:$USER" "$APP_DIR"
-
-            cd "$APP_DIR" || exit 1
+            sudo chown -R $USER:$USER "$APP_DIR"
+            cd "$APP_DIR" || exit
 
             echo "==> Updating source code"
-
-            if [ -d ".git" ]; then
+            if [ ! -d ".git" ]; then
+              git clone -b main ${{ secrets.FRONTEND_REPO_URL }} .
+            else
               git fetch origin main
               git reset --hard origin/main
               git clean -fd
-            else
-              rm -rf ./* ./.??* 2>/dev/null || true
-              git clone -b main "$REPO_URL" .
             fi
 
             echo "==> Creating .env file"
-
-            printf "%s" "$ENV_DATA" > .env
+            # এখানে সরাসরি সিক্রেট ব্যবহার করা হয়েছে, যা সেফ
+            cat <<EOF > .env
+            ${{ secrets.FRONTEND_ENV_FILE }}
+            EOF
 
             echo "==> Installing dependencies"
-
+            # --frozen-lockfile নিশ্চিত করে যে ভার্সন পরিবর্তন হবে না
             pnpm install --frozen-lockfile
 
             echo "==> Building Next.js app"
-
             pnpm build
 
-            echo "==> Starting frontend with PM2"
-
-            pm2 delete "$APP_NAME" 2>/dev/null || true
-
-            pm2 start "pnpm start" \
-              --name "$APP_NAME" \
-              --cwd "$APP_DIR"
+            echo "==> Starting/Reloading with PM2"
+            # জিরো ডাউনটাইম রিলোড চেষ্টা করবে, না থাকলে নতুন শুরু করবে
+            pm2 describe $APP_NAME > /dev/null 2>&1
+            if [ $? -eq 0 ]; then
+              echo "Existing app found. Reloading..."
+              pm2 reload $APP_NAME
+            else
+              echo "Starting new PM2 process..."
+              pm2 start pnpm --name "$APP_NAME" -- start
+            fi
 
             pm2 save
-
-            echo "==> Frontend deploy success"
-
+            echo "==> Frontend deploy success!"
             pm2 status
