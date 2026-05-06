@@ -50,8 +50,6 @@ app.use(
           // 'https://*.vercel.app',
           // 'https://malamal.com.bd',
           // 'https://www.malamal.com.bd',
-          // 'https://malamal.xyz',
-          // 'https://www.malamal.xyz',
           // 'https://www.google-analytics.com',
           // 'https://www.googletagmanager.com',
         ],
@@ -71,8 +69,6 @@ app.use(
         //   "'self'",
         //   'https://malamal.com.bd',
         //   'https://www.malamal.com.bd',
-        //   'https://malamal.xyz',
-        //   'https://www.malamal.xyz',
         // ],
 
         ...(isProduction ? { upgradeInsecureRequests: [] } : {}),

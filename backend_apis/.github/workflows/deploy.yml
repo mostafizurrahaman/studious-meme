@@ -1,4 +1,5 @@
-name: Deploy to Hostinger VPS
+name: Deploy Malamal APIs to VPS
+
 on:
   push:
     branches:
@@ -12,12 +13,10 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
 
+    steps:
       - name: Deploy over SSH
-        uses: appleboy/ssh-action@v0.1.7
+        uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
@@ -29,55 +28,93 @@ jobs:
           script: |
             export DEBIAN_FRONTEND=noninteractive
 
-            # ভেরিয়েবল এসাইন করা
             REPO_URL="${{ secrets.REPO_URL }}"
             ENV_DATA='${{ secrets.ENV_FILE }}'
             DOMAIN_VAL="${{ secrets.VPS_DOMAIN }}"
+            APP_DIR="/var/www/MalaMal_APIs"
+            APP_NAME="malamal-apis"
+            DEFAULT_PORT="5000"
 
-            echo "==> Preparing Directory"
-            sudo mkdir -p /var/www/MalaMal_APIs
-            sudo chown -R $USER:$USER /var/www/MalaMal_APIs
-            cd /var/www/MalaMal_APIs || exit 1
+            echo "==> Installing required packages"
+            sudo apt update -y
+            sudo apt install -y git nginx curl
 
-            echo "==> Updating Source Code"
+            echo "==> Installing pnpm and pm2 if missing"
+            if ! command -v pnpm >/dev/null 2>&1; then
+              sudo npm install -g pnpm
+            fi
+
+            if ! command -v pm2 >/dev/null 2>&1; then
+              sudo npm install -g pm2
+            fi
+
+            echo "==> Preparing app directory"
+            sudo mkdir -p "$APP_DIR"
+            sudo chown -R "$USER:$USER" "$APP_DIR"
+            cd "$APP_DIR" || exit 1
+
+            echo "==> Updating source code"
+            echo "Current directory:"
+            pwd
+
+            echo "Listing current files:"
+            ls -la
+
+            if [ -z "$REPO_URL" ]; then
+              echo "REPO_URL secret is empty"
+              exit 1
+            fi
+
+            echo "Git version:"
+            git --version
+
+            echo "Testing repository access..."
+            git ls-remote "$REPO_URL" > /dev/null
+
+            if [ $? -ne 0 ]; then
+              echo "Cannot access repository. Check REPO_URL token, username, repo name, or permissions."
+              exit 1
+            fi
+
             if [ -d ".git" ]; then
+              echo "Existing git repo found. Pulling latest main..."
+              git remote set-url origin "$REPO_URL"
               git fetch origin main
               git reset --hard origin/main
+              git clean -fd
             else
-              rm -rf * .git 2>/dev/null || true
+              echo "Cloning fresh repo..."
+              rm -rf ./* ./.??* 2>/dev/null || true
               git clone -b main "$REPO_URL" .
             fi
 
             echo "==> Creating .env file"
-            echo "$ENV_DATA" > .env
+            printf "%s" "$ENV_DATA" > .env
 
-            # .env ফাইল থেকে PORT খুঁজে বের করা
-            PORT_VAL=$(grep "^PORT=" .env | cut -d'=' -f2)
-            if [ -z "$PORT_VAL" ]; then 
-              PORT_VAL=5000
-              echo "PORT not found in .env, using default 5000"
+            PORT_VAL=$(grep "^PORT=" .env | cut -d'=' -f2 | tr -d '"' | tr -d "'")
+            if [ -z "$PORT_VAL" ]; then
+              PORT_VAL="$DEFAULT_PORT"
+              echo "PORT not found in .env, using default $PORT_VAL"
             else
               echo "Using PORT from .env: $PORT_VAL"
             fi
 
-            echo "==> Installing & Building"
-            if ! command -v pnpm >/dev/null 2>&1; then sudo npm i -g pnpm; fi
-            if ! command -v pm2 >/dev/null 2>&1; then sudo npm i -g pm2; fi
+            echo "==> Installing dependencies"
+            pnpm install --frozen-lockfile
 
-            pnpm install
+            echo "==> Building app"
             pnpm build
 
-            echo "==> PM2 Service Start"
-            # ecosystem.config.js ব্যবহার করে অ্যাপ চালানো
-            pm2 delete malamal-apis 2>/dev/null || true
-            pm2 start ecosystem.config.js
+            echo "==> Starting app with PM2"
+            pm2 delete "$APP_NAME" 2>/dev/null || true
+            pm2 start ecosystem.config.js --env production
             pm2 save
 
-            # Nginx Setup (WordPress নিরাপদ রেখে)
             if [ -n "$DOMAIN_VAL" ] && [ "$DOMAIN_VAL" != "***" ]; then
-              echo "==> Configuring Nginx for $DOMAIN_VAL on port $PORT_VAL"
-              NGINX_CONF="/etc/nginx/sites-available/malamal-apis"
-              
+              echo "==> Configuring Nginx for $DOMAIN_VAL"
+
+              NGINX_CONF="/etc/nginx/sites-available/$APP_NAME"
+
               sudo tee "$NGINX_CONF" > /dev/null <<EOF
             server {
                 listen 80;
@@ -87,20 +124,23 @@ jobs:
                     proxy_pass http://127.0.0.1:$PORT_VAL;
                     proxy_http_version 1.1;
                     proxy_set_header Upgrade \$http_upgrade;
-                    proxy_set_header Connection 'upgrade';
+                    proxy_set_header Connection "upgrade";
                     proxy_set_header Host \$host;
                     proxy_cache_bypass \$http_upgrade;
                     proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
                     proxy_set_header X-Real-IP \$remote_addr;
+                    proxy_set_header X-Forwarded-Proto \$scheme;
                 }
             }
             EOF
-              
-              sudo ln -sf "$NGINX_CONF" /etc/nginx/sites-enabled/
-              
-              echo "==> Testing and Reloading Nginx"
-              sudo nginx -t && sudo systemctl reload nginx
+
+              sudo ln -sf "$NGINX_CONF" "/etc/nginx/sites-enabled/$APP_NAME"
+              sudo rm -f /etc/nginx/sites-enabled/default
+
+              echo "==> Testing and reloading Nginx"
+              sudo nginx -t
+              sudo systemctl reload nginx
             fi
 
-            echo "==> DEPLOY SUCCESS!"
+            echo "==> Deploy success"
             pm2 status
