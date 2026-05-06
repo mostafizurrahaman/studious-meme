@@ -5,6 +5,7 @@ import { deleteFile } from './deleteFile';
 import globalErrorHandler from './globalErrorHandler';
 import notFoundHandler from './notFound';
 import sendContactUsEmail from './sendContactUsEmail';
+import sendOrderConfirmationEmail from './sendOrderConfirmationEmail';
 import sendOtpEmail from './sendOtpEmail';
 import sendResponse from './sendResponse';
 
@@ -25,5 +26,6 @@ export {
   sendOtpEmail,
   deleteFile,
   sendContactUsEmail,
+  sendOrderConfirmationEmail,
   sendResponse,
 };

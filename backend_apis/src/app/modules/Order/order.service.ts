@@ -1,5 +1,5 @@
 import httpStatus from 'http-status';
-import { AppError } from '../../utils';
+import { AppError, sendOrderConfirmationEmail } from '../../utils';
 import { IUser } from '../User/user.interface';
 import { ProductModel } from '../Product/product.model';
 import { OrderModel } from './order.model';
@@ -380,6 +380,39 @@ const createOrderIntoDB = async (user: IUser, payload: CreateOrderPayload) => {
       paymentStatus,
       status: orderStatus,
     });
+
+    if (normalizedPaymentMethod === 'CASH_ON_DELIVERY') {
+      const recipientEmail = (
+        payload.customer.email ||
+        user.email ||
+        ''
+      ).trim();
+
+      if (recipientEmail) {
+        await sendOrderConfirmationEmail({
+          email: recipientEmail,
+          customerName: payload.customer.name,
+          orderId: order.orderId,
+          paymentMethod: normalizedPaymentMethod,
+          confirmationKind: 'order',
+          items: items.map((item) => ({
+            title: item.title,
+            sku: item.sku,
+            quantity: item.quantity,
+            lineTotal: item.lineTotal,
+          })),
+          subtotal,
+          discount,
+          delivery,
+          total,
+          city: payload.customer.city,
+          address: payload.customer.address,
+        }).catch((error) => {
+          // eslint-disable-next-line no-console
+          console.error('Failed to send COD order confirmation email:', error);
+        });
+      }
+    }
 
     return order;
   } catch (error) {

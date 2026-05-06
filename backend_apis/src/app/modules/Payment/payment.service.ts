@@ -2,10 +2,12 @@ import httpStatus from 'http-status';
 import { AppError } from '../../utils';
 import config from '../../config';
 import { IUser } from '../User/user.interface';
+import UserModel from '../User/user.model';
 import { Payment } from './payment.model';
 import { OrderModel } from '../Order/order.model';
 import { OrderService } from '../Order/order.service';
 import { PortPosService } from './portpos.service';
+import { sendOrderConfirmationEmail } from '../../utils';
 
 type PortPosInitiationResult = {
   orderId: string;
@@ -65,6 +67,21 @@ type PortPosOrderLean = {
   gatewayUrl?: string;
   createdAt?: Date;
   updatedAt?: Date;
+};
+
+const resolveOrderNotificationEmail = async (order: PortPosOrderLean) => {
+  const customerEmail =
+    typeof order.customer.email === 'string' ? order.customer.email.trim() : '';
+
+  if (customerEmail) {
+    return customerEmail;
+  }
+
+  const userId =
+    typeof order.user === 'string' ? order.user : String(order.user);
+  const user = await UserModel.findById(userId).select('email').lean();
+
+  return typeof user?.email === 'string' ? user.email.trim() : '';
 };
 
 const requirePortPosConfig = () => {
@@ -270,6 +287,9 @@ const finalizePaymentFromGateway = async (
 ) => {
   const status = finalStatus === 'PAID' ? 'PAID' : finalStatus;
   const orderStatus = finalStatus === 'PAID' ? 'CONFIRMED' : 'CANCELLED';
+  const shouldSendConfirmationEmail =
+    finalStatus === 'PAID' &&
+    !(order.paymentStatus === 'PAID' && order.status === 'CONFIRMED');
 
   if (payment) {
     await Payment.findByIdAndUpdate(payment._id, {
@@ -295,6 +315,38 @@ const finalizePaymentFromGateway = async (
       : {}),
     transactionId: payment?.transactionId || order.transactionId || '',
   });
+
+  if (shouldSendConfirmationEmail) {
+    const recipientEmail = await resolveOrderNotificationEmail(order);
+
+    if (recipientEmail) {
+      await sendOrderConfirmationEmail({
+        email: recipientEmail,
+        customerName: order.customer.name,
+        orderId: order.orderId,
+        paymentMethod: 'PORTPOS',
+        confirmationKind: 'payment',
+        items: order.items.map((item) => ({
+          title: item.title,
+          sku: item.sku,
+          quantity: item.quantity,
+          lineTotal: item.lineTotal,
+        })),
+        subtotal: order.subtotal,
+        discount: order.discount,
+        delivery: order.delivery,
+        total: order.total,
+        city: order.customer.city,
+        address: order.customer.address,
+      }).catch((error) => {
+        // eslint-disable-next-line no-console
+        console.error(
+          'Failed to send PortPOS order confirmation email:',
+          error,
+        );
+      });
+    }
+  }
 
   return {
     orderId: order.orderId,
