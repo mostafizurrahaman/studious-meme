@@ -205,7 +205,6 @@ import { v2 as cloudinary, ConfigOptions, UploadApiResponse } from 'cloudinary';
 import multer from 'multer';
 import config from '../config';
 import { Readable } from 'stream';
-import type { Express } from 'express';
 
 export type MulterFile = Express.Multer.File;
 

@@ -6,12 +6,14 @@ import unusedImports from 'eslint-plugin-unused-imports';
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
-  pluginJs.configs.recommended,
-  ...tseslint.configs.recommended,
-  eslintConfigPrettier,
   {
     ignores: ['node_modules', 'dist'],
   },
+
+  pluginJs.configs.recommended,
+  ...tseslint.configs.recommended,
+  eslintConfigPrettier,
+
   {
     files: ['**/*.{js,mjs,cjs,ts}'],
     plugins: {
@@ -21,7 +23,10 @@ export default [
       globals: { ...globals.browser, ...globals.node },
     },
     rules: {
-      // Unused imports rules
+      'no-console': 'warn',
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+
       'unused-imports/no-unused-imports': 'error',
       'unused-imports/no-unused-vars': [
         'warn',
@@ -32,13 +37,10 @@ export default [
           argsIgnorePattern: '^_',
         },
       ],
-      // General rules
-      'no-console': 'warn',
-      '@typescript-eslint/no-unused-vars': 'error',
-      'no-unused-vars': 'off',
+
       'no-unused-expressions': 'error',
       'prefer-const': 'error',
-      'no-undef': 'error',
+      'no-undef': 'off',
     },
   },
 ];
