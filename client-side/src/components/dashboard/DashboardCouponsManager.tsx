@@ -411,6 +411,7 @@ export function DashboardCouponsManager({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
+  const [couponRows, setCouponRows] = useState(coupons);
   const [editingCoupon, setEditingCoupon] = useState<Coupon | null>(null);
   const [pendingDeleteCoupon, setPendingDeleteCoupon] = useState<Pick<
     Coupon,
@@ -507,6 +508,10 @@ export function DashboardCouponsManager({
         return refresh(result?.message ?? 'Failed to create coupon.', 'error');
       }
 
+      const createdCoupon = result.data;
+      if (createdCoupon) {
+        setCouponRows((current) => [createdCoupon, ...current]);
+      }
       createForm.reset(getDefaultCouponValues());
       refresh(result.message ?? 'Coupon created successfully.', 'success');
     });
@@ -525,6 +530,14 @@ export function DashboardCouponsManager({
         return refresh(result?.message ?? 'Failed to update coupon.', 'error');
       }
 
+      const updatedCoupon = result.data;
+      if (updatedCoupon) {
+        setCouponRows((current) =>
+          current.map((coupon) =>
+            coupon.id === editingCoupon.id ? updatedCoupon : coupon,
+          ),
+        );
+      }
       setEditingCoupon(null);
       refresh(result.message ?? 'Coupon updated successfully.', 'success');
     });
@@ -541,6 +554,11 @@ export function DashboardCouponsManager({
         );
       }
 
+      setCouponRows((current) =>
+        current.map((row) =>
+          row.id === coupon.id ? { ...row, isActive: !coupon.isActive } : row,
+        ),
+      );
       refresh(
         result.message ??
           `Coupon ${coupon.isActive ? 'disabled' : 'enabled'} successfully.`,
@@ -565,13 +583,14 @@ export function DashboardCouponsManager({
         setEditingCoupon(null);
       }
 
+      setCouponRows((current) => current.filter((row) => row.id !== couponId));
       setPendingDeleteCoupon(null);
       refresh(result.message ?? 'Coupon deleted successfully.', 'success');
     });
   }
 
-  const activeCoupons = coupons.filter((coupon) => coupon.isActive).length;
-  const inactiveCoupons = coupons.length - activeCoupons;
+  const activeCoupons = couponRows.filter((coupon) => coupon.isActive).length;
+  const inactiveCoupons = couponRows.length - activeCoupons;
 
   return (
     <div className="space-y-6">
@@ -588,7 +607,7 @@ export function DashboardCouponsManager({
             <CardDescription>{description}</CardDescription>
           </div>
           <div className="flex flex-wrap gap-2 text-sm">
-            <Badge variant="secondary">Total: {paginationMeta.total}</Badge>
+            <Badge variant="secondary">Total: {couponRows.length}</Badge>
             <Badge variant="secondary">Active: {activeCoupons}</Badge>
             <Badge variant="secondary">Disabled: {inactiveCoupons}</Badge>
           </div>
@@ -626,7 +645,7 @@ export function DashboardCouponsManager({
             <div className="space-y-1">
               <CardTitle>Coupons</CardTitle>
               <CardDescription>
-                Showing {coupons.length} of {paginationMeta.total} coupons
+                Showing {couponRows.length} of {paginationMeta.total} coupons
               </CardDescription>
             </div>
             <TableFilter
@@ -652,14 +671,14 @@ export function DashboardCouponsManager({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {coupons.length === 0 ? (
+              {couponRows.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="h-24 text-center">
                     No coupons found.
                   </TableCell>
                 </TableRow>
               ) : null}
-              {coupons.map((coupon) => (
+              {couponRows.map((coupon) => (
                 <TableRow key={coupon.id}>
                   <TableCell className="font-mono text-xs font-semibold">
                     {coupon.code}

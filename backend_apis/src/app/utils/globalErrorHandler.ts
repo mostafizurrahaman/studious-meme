@@ -16,6 +16,7 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, _next) => {
   // settle default values
   let statusCode: number = httpStatus.INTERNAL_SERVER_ERROR;
   let message = 'Something went wrong!';
+  let meta = {};
   let errorSources: TErrorSources = [
     {
       path: '',
@@ -33,7 +34,8 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, _next) => {
   } else if (err?.name === 'ValidationError') {
     const simplifiedError = handleValidationError(err);
     statusCode = simplifiedError?.statusCode;
-    message = simplifiedError?.message;
+    // message = simplifiedError?.message;
+    message = simplifiedError?.errorSources[0].message;
     errorSources = simplifiedError?.errorSources;
   } else if (err?.name === 'CastError') {
     const simplifiedError = handleCastError(err);
@@ -48,6 +50,7 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, _next) => {
   } else if (err instanceof AppError) {
     statusCode = err?.statusCode;
     message = err.message;
+    meta = err?.meta || {};
     errorSources = [
       {
         path: '',
@@ -72,6 +75,7 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, _next) => {
   res.status(statusCode).json({
     success: false,
     message,
+    ...meta,
     errorSources,
     // err,
     stack: config.NODE_ENV === 'development' ? err?.stack : null,

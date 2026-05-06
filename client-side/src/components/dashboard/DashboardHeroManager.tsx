@@ -193,7 +193,8 @@ export function DashboardHeroManager({
     id: string;
     label: string;
   } | null>(null);
-  const rows = useMemo(() => heroes.slice(0, 10), [heroes]);
+  const [heroRows, setHeroRows] = useState(heroes);
+  const rows = useMemo(() => heroRows.slice(0, 10), [heroRows]);
   const hasExistingHero = rows.length > 0;
 
   function refresh(message: string, type: 'success' | 'error') {
@@ -221,6 +222,7 @@ export function DashboardHeroManager({
           result?.message ?? 'Failed to delete hero section.',
           'error',
         );
+      setHeroRows((current) => current.filter((hero) => hero._id !== heroId));
       setPendingDeleteHero(null);
       refresh(
         result.message ?? 'Hero section deleted successfully.',
@@ -449,6 +451,10 @@ export function DashboardHeroManager({
                       result?.message ?? 'Failed to create hero section.',
                       'error',
                     );
+                  const createdHero = result.data;
+                  if (createdHero) {
+                    setHeroRows((current) => [createdHero, ...current]);
+                  }
                   setForm(emptyHero());
                   refresh(
                     result.message ?? 'Hero section created successfully.',
@@ -565,9 +571,17 @@ export function DashboardHeroManager({
                             if (!result?.success)
                               return refresh(
                                 result?.message ??
-                                  'Failed to update hero section.',
+                                'Failed to update hero section.',
                                 'error',
                               );
+                            const updatedHero = result.data;
+                            if (updatedHero) {
+                              setHeroRows((current) =>
+                                current.map((item) =>
+                                  item._id === heroId ? updatedHero : item,
+                                ),
+                              );
+                            }
                             setEditingId(null);
                             refresh(
                               result.message ??

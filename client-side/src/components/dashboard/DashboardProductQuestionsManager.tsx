@@ -152,6 +152,7 @@ export function DashboardProductQuestionsManager({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
+  const [questionRows, setQuestionRows] = useState(questions);
   const [search, setSearch] = useState(searchTerm);
   const [statusFilter, setStatusFilter] = useState(status);
   const [productFilter, setProductFilter] = useState(product);
@@ -275,6 +276,15 @@ export function DashboardProductQuestionsManager({
         );
       }
 
+      const answeredQuestion = result.data;
+      if (answeredQuestion) {
+        setQuestionRows((current) =>
+          current.map((row) =>
+            row._id === questionId ? answeredQuestion : row,
+          ),
+        );
+      }
+
       setSelectedQuestion(null);
       refresh(result.message ?? 'Question answered successfully.', 'success');
     });
@@ -295,6 +305,12 @@ export function DashboardProductQuestionsManager({
           'error',
         );
       }
+
+      setQuestionRows((current) =>
+        current.map((row) =>
+          row._id === questionId ? { ...row, status: nextStatus } : row,
+        ),
+      );
 
       refresh(
         result.message ?? 'Question status updated successfully.',
@@ -317,12 +333,15 @@ export function DashboardProductQuestionsManager({
         );
       }
 
+      setQuestionRows((current) =>
+        current.filter((row) => row._id !== questionId),
+      );
       setPendingDeleteQuestion(null);
       refresh(result.message ?? 'Question deleted successfully.', 'success');
     });
   }
 
-  const visibleCount = questions.length;
+  const visibleCount = questionRows.length;
 
   return (
     <Card className="shadow-sm">
@@ -391,7 +410,7 @@ export function DashboardProductQuestionsManager({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {questions.length === 0 ? (
+            {questionRows.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={8} className="h-28 text-center">
                   No product questions found.
@@ -399,7 +418,7 @@ export function DashboardProductQuestionsManager({
               </TableRow>
             ) : null}
 
-            {questions.map((question) => {
+            {questionRows.map((question) => {
               const productRef = resolveProduct(question);
               const productSlug = productRef?.slug?.trim();
 

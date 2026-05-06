@@ -44,6 +44,7 @@ export default async function AdminCouponsPage({ searchParams }: Props) {
 
   return (
     <DashboardCouponsManager
+      key={`${page}-${limit}-${searchTerm}`}
       coupons={coupons}
       paginationMeta={paginationMeta}
       searchTerm={searchTerm}

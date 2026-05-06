@@ -286,7 +286,7 @@ function ReviewDialogContent({
   review: ProductReviewRecord | null;
   mode: 'view' | 'edit';
   onClose: () => void;
-  onSaved: () => void;
+  onSaved: (review?: ProductReviewRecord) => void;
 }) {
   const [isPending, startTransition] = useTransition();
   const form = useForm<ReviewFormValues>({
@@ -358,7 +358,7 @@ function ReviewDialogContent({
       }
 
       toast.success(result.message ?? 'Review updated successfully.');
-      onSaved();
+      onSaved(result.data);
     });
   }
 
@@ -680,6 +680,7 @@ export function DashboardProductReviewsManager({
   const [createReviewImageFiles, setCreateReviewImageFiles] = useState<File[]>(
     [],
   );
+  const [reviewRows, setReviewRows] = useState(reviews);
   const [pendingStatusChange, setPendingStatusChange] = useState<{
     review: ProductReviewRecord;
     status: ReviewStatus;
@@ -701,7 +702,7 @@ export function DashboardProductReviewsManager({
   const createStatus =
     useWatch({ control: createForm.control, name: 'status' }) ?? 'approved';
 
-  const visibleCount = reviews.length;
+  const visibleCount = reviewRows.length;
 
   const updateQuery = useCallback(
     (updates: {
@@ -801,6 +802,18 @@ export function DashboardProductReviewsManager({
     router.refresh();
   }
 
+  function handleReviewSavedData(updatedReview?: ProductReviewRecord) {
+    if (updatedReview?._id) {
+      setReviewRows((current) =>
+        current.map((row) =>
+          row._id === updatedReview._id ? updatedReview : row,
+        ),
+      );
+    }
+
+    handleReviewSaved();
+  }
+
   function handleDeleteReview() {
     const reviewId = pendingDeleteReview?._id;
     if (!reviewId) return;
@@ -811,6 +824,7 @@ export function DashboardProductReviewsManager({
         return refresh(result.message ?? 'Failed to delete review.', 'error');
       }
 
+      setReviewRows((current) => current.filter((row) => row._id !== reviewId));
       setPendingDeleteReview(null);
       refresh(result.message ?? 'Review deleted successfully.', 'success');
     });
@@ -828,6 +842,11 @@ export function DashboardProductReviewsManager({
         );
       }
 
+      setReviewRows((current) =>
+        current.map((row) =>
+          row._id === reviewId ? { ...row, status: nextStatus } : row,
+        ),
+      );
       refresh(
         result.message ?? 'Review status updated successfully.',
         'success',
@@ -863,15 +882,6 @@ export function DashboardProductReviewsManager({
     const displayImage =
       createDisplayImageFile ?? values.displayImage?.trim() ?? '';
 
-    if (!displayImage) {
-      createForm.setError('displayImage', {
-        type: 'manual',
-        message: 'Display image is required!',
-      });
-      toast.error('Display image is required!');
-      return;
-    }
-
     startTransition(async () => {
       const result = await createManualProductReview({
         product: values.product,
@@ -887,6 +897,10 @@ export function DashboardProductReviewsManager({
         return refresh(result.message ?? 'Failed to create review.', 'error');
       }
 
+      const createdReview = result.data;
+      if (createdReview) {
+        setReviewRows((current) => [createdReview, ...current]);
+      }
       setIsCreateOpen(false);
       refresh(
         result.message ?? 'Manual review created successfully.',
@@ -1062,7 +1076,7 @@ export function DashboardProductReviewsManager({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {reviews.length === 0 ? (
+            {reviewRows.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="h-28 text-center">
                     No product reviews found.
@@ -1070,7 +1084,7 @@ export function DashboardProductReviewsManager({
                 </TableRow>
               ) : null}
 
-              {reviews.map((review) => {
+              {reviewRows.map((review) => {
                 const productSlug = ProductRefSlug(review.product);
 
                 return (
@@ -1253,7 +1267,7 @@ export function DashboardProductReviewsManager({
           review={selectedReview}
           mode={dialogMode}
           onClose={closeReviewDialog}
-          onSaved={handleReviewSaved}
+          onSaved={handleReviewSavedData}
         />
       </Dialog>
 
@@ -1308,7 +1322,7 @@ export function DashboardProductReviewsManager({
                   <span>
                     {createDisplayImageFile
                       ? createDisplayImageFile.name
-                      : 'Required upload'}
+                      : 'Default image will be used'}
                   </span>
                 </div>
                 <DashboardInput

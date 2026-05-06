@@ -154,7 +154,7 @@ export function ProductReviewsSection({
   }
 
   return (
-    <section className="rounded-md bg-card p-5 shadow-sm">
+    <section id="product-reviews" className="scroll-mt-24 rounded-md bg-card p-5 shadow-sm">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h2 className="text-xl font-medium text-secondary">

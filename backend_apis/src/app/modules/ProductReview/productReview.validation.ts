@@ -38,6 +38,7 @@ const manualCreateReviewSchema = z.object({
       .trim()
       .min(1, { message: 'Display name is required!' })
       .max(100, { message: 'Display name cannot exceed 100 characters!' }),
+    displayImage: z.string().trim().optional(),
     rating: z.coerce
       .number({ error: 'Rating is required!' })
       .min(1, { message: 'Rating must be at least 1!' })

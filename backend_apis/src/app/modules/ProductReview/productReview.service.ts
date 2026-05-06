@@ -11,6 +11,7 @@ import {
 } from './productReview.interface';
 import { IUser } from '../User/user.interface';
 import UserModel from '../User/user.model';
+import { defaultUserImage } from '../User/user.constant';
 
 const DEFAULT_PUBLIC_LIMIT = 5;
 const DEFAULT_ADMIN_LIMIT = 20;
@@ -269,7 +270,7 @@ const createManualReviewIntoDB = async (
   payload: {
     product: string;
     displayName: string;
-    displayImage: string;
+    displayImage?: string;
     rating: number;
     comment: string;
     images?: string[];
@@ -288,7 +289,7 @@ const createManualReviewIntoDB = async (
     product: product._id,
     createdBy: adminUser._id,
     displayName: payload.displayName.trim(),
-    displayImage: resolveReviewDisplayImage(payload.displayImage, ''),
+    displayImage: resolveReviewDisplayImage(payload.displayImage, defaultUserImage),
     rating: payload.rating,
     comment: payload.comment.trim(),
     images: payload.images ?? [],

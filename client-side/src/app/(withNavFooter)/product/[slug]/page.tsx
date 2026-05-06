@@ -136,7 +136,7 @@ export default async function ProductPage({ params }: Props) {
           </nav>
 
           <div className="mt-3 rounded-md bg-background p-3 shadow-sm sm:p-4">
-            <ProductDetailClient product={product} />
+            <ProductDetailClient product={product} reviewSummary={reviewSummary} />
           </div>
 
           <div className="mt-8">

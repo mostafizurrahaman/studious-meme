@@ -66,6 +66,7 @@ export function DashboardAdminsManager({
 }: DashboardAdminsManagerProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [adminRows, setAdminRows] = useState(admins);
   const [adminImageFile, setAdminImageFile] = useState<File | null>(null);
   const [adminImagePreview, setAdminImagePreview] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -319,6 +320,10 @@ export function DashboardAdminsManager({
                   return;
                 }
 
+                const createdAdmin = result.data as AdminRow | undefined;
+                if (createdAdmin) {
+                  setAdminRows((current) => [createdAdmin, ...current]);
+                }
                 toast.success(result.message ?? 'Admin created successfully.');
                 createForm.reset();
                 setAdminImageFile(null);

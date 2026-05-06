@@ -45,6 +45,7 @@ export default async function AdminUsersPage({ searchParams }: Props) {
 
   return (
     <DashboardUsersManager
+      key={`${page}-${limit}-${searchTerm}`}
       users={
         users as Array<{
           _id?: string;

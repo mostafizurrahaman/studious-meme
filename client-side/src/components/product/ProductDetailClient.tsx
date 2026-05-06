@@ -12,6 +12,7 @@ import {
   Plus,
   Send,
   Share,
+  Star,
   Truck,
 } from 'lucide-react';
 import PaymentOptionSvg from '@/assets/Payment-Option.svg';
@@ -88,6 +89,10 @@ function PinterestIcon({ className }: { className?: string }) {
 
 type ProductDetailClientProps = {
   product: Product;
+  reviewSummary?: {
+    total: number;
+    averageRating: number;
+  };
 };
 
 const WHATSAPP_URL = 'https://wa.me/8801972525821';
@@ -194,10 +199,18 @@ function resolveYouTubeVideoId(product: Product) {
   return '';
 }
 
-export function ProductDetailClient({ product }: ProductDetailClientProps) {
+export function ProductDetailClient({
+  product,
+  reviewSummary,
+}: ProductDetailClientProps) {
   const router = useRouter();
   const addProductQuantity = useCartStore((state) => state.addProductQuantity);
   const markItemAsSynced = useCartStore((state) => state.markItemAsSynced);
+  const handleScrollToReviews = () => {
+    const target = document.getElementById('product-reviews');
+
+    target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
   const images = useMemo(
     () =>
       product.images.length > 0
@@ -454,15 +467,47 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               {product.category}
             </div>
           </div>
-          <div className="flex flex-wrap items-end gap-2">
-            {product.oldPrice ? (
-              <span className="text-lg font-semibold text-muted-foreground line-through">
-                {formatMoney(Number(product.oldPrice))}
+          <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-wrap items-end gap-2">
+              {product.oldPrice ? (
+                <span className="text-lg font-semibold text-muted-foreground line-through">
+                  {formatMoney(Number(product.oldPrice))}
+                </span>
+              ) : null}
+              <span className="text-2xl font-black text-primary sm:text-3xl">
+                {formatPriceLabelWithUnit(product.price, product.sellingUnit)}
               </span>
+            </div>
+
+            {reviewSummary ? (
+              <button
+                type="button"
+                onClick={handleScrollToReviews}
+                className="inline-flex w-fit items-center gap-2 rounded-full border bg-background px-3 py-2 text-left shadow-sm transition hover:border-primary/40 hover:bg-primary/5 lg:self-center"
+              >
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-black text-primary">
+                  {reviewSummary.averageRating.toFixed(1)}
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-0.5 text-primary">
+                    {Array.from({ length: 5 }, (_, index) => (
+                      <Star
+                        key={index}
+                        className={
+                          index < Math.round(reviewSummary.averageRating)
+                            ? 'size-3.5 fill-primary text-primary'
+                            : 'size-3.5 text-muted-foreground/30'
+                        }
+                      />
+                    ))}
+                  </div>
+                  <div className="text-xs font-medium text-muted-foreground">
+                    {reviewSummary.total} review
+                    {reviewSummary.total === 1 ? '' : 's'}
+                  </div>
+                </div>
+              </button>
             ) : null}
-            <span className="text-2xl font-black text-primary sm:text-3xl">
-              {formatPriceLabelWithUnit(product.price, product.sellingUnit)}
-            </span>
           </div>
 
           {features ? (

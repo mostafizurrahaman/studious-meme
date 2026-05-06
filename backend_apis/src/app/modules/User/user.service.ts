@@ -36,11 +36,7 @@ const createUserIntoDB = async (payload: IUser) => {
     // if OTP expired sending new otp
     if (!existingUser.otpExpiry || existingUser.otpExpiry < now) {
       const otp = generateOtp();
-      await sendOtpEmail({
-        email: payload.email,
-        otp,
-        name: payload.name,
-      });
+      await sendOtpEmail({ email: payload?.email, otp, name: payload?.name });
 
       existingUser.otp = otp;
       existingUser.otpExpiry = new Date(
@@ -51,12 +47,14 @@ const createUserIntoDB = async (payload: IUser) => {
       throw new AppError(
         httpStatus.BAD_REQUEST,
         'You have an unverified account, verify it with the new OTP sent to the mail!',
+        { isVerified: false },
       );
     } else {
       // if OTP is valid till now
       throw new AppError(
         httpStatus.BAD_REQUEST,
         'You have an unverified account, verify it now with the otp sent to the mail!',
+        { isVerified: false },
       );
     }
   }
@@ -118,12 +116,12 @@ const sendSignupOtpAgainIntoDB = async (userEmail: string) => {
     };
   } else {
     // if OTP is still valid
-    await sendOtpEmail({
-      email: user?.email,
-      otp: user?.otp,
-      name: user?.name,
-      customMessage: 'Verify quickly using this OTP!',
-    });
+    // await sendOtpEmail({
+    //   email: user?.email,
+    //   otp: user?.otp,
+    //   name: user?.name,
+    //   customMessage: 'Verify quickly using this OTP!',
+    // });
     throw new AppError(
       httpStatus.BAD_REQUEST,
       'An OTP was already sent. Please wait until it expires before requesting a new one.',
@@ -206,29 +204,41 @@ const signinIntoDB = async (payload: { email: string; password: string }) => {
 
   // no need this part as isDeleted is functioned to hide the soft deleted user
   // if (user.isDeleted) {
-  //   throw new AppError(httpStatus.BAD_REQUEST, 'This account is deleted!');
+  //   throw new AppError(httpStatus.BAD_REQUEST, 'You are not authorized!');
   // }
 
   if (!user.isVerifiedByOTP) {
-    const otp = generateOtp();
+    const now = new Date();
 
-    await sendOtpEmail({ email: user?.email, otp, name: user?.name });
+    // if OTP expired sending new otp
+    if (!user.otpExpiry || user.otpExpiry < now) {
+      const otp = generateOtp();
+      await sendOtpEmail({ email: user?.email, otp, name: user?.name });
 
-    user.otp = otp;
-    user.otpExpiry = new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000);
-    await user.save();
+      user.otp = otp;
+      user.otpExpiry = new Date(now.getTime() + OTP_EXPIRY_MINUTES * 60 * 1000);
+      await user.save();
 
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      'Verify your account with the new OTP sent to the mail!',
-    );
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'You have an unverified account, verify it with the new OTP sent to the mail!',
+        { isVerified: false },
+      );
+    } else {
+      // if OTP is valid till now
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'You have an unverified account, verify it now with the otp sent to the mail!',
+        { isVerified: false },
+      );
+    }
   }
 
   // Validate password
   const isPasswordCorrect = await user.isPasswordMatched(payload.password);
 
   if (!isPasswordCorrect) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid credentials!');
+    throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid credentials!');
   }
 
   // Prepare user data for token generation
@@ -245,7 +255,6 @@ const signinIntoDB = async (payload: { email: string; password: string }) => {
   const refreshTokenPayload = {
     email: user?.email,
   };
-
   // tokens
   const accessToken = createAccessToken(accessTokenPayload);
   const refreshToken = createRefreshToken(refreshTokenPayload);
@@ -259,8 +268,8 @@ const signinIntoDB = async (payload: { email: string; password: string }) => {
 
 // 5. updateProfilePhotoIntoDB
 const updateProfilePhotoIntoDB = async (
-  user: IUser,
   imageFile: MulterFile | undefined,
+  user: IUser,
 ) => {
   // 1. Validation: Ensure an image file is provided
   if (!imageFile) {
@@ -349,8 +358,8 @@ const updateProfileDataIntoDB = async (
 
 // 7. changePasswordIntoDB
 const changePasswordIntoDB = async (
-  userData: IUser,
   payload: z.infer<typeof UserValidation.changePasswordSchema.shape.body>,
+  userData: IUser,
 ) => {
   const { oldPassword, newPassword } = payload;
 
@@ -457,6 +466,7 @@ const sendForgotPasswordOtpAgain = async (forgotPassToken: string) => {
   } catch {
     throw new AppError(httpStatus.BAD_REQUEST, 'Invalid token!');
   }
+
   const email = decoded.email as string;
 
   if (!email) {
@@ -589,9 +599,9 @@ const resetPasswordIntoDB = async (
   }
 
   user.password = newPassword;
-  user.passwordChangedAt = new Date(Date.now());
+  // user.passwordChangedAt = new Date(Date.now());
 
-  // save({ validateBeforeSave: true }) by default true
+  // await user.save({ validateBeforeSave: true }) // by default true
   await user.save();
 
   return null;
@@ -661,8 +671,8 @@ const getNewAccessTokenFromServer = async (refreshToken: string) => {
 
 // 14. deactivateAccountIntoDB
 const deactivateAccountIntoDB = async (
-  user: IUser,
   payload: TDeactiveAccountPayload,
+  user: IUser,
 ) => {
   const { email, password, deactivationReason } = payload;
 
@@ -827,6 +837,7 @@ const adminGetAllUsersFromDB = async (query: Record<string, unknown>) => {
   const limit = Number(limitQuery) || 10;
   const skip = (page - 1) * limit;
 
+  // Base match: exclude admins and super admins
   const matchStage: Record<string, unknown> = {
     role: { $nin: [ROLE.ADMIN, ROLE.SUPER_ADMIN] },
     ...rawFilters,
@@ -920,6 +931,7 @@ const adminGetAllUsersFromDB = async (query: Record<string, unknown>) => {
   return { data: facetResult.data, meta };
 };
 
+// 18. adminUpdateUserStatusIntoDB (activate/deactivate user)
 const adminUpdateUserStatusIntoDB = async (
   userId: string,
   isActive: boolean,
@@ -937,6 +949,7 @@ const adminUpdateUserStatusIntoDB = async (
   return null;
 };
 
+// 19. adminDeleteUserIntoDB (soft delete)
 const adminDeleteUserIntoDB = async (userId: string) => {
   const user = await UserModel.findOneAndUpdate(
     { _id: userId, role: { $nin: [ROLE.ADMIN, ROLE.SUPER_ADMIN] } },
@@ -951,7 +964,7 @@ const adminDeleteUserIntoDB = async (userId: string) => {
   return null;
 };
 
-// 18. adminGetAllMetaDataFromDB (dashboard meta aggregation)
+// 20. adminGetAllMetaDataFromDB (dashboard meta aggregation)
 // const adminGetAllMetaDataFromDB = async () => {
 //   const [
 //     totalBooks,
