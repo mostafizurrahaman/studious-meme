@@ -1,4 +1,4 @@
-name: Deploy Malamal APIs
+name: Deploy Malamal APIs to VPS
 
 on:
   push:
@@ -11,11 +11,39 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  test-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # ১. রানারের ভার্চুয়াল মেশিনে কোড নিয়ে আসা
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # ২. রানারে Node.js সেটআপ করা
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # ৩. রানারে pnpm সেটআপ করা
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      # ৪. রানারে ডিপেন্ডেন্সি ইন্সটল করা (টেস্ট করার জন্য প্রয়োজন)
+      - name: Install dependencies on runner
+        run: pnpm install
+
+      # ৫. রানারে টেস্ট এবং বিল্ড চেক করা (Backend-এর জন্য এটি খুব জরুরি)
+      - name: Run Tests and Build check
+        run: |
+          pnpm test
+          pnpm build
+
+      # ৬. টেস্ট পাস হলে তবেই কেবল SSH-এর মাধ্যমে VPS-এ ডিপ্লয়মেন্ট শুরু হবে
       - name: Deploy over SSH
+        if: success() # আগের ধাপগুলো সফল হলেই এটি চলবে
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.VPS_HOST }}
