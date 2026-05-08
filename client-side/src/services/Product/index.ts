@@ -109,6 +109,8 @@ export async function mapBackendProductToStorefrontProduct(
 type GetAllProductsParams = {
   page?: number;
   limit?: number;
+  fields?: string;
+  fetchCache?: RequestCache;
   searchTerm?: string;
   c?: string;
   category?: string;
@@ -131,6 +133,7 @@ const buildProductSearchParams = (params: GetAllProductsParams) => {
 
   if (params.page) searchParams.set('page', String(params.page));
   if (params.limit) searchParams.set('limit', String(params.limit));
+  if (params.fields?.trim()) searchParams.set('fields', params.fields.trim());
   if (params.searchTerm?.trim())
     searchParams.set('searchTerm', params.searchTerm.trim());
   if (params.c?.trim()) searchParams.set('c', params.c.trim());
@@ -160,17 +163,22 @@ const buildProductSearchParams = (params: GetAllProductsParams) => {
 export const getAllProducts = async (
   params: GetAllProductsParams = {},
 ): Promise<BackendEnvelope<BackendProduct[]>> => {
-  const searchParams = buildProductSearchParams(params);
+  const { fetchCache, ...queryParams } = params;
+  const searchParams = buildProductSearchParams(queryParams);
   const query = searchParams.toString();
 
   return requestBackendJson<BackendEnvelope<BackendProduct[]>>(
     `/product/products${query ? `?${query}` : ''}`,
     {
       method: 'GET',
-      next: {
-        revalidate: CACHE_REVALIDATE.LONG,
-        tags: [CACHE_TAGS.PRODUCTS],
-      },
+      ...(fetchCache
+        ? { cache: fetchCache }
+        : {
+            next: {
+              revalidate: CACHE_REVALIDATE.LONG,
+              tags: [CACHE_TAGS.PRODUCTS],
+            },
+          }),
     },
   );
 };
@@ -178,17 +186,22 @@ export const getAllProducts = async (
 const fetchActiveProductsPage = async (
   pageParams: Omit<GetAllProductsParams, 'includeInactive'>,
 ) => {
-  const searchParams = buildProductSearchParams(pageParams);
+  const { fetchCache, ...queryParams } = pageParams;
+  const searchParams = buildProductSearchParams(queryParams);
   const query = searchParams.toString();
 
   return requestBackendJson<BackendEnvelope<BackendProduct[]>>(
     `/product/products/active${query ? `?${query}` : ''}`,
     {
       method: 'GET',
-      next: {
-        revalidate: CACHE_REVALIDATE.LONG,
-        tags: [CACHE_TAGS.PRODUCTS],
-      },
+      ...(fetchCache
+        ? { cache: fetchCache }
+        : {
+            next: {
+              revalidate: CACHE_REVALIDATE.LONG,
+              tags: [CACHE_TAGS.PRODUCTS],
+            },
+          }),
     },
   );
 };

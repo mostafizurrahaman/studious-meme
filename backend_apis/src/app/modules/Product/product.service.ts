@@ -85,6 +85,14 @@ const csv = (value: unknown) =>
     .map((item) => item.trim())
     .filter(Boolean);
 
+const pickFields = (value: unknown) => {
+  const fields = csv(value)
+    .filter((field) => /^[a-zA-Z0-9_.-]+$/.test(field))
+    .join(' ');
+
+  return fields || undefined;
+};
+
 const pickSort = (value: unknown): ProductSort => {
   switch (getString(value)) {
     case 'price-asc':
@@ -379,15 +387,23 @@ const getAllProductsFromDB = async (query: Record<string, unknown>) => {
   const skip = (page - 1) * limit;
   const filter = await buildProductFilters(query);
   const sort = pickSort(query.sort);
+  const fields = pickFields(query.fields);
+
+  let productsQuery = ProductModel.find(filter)
+    .sort(sort)
+    .skip(skip)
+    .limit(limit);
+
+  if (fields) {
+    productsQuery = productsQuery.select(fields);
+  } else {
+    productsQuery = productsQuery
+      .populate('brand')
+      .populate('category');
+  }
 
   const [data, total] = await Promise.all([
-    ProductModel.find(filter)
-      .populate('brand')
-      .populate('category')
-      .sort(sort)
-      .skip(skip)
-      .limit(limit)
-      .lean(),
+    productsQuery.lean(),
     ProductModel.countDocuments(filter),
   ]);
 

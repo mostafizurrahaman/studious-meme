@@ -1,14 +1,13 @@
 import { absoluteUrl } from '@/lib/seo';
-import {
-  getAllActiveProductsAcrossPages,
-  mapBackendProductToStorefrontProduct,
-} from '@/services/Product';
+import { getAllActiveProductsAcrossPages } from '@/services/Product';
 import { getActiveCategories } from '@/services/Category';
 import {
   mapBackendCategoryToStorefrontCategory,
   type BackendCategory,
 } from '@/services/Category/mappers';
 import type { MetadataRoute } from 'next';
+
+const SITEMAP_PRODUCT_FETCH_LIMIT = 10000;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
@@ -85,7 +84,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const [categoriesResult, productsResult] = await Promise.all([
     getActiveCategories().catch(() => null),
-    getAllActiveProductsAcrossPages({ limit: 10000 }).catch(() => null),
+    getAllActiveProductsAcrossPages({
+      fetchCache: 'no-store',
+      fields: 'slug,updatedAt,createdAt',
+      limit: SITEMAP_PRODUCT_FETCH_LIMIT,
+    }).catch(() => null),
   ]);
 
   const categoryRoutes: MetadataRoute.Sitemap = Array.isArray(
@@ -105,10 +108,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     : [];
 
   const productRoutes = Array.isArray(productsResult?.data)
-    ? productsResult.data.map(async (item) => {
-        const product = await mapBackendProductToStorefrontProduct(item);
+    ? productsResult.data.map((item) => {
         return {
-          url: absoluteUrl(`/product/${product.slug}`),
+          url: absoluteUrl(`/product/${item.slug}`),
           lastModified: toLastModified(item.updatedAt ?? item.createdAt),
           changeFrequency: 'weekly' as const,
           priority: 0.8,
@@ -116,8 +118,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       })
     : [];
 
-  const resolvedProductRoutes =
-    productRoutes.length > 0 ? await Promise.all(productRoutes) : [];
-
-  return [...staticRoutes, ...categoryRoutes, ...resolvedProductRoutes];
+  return [...staticRoutes, ...categoryRoutes, ...productRoutes];
 }

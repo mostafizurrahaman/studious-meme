@@ -15,6 +15,8 @@ import {
 import { getAnsweredProductQuestionsByProduct } from '@/services/ProductQuestion';
 import { getProductReviewsByProduct } from '@/services/ProductReview';
 
+const STATIC_PRODUCT_FETCH_LIMIT = 10000;
+
 type Props = {
   params: Promise<{ slug: string }>;
 };
@@ -23,7 +25,9 @@ export const dynamicParams = true;
 
 export async function generateStaticParams() {
   const productsResult = await getAllActiveProductsAcrossPages({
-    limit: 10000,
+    fetchCache: 'no-store',
+    fields: 'slug',
+    limit: STATIC_PRODUCT_FETCH_LIMIT,
   }).catch(() => null);
 
   return Array.isArray(productsResult?.data)
