@@ -1,12 +1,14 @@
 import type { NextConfig } from 'next';
 
 const isProduction = process.env.NODE_ENV === 'production';
+
 const scriptSrc = [
   "'self'",
   "'unsafe-inline'",
   !isProduction ? "'unsafe-eval'" : '',
   'https://www.googletagmanager.com',
   'https://www.google-analytics.com',
+  'https://static.cloudflareinsights.com',
 ]
   .filter(Boolean)
   .join(' ');
@@ -15,9 +17,9 @@ const csp = `
   default-src 'self';
   script-src ${scriptSrc};
   style-src 'self' 'unsafe-inline';
-  img-src 'self' data: blob: https://res.cloudinary.com https://img.youtube.com;
+  img-src 'self' data: blob: https://res.cloudinary.com https://img.youtube.com https://malamal.com.bd;
   font-src 'self' data:;
-  connect-src 'self' https://api.malamal.com.bd https://malamal.xyz https://www.google-analytics.com https://www.googletagmanager.com;
+  connect-src 'self' https://api.malamal.com.bd https://malamal.com.bd https://www.google-analytics.com https://www.googletagmanager.com https://cloudflareinsights.com; 
   frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com;
   object-src 'none';
   base-uri 'self';
@@ -39,12 +41,16 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'res.cloudinary.com',
-        port: '',
         pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: 'img.youtube.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'malamal.com.bd',
         pathname: '/**',
       },
     ],
@@ -58,8 +64,6 @@ const nextConfig: NextConfig = {
   //     ignoreBuildErrors: true,
   // },
   async headers() {
-    const isProduction = process.env.NODE_ENV === 'production';
-
     return [
       {
         source: '/:path*',
