@@ -23,29 +23,28 @@ const MainLayout = async ({ children }: { children: React.ReactNode }) => {
   ]);
 
   const categories = Array.isArray(categoriesResult?.data)
-    ? categoriesResult.data
-        .map((item) =>
-          mapBackendCategoryToStorefrontCategory(item as BackendCategory),
-        )
-        .slice(0, 12)
-    : [];
+    ? categoriesResult.data.map((item) =>
+        mapBackendCategoryToStorefrontCategory(item as BackendCategory),
+      )
+    : // .slice(0, 12)
+      [];
 
   const brands = brandsResult?.data?.length
     ? await Promise.all(
-        brandsResult.data.slice(0, 12).map(mapBackendBrandToStorefrontBrand),
+        brandsResult.data.slice(0, 200).map(mapBackendBrandToStorefrontBrand),
       )
     : [];
 
   return (
     <div>
-      <StorefrontHeader categories={categories} />
+      <StorefrontHeader categories={categories.slice(0, 14)} />
       <main
         style={{
           paddingTop:
             'var(--storefront-header-height, clamp(120px, 12vw, 160px))',
         }}
       >
-        <FloatingCategoryRail categories={categories} />
+        <FloatingCategoryRail categories={categories.slice(0, 20)} />
         <Container>
           <div className="min-h-screen">
             <Suspense fallback={<Loading />}>{children}</Suspense>

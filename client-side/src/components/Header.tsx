@@ -327,9 +327,9 @@ export function Header({ categories }: Props) {
                           <div className="text-sm font-bold text-foreground">
                             {category.name}
                           </div>
-                          <div className="mt-1 text-xs font-normal text-foreground/55">
+                          {/* <div className="mt-1 text-xs font-normal text-foreground/55">
                             {category.description}
-                          </div>
+                          </div> */}
                         </Link>
                       ))}
                     </div>
@@ -352,11 +352,11 @@ export function Header({ categories }: Props) {
                             <div className="text-sm font-bold text-foreground">
                               {subCategory.name}
                             </div>
-                            {subCategory.description ? (
+                            {/* {subCategory.description ? (
                               <div className="mt-1 text-xs font-normal text-foreground/55">
                                 {subCategory.description}
                               </div>
-                            ) : null}
+                            ) : null} */}
                           </Link>
                         ))
                       ) : (

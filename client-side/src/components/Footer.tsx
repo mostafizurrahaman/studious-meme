@@ -92,21 +92,6 @@ export function Footer({ categories, brands }: Props) {
               >
                 About Us
               </Link>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-bold tracking-wide">Categories</h3>
-            <div className="mt-4 grid gap-2 text-sm text-secondary-foreground/90">
-              {categories.slice(0, 4).map((category) => (
-                <Link
-                  key={category.name}
-                  className="hover:text-secondary-foreground"
-                  href={category.href}
-                >
-                  {category.name}
-                </Link>
-              ))}
               <Link
                 className="hover:text-secondary-foreground"
                 href="/my-account"
@@ -141,6 +126,21 @@ export function Footer({ categories, brands }: Props) {
           </div>
 
           <div>
+            <h3 className="text-sm font-bold tracking-wide">Categories</h3>
+            <div className="mt-4 grid gap-2 text-sm text-secondary-foreground/90">
+              {categories.slice(5, 25).map((category) => (
+                <Link
+                  key={category.name}
+                  className="hover:text-secondary-foreground"
+                  href={category.href}
+                >
+                  {category.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <div>
             <h3 className="text-sm font-bold tracking-wide">Contact</h3>
             <div className="mt-4 grid gap-2 text-sm text-secondary-foreground/90">
               {contactChannels.map((channel) => (
@@ -154,7 +154,7 @@ export function Footer({ categories, brands }: Props) {
               ))}
             </div>
             <div className="mt-5 grid grid-cols-2 gap-2 text-xs font-semibold text-secondary-foreground/80">
-              {brands.slice(0, 4).map((brand) => (
+              {brands.slice(10, 30).map((brand) => (
                 <Link
                   key={brand.name}
                   href={brand.href}
