@@ -93,7 +93,7 @@ const getHomeContentFromDB = async (query: Record<string, unknown> = {}) => {
       ProductModel.find({ ...activeProductFilter, isFeatured: true })
         .populate('brand')
         .populate('category')
-        .sort({ createdAt: -1 })
+        .sort({ updatedAt: -1 })
         .limit(10)
         .lean(),
       ProductModel.find(activeProductFilter)
