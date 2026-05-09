@@ -11,7 +11,7 @@ import config from './app/config';
 import serverHomePage, { getMonitorStats } from './app/helpers/serverHomePage';
 import { globalLimiter } from './app/middlewares';
 // import { migrateOldImagesToCloudinary } from './app/scripts/migrateOldImagesToCloudinary';
-// import { responseTimeLogger } from './app/middlewares/logger';
+import { responseTimeLogger } from './app/middlewares/logger';
 
 const app: Application = express();
 
@@ -32,14 +32,22 @@ app.use(
 
         scriptSrc: [
           "'self'",
-          // "'unsafe-inline'",
-          // 'https://www.googletagmanager.com',
-          // 'https://www.google-analytics.com',
+          "'unsafe-inline'",
+          'https://cdn.jsdelivr.net',
         ],
 
-        styleSrc: ["'none'"], // [("'self'", "'unsafe-inline'")]
+        scriptSrcAttr: ["'unsafe-inline'"],
 
-        imgSrc: ["'self'"], // [ "'self'", 'data:', 'blob:', 'https:', 'https://res.cloudinary.com', 'https://img.youtube.com' ]
+        styleSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          'https://cdnjs.cloudflare.com',
+          'https://fonts.googleapis.com',
+        ],
+
+        styleSrcAttr: ["'unsafe-inline'"],
+
+        imgSrc: ["'self'", 'data:'],
 
         connectSrc: [
           "'self'",
@@ -54,7 +62,12 @@ app.use(
           // 'https://www.googletagmanager.com',
         ],
 
-        fontSrc: ["'self'"], // ["'self'", 'data:', 'https:']
+        fontSrc: [
+          "'self'",
+          'data:',
+          'https://cdnjs.cloudflare.com',
+          'https://fonts.gstatic.com',
+        ],
 
         frameSrc: ["'none'"], // ["'self'", 'https://www.youtube.com', 'https://www.youtube-nocookie.com']
 
@@ -91,7 +104,7 @@ app.use(
 
 // (3)
 // response time logger
-// app.use(responseTimeLogger);
+app.use(responseTimeLogger);
 
 // CORS configuration
 app.use(

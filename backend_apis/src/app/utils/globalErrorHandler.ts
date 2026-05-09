@@ -8,10 +8,9 @@ import handleCastError from '../errors/handleCastError';
 import handleDuplicateError from '../errors/handleDuplicateError';
 import AppError from './AppError';
 import handleValidationError from '../errors/handleValidationError';
-// import { errorLogger } from '../middlewares/logger';
+import { errorLogger } from '../middlewares/logger';
 
 // global error handling middleware (four parameters error handler)
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, _next) => {
   // settle default values
   let statusCode: number = httpStatus.INTERNAL_SERVER_ERROR;
@@ -69,7 +68,7 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, _next) => {
 
   // (2)
   // log error to Error.log logger
-  // errorLogger(err, req, statusCode);
+  errorLogger(err, req, statusCode);
 
   // ultimate return
   res.status(statusCode).json({

@@ -1232,7 +1232,7 @@ async function serverHomePage(): Promise<string> {
       <div id="login-screen" class="login-wrap">
         <form class="login-box" onsubmit="event.preventDefault(); authenticate()" autocomplete="on">
           <i class="fas fa-terminal" style="font-size: 2.5rem; color: var(--accent-blue); margin-bottom: 1rem;"></i>
-          <h2>BasBanGeet Monitor</h2>
+          <h2>${config.preffered_website_name || 'Server'} Monitor</h2>
           <div class="input-wrap">
             <i class="fas fa-envelope"></i>
             <input type="text" id="username" name="username" placeholder="Email or Username" autocomplete="username" required>
@@ -1251,7 +1251,7 @@ async function serverHomePage(): Promise<string> {
 
       <div id="main-view" class="container">
         <header>
-          <div class="logo">${(config.preffered_website_name || 'BasBanGeet').toUpperCase()}<span> MONITOR</span></div>
+          <div class="logo">${(config.preffered_website_name || 'Server').toUpperCase()}<span> MONITOR</span></div>
           <div class="header-actions">
             <div style="display: flex; align-items: center; gap: 0.5rem; background: rgba(0,0,0,0.2); padding: 0.5rem 1rem; border-radius: 2rem;">
               <div class="pulse"></div>
