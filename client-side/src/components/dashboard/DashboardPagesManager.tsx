@@ -440,7 +440,7 @@ export function DashboardPagesManager({
               suppressContentEditableWarning
               onInput={syncEditorContent}
               onBlur={syncEditorContent}
-              className="min-h-90 px-5 py-4 text-sm leading-7 outline-none [&_a]:font-semibold [&_a]:text-primary [&_blockquote]:border-l-4 [&_blockquote]:border-primary/30 [&_blockquote]:pl-4 [&_blockquote]:text-foreground/65 [&_h1]:mt-6 [&_h1]:text-2xl [&_h1]:font-black [&_h2]:mt-5 [&_h2]:text-xl [&_h2]:font-black [&_h3]:mt-4 [&_h3]:text-lg [&_h3]:font-bold [&_li]:ml-5 [&_ol]:list-decimal [&_p]:mb-3 [&_ul]:list-disc"
+              className="max-h-[65vh] min-h-90 overflow-auto px-5 py-4 text-sm leading-7 wrap-break-word outline-none **:max-w-full [&_a]:font-semibold [&_a]:text-primary [&_blockquote]:border-l-4 [&_blockquote]:border-primary/30 [&_blockquote]:pl-4 [&_blockquote]:text-foreground/65 [&_h1]:mt-6 [&_h1]:text-2xl [&_h1]:font-black [&_h2]:mt-5 [&_h2]:text-xl [&_h2]:font-black [&_h3]:mt-4 [&_h3]:text-lg [&_h3]:font-bold [&_img]:h-auto [&_li]:ml-5 [&_ol]:list-decimal [&_p]:mb-3 [&_table]:block [&_table]:max-w-full [&_table]:overflow-x-auto [&_ul]:list-disc"
             />
           </div>
 
@@ -474,7 +474,7 @@ export function DashboardPagesManager({
               {title || pageLabels[slug]}
             </h2>
             <div
-              className="mt-4 text-sm leading-7 text-foreground/70 [&_a]:font-semibold [&_a]:text-primary [&_blockquote]:border-l-4 [&_blockquote]:border-primary/30 [&_blockquote]:pl-4 [&_blockquote]:text-foreground/65 [&_h1]:mt-6 [&_h1]:text-xl [&_h1]:font-black [&_h2]:mt-5 [&_h2]:text-lg [&_h2]:font-black [&_h3]:mt-4 [&_h3]:font-bold [&_li]:ml-5 [&_ol]:list-decimal [&_p]:mb-3 [&_ul]:list-disc"
+              className="mt-4 max-h-[70vh] overflow-auto text-sm leading-7 wrap-break-word text-foreground/70 **:max-w-full [&_a]:font-semibold [&_a]:text-primary [&_blockquote]:border-l-4 [&_blockquote]:border-primary/30 [&_blockquote]:pl-4 [&_blockquote]:text-foreground/65 [&_h1]:mt-6 [&_h1]:text-xl [&_h1]:font-black [&_h2]:mt-5 [&_h2]:text-lg [&_h2]:font-black [&_h3]:mt-4 [&_h3]:font-bold [&_img]:h-auto [&_li]:ml-5 [&_ol]:list-decimal [&_p]:mb-3 [&_table]:block [&_table]:max-w-full [&_table]:overflow-x-auto [&_ul]:list-disc"
               dangerouslySetInnerHTML={{ __html: content }}
             />
           </div>

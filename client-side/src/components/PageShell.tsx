@@ -12,13 +12,13 @@ export function PageShell({ title, description, children }: Props) {
     <main className="flex-1 bg-background">
       <Container>
         <div className="py-8">
-          <Card className="p-6 shadow-sm">
+          <Card className="overflow-hidden p-6 shadow-sm">
             <h1 className="text-xl font-extrabold text-secondary">{title}</h1>
             {description ? (
               <p className="mt-2 text-sm text-foreground/60">{description}</p>
             ) : null}
 
-            <div className="mt-6">{children}</div>
+            <div className="mt-6 min-w-0 max-w-full">{children}</div>
           </Card>
         </div>
       </Container>
