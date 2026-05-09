@@ -1,5 +1,5 @@
 import { absoluteUrl } from '@/lib/seo';
-import { getAllActiveProductsAcrossPages } from '@/services/Product';
+import { getAllActiveProducts } from '@/services/Product';
 import { getActiveCategories } from '@/services/Category';
 import {
   mapBackendCategoryToStorefrontCategory,
@@ -84,8 +84,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const [categoriesResult, productsResult] = await Promise.all([
     getActiveCategories().catch(() => null),
-    getAllActiveProductsAcrossPages({
-      fetchCache: 'no-store',
+    getAllActiveProducts({
       fields: 'slug,updatedAt,createdAt',
       limit: SITEMAP_PRODUCT_FETCH_LIMIT,
     }).catch(() => null),

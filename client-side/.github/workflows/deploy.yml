@@ -50,6 +50,8 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT }}
           script: |
+            set -euo pipefail
+
             echo "==> Variables declaration"
             # ভ্যারিয়েবল ডিক্লেয়ারেশন
             APP_DIR="/var/www/MalaMal_Frontend"
@@ -62,6 +64,7 @@ jobs:
             echo "==> Checking/Installing pnpm and pm2"
             if ! command -v pnpm >/dev/null 2>&1; then sudo npm install -g pnpm; fi
             if ! command -v pm2 >/dev/null 2>&1; then sudo npm install -g pm2; fi
+            export PNPM_CONFIG_DANGEROUSLY_ALLOW_ALL_BUILDS=true
 
             echo "==> Preparing app directory"
             sudo mkdir -p "$APP_DIR"
@@ -72,10 +75,14 @@ jobs:
             if [ ! -d ".git" ]; then 
               git clone -b main ${{ secrets.FRONTEND_REPO_URL }} .
             else
+              git remote set-url origin ${{ secrets.FRONTEND_REPO_URL }}
               git fetch origin main
               git reset --hard origin/main
               git clean -fd
             fi
+
+            echo "==> Cleaning previous build and dependencies"
+            rm -rf .next .next-build .next-build-* node_modules
 
             echo "==> Creating .env file"
             # এখানে সরাসরি সিক্রেট ব্যবহার করা হয়েছে, যা সেফ

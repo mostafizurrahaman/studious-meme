@@ -9,7 +9,6 @@ import { buildProductMetadata, buildProductSchemas } from '@/lib/seo';
 import {
   getActiveProductBySlug,
   getAllActiveProducts,
-  getAllActiveProductsAcrossPages,
   mapBackendProductToStorefrontProduct,
 } from '@/services/Product';
 import { getAnsweredProductQuestionsByProduct } from '@/services/ProductQuestion';
@@ -24,8 +23,7 @@ type Props = {
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
-  const productsResult = await getAllActiveProductsAcrossPages({
-    fetchCache: 'no-store',
+  const productsResult = await getAllActiveProducts({
     fields: 'slug',
     limit: STATIC_PRODUCT_FETCH_LIMIT,
   }).catch(() => null);

@@ -110,7 +110,6 @@ type GetAllProductsParams = {
   page?: number;
   limit?: number;
   fields?: string;
-  fetchCache?: RequestCache;
   searchTerm?: string;
   c?: string;
   category?: string;
@@ -163,22 +162,17 @@ const buildProductSearchParams = (params: GetAllProductsParams) => {
 export const getAllProducts = async (
   params: GetAllProductsParams = {},
 ): Promise<BackendEnvelope<BackendProduct[]>> => {
-  const { fetchCache, ...queryParams } = params;
-  const searchParams = buildProductSearchParams(queryParams);
+  const searchParams = buildProductSearchParams(params);
   const query = searchParams.toString();
 
   return requestBackendJson<BackendEnvelope<BackendProduct[]>>(
     `/product/products${query ? `?${query}` : ''}`,
     {
       method: 'GET',
-      ...(fetchCache
-        ? { cache: fetchCache }
-        : {
-            next: {
-              revalidate: CACHE_REVALIDATE.LONG,
-              tags: [CACHE_TAGS.PRODUCTS],
-            },
-          }),
+      next: {
+        revalidate: CACHE_REVALIDATE.LONG,
+        tags: [CACHE_TAGS.PRODUCTS],
+      },
     },
   );
 };
@@ -186,22 +180,17 @@ export const getAllProducts = async (
 const fetchActiveProductsPage = async (
   pageParams: Omit<GetAllProductsParams, 'includeInactive'>,
 ) => {
-  const { fetchCache, ...queryParams } = pageParams;
-  const searchParams = buildProductSearchParams(queryParams);
+  const searchParams = buildProductSearchParams(pageParams);
   const query = searchParams.toString();
 
   return requestBackendJson<BackendEnvelope<BackendProduct[]>>(
     `/product/products/active${query ? `?${query}` : ''}`,
     {
       method: 'GET',
-      ...(fetchCache
-        ? { cache: fetchCache }
-        : {
-            next: {
-              revalidate: CACHE_REVALIDATE.LONG,
-              tags: [CACHE_TAGS.PRODUCTS],
-            },
-          }),
+      next: {
+        revalidate: CACHE_REVALIDATE.LONG,
+        tags: [CACHE_TAGS.PRODUCTS],
+      },
     },
   );
 };
@@ -214,10 +203,16 @@ export const getAllActiveProducts = async (
 export const getAllActiveProductsAcrossPages = async (
   params: Omit<GetAllProductsParams, 'includeInactive' | 'page'> = {},
 ): Promise<BackendEnvelope<BackendProduct[]>> => {
-  const firstPage = await fetchActiveProductsPage({ ...params, page: 1 });
+  const pageParams = {
+    ...params,
+    ...(!params.fields && (params.limit ?? 0) >= 10000
+      ? { fields: 'slug' }
+      : {}),
+  };
+  const firstPage = await fetchActiveProductsPage({ ...pageParams, page: 1 });
   const products = [...(firstPage.data ?? [])];
   const totalPages = firstPage.meta?.totalPages ?? 1;
-  const limit = firstPage.meta?.limit ?? params.limit;
+  const limit = firstPage.meta?.limit ?? pageParams.limit;
 
   if (totalPages <= 1) {
     return {
@@ -232,7 +227,11 @@ export const getAllActiveProductsAcrossPages = async (
   );
   const remainingResults = await Promise.all(
     remainingPages.map((page) =>
-      fetchActiveProductsPage({ ...params, page, ...(limit ? { limit } : {}) }),
+      fetchActiveProductsPage({
+        ...pageParams,
+        page,
+        ...(limit ? { limit } : {}),
+      }),
     ),
   );
 
@@ -264,7 +263,7 @@ export const getProductBySlug = async (
       method: 'GET',
       next: {
         revalidate: CACHE_REVALIDATE.LONG,
-        tags: [CACHE_TAGS.PRODUCTS, CACHE_TAGS.PRODUCT(slug)],
+        tags: [CACHE_TAGS.PRODUCT(slug)],
       },
     },
   );
@@ -279,7 +278,7 @@ export const getActiveProductBySlug = async (
       method: 'GET',
       next: {
         revalidate: CACHE_REVALIDATE.LONG,
-        tags: [CACHE_TAGS.PRODUCTS, CACHE_TAGS.PRODUCT(slug)],
+        tags: [CACHE_TAGS.PRODUCT(slug)],
       },
     },
   );
@@ -413,6 +412,9 @@ export const createProduct = async (
   );
 
   revalidateTag(CACHE_TAGS.PRODUCTS, 'max');
+  if (result.data?.slug) {
+    revalidateTag(CACHE_TAGS.PRODUCT(result.data.slug), 'max');
+  }
   revalidateTag(CACHE_TAGS.SEARCH, 'max');
   return result;
 };
@@ -436,14 +438,14 @@ export const updateProduct = async (
   );
 
   revalidateTag(CACHE_TAGS.PRODUCTS, 'max');
+  revalidateTag(CACHE_TAGS.PRODUCT(slug), 'max');
+  revalidateTag(CACHE_TAGS.PRODUCT(nextSlug), 'max');
   revalidateTag(CACHE_TAGS.SEARCH, 'max');
   revalidatePath('/dashboard/admin/products');
   revalidatePath('/dashboard/super-admin/products');
 
-  if (nextSlug !== slug) {
-    revalidatePath(`/product/${slug}`);
-    revalidatePath(`/product/${nextSlug}`);
-  }
+  revalidatePath(`/product/${slug}`);
+  revalidatePath(`/product/${nextSlug}`);
 
   return result;
 };
@@ -461,6 +463,7 @@ export const deleteProduct = async (
   );
 
   revalidateTag(CACHE_TAGS.PRODUCTS, 'max');
+  revalidateTag(CACHE_TAGS.PRODUCT(slug), 'max');
   revalidateTag(CACHE_TAGS.SEARCH, 'max');
   return result;
 };
