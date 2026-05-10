@@ -313,7 +313,7 @@ export function buildProductMetadata(product: {
   features?: string;
   description?: string;
 }) {
-  const image = getProductPrimaryImage(product);
+  const image = absoluteUrl(getProductPrimaryImage(product));
 
   const descriptionParts = [product.description, product.features].filter(
     Boolean,
@@ -330,11 +330,7 @@ export function buildProductMetadata(product: {
       title: product.title,
       description: fullDescription,
       url: `${siteConfig.url}/product/${product.slug}`,
-      images: product.images?.length
-        ? product.images.map((img) => ({ url: img }))
-        : image
-          ? [{ url: image }]
-          : [],
+      images: [{ url: image }],
       type: 'website',
     },
 

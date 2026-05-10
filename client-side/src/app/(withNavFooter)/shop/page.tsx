@@ -20,6 +20,8 @@ type Props = {
     stock?: string;
     tag?: string;
     price?: string;
+    brand?: string;
+    b?: string;
     page?: string;
     limit?: string;
     sort?: string;
@@ -45,6 +47,8 @@ export default async function ShopPage({ searchParams }: Props) {
       stock: query.stock,
       tag: query.tag,
       price: query.price,
+      brand: query.brand,
+      b: query.b,
       sort: query.sort,
       searchTerm,
     }).catch(() => null),

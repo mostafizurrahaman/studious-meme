@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useCartStore } from '@/lib/cart-store';
@@ -33,6 +34,9 @@ export function AddToCartButton({
 
         addProduct(product);
         setAdded(true);
+        toast.success('Added to cart.', {
+          description: product.title,
+        });
         if (product.id) {
           void addCartItem(product.id)
             .then((result) => {

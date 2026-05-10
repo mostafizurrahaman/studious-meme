@@ -44,7 +44,7 @@ const MainLayout = async ({ children }: { children: React.ReactNode }) => {
             'var(--storefront-header-height, clamp(120px, 12vw, 160px))',
         }}
       >
-        <FloatingCategoryRail categories={categories.slice(0, 20)} />
+        <FloatingCategoryRail categories={categories.slice(0, 12)} />
         <Container>
           <div className="min-h-screen">
             <Suspense fallback={<Loading />}>{children}</Suspense>

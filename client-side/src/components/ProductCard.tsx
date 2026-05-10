@@ -58,12 +58,12 @@ export function ProductCard({
             compact
             className="w-full rounded-full border border-border bg-background px-2 py-0.5 text-[10px] font-semibold text-foreground/70 shadow-sm transition hover:border-primary/30 hover:text-primary"
           />
-          <Link
+          {/* <Link
             href={`/product/${product.slug}`}
             className="rounded-full border border-border bg-background px-2 py-0.5 text-[10px] font-semibold text-foreground/70 shadow-sm transition hover:border-primary/30 hover:text-primary"
           >
             Quick view
-          </Link>
+          </Link> */}
           <AddToWishlistButton
             product={product}
             compact
@@ -74,7 +74,7 @@ export function ProductCard({
       <CardContent className="flex flex-1 flex-col p-2.5 pt-2.5 sm:p-4 sm:pt-4">
         <Link href={`/product/${product.slug}`} className="block">
           <h3
-            className="line-clamp-3 min-h-15 wrap-break-word text-[11px] font-semibold leading-5 text-foreground transition hover:text-primary sm:text-[13px]"
+            className="line-clamp-2 min-h-10 wrap-break-word text-[11px] font-semibold leading-5 text-foreground transition hover:text-primary sm:text-[13px]"
             title={product.title}
           >
             {product.title}

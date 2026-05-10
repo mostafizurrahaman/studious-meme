@@ -56,7 +56,7 @@ export function FloatingCategoryRail({ categories }: Props) {
 
   return (
     <div
-      className="fixed left-2 top-5 z-50 hidden lg:block"
+      className="fixed left-2 top-(--storefront-header-height,clamp(120px,12vw,160px)) z-30 hidden lg:block"
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
     >

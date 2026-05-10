@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
+import { toast } from 'sonner';
 import {
   MessageCircle,
   Minus,
@@ -249,6 +250,9 @@ export function ProductDetailClient({
   const description = sanitizeProductHtml(product.description?.trim() ?? '');
   const features = sanitizeProductHtml(product.features?.trim() ?? '');
   const productUrl = `https://malamal.com.bd/product/${product.slug}/`;
+  const whatsappOrderUrl = `${WHATSAPP_URL}?text=${encodeURIComponent(
+    `Hello, I want to order this product:\n\nProduct: ${product.title}\nLink: ${productUrl}`,
+  )}`;
   const encodedProductUrl = encodeURIComponent(productUrl);
   const primaryImage = getProductPrimaryImage(product);
   const outOfStock = isOutOfStockLabel(product.stock);
@@ -296,6 +300,10 @@ export function ProductDetailClient({
     }
 
     addProductQuantity(product, quantity);
+    toast.success('Added to cart.', {
+      description:
+        quantity > 1 ? `${quantity} x ${product.title}` : product.title,
+    });
     if (product.id) {
       void addCartItem(product.id, quantity)
         .then((result) => {
@@ -305,7 +313,6 @@ export function ProductDetailClient({
         })
         .catch(() => null);
     }
-    // toast.success('Product added to cart.');
     if (redirect) router.push('/checkout');
   }
 
@@ -533,7 +540,7 @@ export function ProductDetailClient({
             variant="link"
             className="h-auto p-0 font-bold text-green-600! underline! underline-offset-6"
           >
-            <Link href={WHATSAPP_URL} target="_blank">
+            <Link href={whatsappOrderUrl} target="_blank">
               <Send className="size-4" />
               Order on WhatsApp
             </Link>
