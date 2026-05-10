@@ -82,7 +82,7 @@ jobs:
             fi
 
             echo "==> Cleaning previous build and dependencies"
-            rm -rf .next .next-build .next-build-* node_modules
+            # rm -rf .next .next-build .next-build-* node_modules
 
             echo "==> Creating .env file"
             # এখানে সরাসরি সিক্রেট ব্যবহার করা হয়েছে, যা সেফ

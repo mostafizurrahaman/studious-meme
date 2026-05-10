@@ -88,7 +88,7 @@ jobs:
             EOF
 
             echo "==> Cleaning old build and installing dependencies"
-            rm -rf dist node_modules
+            # rm -rf dist node_modules
             pnpm install --frozen-lockfile
 
             echo "==> Building Backend app"
