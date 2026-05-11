@@ -45,11 +45,13 @@ const MainLayout = async ({ children }: { children: React.ReactNode }) => {
         }}
       >
         <FloatingCategoryRail categories={categories.slice(0, 12)} />
-        <Container>
-          <div className="min-h-screen">
-            <Suspense fallback={<Loading />}>{children}</Suspense>
-          </div>
-        </Container>
+        <div className="lg:pl-18 2xl:pl-0">
+          <Container>
+            <div className="min-h-screen">
+              <Suspense fallback={<Loading />}>{children}</Suspense>
+            </div>
+          </Container>
+        </div>
       </main>
       <Footer categories={categories} brands={brands} />
       <MobileToolbar />
