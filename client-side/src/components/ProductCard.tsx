@@ -80,9 +80,9 @@ export function ProductCard({
             {product.title}
           </h3>
         </Link>
-        <div className="mt-1.5 flex items-center gap-1 text-[9px] text-foreground/55 sm:mt-2 sm:text-[11px]">
-          <span>Brand: {product.brand}</span>
-          <span>SKU {product.sku}</span>
+        <div className="mt-1.5 flex items-center justify-between gap-3 text-[9px] text-foreground/55 sm:mt-2 sm:text-[11px]">
+          <span className="min-w-0 truncate">Brand: {product.brand}</span>
+          <span className="shrink-0">SKU: {product.sku}</span>
         </div>
         <div className="mt-1.5 flex items-center gap-1 text-[9px] text-primary sm:mt-2 sm:text-[11px]">
           <span>★★★★★</span>
@@ -102,13 +102,13 @@ export function ProductCard({
           <span>{product.stock}</span>
           <span>In catalog</span>
         </div>
-          <div className="mt-auto grid gap-1.5 pt-4 sm:grid-cols-1 sm:gap-2">
-            <AddToCartButton
-              product={product}
-              disabled={outOfStock}
-              className="sm:w-full"
-            />
-            <div className="flex items-center gap-2">
+        <div className="mt-auto grid gap-1.5 pt-4 sm:grid-cols-1 sm:gap-2">
+          <AddToCartButton
+            product={product}
+            disabled={outOfStock}
+            className="sm:w-full"
+          />
+          <div className="flex items-center gap-2">
             <Button
               asChild
               variant="outline"
