@@ -199,7 +199,7 @@ export function ShopPageClient({ products, categories, meta }: Props) {
     const params = new URLSearchParams(searchParams.toString());
     params.set('page', String(nextPage));
     router.replace(`${pathname}?${params.toString()}` as Route, {
-      scroll: false,
+      scroll: true,
     });
   }
 
