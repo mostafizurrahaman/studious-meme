@@ -69,6 +69,10 @@ productSchema.index(
   { name: 'product_active_featured_createdAt_idx' },
 );
 productSchema.index(
+  { isActive: 1, isFeatured: 1, updatedAt: -1 },
+  { name: 'product_active_featured_updatedAt_idx' },
+);
+productSchema.index(
   { isActive: 1, isNoCOD: 1, createdAt: -1 },
   { name: 'product_active_noCod_createdAt_idx' },
 );

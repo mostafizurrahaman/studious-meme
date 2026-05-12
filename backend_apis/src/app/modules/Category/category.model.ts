@@ -61,6 +61,10 @@ categorySchema.index(
   { name: 'category_active_createdAt_idx' },
 );
 categorySchema.index(
+  { isActive: 1, name: 1 },
+  { name: 'category_active_name_idx' },
+);
+categorySchema.index(
   { isActive: 1, 'subCategories.slug': 1 },
   { name: 'category_active_subCategorySlug_idx' },
 );

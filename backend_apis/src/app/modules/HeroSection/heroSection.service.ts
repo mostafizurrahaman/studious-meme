@@ -51,6 +51,16 @@ const getPositiveLimit = (value: unknown) => {
   return Number.isInteger(limit) && limit > 0 ? limit : undefined;
 };
 
+const HOME_BRAND_FIELDS = 'name slug image';
+const HOME_CATEGORY_FIELDS =
+  'name slug image description accent subCategories.name subCategories.slug subCategories.image subCategories.description subCategories.accent';
+const HOME_PRODUCT_FIELDS =
+  'title slug sku images price oldPrice badge sellingUnit brand category stock rating isFeatured isNoCOD weightKg createdAt';
+const HOME_PRODUCT_POPULATE = [
+  { path: 'brand', select: 'name slug' },
+  { path: 'category', select: 'name slug' },
+];
+
 // 1. ensureHeroSectionImages
 const ensureHeroSectionImages = (payload: Partial<IHeroSection>) => {
   const cards = [...(payload.slides || []), ...(payload.features || [])];
@@ -83,22 +93,24 @@ const getHomeContentFromDB = async (query: Record<string, unknown> = {}) => {
     await Promise.all([
       HeroSectionModel.findOne({ isActive: true }).lean(),
       BrandModel.find({ isActive: true })
+        .select(HOME_BRAND_FIELDS)
         .sort({ name: 1 })
         .limit(brandLimit ?? 0)
         .lean(),
       CategoryModel.find({ isActive: true })
+        .select(HOME_CATEGORY_FIELDS)
         .sort({ name: 1 })
         .limit(categoryLimit ?? 0)
         .lean(),
       ProductModel.find({ ...activeProductFilter, isFeatured: true })
-        .populate('brand')
-        .populate('category')
+        .select(HOME_PRODUCT_FIELDS)
+        .populate(HOME_PRODUCT_POPULATE)
         .sort({ updatedAt: -1 })
         .limit(10)
         .lean(),
       ProductModel.find(activeProductFilter)
-        .populate('brand')
-        .populate('category')
+        .select(HOME_PRODUCT_FIELDS)
+        .populate(HOME_PRODUCT_POPULATE)
         .sort({ createdAt: -1 })
         .limit(20)
         .lean(),
