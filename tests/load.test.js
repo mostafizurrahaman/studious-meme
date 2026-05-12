@@ -48,6 +48,19 @@
 //   sleep(1);
 // }
 
+// import http from 'k6/http';
+// import { sleep } from 'k6';
+
+// export const options = {
+//   vus: 1000, // 1000 জন ভার্চুয়াল ইউজার
+//   duration: '30s', // ৩০ সেকেন্ড ধরে টেস্ট চলবে
+// };
+
+// export default function () {
+//   http.get('https://malamal.com.bd'); // এই লিঙ্কে রিকোয়েস্ট পাঠাবে
+//   sleep(1); // প্রতি রিকোয়েস্টের মাঝে ১ সেকেন্ড বিরতি
+// }
+
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 
