@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { describe, it, expect } from 'vitest';
 import { ProductValidation } from './product.validation';
 
@@ -45,6 +46,7 @@ describe('Product Validation - Critical Paths', () => {
     });
 
     it('should reject product without title', () => {
+      // eslint-disable-next-line unused-imports/no-unused-vars
       const { title, ...dataWithoutTitle } = validProductBase;
       const result = ProductValidation.productCreateSchema.safeParse({
         body: dataWithoutTitle,

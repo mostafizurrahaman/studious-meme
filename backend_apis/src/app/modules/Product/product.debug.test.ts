@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { describe, it, expect } from 'vitest';
 import { ProductValidation } from './product.validation';
 

@@ -14,9 +14,9 @@ describe('Validators', () => {
       }),
     });
 
-    const mockReq = { body: { name: 'Test' } } as any;
-    const mockRes = { status: () => ({ json: () => {} }) } as any;
-    const mockNext = () => {};
+    // const mockReq = { body: { name: 'Test' } } as any;
+    // const mockRes = { status: () => ({ json: () => {} }) } as any;
+    // const mockNext = () => {};
 
     // Just check the function exists and can be called
     expect(validateRequest(schema)).toBeDefined();

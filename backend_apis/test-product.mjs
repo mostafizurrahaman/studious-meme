@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { ProductValidation } from './src/app/modules/Product/product.validation.ts';
 
 const validProductBase = {

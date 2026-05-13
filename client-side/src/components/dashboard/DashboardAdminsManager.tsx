@@ -66,6 +66,7 @@ export function DashboardAdminsManager({
 }: DashboardAdminsManagerProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [adminRows, setAdminRows] = useState(admins);
   const [adminImageFile, setAdminImageFile] = useState<File | null>(null);
   const [adminImagePreview, setAdminImagePreview] = useState('');
