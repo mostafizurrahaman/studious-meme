@@ -8,6 +8,8 @@ const pageSchema = new Schema<IPage>(
       type: String,
       enum: Object.values(PageSlugs),
       required: [true, 'Slug is required!'],
+      unique: true,
+      index: true,
     },
     title: {
       type: String,
