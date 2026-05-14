@@ -24,9 +24,9 @@ const csp = `
     'self'
     data:
     blob:
-    https://res.cloudinary.com
-    https://img.youtube.com
     https://malamal.com.bd
+    https://img.youtube.com
+    https://res.cloudinary.com;
 
   font-src 'self' data:;
 
@@ -57,68 +57,96 @@ const csp = `
 const nextConfig: NextConfig = {
   /* config options here */
   distDir: process.env.NEXT_DIST_DIR || '.next',
+
+  // Performance & SEO Optimizations
   reactStrictMode: true,
+  devIndicators: false,
+  poweredByHeader: false,
+
+  /**
+   * Next.js 16+
+   * React Compiler এখন stable direction এ যাচ্ছে,
+   * কিন্তু অনেক library compatibility issue থাকতে পারে।
+   * Safe হলে enable করুন।
+   */
   reactCompiler: true,
+
+  // Next.js 16: Enable Cache Components and use-cache based caching behavior
+  /**
+   * Next.js 16 caching
+   * cacheComponents এখন useful,
+   * কিন্তু app-wide blindly enable না করাই better
+   * যদি use cache strategy properly follow না করেন।
+   */
+  // cacheComponents: true,
+
   images: {
-    qualities: [50, 75, 90, 100],
+    // Next.js 16 allows multiple qualities for better optimization
+    // formats: ['image/avif', 'image/webp'],
+    qualities: [50, 75, 90],
+    minimumCacheTTL: 60 * 60 * 24 * 7, // 7 days
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'res.cloudinary.com',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'img.youtube.com',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'malamal.com.bd',
-        pathname: '/**',
-      },
+      { protocol: 'https', hostname: 'res.cloudinary.com', pathname: '/**' },
+      { protocol: 'https', hostname: 'img.youtube.com', pathname: '/**' },
+      { protocol: 'https', hostname: 'malamal.com.bd', pathname: '/**' },
     ],
   },
+
   experimental: {
     serverActions: {
       bodySizeLimit: '5mb', // Set this to 2mb, 5mb, etc.
     },
+
+    // Optimize static generation performance
+    // staticGenerationRetryCount: 1,
+    // staticGenerationMaxConcurrency: 8,
   },
+
   // typescript: {
   //     ignoreBuildErrors: true,
   // },
+
+  compiler: {
+    removeConsole: isProduction
+      ? {
+          exclude: ['error', 'warn'],
+        }
+      : false,
+  },
+
   async headers() {
     return [
       {
         source: '/:path*',
         headers: [
+          { key: 'Content-Security-Policy', value: csp },
           // Prevent clickjacking
           { key: 'X-Frame-Options', value: 'DENY' },
+
           // Prevent MIME-type sniffing
           { key: 'X-Content-Type-Options', value: 'nosniff' },
-          // XSS protection (legacy browsers)
-          // { key: 'X-XSS-Protection', value: '1; mode=block' },
+
           // Referrer policy
-          {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin',
-          },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+
+          { key: 'X-DNS-Prefetch-Control', value: 'on' },
+
+          // XSS protection (legacy browsers)
+          { key: 'X-XSS-Protection', value: '1; mode=block' },
+
           // Permissions policy (disable unused features)
           {
             key: 'Permissions-Policy',
             value:
               'camera=(), microphone=(), geolocation=(self), interest-cohort=()',
           },
-          {
-            key: 'Content-Security-Policy',
-            value: csp,
-          },
+
           // HSTS (production only)
           ...(isProduction
             ? [
                 {
                   key: 'Strict-Transport-Security',
-                  value: 'max-age=31536000; includeSubDomains; preload',
+                  value: 'max-age=63072000; includeSubDomains; preload',
                 },
               ]
             : []),
@@ -129,120 +157,3 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
-
-// import type { NextConfig } from 'next';
-
-// const isProduction = process.env.NODE_ENV === 'production';
-// const scriptSrc = [
-//   "'self'",
-//   "'unsafe-inline'",
-//   !isProduction ? "'unsafe-eval'" : '',
-//   'https://www.googletagmanager.com',
-//   'https://www.google-analytics.com',
-// ]
-//   .filter(Boolean)
-//   .join(' ');
-
-// const csp = `
-//   default-src 'self';
-//   script-src ${scriptSrc};
-//   style-src 'self' 'unsafe-inline';
-//   img-src 'self' data: blob: https://res.cloudinary.com https://img.youtube.com https://malamal.com.bd https://i0.wp.com;
-//   font-src 'self' data:;
-//   connect-src 'self' https://api.malamal.com.bd https://malamal.xyz https://www.google-analytics.com https://www.googletagmanager.com;
-//   frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com;
-//   object-src 'none';
-//   base-uri 'self';
-//   form-action 'self';
-//   frame-ancestors 'none';
-//   ${isProduction ? 'upgrade-insecure-requests;' : ''}
-// `
-//   .replace(/\s{2,}/g, ' ')
-//   .trim();
-
-// const nextConfig: NextConfig = {
-//   /* config options here */
-//   distDir: process.env.NEXT_DIST_DIR || '.next',
-//   reactStrictMode: true,
-//   reactCompiler: true,
-//   images: {
-//     // The legacy WordPress image host can resolve through a NAT64 address that
-//     // Next.js treats as private, even though the hostname is explicitly trusted.
-//     dangerouslyAllowLocalIP: true,
-//     qualities: [50, 75, 90, 100],
-//     remotePatterns: [
-//       {
-//         protocol: 'https',
-//         hostname: 'malamal.com.bd',
-//         pathname: '/wp-content/uploads/**',
-//       },
-//       {
-//         protocol: 'https',
-//         hostname: 'i0.wp.com',
-//         pathname: '/malamal.com.bd/wp-content/uploads/**',
-//       },
-//       {
-//         protocol: 'https',
-//         hostname: 'res.cloudinary.com',
-//         port: '',
-//         pathname: '/**',
-//       },
-//       {
-//         protocol: 'https',
-//         hostname: 'img.youtube.com',
-//         pathname: '/**',
-//       },
-//     ],
-//   },
-//   experimental: {
-//     serverActions: {
-//       bodySizeLimit: '5mb', // Set this to 2mb, 5mb, etc.
-//     },
-//   },
-//   // typescript: {
-//   //     ignoreBuildErrors: true,
-//   // },
-//   async headers() {
-//     const isProduction = process.env.NODE_ENV === 'production';
-
-//     return [
-//       {
-//         source: '/:path*',
-//         headers: [
-//           // Prevent clickjacking
-//           { key: 'X-Frame-Options', value: 'DENY' },
-//           // Prevent MIME-type sniffing
-//           { key: 'X-Content-Type-Options', value: 'nosniff' },
-//           // XSS protection (legacy browsers)
-//           // { key: 'X-XSS-Protection', value: '1; mode=block' },
-//           // Referrer policy
-//           {
-//             key: 'Referrer-Policy',
-//             value: 'strict-origin-when-cross-origin',
-//           },
-//           // Permissions policy (disable unused features)
-//           {
-//             key: 'Permissions-Policy',
-//             value:
-//               'camera=(), microphone=(), geolocation=(self), interest-cohort=()',
-//           },
-//           {
-//             key: 'Content-Security-Policy',
-//             value: csp,
-//           },
-//           // HSTS (production only)
-//           ...(isProduction
-//             ? [
-//                 {
-//                   key: 'Strict-Transport-Security',
-//                   value: 'max-age=31536000; includeSubDomains; preload',
-//                 },
-//               ]
-//             : []),
-//         ],
-//       },
-//     ];
-//   },
-// };
-
-// export default nextConfig;
