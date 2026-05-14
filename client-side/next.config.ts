@@ -15,16 +15,40 @@ const scriptSrc = [
 
 const csp = `
   default-src 'self';
+
   script-src ${scriptSrc};
+
   style-src 'self' 'unsafe-inline';
-  img-src 'self' data: blob: https://res.cloudinary.com https://img.youtube.com https://malamal.com.bd;
+
+  img-src
+    'self'
+    data:
+    blob:
+    https://res.cloudinary.com
+    https://img.youtube.com
+    https://malamal.com.bd
+
   font-src 'self' data:;
-  connect-src 'self' https://api.malamal.com.bd https://malamal.com.bd https://www.google-analytics.com https://www.googletagmanager.com https://cloudflareinsights.com; 
-  frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com;
+
+  connect-src
+    'self'
+    https://api.malamal.com.bd
+    https://malamal.com.bd
+    https://www.google-analytics.com
+    https://www.googletagmanager.com
+    https://cloudflareinsights.com
+    https://static.cloudflareinsights.com;
+
+  frame-src
+    'self'
+    https://www.youtube.com
+    https://www.youtube-nocookie.com;
+
   object-src 'none';
   base-uri 'self';
   form-action 'self';
   frame-ancestors 'none';
+
   ${isProduction ? 'upgrade-insecure-requests;' : ''}
 `
   .replace(/\s{2,}/g, ' ')
