@@ -54,7 +54,7 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "express-rate-limit": "^8.5.1",
+    "express-rate-limit": "^8.5.2",
     "helmet": "^8.1.0",
     "http-status": "^2.1.0",
     "jsonwebtoken": "^9.0.3",
@@ -65,7 +65,7 @@
     "otp-generator": "^4.0.1",
     "rate-limit-redis": "^5.0.0",
     "redis": "^5.12.1",
-    "undici": "^8.2.0",
+    "undici": "^8.3.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
@@ -76,7 +76,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.10",
     "@types/multer": "^2.1.0",
-    "@types/node": "^25.7.0",
+    "@types/node": "^25.8.0",
     "@types/nodemailer": "^8.0.0",
     "@types/os-utils": "^0.0.4",
     "@types/otp-generator": "^4.0.2",
