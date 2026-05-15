@@ -1,55 +1,57 @@
-import type { Metadata } from 'next';
-import { DashboardCouponsManager } from '@/components/dashboard/DashboardCouponsManager';
-import { requireDashboardRoles } from '@/lib/dashboard-auth';
-import { buildMetadata } from '@/lib/seo';
-import { getAllCoupons } from '@/services/Coupon/admin';
+// TODO: add coupons back
 
-export const metadata: Metadata = buildMetadata({
-  title: 'Coupons',
-  description: 'Create, update, and disable coupon offers.',
-  path: '/dashboard/admin/coupons',
-  noindex: true,
-});
+// import type { Metadata } from 'next';
+// import { DashboardCouponsManager } from '@/components/dashboard/DashboardCouponsManager';
+// import { requireDashboardRoles } from '@/lib/dashboard-auth';
+// import { buildMetadata } from '@/lib/seo';
+// import { getAllCoupons } from '@/services/Coupon/admin';
 
-export const dynamic = 'force-dynamic';
+// export const metadata: Metadata = buildMetadata({
+//   title: 'Coupons',
+//   description: 'Create, update, and disable coupon offers.',
+//   path: '/dashboard/admin/coupons',
+//   noindex: true,
+// });
 
-type Props = {
-  searchParams: Promise<{ page?: string; limit?: string; searchTerm?: string }>;
-};
+// export const dynamic = 'force-dynamic';
 
-const parsePositiveInteger = (value: string | undefined, fallback: number) => {
-  const parsed = Number(value);
+// type Props = {
+//   searchParams: Promise<{ page?: string; limit?: string; searchTerm?: string }>;
+// };
 
-  return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
-};
+// const parsePositiveInteger = (value: string | undefined, fallback: number) => {
+//   const parsed = Number(value);
 
-export default async function AdminCouponsPage({ searchParams }: Props) {
-  await requireDashboardRoles(['ADMIN', 'SUPER_ADMIN']);
-  const query = await searchParams;
-  const page = parsePositiveInteger(query.page, 1);
-  const limit = parsePositiveInteger(query.limit, 50);
-  const searchTerm = query.searchTerm?.trim() ?? '';
-  const couponsResult = await getAllCoupons({ page, limit, searchTerm }).catch(
-    () => null,
-  );
-  const coupons = Array.isArray(couponsResult?.data) ? couponsResult.data : [];
-  const paginationMeta = {
-    page: couponsResult?.meta?.page ?? page,
-    limit: couponsResult?.meta?.limit ?? limit,
-    total: couponsResult?.meta?.total ?? coupons.length,
-    totalPages:
-      couponsResult?.meta?.totalPages ??
-      (Math.ceil(coupons.length / limit) || 1),
-  };
+//   return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
+// };
 
-  return (
-    <DashboardCouponsManager
-      key={`${page}-${limit}-${searchTerm}`}
-      coupons={coupons}
-      paginationMeta={paginationMeta}
-      searchTerm={searchTerm}
-      title="Coupons"
-      description="Create and manage coupon codes, expiry dates, and activation state."
-    />
-  );
-}
+// export default async function AdminCouponsPage({ searchParams }: Props) {
+//   await requireDashboardRoles(['ADMIN', 'SUPER_ADMIN']);
+//   const query = await searchParams;
+//   const page = parsePositiveInteger(query.page, 1);
+//   const limit = parsePositiveInteger(query.limit, 50);
+//   const searchTerm = query.searchTerm?.trim() ?? '';
+//   const couponsResult = await getAllCoupons({ page, limit, searchTerm }).catch(
+//     () => null,
+//   );
+//   const coupons = Array.isArray(couponsResult?.data) ? couponsResult.data : [];
+//   const paginationMeta = {
+//     page: couponsResult?.meta?.page ?? page,
+//     limit: couponsResult?.meta?.limit ?? limit,
+//     total: couponsResult?.meta?.total ?? coupons.length,
+//     totalPages:
+//       couponsResult?.meta?.totalPages ??
+//       (Math.ceil(coupons.length / limit) || 1),
+//   };
+
+//   return (
+//     <DashboardCouponsManager
+//       key={`${page}-${limit}-${searchTerm}`}
+//       coupons={coupons}
+//       paginationMeta={paginationMeta}
+//       searchTerm={searchTerm}
+//       title="Coupons"
+//       description="Create and manage coupon codes, expiry dates, and activation state."
+//     />
+//   );
+// }

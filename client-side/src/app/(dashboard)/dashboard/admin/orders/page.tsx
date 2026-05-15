@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { requireDashboardRoles } from '@/lib/dashboard-auth';
+import type { OrderStatus } from '@/lib/order-status';
 import { buildMetadata } from '@/lib/seo';
 import { getAllOrdersForAdmin, updateOrderStatus } from '@/services/Order';
 import { DashboardOrdersManager } from '@/components/dashboard/DashboardOrdersManager';
@@ -42,11 +43,7 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
     'use server';
 
     const orderId = String(formData.get('orderId') ?? '');
-    const status = String(formData.get('status') ?? '') as
-      | 'PLACED'
-      | 'PROCESSING'
-      | 'DELIVERED'
-      | 'CANCELLED';
+    const status = String(formData.get('status') ?? '') as OrderStatus;
 
     await updateOrderStatus(orderId, status);
   }

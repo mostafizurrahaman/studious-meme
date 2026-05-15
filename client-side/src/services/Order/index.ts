@@ -1,6 +1,7 @@
 'use server';
 
 import { requestBackendJson } from '@/lib/backend-api';
+import type { OrderStatus } from '@/lib/order-status';
 import {
   getValidAccessTokenForServerActions,
   getValidAccessTokenForServerHandlerGet,
@@ -52,8 +53,15 @@ export type BackendOrder = {
   total: number;
   couponCode?: string;
   paymentMethod: 'CASH_ON_DELIVERY' | 'PORTPOS';
-  paymentStatus: 'UNPAID' | 'PENDING' | 'PAID' | 'FAILED' | 'CANCELLED';
-  status: 'PLACED' | 'PROCESSING' | 'DELIVERED' | 'CANCELLED';
+  paymentStatus:
+    | 'UNPAID'
+    | 'PENDING'
+    | 'PENDING_PAYMENT'
+    | 'PAID'
+    | 'FAILED'
+    | 'CANCELLED'
+    | 'REFUNDED';
+  status: OrderStatus;
   transactionId?: string;
   paymentUrl?: string;
   gatewayUrl?: string;

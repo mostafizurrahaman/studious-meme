@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/table';
 import { TablePagination } from '@/components/ui/table-pagination';
 import { formatDashboardDate } from '@/lib/formatDate';
+import { ORDER_STATUS_OPTIONS } from '@/lib/order-status';
 import type { BackendOrder } from '@/services/Order';
 
 export function DashboardOrdersManager({
@@ -148,13 +149,11 @@ export function DashboardOrdersManager({
                       defaultValue={order.status}
                       className="h-9 rounded-md border border-input bg-background px-3 text-sm"
                     >
-                      {['PLACED', 'PROCESSING', 'DELIVERED', 'CANCELLED'].map(
-                        (status) => (
-                          <option key={status} value={status}>
-                            {status}
-                          </option>
-                        ),
-                      )}
+                      {ORDER_STATUS_OPTIONS.map((status) => (
+                        <option key={status} value={status}>
+                          {status}
+                        </option>
+                      ))}
                     </select>
                     <Button size="sm" type="submit">
                       Update

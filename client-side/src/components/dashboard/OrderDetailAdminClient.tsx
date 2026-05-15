@@ -2,12 +2,24 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatMoney } from '@/lib/cart';
 import { formatDashboardDate } from '@/lib/formatDate';
+import type { OrderStatus } from '@/lib/order-status';
 import type { BackendOrder } from '@/services/Order';
+
+const ORDER_TIMELINE: Array<{
+  key: Exclude<OrderStatus, 'CANCELLED'>;
+  label: string;
+}> = [
+  { key: 'PLACED', label: 'Placed' },
+  { key: 'PENDING_PAYMENT', label: 'Pending payment' },
+  { key: 'CONFIRMED', label: 'Confirmed' },
+  { key: 'PROCESSING', label: 'Processing' },
+  { key: 'SHIPPED', label: 'Shipped' },
+  { key: 'DELIVERED', label: 'Delivered' },
+];
 
 export function OrderDetailAdminClient({
   order,
@@ -16,21 +28,14 @@ export function OrderDetailAdminClient({
   order: BackendOrder | null;
   backHref?: string;
 }) {
-  const timeline = useMemo(
-    () => [
-      { key: 'PLACED', label: 'Placed' },
-      { key: 'PROCESSING', label: 'Processing' },
-      { key: 'DELIVERED', label: 'Delivered' },
-    ],
-    [],
-  );
-
   if (!order) {
     return <div className="p-4 text-muted-foreground">Order not found</div>;
   }
 
   const activeIndex =
-    order.status === 'DELIVERED' ? 2 : order.status === 'PROCESSING' ? 1 : 0;
+    order.status === 'CANCELLED'
+      ? -1
+      : ORDER_TIMELINE.findIndex((step) => step.key === order.status);
 
   return (
     <div className="space-y-6">
@@ -64,8 +69,8 @@ export function OrderDetailAdminClient({
       </div>
 
       {/* Timeline */}
-      <div className="grid gap-3 sm:grid-cols-3">
-        {timeline.map((step, index) => {
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {ORDER_TIMELINE.map((step, index) => {
           const isActive = index <= activeIndex;
           return (
             <div
