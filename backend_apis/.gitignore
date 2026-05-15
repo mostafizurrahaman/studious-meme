@@ -149,7 +149,7 @@ public/
 
 
 package-lock.json
-pnpm-lock.yaml
+# pnpm-lock.yaml
 bun.lock
 yarn.lock
 .vscode
