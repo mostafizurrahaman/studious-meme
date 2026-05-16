@@ -904,18 +904,12 @@ export function buildProductSchemas(product: {
         {
           '@type': 'ListItem',
           position: 2,
-          name: 'Shop',
-          item: absoluteUrl('/shop'),
-        },
-        {
-          '@type': 'ListItem',
-          position: 3,
           name: product.category,
           item: categoryUrl,
         },
         {
           '@type': 'ListItem',
-          position: 4,
+          position: 3,
           name: product.title,
           item: url,
         },

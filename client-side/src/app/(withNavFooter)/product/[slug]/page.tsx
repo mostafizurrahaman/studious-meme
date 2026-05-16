@@ -120,6 +120,9 @@ export default async function ProductPage({ params }: Props) {
       productQuestionsResult?.meta?.totalPages ??
       (Math.ceil(answeredQuestions.length / 5) || 1),
   };
+  const categoryHref = product.categorySlug?.trim()
+    ? `/category/${product.categorySlug.trim()}`
+    : `/shop?c=${encodeURIComponent(product.category)}`;
 
   return (
     <>
@@ -131,8 +134,8 @@ export default async function ProductPage({ params }: Props) {
               Home
             </Link>{' '}
             /{' '}
-            <Link href="/shop" className="hover:text-primary">
-              Shop
+            <Link href={categoryHref} className="hover:text-primary">
+              {product.category}
             </Link>{' '}
             / {product.title}
           </nav>
