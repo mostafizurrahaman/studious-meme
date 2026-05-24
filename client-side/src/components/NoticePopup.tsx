@@ -49,16 +49,16 @@ export function NoticePopup() {
 
   return (
     <div
-      className="fixed inset-0 z-100 flex items-center justify-center bg-black/60 px-4 py-8 sm:py-10"
+      className="fixed inset-0 z-100 flex items-center justify-center bg-black/60 p-3 sm:p-6"
       role="dialog"
       aria-modal="true"
       aria-label="Notice"
     >
-      <div className="relative max-h-[calc(100vh-4rem)] overflow-hidden rounded-lg shadow-2xl sm:max-h-[calc(100vh-5rem)]">
+      <div className="relative w-[min(96vw,calc((100dvh-1.5rem)*0.8),900px)] overflow-hidden rounded-lg shadow-2xl sm:w-[min(90vw,calc((100dvh-3rem)*0.8),900px)]">
         <button
           type="button"
           onClick={closeNotice}
-          className="absolute right-3 top-3 z-10 inline-flex size-9 items-center justify-center rounded-full bg-background/95 text-foreground shadow-md transition hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          className="absolute right-3 top-3 z-10 inline-flex size-10 items-center justify-center rounded-full bg-background/95 text-foreground shadow-md transition hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           aria-label="Close notice"
         >
           <X className="size-5" aria-hidden="true" />
@@ -67,11 +67,11 @@ export function NoticePopup() {
         <Image
           src={noticeImage}
           alt="Notice"
-          height={400}
-          width={800}
-          className="h-auto max-h-[calc(100vh-4rem)] w-auto max-w-[calc(100vw-2rem)] object-contain sm:max-h-[calc(100vh-5rem)]"
+          height={1350}
+          width={1080}
+          className="block h-auto w-full object-contain"
           priority
-          sizes="(max-width: 768px) calc(100vw - 32px), 768px"
+          sizes="(max-width: 640px) 96vw, (max-width: 1024px) 90vw, 900px"
         />
       </div>
     </div>
