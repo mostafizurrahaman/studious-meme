@@ -8,7 +8,7 @@ import { GoogleAnalytics } from '@/components/GoogleAnalytics';
 import { GoogleTagManager } from '@/components/GoogleTagManager';
 import { NetworkStatusGate } from '@/components/NetworkStatusGate';
 import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistration';
-import { NoticePopup } from '@/components/NoticePopup';
+// import { NoticePopup } from '@/components/NoticePopup';
 import { siteMetadata, siteSchemas } from '@/lib/seo';
 import { cn } from '@/lib/utils';
 import { Toaster } from 'sonner';
@@ -65,7 +65,7 @@ export default function RootLayout({
 
           {children}
           <NetworkStatusGate />
-          <NoticePopup />
+          {/* <NoticePopup /> */}
         </UserProvider>
       </body>
     </html>
