@@ -842,7 +842,7 @@ function readLogFile(): {
       // Robustly handle multiple JSON objects on the same line or concatenated
       const normalizedData = responseLogData.replace(/\}[\s]*\{/g, '}\n{');
 
-      normalizedData.split('\n').forEach((entry) => {
+      normalizedData.split('\n').forEach(entry => {
         if (!entry.trim()) return;
 
         try {
@@ -880,7 +880,7 @@ function readLogFile(): {
       // Robustly handle multiple JSON objects on the same line or concatenated
       const normalizedErrorData = errorLogData.replace(/\}[\s]*\{/g, '}\n{');
 
-      normalizedErrorData.split('\n').forEach((entry) => {
+      normalizedErrorData.split('\n').forEach(entry => {
         if (!entry.trim()) return;
         try {
           const log = JSON.parse(entry);
@@ -913,7 +913,7 @@ function readLogFile(): {
 }
 
 async function generateCpuUsageHtml(): Promise<string> {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     osUtils.cpuUsage((usage: number) => {
       const totalCores = os.cpus().length;
       const cpuUsagePercentage = usage * 100;
@@ -956,7 +956,7 @@ function generateErrorLogTable(errorLogs: ErrorLogEntry[]): string {
       <tbody>
   `;
 
-  errorLogs.forEach((log) => {
+  errorLogs.forEach(log => {
     tableHtml += `
       <tr>
         <td>${log.timestamp}</td>
@@ -993,7 +993,7 @@ function generateResponseTimeTable(
       <tbody>
   `;
 
-  responseTimeLogs.forEach((log) => {
+  responseTimeLogs.forEach(log => {
     const labelClass = `bg-${log.label.toLowerCase()}`;
     tableHtml += `
       <tr>
@@ -1036,11 +1036,11 @@ async function serverHomePage(): Promise<string> {
       chartLabels: responseTimeLogs
         .slice(0, 20)
         .reverse()
-        .map((l) => l.timestamp.split(', ')[1]),
+        .map(l => l.timestamp.split(', ')[1]),
       chartData: responseTimeLogs
         .slice(0, 20)
         .reverse()
-        .map((l) => l.responseTime),
+        .map(l => l.responseTime),
     }),
   ).toString('base64');
 
@@ -1528,11 +1528,11 @@ export function getMonitorStats() {
     chartLabels: responseTimeLogs
       .slice(0, 20)
       .reverse()
-      .map((l) => l.timestamp.split(', ')[1]),
+      .map(l => l.timestamp.split(', ')[1]),
     chartData: responseTimeLogs
       .slice(0, 20)
       .reverse()
-      .map((l) => l.responseTime),
+      .map(l => l.responseTime),
     errorLogs: errorLogs.slice(0, 50000), // Limit for real-time
     responseTimeLogs: responseTimeLogs.slice(0, 50000), // Limit for real-time
   };
