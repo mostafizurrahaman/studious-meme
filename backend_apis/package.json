@@ -5,9 +5,9 @@
   "license": "UNLICENSED",
   "main": "server.ts",
   "author": {
-    "name": "Khaled Siddique",
-    "email": "khaledssbd@gmail.com",
-    "url": "https://khaled-siddique.vercel.app"
+    "name": "Mostafizur Rahaman",
+    "email": "mostafizurrahaman0401@gmail.com",
+    "url": "https://mostafizur-rahaman-portfolio.web.app"
   },
   "description": "Malamal: A high-performance, mobile-first e-commerce and price comparison engine. Built with the MERN stack and Next.js, it enables users to discover real-time deals and compare product prices across various retailers to maximize savings.",
   "keywords": [
